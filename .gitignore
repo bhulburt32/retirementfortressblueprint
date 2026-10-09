@@ -1,6 +1,5 @@
 node_modules/
 dist/
 *.png
-*.jpg
-*.jpeg
-.DS_Store
+!assets/**/*.png
+guide-print.html

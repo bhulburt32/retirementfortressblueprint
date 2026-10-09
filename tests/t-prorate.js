@@ -1,0 +1,20 @@
+const { chromium } = (function(){ try { return require('playwright'); } catch(e){ return require('playwright-core'); } })();
+const path = require('path');
+(async()=>{
+  const b=await chromium.launch(process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH} : {});
+  const p=await b.newPage({viewport:{width:1400,height:900}});
+  const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
+  await p.goto('file://'+path.resolve(__dirname,'../dist/preview.html'),{waitUntil:'load'}); await p.waitForTimeout(800);
+  await p.click('#expandAll'); await p.waitForTimeout(300);
+  const row=async(n)=>p.$eval('#incSrcTable tbody tr:nth-child('+n+')',e=>e.textContent.replace(/\s+/g,' ').trim());
+  console.log('prepDate:', await p.$eval('#prepDate',e=>e.value));
+  console.log('2026 row:', (await row(1)).slice(0,200));
+  console.log('2027 row:', (await row(2)).slice(0,200));
+  console.log('sq assume:', (await p.$eval('#sqAssume',e=>e.textContent)).match(/first year[^.]*\./)?.[0]);
+  console.log('asset assume:', (await p.$eval('#assetAssume',e=>e.textContent)).match(/The first year[^.]*\./)?.[0]);
+  await p.fill('#prepDate','2026-01-15'); await p.$eval('#prepDate',e=>e.dispatchEvent(new Event('input',{bubbles:true}))); await p.waitForTimeout(400);
+  console.log('Jan prep 2026 row:', (await row(1)).slice(0,120));
+  await p.fill('#prepDate','2026-07-01'); await p.$eval('#prepDate',e=>e.dispatchEvent(new Event('input',{bubbles:true}))); await p.waitForTimeout(400);
+  console.log('Jul prep 2026 row:', (await row(1)).slice(0,120));
+  console.log('ERRORS:', errs.length?errs:'none'); await b.close();
+})();
