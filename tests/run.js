@@ -11,6 +11,7 @@ const SUITE = [
   't-qcd',       // qualified charitable distributions
   't-rmd',       // RMD comparison chart
   't-scn',       // scenarios A/B/C
+  't-scncmp',    // the three scenarios on one chart + the comparison page of the report
   't-sens',      // sensitivity analysis
   't-prorate',   // first-year proration
   't-anngroup',  // annuity contracts combined by To account

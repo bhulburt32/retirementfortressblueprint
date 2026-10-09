@@ -171,6 +171,9 @@
   .scn-card-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;background:var(--scn-bg);font-size:13.5px;flex-wrap:wrap}
   .scn-card-foot label{display:inline-flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
   .scn-card-foot button{background:var(--scn);border-color:var(--scn);color:#fff}
+  .scn-cmp{margin-top:18px;padding-top:16px;border-top:1px dashed var(--line-strong)}
+  .scn-cmp h4{margin:0 0 4px;font-size:15px;color:var(--ink)}
+  .scn-cmp .scn-cmp-sub{font-size:13px;color:var(--muted);margin:0 0 10px}
   .scn-viewing{font-weight:700;color:var(--scn)}
   .sec-note{color:var(--muted);font-size:15.5px;margin:2px 0 18px;max-width:74ch}
 
@@ -1525,6 +1528,16 @@
         <span class="bkt-cust">Each scenario carries its own transfers, annuity income, LTC benefits, Roof growth, Walls assumptions, withdrawal order and Roth strategy &middot; sections 14&ndash;20 show the one being viewed</span></div>
       <div class="panel-pad" style="padding-top:14px">
         <div class="scn-grid" id="scnGrid"></div>
+        <div class="scn-cmp" id="scnCmp">
+          <h4>Projected assets under each scenario</h4>
+          <p class="scn-cmp-sub">The total of the accounts at the end of each year, through the end of plan, with the three scenarios on one chart. Hover for the figures in any year.</p>
+          <div class="pj-legend" id="scnCmpLegend"></div>
+          <div class="pj-wrap">
+            <svg id="scnCmpSvg" class="pj" viewBox="0 0 1000 360" role="img" aria-label="Projected total assets by year, one line per scenario"></svg>
+            <div id="scnCmpTip" class="pj-tip" hidden></div>
+          </div>
+          <p class="hint" id="scnCmpNote" style="margin-top:10px"></p>
+        </div>
       </div>
     </div>
     <div class="panel">
@@ -10236,7 +10249,8 @@
       var AS = annuitySummary(r), MC = moatContracts(r);
       var S = scnFor(k);
       var n = (S.adjMoves ? S.adjMoves.length : 0);
-      return {r:r, funded:r.funded, annuity:AS.total, gR:effGrowth(r).r, moatBenefit:MC.reduce(function(a, c){ return a + (c.benefit || 0); }, 0),
+      return {r:r, funded:r.funded, rows:TX.rows, N:TX.N, lastRet:TX.lastRet || 0, protectedAmt:r.funded.foundation + r.funded.moat,
+              annuity:AS.total, gR:effGrowth(r).r, moatBenefit:MC.reduce(function(a, c){ return a + (c.benefit || 0); }, 0),
               converted:TX.convTotal || 0, rothOn:!!cfg.apply, tax:TX.lifetime + TX.lifetimeState, end:last.layers.total, endYear:last.year, dep:dep,
               adjusted:!!S.adjMoves, lines:n, wd:(S.wdOrder || WD_DEFAULT).map(function(t){ return ({taxable:'Taxable', deferred:'Tax-deferred', roth:'Roth'})[t] || t; }).join(' \u2192 ')};
     });
@@ -10244,7 +10258,7 @@
   function renderScenarioBar(){
     scnChrome();
     var grid = $('scnGrid'); if(!grid) return;
-    if(!accounts.length){ grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1">Add the client’s accounts in section 06 and the three scenarios appear here side by side.</div>'; return; }
+    if(!accounts.length){ grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1">Add the client’s accounts in section 06 and the three scenarios appear here side by side.</div>'; renderScenarioCompare(null); return; }
     var M = [0, 1, 2].map(scnMetrics);
     var rows = [
       ['Foundation', function(m){ return money(m.funded.foundation); }],
@@ -10279,6 +10293,83 @@
       var vb = card.querySelector('[data-scn-view]'); vb.hidden = on; vb.textContent = 'View ' + scnNames[k];
       card.querySelector('input[name="scnReport"]').checked = k === reportScn;
     });
+    renderScenarioCompare(M);
+  }
+  /* ---- the three scenarios on one chart: the total of the accounts by year, one line each ---- */
+  function scnCompareFacts(M){
+    M = M || [0, 1, 2].map(scnMetrics);
+    var N = Math.min.apply(null, M.map(function(m){ return m.rows.length; })) - 1;
+    var series = M.map(function(m){ return m.rows.slice(0, N + 1).map(function(x){ return x.layers.total; }); });
+    var same = M.map(function(m, k){                      // the first earlier scenario this one repeats, if any
+      for(var j = 0; j < k; j++){
+        if(Math.abs(M[j].tax - m.tax) < 0.5 && Math.abs(M[j].protectedAmt - m.protectedAmt) < 0.5
+           && series[j].every(function(v, t){ return Math.abs(v - series[k][t]) < 0.5; })) return j;
+      }
+      return -1;
+    });
+    var ends = M.map(function(m){ return m.dep ? 0 : m.end; });
+    var hi = ends.indexOf(Math.max.apply(null, ends)), lo = ends.indexOf(Math.min.apply(null, ends));
+    return {M:M, N:N, series:series, same:same, differ:same.some(function(x, k){ return k > 0 && x < 0; }), hi:hi, lo:lo, spread:ends[hi] - ends[lo]};
+  }
+  /* one scenario's settings in a phrase */
+  function scnPhrase(m){
+    return (m.adjusted ? m.lines + ' adjusted transfer line' + (m.lines === 1 ? '' : 's') : 'the model’s own transfers')
+      + ' · Roth conversions ' + (m.rothOn ? (m.converted > 0.5 ? money(m.converted) : 'none fit') : 'off') + ' · ' + m.wd;
+  }
+  var scnCmpM = null;                                   // the metrics behind the chart, for a redraw on rename
+  function renderScenarioCompare(M){
+    var box = $('scnCmp'), svgEl = $('scnCmpSvg'); if(!box || !svgEl) return;
+    scnCmpM = M;
+    if(!M){ box.hidden = true; return; }
+    box.hidden = false;
+    var CM = scnCompareFacts(M), N = CM.N, rows0 = M[0].rows;
+    var W = 1000, H = 360, L = 74, R = 112, Tp = 26, B = 56, pw = W - L - R, ph = H - Tp - B;
+    var slot = pw / (N + 1), Xc = function(t){ return L + slot * (t + 0.5); };
+    var ymax = Math.max.apply(null, CM.series.map(function(sr){ return Math.max.apply(null, sr); })); ymax = ymax > 0 ? ymax * 1.08 : 100000;
+    var step = Math.pow(10, Math.floor(Math.log(ymax) / Math.LN10)); if(ymax / step < 3) step /= 2; if(ymax / step > 7) step *= 2;
+    var Yf = function(v){ return Tp + ph - ph * Math.max(0, Math.min(v, ymax)) / ymax; };
+    var svg = '';
+    var lastRet = M[0].lastRet;
+    if(lastRet > 0 && lastRet <= N){ var xr = Xc(lastRet) - slot / 2; svg += '<rect x="' + xr.toFixed(1) + '" y="' + Tp + '" width="' + (L + pw - xr).toFixed(1) + '" height="' + ph + '" fill="var(--surface-2)"/><text x="' + (xr + 5).toFixed(1) + '" y="' + (Tp + 13) + '" class="pj-band">retired</text>'; }
+    for(var v = 0; v <= ymax; v += step) svg += '<line x1="' + L + '" x2="' + (L + pw) + '" y1="' + Yf(v).toFixed(1) + '" y2="' + Yf(v).toFixed(1) + '" stroke="var(--line)"/><text x="' + (L - 8) + '" y="' + (Yf(v) + 4).toFixed(1) + '" text-anchor="end" class="pj-tick">' + fmtKM(v) + '</text>';
+    for(var t = 0; t <= N; t += 5){ var x = rows0[t]; svg += '<text x="' + Xc(t).toFixed(1) + '" y="' + (Tp + ph + 18) + '" text-anchor="middle" class="pj-tick">' + x.year + '</text><text x="' + Xc(t).toFixed(1) + '" y="' + (Tp + ph + 33) + '" text-anchor="middle" class="pj-tick muted">age ' + x.ages.join(' / ') + '</text>'; }
+    var labels = [], order = [0, 1, 2].filter(function(k){ return CM.same[k] < 0; }).concat([0, 1, 2].filter(function(k){ return CM.same[k] >= 0; }));   // repeats drawn last, dashed, so both show
+    order.forEach(function(k){
+      var sr = CM.series[k], meta = SCN_META[k], dup = CM.same[k] >= 0, m = M[k];
+      var d = sr.map(function(val, t){ return (t ? 'L' : 'M') + Xc(t).toFixed(1) + ',' + Yf(val).toFixed(1); }).join('');
+      svg += '<path d="' + d + '" fill="none" stroke="' + meta.color + '" stroke-width="' + (dup ? 2.5 : 3) + '" stroke-linejoin="round" stroke-linecap="round"' + (dup ? ' stroke-dasharray="7 7"' : '') + ' opacity=".95"/>';
+      if(!dup) labels.push({k:k, y:Yf(sr[N]), t:m.dep ? 'run out ' + m.dep.year : fmtKM(m.end), who:[k].concat([0, 1, 2].filter(function(j){ return CM.same[j] === k; })).map(function(j){ return SCN_META[j].letter; }).join(', ')});
+    });
+    labels.sort(function(a, b){ return a.y - b.y; });
+    for(var i = 1; i < labels.length; i++) if(labels[i].y - labels[i - 1].y < 15) labels[i].y = labels[i - 1].y + 15;
+    var over = labels.length ? labels[labels.length - 1].y - (Tp + ph) : 0; if(over > 0) labels.forEach(function(lb){ lb.y -= over; });
+    labels.forEach(function(lb){ svg += '<text x="' + (Xc(N) + 9).toFixed(1) + '" y="' + (lb.y + 4).toFixed(1) + '" class="pj-label" style="fill:' + SCN_META[lb.k].color + '">' + lb.who + ' ' + lb.t + '</text>'; });
+    svg += '<line id="scnCmpCross" x1="0" x2="0" y1="' + Tp + '" y2="' + (Tp + ph) + '" stroke="var(--ink)" stroke-width="1" opacity="0"/>';
+    svgEl.innerHTML = svg;
+    $('scnCmpLegend').innerHTML = M.map(function(m, k){
+      var dup = CM.same[k];
+      return '<span class="pj-key"><i style="border-color:' + SCN_META[k].color + (dup >= 0 ? ';border-top-style:dashed' : '') + '"></i>' + esc(scnNames[k])
+        + ' <small>' + (dup >= 0 ? 'same as ' + esc(scnNames[dup]) : (m.adjusted ? m.lines + ' adjusted line' + (m.lines === 1 ? '' : 's') : 'the model’s own proposal')) + '</small></span>';
+    }).join('') + '<span class="pj-key"><small>labels: the ending balance, or the year the accounts run out</small></span>';
+    var tip = $('scnCmpTip'), cross = $('scnCmpCross');
+    svgEl.onmousemove = function(ev){
+      var rect = svgEl.getBoundingClientRect(), fx = (ev.clientX - rect.left) / rect.width * W;
+      var n = Math.max(0, Math.min(N, Math.floor((fx - L) / slot))), x = rows0[n]; if(!x) return;
+      cross.setAttribute('x1', Xc(n).toFixed(1)); cross.setAttribute('x2', Xc(n).toFixed(1)); cross.setAttribute('opacity', '.5');
+      tip.hidden = false;
+      tip.innerHTML = '<b>' + x.year + ' · age ' + x.ages.join(' / ') + '</b>' + M.map(function(m, k){
+        var row = m.rows[n];
+        return '<div><span style="color:' + SCN_META[k].color + '">' + esc(scnNames[k]) + '</span><span>' + (row.unfunded > 0.5 ? 'unfunded ' + money(row.unfunded) : money(row.layers.total)) + '</span></div>';
+      }).join('');
+      var px = ev.clientX - rect.left, left = px + 14; if(left + 250 > rect.width) left = px - 264;
+      tip.style.left = left + 'px'; tip.style.top = Math.max(0, (ev.clientY - rect.top) - 30) + 'px';
+    };
+    svgEl.onmouseleave = function(){ tip.hidden = true; cross.setAttribute('opacity', '0'); };
+    $('scnCmpNote').innerHTML = M.map(function(m, k){
+      var dup = CM.same[k];
+      return '<b>' + esc(scnNames[k]) + '</b> ' + (dup >= 0 ? 'is the same as ' + esc(scnNames[dup]) + '.'
+        : '(' + scnPhrase(m) + ') ' + (m.dep ? 'runs out in <b>' + m.dep.year + '</b>' : 'ends ' + m.endYear + ' with <b>' + money(m.end) + '</b>') + ', with ' + money(m.tax) + ' of lifetime income tax and ' + money(m.protectedAmt) + ' placed in the Foundation and Moat.');
+    }).join(' ') + (CM.differ ? ' The executive summary carries this comparison on its own page, after the stress tests.' : ' The three scenarios are identical, so the executive summary leaves the comparison page out.');
   }
   /* the case file: every scenario, and which is showing / reported */
   function scnSerialize(S){
@@ -10912,7 +11003,7 @@
   $('nitroAnalyze').addEventListener('click', function(){ var t = $('nitroText').value.trim(); if(!t){ $('nitroMsg').textContent = 'Upload the report or paste its text first.'; return; } nitroAnalyze(t, nitro ? nitro.name : 'Pasted report text'); });
   $('nitroClear').addEventListener('click', function(){ nitro = null; $('nitroText').value = ''; $('nitroMsg').textContent = 'Cleared.'; renderNitro(); $('caseJson').value = caseData(); });
   $('scnTabs').addEventListener('click', function(e){ var b = e.target.closest('[data-scn]'); if(b) switchScenario(+b.getAttribute('data-scn')); });
-  $('scnName').addEventListener('input', function(){ scnNames[activeScn] = this.value.trim().slice(0, 40) || ('Scenario ' + SCN_META[activeScn].letter); scnChrome(); $('caseJson').value = caseData(); });
+  $('scnName').addEventListener('input', function(){ scnNames[activeScn] = this.value.trim().slice(0, 40) || ('Scenario ' + SCN_META[activeScn].letter); scnChrome(); if(scnCmpM) renderScenarioCompare(scnCmpM); $('caseJson').value = caseData(); });
   $('scnCopyTo').addEventListener('change', function(){ var to = this.value; if(to === '') return; copyScenario(activeScn, +to); this.value = ''; });
   $('scnGrid').addEventListener('click', function(e){ var b = e.target.closest('[data-scn-view]'); if(b) switchScenario(+b.getAttribute('data-scn-view')); });
   $('scnGrid').addEventListener('change', function(e){ if(e.target.name === 'scnReport'){ reportScn = +e.target.value; scnChrome(); $('caseJson').value = caseData(); } });
@@ -11876,6 +11967,23 @@
     });
   }
 
+  /* report page: the three scenarios compared — the chart from section 14 and a tile per scenario */
+  function scnDeckPage(s, frame, CM){
+    var M = CM.M, names = scnNames.map(function(n){ return n.length > 30 ? n.slice(0, 29) + '…' : n; });
+    frame(s, '', 'Three Ways to Build the Fortress, Compared');
+    var repeats = [0, 1, 2].filter(function(k){ return CM.same[k] >= 0; });
+    dkBody(s, 0.9, 1.95, 18.2, 1.1, 'Each scenario builds the Fortress from the same household in a different way — its own transfers, annuity income, long term care benefit, withdrawal order and Roth conversion strategy — and the chart follows the total value of the accounts under each, year by year, through the end of plan. '
+      + (repeats.length ? repeats.map(function(k){ return names[k] + ' is the same as ' + names[CM.same[k]]; }).join('; ') + '. ' : '')
+      + 'The pages that follow are built from ' + names[reportScn] + '.', {sz:16});
+    dkAppLegend(s, 1.0, 3.15, 12.6, 'scnCmpLegend');
+    if(!dkSvg(s, 0.9, 4.15, 12.7, 5.75, 'scnCmpSvg')) dkBody(s, 0.9, 3.9, 12.6, 1, 'The comparison chart is not available for this case.', {sz:16, i:true});
+    M.forEach(function(m, k){
+      dkTile(s, 14.0, 3.15 + k * 1.7, 5.1, 1.6, names[k], m.dep ? 'Run out ' + m.dep.year : money(m.end),
+             'Lifetime tax ' + fmtKM(m.tax) + ' · Roth ' + (m.rothOn ? (m.converted > 0.5 ? fmtKM(m.converted) : 'none fit') : 'off'),
+             {big:22, valueColor:m.dep ? DECK_C.red : SCN_META[k].color.replace('#', '')});
+    });
+    dkTile(s, 14.0, 8.25, 5.1, 1.65, 'Spread at the end of plan', money(CM.spread), 'Highest less lowest ending balance', {big:22});
+  }
   /* report page: the three care-event projections of section 06 or 17, side by side */
   function ltcDeckPage(s, frame, r, mode, baseX, title){
     frame(s, '', title);
@@ -12525,6 +12633,8 @@
     /* 23b. projected assets with the Fortress and a long term care event */
     if(ltcScenarios(r).scenarios.length){ page++; ltcDeckPage(doc.slide(), frame, r, 'plan', TX, 'With the Fortress in Place, If Long Term Care Is Needed'); }
     sensDefs(r, TX.income || projectIncome(r)).forEach(function(d){ page++; sensDeckSlide(doc.slide(), frame, r, TX, d); });
+    /* 23c. the three scenarios compared — only when they differ */
+    (function(){ var CM = scnCompareFacts(); if(CM.differ){ page++; scnDeckPage(doc.slide(), frame, CM); } })();
 
     /* 24. transfer sequence — two slides (or more): first the consolidation, line by line, then
        the protected pieces in detail — each Foundation annuity contract and each LTC contract
