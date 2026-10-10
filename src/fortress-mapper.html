@@ -8,6 +8,7 @@
     /* Alto's palette, shared with the risk profile questionnaire: navy, gold and red on a
        cool grey page; the Fortress level colours below are the same on every report. */
     --navy:#1F3162;
+    --navy-text:#1F3162;      /* navy used as a text colour: white in the dark theme */
     --bg:#F5F6F9;
     --surface:#FFFFFF;
     --surface-2:#EEF1F8;
@@ -34,12 +35,12 @@
     --shadow:0 1px 2px rgba(20,29,38,.06), 0 8px 24px -12px rgba(20,29,38,.18);
     --radius:6px;
   }
-  /* The page opens light for everyone. Dark is available, but only when the
-     advisor asks for it with the theme button — the system preference does
-     not decide, so a client looking over a shoulder always sees the same
-     thing the advisor set up. */
+  /* The page opens dark; the theme button switches to light and the choice is
+     remembered in this browser. The system preference does not decide, so a
+     client looking over a shoulder always sees the same thing the advisor set up. */
   :root[data-theme="dark"]{
     color-scheme:dark;
+    --navy-text:#FFFFFF;
     --bg:#10162A;
     --surface:#182140;
     --surface-2:#1F2A52;
@@ -723,7 +724,7 @@
   .risk-item.on{background:var(--st-alert-bg);border-color:var(--st-alert)}
   .risk-item input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--navy)}
   .risk-item b{display:block;font-size:15px;color:var(--ink);font-weight:600}
-  .risk-item b .fig{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--navy)}
+  .risk-item b .fig{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--navy-text)}
   .risk-item small{display:block;font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.35}
   .risk-item small.sug{color:var(--st-alert);font-weight:600}
   .risk-custom{display:grid;gap:8px;margin-top:14px}
@@ -748,6 +749,9 @@
   .rq-opt{display:flex;gap:10px;align-items:flex-start;padding:8px 11px;border:1px solid var(--line);border-radius:4px;cursor:pointer;font-size:14px;background:var(--surface)}
   .rq-opt:hover{border-color:var(--line-strong)}
   .rq-opt.on{background:var(--surface-2);border-color:var(--navy)}
+  .rq-opt.auto{border-style:dashed}
+  .rq-q .rq-auto{color:var(--st-ok);font-size:12.5px;margin:8px 0 0}
+  .rq-q .rq-auto.over{color:var(--muted)}
   .rq-opt input{width:16px;height:16px;margin:3px 0 0;accent-color:var(--navy);flex:none}
   .rq-opt .ol{min-width:0;flex:1}
   .rq-opt .os{display:block;font-size:12.5px;color:var(--muted);font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
@@ -755,8 +759,8 @@
   .rq-opt .range .dn{color:var(--st-alert)} .rq-opt .range .up{color:var(--st-ok)}
   .rq-panel{position:sticky;top:16px;background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--navy);border-radius:var(--radius);padding:16px 18px}
   .rq-panel .eyebrow{margin:0 0 4px}
-  .rq-big{font-family:Bitter,Georgia,serif;font-size:56px;line-height:1;color:var(--navy);font-variant-numeric:tabular-nums}
-  .rq-band{display:inline-block;margin-top:8px;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:var(--surface-2);color:var(--navy)}
+  .rq-big{font-family:Bitter,Georgia,serif;font-size:56px;line-height:1;color:var(--navy-text);font-variant-numeric:tabular-nums}
+  .rq-band{display:inline-block;margin-top:8px;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:var(--surface-2);color:var(--navy-text)}
   .rq-gauge{position:relative;height:10px;border-radius:5px;margin:16px 0 6px;background:linear-gradient(90deg,#3E7CB1,#2E7D4F 35%,#C5A044 65%,#D82629)}
   .rq-gauge .pin{position:absolute;top:-5px;width:4px;height:20px;background:var(--ink);border-radius:2px;transform:translateX(-2px)}
   .rq-ticks{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
@@ -768,7 +772,7 @@
   #riskTol.auto,#rqAmt.auto{color:var(--muted)}
   .wd-list{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:10px}
   .wd-tier{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px 16px;align-items:start;padding:14px 16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface-2)}
-  .wd-rank{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;color:var(--navy);line-height:1}
+  .wd-rank{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;color:var(--navy-text);line-height:1}
   .wd-rank small{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:4px}
   .wd-tier h4{margin:0;font-family:Bitter,Georgia,serif;font-size:17px;color:var(--ink)}
   .wd-tier p{margin:4px 0 8px;font-size:13.5px;color:var(--muted)}
@@ -1514,7 +1518,7 @@
         <label class="f"><span>Risk tolerance<small>1&ndash;100, what the client is comfortable with</small></span><input type="text" inputmode="numeric" id="riskTol" value=""></label>
       </div>
       <div class="moat-readout" id="riskReadout"></div>
-      <div class="inc-title gap">Risk profile questionnaire<small>Twelve questions that produce a 1&ndash;99 risk score on the Risk Number scale &middot; a completed questionnaire fills the risk tolerance above unless one is typed</small></div>
+      <div class="inc-title gap">Risk profile questionnaire<small>Twelve questions that produce a 1&ndash;99 risk score on the Risk Number scale &middot; a completed questionnaire fills the risk tolerance above; questions 6 and 7 follow the plan until answered</small></div>
       <div class="rq" id="rq">
         <div class="rq-top">
           <label class="f"><span>Portfolio being assessed<small>The dollar amounts in the questions scale to this; blank follows the accounts in section 06</small></span><input type="text" inputmode="numeric" id="rqAmt" value=""></label>
@@ -9112,8 +9116,26 @@
     'Moderate':'You are looking for a balance between growing your savings and protecting them. A portfolio at this level accepts moderate ups and downs in pursuit of steady long-term growth.',
     'Moderately Aggressive':'You are willing to accept meaningful ups and downs in exchange for higher expected long-term growth. A portfolio at this level will have years with noticeable declines along the way.',
     'Aggressive':'You are comfortable with large swings in value in pursuit of maximum long-term growth. A portfolio at this level can see sharp declines in difficult years and needs time to recover.'};
-  var rq = {a:{}, amt:''};        // answers: question id -> option index; amt: the portfolio typed, '' follows section 06
-  var rqSig = null;               // what the form was last built for (the amount drives the dollar labels)
+  var rq = {a:{}, amt:''};        // answers chosen by the advisor: question id -> option index; amt: the portfolio typed, '' follows section 06
+  var rqSig = null;               // what the form was last built for (the amount and the plan's answers drive the labels)
+  var rqDef = {};                 // the plan's own answers (q6 from the first retirement date, q7 from the Needs gap), refreshed each render
+  var rqDirty = false;            // an answer changed: a completed questionnaire writes the risk tolerance even over a typed value
+  /* Questions 6 and 7 follow the plan until the advisor picks an answer: when withdrawals begin
+     from the first retirement date in section 04, and how much of Needs guaranteed income covers
+     from the annual Needs gap the Foundation is sized on (section 13). */
+  function rqDefaults(r){
+    var i = r.inputs, e = i.employment, ppl = hasSpouse(i) ? ['client', 'spouse'] : ['client'], out = {};
+    var retYrs = ppl.map(function(w){ return (e[w] && e[w].salary > 0.5) ? planYears(e[w].retire) : null; }).filter(function(v){ return v != null; });
+    var y = retYrs.length ? Math.min.apply(null, retYrs) : 0;
+    out.q6 = {k:y <= 0.05 ? 0 : y < 3 ? 1 : y < 7 ? 2 : y < 15 ? 3 : 4,
+              why:retYrs.length ? 'the first retirement date in section 04 is ' + (y <= 0.05 ? 'now or past' : (Math.round(y * 10) / 10) + ' years away') : 'nobody is drawing a salary, so withdrawals have begun'};
+    var needs = i.needs || 0, gap = Math.max(0, r.incomeGap || 0), cover = needs > 0.5 ? Math.max(0, Math.min(1, 1 - gap / needs)) : 1;
+    out.q7 = {k:gap <= 0.5 ? 4 : cover < 0.25 ? 0 : cover < 0.5 ? 1 : cover < 0.75 ? 2 : 3,
+              why:needs > 0.5 ? (gap <= 0.5 ? 'guaranteed income covers Needs through the sizing window' : 'the annual Needs gap of ' + money(gap) + ' leaves ' + Math.round(cover * 100) + '% of Needs covered by guaranteed income') : 'no Needs are entered yet'};
+    return out;
+  }
+  /* the answer in force for a question: the advisor's, else the plan's */
+  function rqAnswer(id){ if(rq.a[id] != null) return rq.a[id]; return rqDef[id] ? rqDef[id].k : null; }
   function rqAmount(){ return rq.amt.trim() !== '' ? Math.max(0, num(rq.amt)) : accounts.reduce(function(a, x){ return a + (x.val || 0); }, 0); }
   function rqNeg(v){ return '−' + money(Math.abs(v)); }
   /* an option's label, with the dollar figures for the portfolio */
@@ -9131,27 +9153,33 @@
     return o.l;
   }
   function rqScore(){
-    var a = rq.a, ws = 0, ww = 0, cs = 0, cw = 0, n = 0;
+    var a = {}, ws = 0, ww = 0, cs = 0, cw = 0, n = 0, fromPlan = 0;
+    RQ_ALL.forEach(function(q){ var k = rqAnswer(q.id); if(k != null && q.o[k]){ a[q.id] = k; if(rq.a[q.id] == null) fromPlan++; } });
     RQ_ALL.forEach(function(q){ var k = a[q.id]; if(k == null || !q.o[k]) return; n++; var sc = q.o[k].s; if(q.dim === 'w'){ ws += sc * q.w; ww += q.w; } else { cs += sc * q.w; cw += q.w; } });
-    var S = {n:n, total:RQ_ALL.length, rn:null, complete:n === RQ_ALL.length};
+    var S = {n:n, total:RQ_ALL.length, rn:null, complete:n === RQ_ALL.length, fromPlan:fromPlan};
     if(!ww || !cw) return S;
     var W = ws / ww, C = cs / cw, raw = 0.65 * W + 0.35 * C, capped = false;
     if(W - C > 15 && raw > C + 15){ raw = C + 15; capped = true; }
     var rn = Math.max(1, Math.min(99, Math.round(1 + raw * 0.98)));
     var obj = a.q5 != null ? rqQ('q5').o[a.q5] : null;
+    S.a = a;
     S.rn = rn; S.band = rqBand(rn); S.W = Math.round(1 + W * 0.98); S.C = Math.round(1 + C * 0.98); S.capped = capped; S.wideC = C - W > 20;
     S.d = rqDownside(rn); S.u = -S.d * 1.3; S.A = rqAmount();
     S.obj = obj ? obj.k : null;
     S.objMis = !!(obj && ((obj.k === 'Avoid losses' && rn >= 45) || (obj.k === 'Grow' && rn < 45) || (obj.k === 'Protect with growth' && (rn < 30 || rn >= 75))));
     return S;
   }
-  /* the risk tolerance cell follows a completed questionnaire until a value is typed */
-  function rqApply(){
+  /* A completed questionnaire writes its score into the risk tolerance cell (grey, like any value
+     that follows the plan) whenever an answer changes, even over a typed value; a value typed
+     afterwards holds until the answers change again, and a blank cell follows the score. */
+  function rqApply(r){
+    if(r) rqDef = rqDefaults(r);
     var el = $('riskTol'), S = rqScore(), done = S.complete && S.rn != null;
     if(document.activeElement !== el){
       if(!done && el.classList.contains('auto')){ el.value = ''; el.classList.remove('auto'); }
-      if(done && (el.value.trim() === '' || el.classList.contains('auto'))){ el.value = String(S.rn); el.classList.add('auto'); }
+      if(done && (rqDirty || el.value.trim() === '' || el.classList.contains('auto'))){ el.value = String(S.rn); el.classList.add('auto'); }
     }
+    rqDirty = false;
     return S;
   }
   function rqFlag(S){
@@ -9164,7 +9192,7 @@
   }
   function renderRiskQuiz(S){
     var form = $('rqForm'), panel = $('rqPanel'); if(!form) return;
-    var A = rqAmount(), sig = A + '|' + hasSpouse(null);
+    var A = rqAmount(), sig = A + '|' + hasSpouse(null) + '|' + ['q6', 'q7'].map(function(id){ return rqDef[id] ? rqDef[id].k + ':' + rqDef[id].why : ''; }).join('|');
     if(document.activeElement !== $('rqAmt')) $('rqAmt').value = rq.amt.trim() !== '' ? rq.amt : fmtN.format(Math.round(A));
     $('rqAmt').classList.toggle('auto', rq.amt.trim() === '');
     if(rqSig !== sig){
@@ -9176,13 +9204,18 @@
           return '<fieldset class="rq-q" style="border:1px solid var(--line);margin:0 0 10px;min-width:0"><legend class="qt" style="padding:0 4px">' + n + '. ' + esc(q.t) + (q.pctNote ? ' <span class="dn">(' + rqNeg(A * q.pctNote / 100) + ')</span>' : '') + '</legend>'
             + (q.h ? '<p class="qh">' + esc(q.h) + '</p>' : '') + '<div class="rq-opts">'
             + q.o.map(function(o, i){ return '<label class="rq-opt"><input type="radio" name="rq_' + q.id + '" value="' + i + '"><span class="ol">' + rqOptHtml(q, o, A) + '</span></label>'; }).join('')
-            + '</div></fieldset>';
+            + '</div>' + (rqDef[q.id] ? '<p class="rq-auto" data-auto="' + q.id + '"></p>' : '') + '</fieldset>';
         }).join('') + '</div>';
       }).join('');
     }
     RQ_ALL.forEach(function(q){
-      var k = rq.a[q.id], opts = form.querySelectorAll('input[name="rq_' + q.id + '"]');
-      for(var i = 0; i < opts.length; i++){ opts[i].checked = (k === i); opts[i].closest('.rq-opt').classList.toggle('on', k === i); }
+      var k = rqAnswer(q.id), own = rq.a[q.id] != null, opts = form.querySelectorAll('input[name="rq_' + q.id + '"]');
+      for(var i = 0; i < opts.length; i++){ opts[i].checked = (k === i); opts[i].closest('.rq-opt').classList.toggle('on', k === i); opts[i].closest('.rq-opt').classList.toggle('auto', k === i && !own); }
+      var note = form.querySelector('[data-auto="' + q.id + '"]'), D = rqDef[q.id];
+      if(note && D){
+        note.classList.toggle('over', own);
+        note.textContent = own ? 'Chosen by the advisor \u00b7 the plan suggests \u201c' + q.o[D.k].l + '\u201d (' + D.why + ').' : 'Answered from the plan: ' + D.why + '. Pick another answer to override.';
+      }
     });
     var fl = rqFlag(S), tolEl = $('riskTol'), typed = tolEl.value.trim() !== '' && !tolEl.classList.contains('auto');
     panel.innerHTML = '<div class="eyebrow">Risk score</div><div class="rq-big">' + (S.rn == null ? '–' : S.rn) + '</div>'
@@ -9191,13 +9224,13 @@
       + '<dl class="rq-kv"><dt>Primary objective</dt><dd>' + (S.obj ? esc(S.obj) : '–') + '</dd><dt>Willingness</dt><dd>' + (S.rn == null ? '–' : S.W) + '</dd><dt>Capacity</dt><dd>' + (S.rn == null ? '–' : S.C) + '</dd>'
       + '<dt>Implied 1-yr range</dt><dd>' + (S.rn == null ? '–' : S.d.toFixed(1) + '% to +' + S.u.toFixed(1) + '%') + '</dd><dt>In dollars</dt><dd>' + (S.rn == null ? '–' : rqNeg(S.A * S.d / 100) + ' to +' + money(S.A * S.u / 100)) + '</dd></dl>'
       + (fl ? '<div class="rq-flag ' + fl.cls + '">' + esc(fl.t) + '</div>' : '')
-      + '<div class="rq-prog">' + S.n + ' of ' + S.total + ' questions answered' + (S.complete ? (typed ? ' · the risk tolerance above was typed and is used instead of this score' : ' · filling the risk tolerance above') : '') + '</div>'
+      + '<div class="rq-prog">' + S.n + ' of ' + S.total + ' questions answered' + (S.fromPlan ? ' (' + S.fromPlan + ' from the plan)' : '') + (S.complete ? (typed ? ' · a tolerance typed since the last answer is used instead' : ' · filling the risk tolerance above') : '') + '</div>'
       + '<p class="hint" style="margin:10px 0 0;font-size:12px">Illustrative one-year range at roughly 95% probability, interpolated from calibration anchors.</p>';
   }
   /* the answers in words: the worksheet, the summary and the client report share it */
   function rqAnswerLines(client){
     var A = rqAmount();
-    return RQ_ALL.map(function(q, k){ var i = rq.a[q.id]; return {n:k + 1, q:q.t, a:i == null ? null : rqOptText(q, q.o[i], A, client)}; });
+    return RQ_ALL.map(function(q, k){ var i = rqAnswer(q.id); return {n:k + 1, q:q.t, a:i == null ? null : rqOptText(q, q.o[i], A, client) + (rq.a[q.id] == null && rqDef[q.id] && !client ? ' (from the plan)' : '')}; });
   }
   function rqSummaryText(){
     var S = rqScore(); if(S.rn == null) return '';
@@ -9529,7 +9562,7 @@
   }
 
   function renderRisk(r){
-    var S = rqApply(), f = riskFacts(r);
+    var S = rqApply(r), f = riskFacts(r);
     renderNitro();
     $('riskReadout').innerHTML = f.gap == null
       ? '<span class="gap-label">Risk gap</span><b>—</b><span class="gap-math">Enter the current risk score and the risk tolerance, each from 1 to 100.</span>'
@@ -9538,7 +9571,7 @@
           : f.gap < 0 ? 'The portfolio carries <b>' + (-f.gap) + ' points</b> less risk than the client would accept (score ' + f.score + ', tolerance ' + f.tol + ').'
           : 'The portfolio’s risk matches the client’s tolerance (' + f.score + ').') + '</span>';
     if(S.rn != null) $('riskReadout').innerHTML += '<span class="gap-math" style="flex-basis:100%">Questionnaire: <b>' + S.rn + '</b> · ' + esc(S.band) + ' · willingness ' + S.W + ', capacity ' + S.C
-      + (S.complete ? ($('riskTol').classList.contains('auto') ? ' — filling the risk tolerance above.' : ' — a typed risk tolerance is used instead.') : ' — ' + (S.total - S.n) + ' question' + (S.total - S.n === 1 ? '' : 's') + ' still unanswered.') + '</span>';
+      + (S.complete ? ($('riskTol').classList.contains('auto') ? ' — filling the risk tolerance above.' : ' — a tolerance typed since the last answer is used instead.') : ' — ' + (S.total - S.n) + ' question' + (S.total - S.n === 1 ? '' : 's') + ' still unanswered.') + '</span>';
     renderRiskQuiz(S);
     $('riskList').innerHTML = RISK_ITEMS.map(function(it){
       var on = !!risk.selected[it.id], sug = it.sug ? it.sug(f) : false;
@@ -11047,11 +11080,11 @@
   $('riskTol').addEventListener('blur', function(){ if(this.value.trim() === '') render(); });
   $('rqForm').addEventListener('change', function(e){
     var m = /^rq_(q\d+)$/.exec(e.target.name || ''); if(!m) return;
-    rq.a[m[1]] = +e.target.value; render();
+    rq.a[m[1]] = +e.target.value; rqDirty = true; render();
   });
   $('rqAmt').addEventListener('input', function(){ rq.amt = this.value; render(); });
   $('rqAmt').addEventListener('blur', function(){ if(this.value.trim() !== ''){ rq.amt = fmtN.format(Math.round(num(this.value))); this.value = rq.amt; } render(); });
-  $('rqClear').addEventListener('click', function(){ rq.a = {}; $('rqMsg').textContent = 'Answers cleared.'; render(); });
+  $('rqClear').addEventListener('click', function(){ rq.a = {}; rqDirty = true; $('rqMsg').textContent = 'Answers cleared \u2014 questions 6 and 7 follow the plan again.'; render(); });
   $('rqCopy').addEventListener('click', function(){
     var t = rqSummaryText(), msg = $('rqMsg');
     if(!t){ msg.textContent = 'Answer at least one question in each section first.'; return; }
@@ -13015,7 +13048,7 @@
     var i = readInputs(), E = esc, today = new Date();
     var couple = hasSpouse(i), client = (function(){ var c = (i.clientFirst || 'Client').trim(), sp = couple ? (i.spouseFirst || 'Spouse').trim() : ''; return couple ? c + ' and ' + sp + (i.clientLast ? ' ' + i.clientLast : '') : c + (i.clientLast ? ' ' + i.clientLast : ''); })();
     var advisor = (i.advisor || '').trim(), dateTxt = longDate(i.prepDate || todayISO());
-    var pick = function(id, useK){ var q = rqQ(id), k = rq.a[id]; if(k == null) return 'Not answered'; var o = q.o[k]; return useK && o.k ? o.k : rqOptText(q, o, S.A, true); };
+    var pick = function(id, useK){ var q = rqQ(id), k = rqAnswer(id); if(k == null) return 'Not answered'; var o = q.o[k]; return useK && o.k ? o.k : rqOptText(q, o, S.A, true); };
     var ans = [['Most important objective', pick('q5', true)], ['Range you’re most comfortable with in a year', pick('q1')], ['If your portfolio fell 20% in a year', pick('q2')], ['Largest one-year decline you could accept', pick('q3')],
                ['When withdrawals begin', pick('q6')], ['Essential expenses covered by guaranteed income', pick('q7')], ['Unexpected expenses to be ready for', pick('q12')]];
     var lo = -S.A * S.d / 100, hi = S.A * S.u / 100;
@@ -13098,10 +13131,14 @@
   });
 
   /* theme toggle */
+  (function(){   // dark unless this browser chose light before
+    var t = null; try { t = localStorage.getItem('rfb-theme'); } catch(e){}
+    document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+  })();
   $('themeBtn').addEventListener('click', function(){
-    // unset means light, so the first click always goes to dark
-    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
-    document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark', next = dark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('rfb-theme', next); } catch(e){}
   });
 
   /* tooltip */
