@@ -16,7 +16,10 @@ const path = require('path');
   await p.click('#expandAll'); await p.waitForTimeout(300);
   // 2. the position choices
   const posOpts=await p.$eval('#acctBody select[data-k="pos"]',s=>[...s.options].map(o=>o.value)); console.log('positions:', JSON.stringify(posOpts));
-  for(const want of ['MYGA Annuity','Variable Annuity','Income Annuity (FIA)','Growth Annuity (FIA)','RILA Annuity']) if(!posOpts.includes(want)) errs.push('missing position '+want);
+  for(const want of ['MYGA Annuity','Variable Annuity','Income Annuity (FIA)','Growth Annuity (FIA)','RILA Annuity','Cash Value Life Insurance']) if(!posOpts.includes(want)) errs.push('missing position '+want);
+  // the transfers table carries the current position, following section 06
+  console.log('transfers header:', await p.$eval('#adjTable thead',h=>/Current position/.test(h.textContent)), '| first row:', await p.$eval('#adjBody tr[data-adj]',r=>r.querySelector('select[data-ak=acctId] option:checked').textContent.slice(0,30)+' => '+r.querySelector('[data-fpos]').textContent));
+  if(!(await p.$eval('#adjTable thead',h=>/Current position/.test(h.textContent)))) errs.push('transfers table lacks the Current position column');
   if(posOpts.includes('Annuity')) errs.push('the plain Annuity position should be gone');
   // 3. the Annuities subsection follows the annuity positions (the Smith case has three generic ones)
   const rows=async()=>p.$$eval('#anxBody tr[data-anx]',rs=>rs.map(r=>({id:r.dataset.anx, owner:r.querySelector('[data-af=owner]').textContent, name:r.querySelector('[data-af=name]').textContent, type:r.querySelector('select').value,
@@ -28,6 +31,8 @@ const path = require('path');
   const firstId=await p.$eval('#acctBody tr[data-id]',r=>r.dataset.id);
   await p.selectOption(`#acctBody tr[data-id="${firstId}"] select[data-k="pos"]`,'MYGA Annuity'); await p.waitForTimeout(500);
   let R=await rows(); const my=R.find(r=>r.id===firstId); console.log('after MYGA:', JSON.stringify(my));
+  const posCell=await p.$$eval('#adjBody tr[data-adj]',(rs,id)=>rs.filter(r=>r.querySelector('select[data-ak=acctId]').value===String(id)).map(r=>r.querySelector('[data-fpos]').textContent), firstId); console.log('position cells for that account:', JSON.stringify(posCell));
+  if(!posCell.length || posCell.some(x=>x!=='MYGA Annuity')) errs.push('the transfers table position should follow section 06');
   if(!my || !my.rateOn || my.monthlyOn || my.capOn) errs.push('a MYGA row should enable the rate and nothing FIA-only');
   // type a rate, fees, maturity and a company
   const tr=`#anxBody tr[data-anx="${firstId}"]`;
@@ -40,6 +45,8 @@ const path = require('path');
   // change the type from the subsection: the account list follows, monthly income opens
   await p.selectOption(tr+' select[data-ax="pos"]','Income Annuity (FIA)'); await p.waitForTimeout(500);
   console.log('account list pos:', await p.$eval(`#acctBody tr[data-id="${firstId}"] select[data-k="pos"]`,s=>s.value));
+  const incRows=await p.$$eval('#annIncBody tr[data-inc]',rs=>rs.map(r=>r.textContent.replace(/\s+/g,' ').trim().slice(0,120))); console.log('annuity income rows (section 14):', JSON.stringify(incRows));
+  if(!incRows.length || !/Inherited IRA/.test(incRows[0])) errs.push('the income annuity should be listed under Annuity income in section 14');
   R=await rows(); const inc=R.find(r=>r.id===firstId); console.log('after Income FIA:', JSON.stringify(inc));
   if((await p.$eval(`#acctBody tr[data-id="${firstId}"] select[data-k="pos"]`,s=>s.value))!=='Income Annuity (FIA)') errs.push('the account list should follow the type picked in the subsection');
   if(!inc.monthlyOn || !inc.capOn || inc.rateOn) errs.push('an income FIA row should enable monthly, cap and participation, not the MYGA rate');

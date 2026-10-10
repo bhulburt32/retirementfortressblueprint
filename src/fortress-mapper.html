@@ -363,6 +363,7 @@
   #adjTable td.rt{color:var(--muted);white-space:nowrap}
   #adjTable td.rem,#adjTable td.bal{white-space:nowrap}
   #adjTable .tax-tag{display:block;font-size:11.5px;color:var(--muted);margin-top:3px;letter-spacing:.02em}
+  #adjTable td.pos{font-size:13px;color:var(--ink-2);white-space:nowrap}
   #adjTable th small.th-sub{display:block;font-weight:400;font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0}
   #adjTable td.rt.hit{color:var(--ink);font-weight:600}
   #adjTable td.rem.zero{color:var(--muted)}
@@ -1620,6 +1621,7 @@
               <thead>
                 <tr>
                   <th rowspan="2">From account<small class="th-sub">and its tax type</small></th>
+                  <th rowspan="2">Current position<small class="th-sub">from section 06</small></th>
                   <th rowspan="2" class="num">Starting balance<small class="th-sub">before this line</small></th>
                   <th rowspan="2">Fortress level</th>
                   <th rowspan="2">To account<small class="th-sub">and its tax type</small></th>
@@ -1648,7 +1650,7 @@
           </div>
           <div id="adjFlags"></div>
         </div>
-        <div class="inc-title gap">Annuity income<small>One line for each Fixed Indexed Annuity or MYGA in the Foundation above &middot; blank follows section 03, the first retirement date and the Foundation yield</small></div>
+        <div class="inc-title gap">Annuity income<small>Every income annuity in force (current position <b>Income Annuity (FIA)</b> in section 06), then one line for each Fixed Indexed Annuity or MYGA in the Foundation above &middot; blank follows section 03, the first retirement date and the Foundation yield</small></div>
         <div class="tbl-wrap" style="margin-top:10px">
           <table id="annIncTable" class="adj-ann">
             <thead><tr><th>Annuity</th><th class="num">Amount</th><th>Guaranteed income</th><th>Income starts</th><th class="num">Monthly income</th><th class="num">Inflation</th><th class="num">Withdrawn each month</th></tr></thead>
@@ -2020,12 +2022,14 @@
     [ {tax:'Qualified', bucket:'roof'} ]
   ];
 
-  var POSITIONS = ['Cash','Market','MYGA Annuity','Variable Annuity','Income Annuity (FIA)','Growth Annuity (FIA)','RILA Annuity','LTC / Life','Unassigned'];
+  var POSITIONS = ['Cash','Market','MYGA Annuity','Variable Annuity','Income Annuity (FIA)','Growth Annuity (FIA)','RILA Annuity','Cash Value Life Insurance','LTC / Life','Unassigned'];
+  /* a life policy's cash value and an LTC / life hybrid are handled alike: never a withdrawal tier, a 1035 into the Moat or left in place */
+  function isLifePos(p){ return p === 'LTC / Life' || p === 'Cash Value Life Insurance'; }
   /* the five annuity positions; a plain "Annuity" from an older case loads as a MYGA */
   var ANNUITY_POS = {'MYGA Annuity':1, 'Variable Annuity':1, 'Income Annuity (FIA)':1, 'Growth Annuity (FIA)':1, 'RILA Annuity':1};
   function isAnnuityPos(p){ return !!ANNUITY_POS[p]; }
   function isIncomeAnn(a){ return !!a && a.pos === 'Income Annuity (FIA)'; }
-  function posShort(p){ return ({'MYGA Annuity':'MYGA', 'Variable Annuity':'Variable annuity', 'Income Annuity (FIA)':'Income FIA', 'Growth Annuity (FIA)':'Growth FIA', 'RILA Annuity':'RILA'})[p] || p; }
+  function posShort(p){ return ({'MYGA Annuity':'MYGA', 'Variable Annuity':'Variable annuity', 'Income Annuity (FIA)':'Income FIA', 'Growth Annuity (FIA)':'Growth FIA', 'RILA Annuity':'RILA', 'Cash Value Life Insurance':'Cash value life'})[p] || p; }
   /* the contract details kept on an annuity account (section 06, Annuities):
      rate and interest (taken or deferred) for a MYGA; monthly income and payout (single or joint)
      for an income annuity; cap for the FIAs and a RILA, participation for the FIAs, floor (the
@@ -2635,7 +2639,7 @@
   function carrierFromAccounts(pos){
     var best = null;
     accounts.forEach(function(a){
-      if((pos === 'Annuity' ? !isAnnuityPos(a.pos) : a.pos !== pos) || !(a.cust || '').trim()) return;   // 'Annuity' means any annuity type
+      if((pos === 'Annuity' ? !isAnnuityPos(a.pos) : pos === 'LTC / Life' ? !isLifePos(a.pos) : a.pos !== pos) || !(a.cust || '').trim()) return;   // 'Annuity' means any annuity type, 'LTC / Life' either policy
       if(!best || a.val > best.val) best = a;
     });
     return best ? best.cust.trim() : '';
@@ -2961,9 +2965,9 @@
               if(!leg){ leg = {label:who, premium:0, filled:0}; moatLegs.push(leg); }
               if(leg.premium < leg.filled + part) leg.premium = leg.filled + part;
               leg.filled += part; funded.moat += part;
-              moves.push({acct:a, bucket:'moat', amt:part, fromLife:a.pos === 'LTC / Life', person:who, pinned:true});
+              moves.push({acct:a, bucket:'moat', amt:part, fromLife:isLifePos(a.pos), person:who, pinned:true});
             });
-          } else pushMoat(a, amt, a.pos === 'LTC / Life', personOwner(a.owner, i), true);
+          } else pushMoat(a, amt, isLifePos(a.pos), personOwner(a.owner, i), true);
         } else {
           funded[bk] += amt;
           moves.push({acct:a, bucket:bk, amt:amt, pinned:true});
@@ -2975,7 +2979,7 @@
        With the cash value in play it funds LTC up to the Moat target; the
        rest of the policy — and the whole policy when the answer is no —
        stays exactly where it is, with no transfer at all. */
-    var lifeAccts = accounts.filter(function(a){ return a.pos === 'LTC / Life' && a.val > 0; });
+    var lifeAccts = accounts.filter(function(a){ return isLifePos(a.pos) && a.val > 0; });
     if(i.lifeCV === 'yes' && !manual){
       lifeAccts.filter(function(a){ return a.move !== 'no'; }).sort(function(a, b){ return remain[b.id] - remain[a.id]; })
         .forEach(function(a){
@@ -3061,7 +3065,7 @@
         if(!(remain[a.id] > 0.5)) return;
         var amt = remain[a.id];
         remain[a.id] = 0;
-        var bk = (a.pos === 'LTC / Life') ? 'inplace' : 'roof';
+        var bk = (isLifePos(a.pos)) ? 'inplace' : 'roof';
         funded[bk] += amt;
         moves.push({acct:a, bucket:bk, amt:amt, residual:true});
       });
@@ -3128,13 +3132,13 @@
               name:a.name || 'Untitled account', cust:a.cust || 'existing institution'};
     }
     if(bucket === 'inplace'){
-      var isLife = (a.move !== 'no' && a.pos === 'LTC / Life');
+      var isLife = (a.move !== 'no' && isLifePos(a.pos));
       return {key:'stay:' + a.id, stay:true, kind:isLife ? 'life' : 'held',
               tax:a.tax, owner:effOwner(a.owner, i),
               name:a.name || (isLife ? 'Life insurance policy' : 'Untitled account'),
               cust:a.cust || 'existing institution'};
     }
-    if(bucket === 'moat' && a.pos === 'LTC / Life'){
+    if(bucket === 'moat' && isLifePos(a.pos)){
       /* Carrier-to-carrier: the old policy becomes the new LTC contract and
          never passes through the custodian. An LTC contract is always
          individually owned, so the insured on the move — not the title on the
@@ -3612,8 +3616,8 @@
   function annFirstYear(c){ return c.gli ? c.monthly * 12 : c.amt * (1 - Math.pow(1 - Math.min(0.5, c.wd), 12)); }
   function annuitySummary(r){
     var cs = annuityContracts(r), any = cs.some(function(c){ return Object.keys(c.set).some(function(k){ return c.set[k] !== '' && c.set[k] != null; }); });
-    var fias = cs.filter(function(c){ return c.fia; }), others = cs.filter(function(c){ return !c.fia && !c.pool; });
-    return {contracts:cs, fias:fias, others:others, count:cs.length, total:cs.reduce(function(a, c){ return a + annFirstYear(c); }, 0), gli:cs.filter(function(c){ return c.gli; }).length, any:any};
+    var fias = cs.filter(function(c){ return c.fia; }), income = cs.filter(function(c){ return c.income; }), others = cs.filter(function(c){ return !c.fia && !c.pool && !c.income; });
+    return {contracts:cs, fias:fias, income:income, others:others, count:cs.length, total:cs.reduce(function(a, c){ return a + annFirstYear(c); }, 0), gli:cs.filter(function(c){ return c.gli; }).length, any:any};
   }
   function clamp01(v){ return Math.max(0, Math.min(1, v)); }
   /* The detailed budget drives the year-by-year expense projection when it
@@ -3691,7 +3695,7 @@
     var acc = {w:[0, 0], r:[0, 0], i:[0, 0]}, any = false, roofMap = null;
     (r.moves || []).forEach(function(m){
       var key = m.bucket === 'walls' ? 'w' : m.bucket === 'roof' ? 'r' : m.bucket === 'inplace' ? 'i' : null;
-      if(!key || !(m.amt > 0.5) || m.acct.pos === 'LTC / Life') return;
+      if(!key || !(m.amt > 0.5) || isLifePos(m.acct.pos)) return;
       var dflt = r.statusQuo ? sqDefaultGrowth(m.acct, i.growthW || 0, gR) : (key === 'r' ? gR : key === 'i' ? (i.growthW || 0) : gW);
       var g = acctGrowth(m.acct, dflt, t);
       if(Math.abs(g - dflt) > 1e-9) any = true;
@@ -3709,7 +3713,7 @@
     var i = r.inputs, A = incomeAdj(r), gR = i.growthR || 0, acc = {w:[0, 0], r:[0, 0]};
     (r.moves || []).forEach(function(m){
       var key = m.bucket === 'walls' ? 'w' : m.bucket === 'roof' ? 'r' : null;
-      if(!key || !(m.amt > 0.5) || m.acct.pos === 'LTC / Life') return;
+      if(!key || !(m.amt > 0.5) || isLifePos(m.acct.pos)) return;
       var ret = acctStressReturn(m.acct, key === 'w' ? SQ.walls : SQ.roof, key === 'w' ? A.gPost : gR, t);
       acc[key][0] += m.amt * ret; acc[key][1] += m.amt;
     });
@@ -3983,11 +3987,18 @@
   var annSig = '';
   function renderAnnuityIncome(r, AS){
     var body = $('annIncBody'); if(!body) return;
-    var i = r.inputs, cs = AS.fias;
-    var sig = cs.map(function(c){ return c.key + '|' + c.name + '|' + c.to + '|' + c.cust + '|' + c.prod + '|' + c.from + '|' + (c.owners || []).join(','); }).join(';');
+    var i = r.inputs, cs = AS.fias, inc = AS.income || [];
+    var sig = inc.map(function(c){ return 'inc:' + c.key + '|' + c.name + '|' + c.cust + '|' + c.prod + '|' + c.amt + '|' + c.monthly + '|' + c.payout + '|' + c.until + '|' + c.cola; }).concat(cs.map(function(c){ return c.key + '|' + c.name + '|' + c.to + '|' + c.cust + '|' + c.prod + '|' + c.from + '|' + (c.owners || []).join(','); })).join(';');
     if(sig !== annSig){
       annSig = sig;
-      body.innerHTML = !cs.length ? '<tr><td colspan="7"><div class="empty-state">No line in the transfer list above is set to <b>Fixed Indexed Annuity</b> yet \u2014 choose it under Product / strategy and the annuity appears here.</div></td></tr>' : cs.map(function(c){
+      var incRows = inc.map(function(c){
+        var acct = acctById(+String(c.key).replace('income:', '')), ownerTxt = acct ? ownerLabel(effOwner(acct.owner, i)) : ownerLabel(c.owner);
+        return '<tr data-inc="' + esc(c.key) + '"><td><b>' + esc(c.name) + '</b> \u00b7 ' + esc(ownerTxt) + '<small class="sub">' + esc(['Income annuity in force', c.cust, c.prod, c.payout === 'joint' ? 'joint payout, to the end of plan' : 'single life' + (c.until != null ? ', to age ' + (i.endAge || 100) : '')].filter(Boolean).join(' \u00b7 ')) + '</small></td>'
+          + '<td class="num">' + money(c.amt) + '</td><td>Yes \u2014 in force</td><td>Now</td>'
+          + '<td class="num">' + money(c.monthly) + '<small class="sub">set in section 06</small></td>'
+          + '<td class="num">' + (c.cola > 0 ? (c.cola * 100).toFixed(1) + '%' : '\u2014') + '</td><td class="num">\u2014</td></tr>';
+      }).join('');
+      body.innerHTML = (!cs.length && !inc.length) ? '<tr><td colspan="7"><div class="empty-state">No income annuity in force in section 06, and no line in the transfer list above is set to <b>Fixed Indexed Annuity</b> yet \u2014 choose it under Product / strategy and the annuity appears here.</div></td></tr>' : incRows + cs.map(function(c){
         return '<tr data-ann="' + esc(c.key) + '">'
           + '<td><b>' + esc(c.name) + '</b>' + (c.pool ? '' : ' \u00b7 ' + esc((c.owners || [c.owner]).map(ownerLabel).join(' & '))) + '<small class="sub">' + esc([(c.stay || c.pool) ? '' : 'from ' + c.from + (c.lines > 1 ? ' (' + c.lines + ' lines combined)' : ''), c.cust, c.prod].filter(Boolean).join(' \u00b7 ')) + '</small></td>'
           + '<td class="num" data-af="amt"></td>'
@@ -4030,7 +4041,9 @@
     renderLtcBenefits(r);
     renderRoofGrowth(r);
     var retWord = function(c){ return c.name + ' \u2014 ' + annWords(c, retTxt); };
-    $('annIncHint').textContent = (AS.fias.length
+    var incC = AS.income || [];
+    $('annIncHint').textContent = (incC.length ? incC.length + ' income annuit' + (incC.length === 1 ? 'y' : 'ies') + ' in force paying ' + money(incC.reduce(function(a, c){ return a + c.monthly * 12; }, 0)) + ' a year: ' + incC.map(function(c){ return c.name + ' \u2014 ' + money(c.monthly) + ' a month ' + (c.payout === 'joint' ? 'to the end of plan' : 'for the owner\u2019s life') + ', the value falling as it pays'; }).join('; ') + ' (monthly income, payout and company are set in the Annuities panel of section 06). ' : '')
+      + (AS.fias.length
         ? AS.fias.length + ' Fixed Indexed Annuit' + (AS.fias.length === 1 ? 'y' : 'ies') + ' paying about ' + money(AS.fias.reduce(function(a, c){ return a + annFirstYear(c); }, 0)) + ' a year at the start: ' + AS.fias.map(retWord).join('; ') + '. Blank cells follow the plan: guaranteed income per section 03, income from the first retirement; the monthly income cell starts at the calculated amount \u2014 ' + pc1(A.yF) + ' of the contract value a year \u2014 and takes any figure typed over it. Lines sent to the same To account are one contract. '
         : '')
       + (AS.others.length ? AS.others.length + ' other Foundation line' + (AS.others.length === 1 ? '' : 's') + ' (' + AS.others.map(function(c){ return c.name + ': ' + (c.prod || 'no product') ; }).join(', ') + ') pay' + (AS.others.length === 1 ? 's' : '') + ' on the plan assumptions \u2014 ' + pc1(A.yF) + ' from the first retirement' + (i.foundGLI ? ', guaranteed for life' : ', until the value is spent') + ' \u2014 and can be set here once chosen as a Fixed Indexed Annuity.' : '')
@@ -4471,7 +4484,7 @@
      Walls and Roof. The liquidity buffer (savings), the Foundation income
      sleeve (annuity) and the Moat (LTC annuity or life policy) are out. */
   var MANAGED_BUCKETS = ['walls','roof'];
-  var UNMANAGED_POS   = {'Cash':1, 'MYGA Annuity':1, 'Variable Annuity':1, 'Income Annuity (FIA)':1, 'Growth Annuity (FIA)':1, 'RILA Annuity':1, 'LTC / Life':1};
+  var UNMANAGED_POS   = {'Cash':1, 'MYGA Annuity':1, 'Variable Annuity':1, 'Income Annuity (FIA)':1, 'Growth Annuity (FIA)':1, 'RILA Annuity':1, 'Cash Value Life Insurance':1, 'LTC / Life':1};
 
   function aumPlan(r){
     var managed = MANAGED_BUCKETS.reduce(function(s, k){ return s + r.funded[k]; }, 0);
@@ -4648,7 +4661,7 @@
         : {lvl:'', txt:'Marked <b>Stay as is</b> in section 06 — counted in the ' + (BUCKET_NAME[m.bucket] || m.bucket) + ' where it sits, no transfer.'};
     }
     if(m.bucket === 'inplace') return {lvl:'', txt:'Held out of the plan — funds no Fortress level.'};
-    if(a.pos === 'LTC / Life' && m.bucket !== 'moat'){
+    if(isLifePos(a.pos) && m.bucket !== 'moat'){
       return {lvl:'alert', txt:'A life policy’s cash value can only 1035 into an LTC contract. Send this to the Moat, or leave it put.'};
     }
     if(a.tax === 'Roth' && m.bucket !== 'roof'){
@@ -4692,7 +4705,7 @@
         ? ownerLabel(ppl[0]) + ' LTC Contract'
         : ppl.map(ownerLabel).join(' & ') + ' LTC Contracts';
       return {to:to, cust:i.ltcCarrier || 'TBD', prod:productFor('moat'), toTax:a.tax, stay:false,
-              sub:(a.pos === 'LTC / Life') ? '1035 exchange, carrier to carrier'
+              sub:(isLifePos(a.pos)) ? '1035 exchange, carrier to carrier'
                  : (ppl.length > 1 ? 'one contract per insured' : 'individually owned')};
     }
     var reg = regFor(a, m.bucket, i, null);
@@ -4851,6 +4864,7 @@
                     + esc(o.t) + '</option>';
                 }).join('')
             + '</select><small class="tax-tag" data-ftax></small></td>'
+            + '<td class="pos" data-fpos></td>'
             + '<td class="num bal" data-bal="' + m.id + '"></td>'
             + '<td><select data-ak="bucket" class="adj-bkt">'
             +   PIN_DISPLAY.map(function(bk){
@@ -4872,9 +4886,9 @@
             + '<td><button type="button" class="row-x" data-adjdel="' + m.id
             +   '" aria-label="Remove transfer">&times;</button></td>'
             + '</tr>'
-            + '<tr class="adj-note empty" data-note="' + m.id + '"><td colspan="13"></td></tr>';
+            + '<tr class="adj-note empty" data-note="' + m.id + '"><td colspan="14"></td></tr>';
         }).join('')
-      : '<tr><td colspan="13"><div class="empty-state">'
+      : '<tr><td colspan="14"><div class="empty-state">'
         + (accounts.length
             ? (adjMoves
                 ? 'No transfers set — every dollar falls to the Roof as the residual. '
@@ -4960,6 +4974,7 @@
       var before = a ? a.val - (runUsed[a.id] || 0) : null;
       put('[data-bal]', a ? money(Math.max(0, before)) + ((runUsed[a.id] || 0) > 0.5 ? '<small class="tax-tag">of ' + money(a.val) + '</small>' : '') : '\u2014');
       put('[data-ftax]', a ? esc(a.tax) : '');
+      put('[data-fpos]', a ? esc(a.pos) : '');
       put('[data-ttax]', esc(taxOfTo(L.to, d, a)));
 
       var after = null;
@@ -5004,7 +5019,7 @@
       covered += u;
       if(!(left > 0.5)) return;
       if(a.move === 'no')            heldOut += left;
-      else if(a.pos === 'LTC / Life'){ resLife += left; uncovered.push({a:a, left:left}); }
+      else if(isLifePos(a.pos)){ resLife += left; uncovered.push({a:a, left:left}); }
       else                           { resRoof += left; uncovered.push({a:a, left:left}); }
     });
 
@@ -5086,7 +5101,7 @@
       uncovered.forEach(function(x){
         flags.push({lvl:'', txt:money(x.left) + ' of <b>' + esc(x.a.name || 'Untitled account')
           + '</b> is not covered by a line above, so it '
-          + (x.a.pos === 'LTC / Life' ? 'stays inside the policy.' : 'falls to the Roof as the residual.')
+          + (isLifePos(x.a.pos) ? 'stays inside the policy.' : 'falls to the Roof as the residual.')
           + ' Add a line for it to send it somewhere else.'});
       });
     }
@@ -5729,9 +5744,9 @@
         + 'holds beyond its lines here falls to the Roof as the residual, except a life policy, whose '
         + 'uncovered cash value stays inside the contract.');
       table([
-        {t:'Account', w:92, s:7}, {t:'Owner', w:42, s:7}, {t:'Level', w:66, s:7},
-        {t:'To account', w:96, s:7}, {t:'Custodian', w:64, s:7}, {t:'Product', w:90, s:7},
-        {t:'Amount', w:54, a:'r', f:'F3', s:7}
+        {t:'Account', w:80, s:7}, {t:'Owner', w:36, s:7}, {t:'Position', w:54, s:7}, {t:'Level', w:58, s:7},
+        {t:'To account', w:86, s:7}, {t:'Custodian', w:58, s:7}, {t:'Product', w:84, s:7},
+        {t:'Amount', w:48, a:'r', f:'F3', s:7}
       ], adjMoves.filter(function(m){ return m.amt > 0.5; }).map(function(m){
         var a = acctById(m.acctId);
         var d = a ? adjDest(m, a, r) : {to:'-', cust:'-', prod:'-'};
@@ -5739,6 +5754,7 @@
         return {cells:[
           a ? (a.name || 'Untitled account') : 'Account removed',
           a ? ownerLabel(effOwner(a.owner, i)) : '-',
+          a ? posShort(a.pos) : '-',
           PIN_LABEL[m.bucket].replace('—', '-'),
           pick('to'), pick('cust'), pick('prod'),
           money(m.amt)
@@ -6415,7 +6431,8 @@
     if(/spia|immediate|income annuit/.test(v)) return 'Income Annuity (FIA)';
     if(/annuit/.test(v)) return 'MYGA Annuity';
     if(/cash|savings|checking|money market|cd\b/.test(v)) return 'Cash';
-    if(/ltc|long.term|life|hybrid/.test(v)) return 'LTC / Life';
+    if(/ltc|long.term|hybrid/.test(v)) return 'LTC / Life';
+    if(/life|cash value|whole|universal|\biul\b/.test(v)) return 'Cash Value Life Insurance';
     if(/market|equit|fund|etf|stock|bond|brokerage|invest/.test(v)) return 'Market';
     return 'Unassigned';
   }
@@ -7052,7 +7069,7 @@
   var WD_DEFAULT = ['taxable','deferred','roth'];
   var wdOrder = WD_DEFAULT.slice();
   function wdTierOf(a){
-    if(a.pos === 'LTC / Life') return null;
+    if(isLifePos(a.pos)) return null;
     if(a.tax === 'Roth') return 'roth';
     if(a.tax === 'Qualified') return 'deferred';
     return isAnnuityPos(a.pos) ? 'deferred' : 'taxable';
@@ -7273,7 +7290,7 @@
     var foundQ = 0, foundNQ = 0, wallsQ = {client:0, spouse:0}, wallsTot = 0, wallsNQ = 0, wallsRoth = 0;
     (r.moves || []).forEach(function(m){
       var a = m.acct, tier = wdTierOf(a);
-      if(!tier && a.pos === 'LTC / Life' && m.bucket === 'inplace') lifeHeld += m.amt;
+      if(!tier && isLifePos(a.pos) && m.bucket === 'inplace') lifeHeld += m.amt;
       if(!tier || m.bucket === 'moat') return;
       if(m.bucket === 'foundation'){ if(tier === 'deferred'){ if(a.tax === 'Qualified') foundQ += m.amt; else foundNQ += m.amt; } else foundNQ += m.amt; return; }
       var key = m.bucket === 'walls' ? 'w' : (m.bucket === 'roof' ? 'r' : (m.bucket === 'inplace' ? 'i' : 'f'));
@@ -8420,7 +8437,7 @@
   function sqDefaultGrowth(a, gW, gR){
     if(a.pos === 'Cash') return 0;
     if(isAnnuityPos(a.pos)) return gW;
-    if(a.pos === 'LTC / Life') return 0;
+    if(isLifePos(a.pos)) return 0;
     return gR;
   }
   function statusQuoRun(r, extra){

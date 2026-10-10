@@ -816,7 +816,9 @@
           household with no Cash row gets no buffer. The five annuity positions &mdash; <b>MYGA
           Annuity</b>, <b>Variable Annuity</b>, <b>Income Annuity (FIA)</b>, <b>Growth Annuity
           (FIA)</b> and <b>RILA Annuity</b> (a plain <i>Annuity</i> from an older case loads as a
-          MYGA) &mdash; and <b>LTC / Life</b> get their own handling for assignments and 1035s, every
+          MYGA) &mdash; and the two policy positions, <b>Cash Value Life Insurance</b> and
+          <b>LTC / Life</b> (handled alike: never drawn on, a 1035 into the Moat or left in place),
+          get their own handling for assignments and 1035s, every
           annuity position lists its contract in the <span class="ui">Annuities</span> panel below,
           and each type follows its own rules in the projections (see the panel). An uploaded or
           pasted position such as <i>MYGA</i>, <i>variable annuity</i>, <i>FIA with income rider</i>,
@@ -1209,7 +1211,8 @@
         exactly what the waterfall placed. Until you edit it, it follows the household numbers above:
         change Annual Needs or the buffer and it re-flows.</p>
 
-      <p>Each row is one transfer. You set the <b>from account</b>, the <b>Fortress level</b> and
+      <p>Each row is one transfer. The <b>Current position</b> column beside the from account is
+        read from section&nbsp;06 and follows it. You set the <b>from account</b>, the <b>Fortress level</b> and
         the <b>transfer amount</b>; the tool proposes the <b>to account</b>, <b>custodian or
         carrier</b> and <b>product</b>, and you can pick a different one from each list or choose
         <span class="ui">Custom…</span> and type your own — a changed one is shaded, with the
@@ -1266,7 +1269,11 @@
 
       <dl class="fields">
         <dt>Annuity income</dt>
-        <dd>A table under the transfer list with one row for every Foundation annuity contract
+        <dd>A table under the transfer list. It opens with one row for every income annuity in
+          force &mdash; every account whose current position in section&nbsp;06 is <b>Income Annuity
+          (FIA)</b> &mdash; showing its value, that it pays now, its monthly income and whether it pays
+          for the owner's life or to the end of plan; those figures are set in the Annuities panel of
+          section&nbsp;06, not here. Then one row for every Foundation annuity contract
           above whose product is <span class="ui">Fixed Indexed Annuity</span> &mdash; the default
           for a Foundation line &mdash; named for the account it goes to (the from account is noted
           beneath; a line that stays put keeps its own name), with its carrier and amount. Lines
