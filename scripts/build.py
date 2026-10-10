@@ -7,8 +7,9 @@
 
 The published artifact takes src/fortress-mapper.html as-is (no doctype: claude.ai wraps it).
 """
-import os, re, sys
+import os, re, sys, subprocess
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+subprocess.run([sys.executable, os.path.join(root, 'scripts', 'guide-notes.py')], check=True)   # the User Guide Notes follow docs/advisor-guide.html
 src = os.path.join(root, 'src'); dist = os.path.join(root, 'dist'); os.makedirs(dist, exist_ok=True)
 m = open(os.path.join(src, 'fortress-mapper.html'), encoding='utf-8').read()
 open(os.path.join(dist, 'preview.html'), 'w', encoding='utf-8').write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>\n' + m + '\n</body></html>\n')

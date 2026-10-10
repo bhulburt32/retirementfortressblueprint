@@ -44,6 +44,15 @@ const path = require('path');
   const r0=cf[0]; const check=num(r0[col('Total income')])-Math.abs(num(r0[col('Needs')]))-Math.abs(num(r0[col('Wants')]))-Math.abs(num(r0[col('Federal tax')]))-Math.abs(num(r0[col(cfHead.find(h=>/ tax$/.test(h) && !/Federal/.test(h)))]));
   console.log('first row arithmetic:', check.toFixed(0), 'vs before withdrawals', num(r0[col('Cash flow before withdrawals')]));
   if(Math.abs(check-num(r0[col('Cash flow before withdrawals')]))>2) errs.push('cash flow before withdrawals should be income less expenses and tax');
+  // 1d. every section carries its User Guide Notes, collapsed, with the guide's text; no section-note paragraphs remain
+  const notes=await p.$$eval('section details.guide-notes',ds=>ds.map(d=>({open:d.open, len:d.querySelector('.guide-body').textContent.replace(/\s+/g,' ').trim().length, sum:d.querySelector('summary').textContent.trim().slice(0,16)})));
+  console.log('guide notes:', notes.length, 'shortest', Math.min(...notes.map(n=>n.len)), '| sec-notes left:', await p.$$eval('.sec-note',e=>e.length));
+  if(notes.length!==22) errs.push('every section should carry User Guide Notes ('+notes.length+')');
+  if(notes.some(n=>n.open || n.len<150 || !/^User Guide Notes/.test(n.sum))) errs.push('guide notes should be collapsed, titled User Guide Notes and carry the guide text');
+  if(await p.$$eval('.sec-note',e=>e.length)) errs.push('section-note paragraphs should be gone');
+  await p.click('#acctSec details.guide-notes summary'); await p.waitForTimeout(200);
+  console.log('section 06 notes open:', await p.$eval('#acctSec details.guide-notes',d=>d.open), '|', (await p.$eval('#acctSec .guide-body',e=>e.textContent.replace(/\s+/g,' ').trim())).slice(0,120));
+  if(!(await p.$eval('#acctSec details.guide-notes',d=>d.open))) errs.push('the notes should open on a click');
   console.log('hero image:', await p.$eval('#heroImg',e=>e.naturalWidth+'x'+e.naturalHeight)); if(!(await p.$eval('#heroImg',e=>e.naturalWidth>0))) errs.push('the header graphic did not load');
   // 2. the Walls yield federally tax-free: no change while the Walls hold only IRA money, a lower federal tax once a non-qualified account is in the Walls
   await p.$eval('#adjYWtf',e=>{ e.checked=true; e.dispatchEvent(new Event('change',{bubbles:true})); }); await p.waitForTimeout(700);
