@@ -757,7 +757,10 @@
         Start and end dates and notes are for the file &mdash; a mortgage that ends in 2031, a
         tuition line that starts next autumn &mdash; and do not change the arithmetic.</p>
 
-      <p>Under <em>Healthcare &amp; insurance</em> the worksheet carries four lines it fills for you:
+      <p>Under <em>Healthcare &amp; insurance</em> the worksheet carries six lines it fills for you.
+        <b>Life Insurance</b> and <b>Long Term Care Insurance</b> take the monthly premiums of the
+        policies listed in sections&nbsp;08 and 09 (grey) until you type an amount &mdash; do that when
+        the premiums are already in the budget. The other four:
         <b>Medicare Part B</b> and <b>Part D</b> for each person, at the premiums set in
         section&nbsp;03, with a start date of the month each person turns 65 worked out from the ages
         in section&nbsp;02 (blank once they are 65 already). They are shown in grey while they are
@@ -981,6 +984,16 @@
         coverage recommended; <span class="ui">Complete detailed life insurance needs analysis</span>
         opens the rest, and a case that used it reopens with it showing.</p>
 
+      <p><b>Existing life insurance policies</b>, at the foot of the section, lists each policy in
+        force: owner, company, insured, death benefit, beneficiary, type (Term, Whole Life, IUL), cash
+        value (permanent policies), years remaining (term) and the monthly premium, with
+        <span class="ui">Add a life insurance policy</span> for each. While any are listed, the death
+        benefits by insured fill the <span class="ui">Existing life insurance</span> fields (grey, read
+        from the list) and the needs analysis counts them as coverage in force; the premiums of all
+        policies fill the <b>Life Insurance</b> line of the section&nbsp;05 budget until an amount is
+        typed there &mdash; type one when the premiums are already in the budget. Everything saves
+        with the case.</p>
+
       <dl class="fields">
         <dt>Household obligations</dt>
         <dd><span class="ui">Mortgage balance</span>, <span class="ui">Other debts</span> and
@@ -1026,6 +1039,15 @@
     <div class="num">09<small>Input</small></div>
     <div class="body">
       <h2>Long Term Care</h2>
+      <p><b>Existing long term care policies</b>, at the foot of the section, lists each policy in
+        force: owner and insured, company, daily benefit, benefit term in years and the monthly
+        premium, with <span class="ui">Add a long term care policy</span> for each and the total
+        benefit (daily benefit &times; 365 &times; years) worked out per line. While any are listed,
+        the daily benefits fill the <span class="ui">Existing LTC coverage</span> field for that person
+        (daily benefit &times; 30, grey, read from the list) and the estimate caps what the policies pay
+        at their total benefit when the benefit term is shorter than the care; the premiums of all
+        policies fill the <b>Long Term Care Insurance</b> line of the section&nbsp;05 budget until an
+        amount is typed there. Everything saves with the case.</p>
       <p>The section opens with the two <span class="ui">Average LTC cost</span> fields that size the
         Moat, the Moat premium readout, and Alto's Long-Term Care Needs Estimator folded away behind
         <span class="ui">Complete detailed long term care needs analysis</span>. Press it and two
@@ -1270,8 +1292,9 @@
         eighteen carriers plus Schwab and Fidelity; the product list opens with the model's own
         proposal for the line, then the six generic choices &mdash; <span class="ui">TBD</span>,
         <span class="ui">Checking/Savings</span>, <span class="ui">CD</span>,
-        <span class="ui">Money Market</span>, <span class="ui">AUM</span>,
-        <span class="ui">Life Insurance Cash Value</span> &mdash; and then that custodian's or
+        <span class="ui">Money Market</span>, <span class="ui">AUM</span>, <span class="ui">AUM - Tax
+        Free</span> (a Walls line in municipal bonds: its yield is federally tax-free, see the Walls
+        income assumptions below), <span class="ui">Life Insurance Cash Value</span> &mdash; and then that custodian's or
         carrier's own products, so pick the carrier first. The proposals are
         <span class="ui">Checking/Savings</span> for the liquidity buffer, <span class="ui">AUM</span>
         for the Walls and Roof, <span class="ui">TBD</span> for the Moat until a carrier product is
@@ -1362,20 +1385,20 @@
         <dt>Walls income assumptions</dt>
         <dd>Four fields for the Walls as adjusted: the <span class="ui">Walls yield</span>, when
           <span class="ui">Walls income starts</span>, and the Walls growth rate <span class="ui">before
-          income starts</span> and <span class="ui">after</span>, with a <span class="ui">Federally
-          tax-free</span> box beside the yield for Walls held in municipal bonds. Every field is blank by default
+          income starts</span> and <span class="ui">after</span>. Every field is blank by default
           and then follows the plan &mdash; the Walls growth <em>before</em> income starts is a plan
           assumption of 5%, the growth <em>after</em> is section&nbsp;03's Walls growth rate, and the
           start is the first retirement date; the plan figure is shown under each label. Type a value and the projections in sections&nbsp;15, 16 and 17,
           the worksheet and the executive summary report follow it; the sizing in section&nbsp;13
           keeps the plan assumptions, so a lower yield here shows up as a Needs or Wants shortfall
           in the projections rather than a bigger target. A line beneath states the result in words,
-          <span class="ui">Follow the plan assumptions</span> clears the annuity table, these
-          four fields and the tax-free box, and everything saves with the case. With the box ticked,
-          the non-qualified share of the Walls yield leaves federal taxable income; it still counts
-          toward the taxation of Social Security (as tax-exempt interest does), the state model still
-          taxes it, and the share paid from IRA money in the Walls is a taxable distribution either way,
-          so the box changes nothing while the Walls hold only qualified money. Every date in the projections &mdash;
+          <span class="ui">Follow the plan assumptions</span> clears the annuity table and these
+          four fields, and everything saves with the case. A tax-free yield is set line by line: pick
+          <span class="ui">AUM - Tax Free</span> in the Product/Strategy column of a Walls line held in
+          municipal bonds and that line's share of the non-qualified Walls yield leaves federal taxable
+          income; it still counts toward the taxation of Social Security (as tax-exempt interest does),
+          the state model still taxes it, and the yield on IRA money in the Walls is a taxable
+          distribution whatever the product, so the product changes nothing on a qualified line. Every date in the projections &mdash;
           these, the retirement dates and each benefit's start and end &mdash; lands in the calendar
           year it names: a July 2030 start pays half a year in the 2030 row and the full amount
           from 2031.</dd>

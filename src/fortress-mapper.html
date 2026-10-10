@@ -1507,7 +1507,10 @@
         Start and end dates and notes are for the file &mdash; a mortgage that ends in 2031, a
         tuition line that starts next autumn &mdash; and do not change the arithmetic.</p>
 
-      <p>Under <em>Healthcare &amp; insurance</em> the worksheet carries four lines it fills for you:
+      <p>Under <em>Healthcare &amp; insurance</em> the worksheet carries six lines it fills for you.
+        <b>Life Insurance</b> and <b>Long Term Care Insurance</b> take the monthly premiums of the
+        policies listed in sections&nbsp;08 and 09 (grey) until you type an amount &mdash; do that when
+        the premiums are already in the budget. The other four:
         <b>Medicare Part B</b> and <b>Part D</b> for each person, at the premiums set in
         section&nbsp;03, with a start date of the month each person turns 65 worked out from the ages
         in section&nbsp;02 (blank once they are 65 already). They are shown in grey while they are
@@ -1920,6 +1923,16 @@
         coverage recommended; <span class="ui">Complete detailed life insurance needs analysis</span>
         opens the rest, and a case that used it reopens with it showing.</p>
 
+      <p><b>Existing life insurance policies</b>, at the foot of the section, lists each policy in
+        force: owner, company, insured, death benefit, beneficiary, type (Term, Whole Life, IUL), cash
+        value (permanent policies), years remaining (term) and the monthly premium, with
+        <span class="ui">Add a life insurance policy</span> for each. While any are listed, the death
+        benefits by insured fill the <span class="ui">Existing life insurance</span> fields (grey, read
+        from the list) and the needs analysis counts them as coverage in force; the premiums of all
+        policies fill the <b>Life Insurance</b> line of the section&nbsp;05 budget until an amount is
+        typed there &mdash; type one when the premiums are already in the budget. Everything saves
+        with the case.</p>
+
       <dl class="fields">
         <dt>Household obligations</dt>
         <dd><span class="ui">Mortgage balance</span>, <span class="ui">Other debts</span> and
@@ -1964,8 +1977,8 @@
     <!-- /guide-notes:08 -->
     <div class="panel panel-pad">
       <div class="assump first">
-        <label class="f"><span>Existing life insurance — client<small>Death benefit in force, individual and group combined</small></span><input type="text" inputmode="numeric" id="lifeExistC" value="0"></label>
-        <label class="f"><span>Existing life insurance — spouse<small>Death benefit in force</small></span><input type="text" inputmode="numeric" id="lifeExistS" value="0"></label>
+        <label class="f"><span>Existing life insurance — client<small>Death benefit in force, individual and group combined &middot; follows the policies listed below when any are entered</small></span><input type="text" inputmode="numeric" id="lifeExistC" value="0"></label>
+        <label class="f"><span>Existing life insurance — spouse<small>Death benefit in force &middot; follows the policies below</small></span><input type="text" inputmode="numeric" id="lifeExistS" value="0"></label>
       </div>
       <div class="btn-row" style="margin-top:14px">
         <button type="button" id="lifeToggle" aria-expanded="false" aria-controls="lifeDetail">Complete detailed life insurance needs analysis</button>
@@ -2018,6 +2031,20 @@
         <div class="inc-title gap">Underwriting outlook</div>
         <div id="lifeNotes" style="margin-top:12px"></div>
       </div>
+      <div class="inc-title gap">Existing life insurance policies<small>Each policy in force &middot; the death benefits by insured feed the fields above, the premiums the section 05 budget</small></div>
+      <div class="tbl-scroll">
+        <table id="lifePolTable" class="emp pen">
+          <thead>
+            <tr><th>Owner</th><th>Company</th><th>Insured</th><th class="num">Death benefit</th><th>Beneficiary</th><th>Type</th><th class="num">Cash value</th><th class="num">Years remaining<small>Term</small></th><th class="num">Monthly premium</th><th></th></tr>
+          </thead>
+          <tbody id="lifePolBody"></tbody>
+          <tfoot id="lifePolFoot"></tfoot>
+        </table>
+      </div>
+      <div class="btn-row" style="margin-top:10px">
+        <button type="button" id="lifePolAdd">Add a life insurance policy</button>
+        <span class="hint" id="lifePolMsg"></span>
+      </div>
     </div>
   </section>
   <!-- 9. LONG TERM CARE -->
@@ -2026,6 +2053,15 @@
     <!-- guide-notes:09 -->
     <details class="guide-notes"><summary>User Guide Notes<small>how to use this section</small></summary>
       <div class="guide-body">
+      <p><b>Existing long term care policies</b>, at the foot of the section, lists each policy in
+        force: owner and insured, company, daily benefit, benefit term in years and the monthly
+        premium, with <span class="ui">Add a long term care policy</span> for each and the total
+        benefit (daily benefit &times; 365 &times; years) worked out per line. While any are listed,
+        the daily benefits fill the <span class="ui">Existing LTC coverage</span> field for that person
+        (daily benefit &times; 30, grey, read from the list) and the estimate caps what the policies pay
+        at their total benefit when the benefit term is shorter than the care; the premiums of all
+        policies fill the <b>Long Term Care Insurance</b> line of the section&nbsp;05 budget until an
+        amount is typed there. Everything saves with the case.</p>
       <p>The section opens with the two <span class="ui">Average LTC cost</span> fields that size the
         Moat, the Moat premium readout, and Alto's Long-Term Care Needs Estimator folded away behind
         <span class="ui">Complete detailed long term care needs analysis</span>. Press it and two
@@ -2129,7 +2165,7 @@
             <tr><td>Nursing home<small>Years</small></td>
               <td><input type="text" inputmode="decimal" id="ltcDNHC" class="auto" value=""></td>
               <td><input type="text" inputmode="decimal" id="ltcDNHS" class="auto" value=""></td></tr>
-            <tr><td>Existing LTC coverage<small>Monthly benefit, today's dollars</small></td>
+            <tr><td>Existing LTC coverage<small>Monthly benefit, today's dollars &middot; follows the policies listed below when any are entered</small></td>
               <td><input type="text" inputmode="numeric" id="ltcCovC" value="0"></td>
               <td><input type="text" inputmode="numeric" id="ltcCovS" value="0"></td></tr>
           </tbody>
@@ -2145,6 +2181,20 @@
           <tfoot id="ltcBreakFoot"></tfoot>
         </table>
       </div>
+      </div>
+      <div class="inc-title gap">Existing long term care policies<small>Each policy in force &middot; the daily benefits feed the Existing LTC coverage above, the premiums the section 05 budget</small></div>
+      <div class="tbl-scroll">
+        <table id="ltcPolTable" class="emp pen">
+          <thead>
+            <tr><th>Owner / insured</th><th>Company</th><th class="num">Daily benefit</th><th class="num">Benefit term<small>Years</small></th><th class="num">Total benefit</th><th class="num">Monthly premium</th><th></th></tr>
+          </thead>
+          <tbody id="ltcPolBody"></tbody>
+          <tfoot id="ltcPolFoot"></tfoot>
+        </table>
+      </div>
+      <div class="btn-row" style="margin-top:10px">
+        <button type="button" id="ltcPolAdd">Add a long term care policy</button>
+        <span class="hint" id="ltcPolMsg"></span>
       </div>
     </div>
   </section>
@@ -2465,8 +2515,9 @@
         eighteen carriers plus Schwab and Fidelity; the product list opens with the model's own
         proposal for the line, then the six generic choices &mdash; <span class="ui">TBD</span>,
         <span class="ui">Checking/Savings</span>, <span class="ui">CD</span>,
-        <span class="ui">Money Market</span>, <span class="ui">AUM</span>,
-        <span class="ui">Life Insurance Cash Value</span> &mdash; and then that custodian's or
+        <span class="ui">Money Market</span>, <span class="ui">AUM</span>, <span class="ui">AUM - Tax
+        Free</span> (a Walls line in municipal bonds: its yield is federally tax-free, see the Walls
+        income assumptions below), <span class="ui">Life Insurance Cash Value</span> &mdash; and then that custodian's or
         carrier's own products, so pick the carrier first. The proposals are
         <span class="ui">Checking/Savings</span> for the liquidity buffer, <span class="ui">AUM</span>
         for the Walls and Roof, <span class="ui">TBD</span> for the Moat until a carrier product is
@@ -2557,20 +2608,20 @@
         <dt>Walls income assumptions</dt>
         <dd>Four fields for the Walls as adjusted: the <span class="ui">Walls yield</span>, when
           <span class="ui">Walls income starts</span>, and the Walls growth rate <span class="ui">before
-          income starts</span> and <span class="ui">after</span>, with a <span class="ui">Federally
-          tax-free</span> box beside the yield for Walls held in municipal bonds. Every field is blank by default
+          income starts</span> and <span class="ui">after</span>. Every field is blank by default
           and then follows the plan &mdash; the Walls growth <em>before</em> income starts is a plan
           assumption of 5%, the growth <em>after</em> is section&nbsp;03's Walls growth rate, and the
           start is the first retirement date; the plan figure is shown under each label. Type a value and the projections in sections&nbsp;15, 16 and 17,
           the worksheet and the executive summary report follow it; the sizing in section&nbsp;13
           keeps the plan assumptions, so a lower yield here shows up as a Needs or Wants shortfall
           in the projections rather than a bigger target. A line beneath states the result in words,
-          <span class="ui">Follow the plan assumptions</span> clears the annuity table, these
-          four fields and the tax-free box, and everything saves with the case. With the box ticked,
-          the non-qualified share of the Walls yield leaves federal taxable income; it still counts
-          toward the taxation of Social Security (as tax-exempt interest does), the state model still
-          taxes it, and the share paid from IRA money in the Walls is a taxable distribution either way,
-          so the box changes nothing while the Walls hold only qualified money. Every date in the projections &mdash;
+          <span class="ui">Follow the plan assumptions</span> clears the annuity table and these
+          four fields, and everything saves with the case. A tax-free yield is set line by line: pick
+          <span class="ui">AUM - Tax Free</span> in the Product/Strategy column of a Walls line held in
+          municipal bonds and that line's share of the non-qualified Walls yield leaves federal taxable
+          income; it still counts toward the taxation of Social Security (as tax-exempt interest does),
+          the state model still taxes it, and the yield on IRA money in the Walls is a taxable
+          distribution whatever the product, so the product changes nothing on a qualified line. Every date in the projections &mdash;
           these, the retirement dates and each benefit's start and end &mdash; lands in the calendar
           year it names: a July 2030 start pays half a year in the 2030 row and the full amount
           from 2031.</dd>
@@ -2661,7 +2712,6 @@
         <div class="inc-title gap">Walls income assumptions<small>Yield, start date and growth for the Walls as adjusted &middot; blank follows section 03 and the first retirement date</small></div>
         <div class="assump first" style="margin-top:14px">
           <label class="f"><span>Walls yield<small>Plan assumption <span id="adjYWDef"></span></small></span><input type="text" inputmode="decimal" id="adjYW" placeholder="plan" autocomplete="off"></label>
-          <label class="f"><span>Walls yield tax<small>Federally taxable by default &middot; tick if the Walls hold municipal bonds</small></span><span class="chk-line"><input type="checkbox" id="adjYWtf"> Federally tax-free</span></label>
           <label class="f"><span>Walls income starts<small>Default: first retirement, <span id="adjWStartDef"></span></small></span><input type="month" id="adjWStart"></label>
           <label class="f"><span>Walls growth before income starts<small>Plan assumption <span id="adjGPreDef"></span></small></span><input type="text" inputmode="decimal" id="adjGPre" placeholder="plan" autocomplete="off"></label>
           <label class="f"><span>Walls growth after income starts<small>Plan assumption <span id="adjGPostDef"></span></small></span><input type="text" inputmode="decimal" id="adjGPost" placeholder="plan" autocomplete="off"></label>
@@ -5281,7 +5331,7 @@
      starts paying, and the Walls growth rate before and after income begins.
      Each is blank by default and then follows section 03 and the first
      retirement date. They drive the projections, not the sizing in section 13. */
-  var INC_ADJ = {yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:'', yWtf:''};
+  var INC_ADJ = {yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:''};
   var WALLS_PRE_GROWTH = 0.05;   // the plan's Walls growth before their income starts; section 03's Walls rate applies once it does
   /* Per-annuity income settings for the Foundation lines in section 14, keyed
      by the account's row order, the level and the line's ordinal. Every field
@@ -5400,7 +5450,6 @@
     return {
       yF: INC_ADJ.yF !== '' ? pctIn(INC_ADJ.yF) : r.yF,
       yW: INC_ADJ.yW !== '' ? pctIn(INC_ADJ.yW) : r.yW,
-      yWtf: INC_ADJ.yWtf === 'yes',          // the Walls yield is federally tax-free (municipal bonds)
       fStart: yrs(INC_ADJ.fStart), wStart: yrs(INC_ADJ.wStart),
       gPre: INC_ADJ.gPre !== '' ? pctIn(INC_ADJ.gPre) : WALLS_PRE_GROWTH,
       gPost: INC_ADJ.gPost !== '' ? pctIn(INC_ADJ.gPost) : gW,
@@ -5829,7 +5878,6 @@
       + 'the Foundation annuit' + (AS.count === 1 ? 'y pays' : 'ies pay') + ' about ' + money(AS.total) + ' a year at the start'
       + '; the Walls pay ' + pc1(A.yW) + ' of their balance from ' + (A.wStart != null ? longDate(INC_ADJ.wStart + '-01').replace(/ \d+,/, '') : 'the first retirement')
       + ' \u2014 about ' + money(wRow ? wRow.wallsYield / Math.max(0.01, clamp01(Math.ceil(P.wStart) + 1 - P.wStart)) : r.funded.walls * A.yW) + ' in the first full year \u2014 growing ' + pc1(A.gPre) + ' before income starts and ' + pc1(A.gPost) + ' after.'
-      + (A.yWtf ? ' The yield is federally tax-free; it still counts toward the taxation of Social Security and in the state model, and the share paid from IRA money is a taxable distribution.' : '');
   }
   function renderAdjAlloc(base, r){
     $('adjAllocMsg').innerHTML = r.adjusted
@@ -6548,7 +6596,8 @@
     return null;
   }
   /* product families offered on every line, ahead of the chosen carrier's own products */
-  var GENERIC_PRODUCTS = ['TBD', 'Checking/Savings', 'CD', 'Money Market', 'AUM', 'Life Insurance Cash Value'];
+  var GENERIC_PRODUCTS = ['TBD', 'Checking/Savings', 'CD', 'Money Market', 'AUM', 'AUM - Tax Free', 'Life Insurance Cash Value'];
+  var AUM_TAX_FREE = 'AUM - Tax Free';   // a Walls line in this product: its yield is federally tax-free (municipal bonds)
   function productsFor(cust){
     var k = carrierKeyFor(cust);
     return k ? CARRIER_PRODUCTS[k] : [];
@@ -7362,7 +7411,7 @@
     });
     xrows.push({cells:['Total', '', money(TX.lifetimeGross), '', '', '', '', '', '', money(TX.lifetime), money(TX.lifetimeState), pc(TX.avgTotalEffective)], bold:true, rule:true});
     table(xcols, xrows, {rowH:12});
-    para('2026 federal law (OBBBA): standard deduction ' + money(TAX_2026[TX.status].std) + (TX.status === 'mfj' ? ' plus $1,650 per spouse 65+' : ' plus $2,050 at 65') + ', the $6,000 senior deduction for 2025-2028, brackets and thresholds indexed at ' + pc(i.inflation || 0) + '; up to 85% of Social Security taxable by the provisional-income formula. Ordinary income: wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs (a 10% penalty on tax-deferred withdrawals before 59\u00bd' + (TX.lifetimePenalty > 0.5 ? ', ' + money(TX.lifetimePenalty) + ' over the plan' : '') + '); the Foundation annuity ' + Math.round(TX.foundTaxShare * 100) + '% taxable, annuity income in force by the account that pays it (Roth tax-free); ' + (TX.wallsTaxFree ? 'the Walls yield federally tax-free (in provisional income and the state model); ' : 'the non-qualified share of the Walls yield and ') + 'half of each taxable-account withdrawal taxed as long-term gains. Withdrawals follow the order above and are grossed up for the tax they cause; RMDs use the Uniform Lifetime Table on tax-deferred market balances. Both spouses assumed living to the end of plan; no itemising, credits or IRMAA. State tax follows a planning model of the state\'s 2025 rates, brackets, deductions or exemptions and retirement-income exclusions, Social Security exempt unless the state taxes it, local taxes excluded. A planning estimate, not tax advice.');
+    para('2026 federal law (OBBBA): standard deduction ' + money(TAX_2026[TX.status].std) + (TX.status === 'mfj' ? ' plus $1,650 per spouse 65+' : ' plus $2,050 at 65') + ', the $6,000 senior deduction for 2025-2028, brackets and thresholds indexed at ' + pc(i.inflation || 0) + '; up to 85% of Social Security taxable by the provisional-income formula. Ordinary income: wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs (a 10% penalty on tax-deferred withdrawals before 59\u00bd' + (TX.lifetimePenalty > 0.5 ? ', ' + money(TX.lifetimePenalty) + ' over the plan' : '') + '); the Foundation annuity ' + Math.round(TX.foundTaxShare * 100) + '% taxable, annuity income in force by the account that pays it (Roth tax-free); the non-qualified share of the Walls yield' + (TX.wallsTaxFree > 0.001 ? ' (' + Math.round(TX.wallsTaxFree * 100) + '% of it in AUM - Tax Free, federally tax-free)' : '') + ' and half of each taxable-account withdrawal taxed as long-term gains. Withdrawals follow the order above and are grossed up for the tax they cause; RMDs use the Uniform Lifetime Table on tax-deferred market balances. Both spouses assumed living to the end of plan; no itemising, credits or IRMAA. State tax follows a planning model of the state\'s 2025 rates, brackets, deductions or exemptions and retirement-income exclusions, Social Security exempt unless the state taxes it, local taxes excluded. A planning estimate, not tax advice.');
 
     /* ---------- estate plan ---------- */
     var EF = estateFacts();
@@ -8240,6 +8289,8 @@
       })(),
       estate:readEstate(),
       debts:debts.length ? debts.map(function(x){ return {type:x.type, name:x.name, bal:x.bal, rate:x.rate, pmt:x.pmt, mat:x.mat}; }) : null,
+      lifePolicies:lifePolicies.length ? lifePolicies.map(function(x){ return {owner:x.owner, insured:x.insured, company:x.company, benefit:x.benefit, beneficiary:x.beneficiary, type:x.type, cash:x.cash, years:x.years, prem:x.prem}; }) : null,
+      ltcPolicies:ltcPolicies.length ? ltcPolicies.map(function(x){ return {owner:x.owner, company:x.company, daily:x.daily, term:x.term, prem:x.prem}; }) : null,
       otherAssets:otherAssets.length ? otherAssets.map(function(x){ return {type:x.type, name:x.name, val:x.val, growth:x.growth, note:x.note}; }) : null,
       nitrogen:nitro ? {name:nitro.name, text:nitro.text, analysis:nitro.analysis, src:nitro.src, at:nitro.at} : null,
       risk:{score:$('riskScore').value.trim(), tolerance:$('riskTol').classList.contains('auto') ? '' : $('riskTol').value.trim(), questionnaire:{answers:rq.a, amount:rq.amt}, selected:Object.keys(risk.selected).filter(function(k){ return risk.selected[k]; }), custom:risk.custom.filter(function(c){ return c.text.trim(); })},
@@ -8449,6 +8500,10 @@
     debts = [];
     if(Array.isArray(d.debts)) d.debts.forEach(function(x){ debts.push(mkDebt(x)); });
     renderDebtTable();
+    lifePolicies = []; ltcPolicies = [];
+    if(Array.isArray(d.lifePolicies)) d.lifePolicies.forEach(function(x){ lifePolicies.push(mkLifePolicy(x)); });
+    if(Array.isArray(d.ltcPolicies)) d.ltcPolicies.forEach(function(x){ ltcPolicies.push(mkLtcPolicy(x)); });
+    renderLifePolicies(); renderLtcPolicies();
     otherAssets = [];
     if(Array.isArray(d.otherAssets)) d.otherAssets.forEach(function(x){ otherAssets.push(mkOA(x)); });
     renderOATable();
@@ -8462,6 +8517,7 @@
       });
       budgetLink = !!d.budget.link;
     }
+    BUDGET_CATS.forEach(function(c){ c.items.forEach(function(it, k){ if(polInfo(it)){ var L = budget[budId(c, k)]; if(L && !(L.amt > 0.5)) L.auto = true; } }); });   // a premium line with nothing typed follows the policies
     $('budMsg').textContent = '';
     setBudgetOpen(d.budget && (d.budget.open || (d.budget.lines && Object.keys(d.budget.lines).length)));
     renderBudgetTable();
@@ -8470,7 +8526,7 @@
     resetIncomeAdj();
     if(d.incomeAdj){
       Object.keys(INC_ADJ).forEach(function(k){ if(d.incomeAdj[k] != null) INC_ADJ[k] = String(d.incomeAdj[k]); });
-      $('adjYW').value = INC_ADJ.yW; $('adjGPre').value = INC_ADJ.gPre; $('adjGPost').value = INC_ADJ.gPost; $('adjYWtf').checked = INC_ADJ.yWtf === 'yes';
+      $('adjYW').value = INC_ADJ.yW; $('adjGPre').value = INC_ADJ.gPre; $('adjGPost').value = INC_ADJ.gPost;
       $('adjWStart').value = INC_ADJ.wStart;
     }
     ROOF_G = {}; roofGSig = '';
@@ -8502,7 +8558,7 @@
     } else {
       scenarios[0] = null;   // an older case file: what was loaded above is Scenario A
     }
-    $('adjYW').value = INC_ADJ.yW || ''; $('adjGPre').value = INC_ADJ.gPre || ''; $('adjGPost').value = INC_ADJ.gPost || ''; $('adjYWtf').checked = INC_ADJ.yWtf === 'yes'; $('adjWStart').value = INC_ADJ.wStart || '';
+    $('adjYW').value = INC_ADJ.yW || ''; $('adjGPre').value = INC_ADJ.gPre || ''; $('adjGPost').value = INC_ADJ.gPost || ''; $('adjWStart').value = INC_ADJ.wStart || '';
   }
 
 
@@ -8602,6 +8658,7 @@
     });
     var totalYears = dur.home + dur.al + dur.nh;
     var covM = Math.max(0, num($('ltcCov' + P).value)), covTotal = covM * 12 * totalYears;
+    var pol = ltcPolicyTotals(who); if(pol.n > 0) covTotal = Math.min(covTotal, pol.total);   // a benefit period shorter than the care caps what the policies pay
     var first = rows.filter(function(r){ return r.years > 0; })[0];
     var peak = rows.filter(function(r){ return r.years > 0; }).reduce(function(m, r){ return Math.max(m, r.annualStart); }, 0);
     return {who:who, name:ownerLabel(who), age:age, start:start, yrs:yrs, noAge:noAge, cog:cog, rows:rows, total:total, today:today, infl:infl, base:base, dur:dur,
@@ -9076,7 +9133,14 @@
     });
     /* annuity income is taxable unless it comes from a Roth account: qualified money fully, a non-qualified annuity by its exclusion ratio, Roth money not at all */
     var foundAll = foundQ + foundNQ + foundRoth, foundTaxShare = foundAll > 0 ? (foundQ + foundNQ * NQ_ANNUITY_TAXABLE) / foundAll : 1;
-    var wallsTF = !!incomeAdj(r).yWtf;      // section 14: the Walls yield is federally tax-free (municipal bonds)
+    /* section 14: the share of the non-qualified Walls money whose line is in AUM - Tax Free (municipal bonds): that
+       part of the yield is federally tax-free; the rest of the non-qualified share is long-term gains as before */
+    var wallsTF = 0;
+    if(!r.statusQuo && typeof lineLedger === 'function'){
+      var nqW = 0, tfW = 0;
+      lineLedger(r).lines.forEach(function(L){ if(L.a && L.eff > 0.5 && L.m.bucket === 'walls' && wdTierOf(L.a) === 'taxable'){ nqW += L.eff; if(String(L.prod || '').trim() === AUM_TAX_FREE) tfW += L.eff; } });
+      wallsTF = nqW > 0.5 ? tfW / nqW : 0;
+    }
     var wQshare = {client: wallsTot > 0 ? wallsQ.client / wallsTot : 0, spouse: wallsTot > 0 ? wallsQ.spouse / wallsTot : 0};
     var wNQshare = wallsTot > 0 ? wallsNQ / wallsTot : 0;
     var sum3 = function(b){ return b.w + b.r + b.f + b.i; };
@@ -9140,7 +9204,7 @@
       var wallsOrd = row.wallsYield * (wQ.client + wQ.spouse), wallsNQy = row.wallsYield * (wallsNow > 0.5 ? bal.taxable.w / wallsNow : 0);
       /* the non-qualified share of the yield: long-term gains, or, federally tax-free, out of federal income but still in Social Security's
          provisional income and in the state model; the share paid from IRA money (wallsOrd) is a taxable distribution either way */
-      var wallsCG = wallsTF ? 0 : wallsNQy, wallsExempt = wallsTF ? wallsNQy : 0;
+      var wallsExempt = wallsNQy * wallsTF, wallsCG = wallsNQy - wallsExempt;
       var annOrd = row.annTax != null ? row.annTax : row.ann;   // the taxable part of annuity income already in force
       var qualDraw = {client: row.wallsYield * wQ.client, spouse: row.wallsYield * wQ.spouse};
       /* required minimum distributions on the tax-deferred market balances — and, from 70½, qualified
@@ -10202,7 +10266,7 @@
         }).join('')
       + '</tbody><tfoot><tr><td colspan="2">Total</td><td class="num">' + money(X0.lifetimeGross) + '</td><td colspan="7"></td><td class="num"><b>' + money(X0.lifetime) + '</b></td><td class="num">' + pct(X0.avgEffective) + '</td><td class="num">' + money(X0.lifetimeState) + '</td><td class="num"><b>' + money(X0.lifetime + X0.lifetimeState) + '</b></td><td class="num">' + pct(X0.avgTotalEffective) + '</td>' + (anyUnf ? '<td></td>' : '') + '</tr></tfoot>';
 
-    $('taxAssume').innerHTML = '<b>Assumptions.</b> 2026 federal law: standard deduction ' + money(TAX_2026[X0.status].std) + (X0.status === 'mfj' ? ' plus $1,650 for each spouse 65 or older' : ' plus $2,050 at 65') + ', brackets ' + T.brackets.map(function(b){ return Math.round(b[0] * 100) + '%'; }).join(' / ') + ', and the $6,000 senior deduction for 2025–2028 (phasing out above ' + money(T.seniorPhase) + ' of AGI); brackets, the standard deduction and the capital-gains thresholds are indexed at the ' + pct(i.inflation || 0) + ' inflation assumption, the Social Security thresholds are not. Up to 85% of Social Security is taxable by the provisional-income formula. Wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs are ordinary income; a tax-deferred withdrawal before 59\u00bd carries the 10% additional federal tax' + (X0.lifetimePenalty > 0.5 ? ' (' + money(X0.lifetimePenalty) + ' over the plan)' : '') + ', the birthday from the section 02 date of birth or, without one, taken as mid-year; the Foundation annuity is ' + Math.round(X0.foundTaxShare * 100) + '% taxable (qualified money fully, a non-qualified annuity half, Roth money not at all), and annuity income already in force the same way by the account that pays it; the Walls yield follows the Walls funding mix, with the non-qualified share ' + (X0.wallsTaxFree ? 'federally tax-free (it still counts toward the taxation of Social Security and in the state model)' : 'taxed as long-term gains') + '; half of each taxable-account withdrawal is assumed to be gain. RMDs use the Uniform Lifetime Table from age ' + rmdAge(X0.year0 - i.clientAge) + ' on the tax-deferred market balances (the Foundation annuity’s payments satisfy its own). Both spouses are assumed living to the end of plan; no itemising, credits or Medicare IRMAA. <b>State tax</b> uses a planning model of each state\u2019s 2025 rates, brackets, standard deduction or exemptions and retirement-income exclusions, indexed the same way, with Social Security exempt except where the state taxes it; local income taxes are left out. A planning estimate, not tax advice.';
+    $('taxAssume').innerHTML = '<b>Assumptions.</b> 2026 federal law: standard deduction ' + money(TAX_2026[X0.status].std) + (X0.status === 'mfj' ? ' plus $1,650 for each spouse 65 or older' : ' plus $2,050 at 65') + ', brackets ' + T.brackets.map(function(b){ return Math.round(b[0] * 100) + '%'; }).join(' / ') + ', and the $6,000 senior deduction for 2025–2028 (phasing out above ' + money(T.seniorPhase) + ' of AGI); brackets, the standard deduction and the capital-gains thresholds are indexed at the ' + pct(i.inflation || 0) + ' inflation assumption, the Social Security thresholds are not. Up to 85% of Social Security is taxable by the provisional-income formula. Wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs are ordinary income; a tax-deferred withdrawal before 59\u00bd carries the 10% additional federal tax' + (X0.lifetimePenalty > 0.5 ? ' (' + money(X0.lifetimePenalty) + ' over the plan)' : '') + ', the birthday from the section 02 date of birth or, without one, taken as mid-year; the Foundation annuity is ' + Math.round(X0.foundTaxShare * 100) + '% taxable (qualified money fully, a non-qualified annuity half, Roth money not at all), and annuity income already in force the same way by the account that pays it; the Walls yield follows the Walls funding mix, with the non-qualified share taxed as long-term gains' + (X0.wallsTaxFree > 0.001 ? ' except the ' + Math.round(X0.wallsTaxFree * 100) + '% of it in AUM - Tax Free, which is federally tax-free (it still counts toward the taxation of Social Security and in the state model)' : '') + '; half of each taxable-account withdrawal is assumed to be gain. RMDs use the Uniform Lifetime Table from age ' + rmdAge(X0.year0 - i.clientAge) + ' on the tax-deferred market balances (the Foundation annuity’s payments satisfy its own). Both spouses are assumed living to the end of plan; no itemising, credits or Medicare IRMAA. <b>State tax</b> uses a planning model of each state\u2019s 2025 rates, brackets, standard deduction or exemptions and retirement-income exclusions, indexed the same way, with Social Security exempt except where the state taxes it; local income taxes are left out. A planning estimate, not tax advice.';
     return X0;
   }
 
@@ -11682,8 +11746,8 @@
       ['Health Insurance','need'], ['Prescriptions','need'],
       ['Medicare Part B','need',false,{med:'B',who:'client'}], ['Medicare Part B','need',false,{med:'B',who:'spouse'}],
       ['Medicare Part D','need',false,{med:'D',who:'client'}], ['Medicare Part D','need',false,{med:'D',who:'spouse'}],
-      ['Life Insurance','need'],
-      ['Long Term Care Insurance','need'], ['Disability Insurance','need'], ['Veterinarian','need']]},
+      ['Life Insurance','need',false,{pol:'life'}],
+      ['Long Term Care Insurance','need',false,{pol:'ltc'}], ['Disability Insurance','need'], ['Veterinarian','need']]},
     {key:'tr', name:'Transportation', items:[
       ['Auto Loans','need'], ['Auto Insurance','need'], ['Fuel','need'], ['Repairs','need']]},
     {key:'db', name:'Debt & obligations', items:[
@@ -11700,7 +11764,7 @@
   function budId(c, k){ return c.key + ':' + k; }
   function budLine(c, k){
     var id = budId(c, k), it = c.items[k];
-    if(!budget[id]) budget[id] = {amt:0, nw:it[1], start:'', end:'', note:'', label:'', auto:!!(it[3] && it[3].med), autoStart:!!(it[3] && it[3].med)};
+    if(!budget[id]) budget[id] = {amt:0, nw:it[1], start:'', end:'', note:'', label:'', auto:!!(it[3] && (it[3].med || it[3].pol)), autoStart:!!(it[3] && it[3].med)};
     return budget[id];
   }
   /* Medicare lines: one Part B and one Part D per person, defaulting to the
@@ -11732,12 +11796,24 @@
       });
     });
   }
+  /* the premium lines: the policies' monthly premiums (sections 08 and 09) until the advisor types an amount —
+     type one when the premiums are already in the budget elsewhere */
+  function polInfo(it){ return it[3] && it[3].pol ? it[3].pol : null; }
+  function syncPolicyLines(){
+    BUDGET_CATS.forEach(function(c){
+      c.items.forEach(function(it, k){
+        var p = polInfo(it); if(!p) return;
+        var L = budLine(c, k), tot = p === 'life' ? lifePolicyTotals('client').prem : ltcPolicyTotals('client').prem, n = p === 'life' ? lifePolicies.length : ltcPolicies.length;
+        if(L.auto){ L.amt = n ? Math.max(0, tot) : 0; L.note = n ? 'From the ' + n + ' polic' + (n === 1 ? 'y' : 'ies') + ' in section ' + (p === 'life' ? '08' : '09') + ' \u00b7 type an amount if the premiums are already in the budget' : ''; }
+      });
+    });
+  }
   function medLabel(it){
     var m = medInfo(it);
     return m ? it[0] + ' \u2014 ' + ownerLabel(m.who) : it[0];
   }
   function budgetTotals(){
-    syncMedicare();
+    syncMedicare(); syncPolicyLines();
     var t = {need:0, want:0, total:0, entered:0, cats:{}};
     BUDGET_CATS.forEach(function(c){
       var sub = 0;
@@ -11746,7 +11822,7 @@
         var m = medInfo(it);
         if(m && !medActive(m)) v = 0;
         sub += v; t[L.nw === 'want' ? 'want' : 'need'] += v;
-        if(!(m && L.auto)) t.entered += v;
+        if(!((m || polInfo(it)) && L.auto)) t.entered += v;
       });
       t.cats[c.key] = sub; t.total += sub;
     });
@@ -11759,15 +11835,15 @@
         + '<span class="cat-name">' + esc(c.name) + '</span>'
         + '<span class="cat-sub"><small>subtotal</small><span data-sub="' + c.key + '"></span></span></td></tr>'
         + c.items.map(function(it, k){
-            var id = budId(c, k), L = budLine(c, k), m = medInfo(it);
-            return '<tr data-bud="' + id + '"' + (m ? ' data-med="' + m.who + '"' + (medActive(m) ? '' : ' hidden') : '') + '>'
+            var id = budId(c, k), L = budLine(c, k), m = medInfo(it), pl = polInfo(it);
+            return '<tr data-bud="' + id + '"' + (m ? ' data-med="' + m.who + '"' + (medActive(m) ? '' : ' hidden') : '') + (pl ? ' data-pol="' + pl + '"' : '') + '>'
               + '<td class="name">' + (it[2]
                   ? '<input class="lbl" data-bk="label" value="' + esc(L.label) + '" placeholder="' + esc(it[0]) + '">'
-                  : '<span>' + esc(medLabel(it)) + '</span>') + (m ? '<small data-mednote>' + esc(L.note) + '</small>' : '') + '</td>'
+                  : '<span>' + esc(medLabel(it)) + '</span>') + (m || pl ? '<small data-mednote>' + esc(L.note) + '</small>' : '') + '</td>'
               + '<td><select class="nw ' + L.nw + '" data-bk="nw">'
               +   '<option value="need"' + (L.nw === 'need' ? ' selected' : '') + '>Need</option>'
               +   '<option value="want"' + (L.nw === 'want' ? ' selected' : '') + '>Want</option></select></td>'
-              + '<td class="num"><input class="num' + (m && L.auto ? ' auto' : '') + '" data-bk="amt" inputmode="' + (m ? 'decimal' : 'numeric') + '" value="' + (L.amt ? (m ? L.amt.toFixed(2) : fmtN.format(Math.round(L.amt))) : '') + '" placeholder="0"></td>'
+              + '<td class="num"><input class="num' + ((m || pl) && L.auto ? ' auto' : '') + '" data-bk="amt" inputmode="' + (m ? 'decimal' : 'numeric') + '" value="' + (L.amt ? (m ? L.amt.toFixed(2) : fmtN.format(Math.round(L.amt))) : '') + '" placeholder="0"></td>'
               + '<td><input class="mon" type="month" data-bk="start" value="' + esc(L.start) + '"></td>'
               + '<td><input class="mon" type="month" data-bk="end" value="' + esc(L.end) + '"></td>'
               + '<td>' + (m ? '' : '<input class="note" data-bk="note" value="' + esc(L.note) + '" placeholder="Notes">') + '</td>'
@@ -11783,9 +11859,16 @@
       var el = $('budBody').querySelector('[data-sub="' + c.key + '"]');
       if(el) el.textContent = money(t.cats[c.key]);
       c.items.forEach(function(it, k){
-        var m = medInfo(it); if(!m) return;
+        var m = medInfo(it), pl = polInfo(it);
         var tr = $('budBody').querySelector('tr[data-bud="' + budId(c, k) + '"]'); if(!tr) return;
         var L = budLine(c, k);
+        if(pl){
+          var pn = tr.querySelector('[data-mednote]'); if(pn) pn.textContent = L.note;
+          var pa = tr.querySelector('[data-bk="amt"]');
+          if(pa && L.auto && document.activeElement !== pa){ pa.value = L.amt ? fmtN.format(Math.round(L.amt)) : ''; pa.classList.add('auto'); }
+          return;
+        }
+        if(!m) return;
         tr.hidden = !medActive(m);
         var nameEl = tr.querySelector('td.name span'); if(nameEl) nameEl.textContent = medLabel(it);
         var noteEl = tr.querySelector('[data-mednote]'); if(noteEl) noteEl.textContent = L.note;
@@ -12059,6 +12142,43 @@
      readout, and the balances feed the life insurance need (mortgage payoff
      and other debts). Payments are deliberately not pushed into the expense
      budget — the budget is the advisor's own worksheet. */
+  /* Existing life insurance policies (section 08) and long term care policies (section 09). The death
+     benefits by insured feed the Existing life insurance fields, the LTC daily benefits by insured feed the
+     Existing LTC coverage fields, and the premiums feed the Life Insurance and Long Term Care Insurance lines
+     of the section 05 budget — each until the advisor types over the figure. */
+  var LIFE_TYPES = [['term','Term'],['whole','Whole Life'],['iul','IUL']];
+  var lifePolicies = [], lifePolUid = 0, ltcPolicies = [], ltcPolUid = 0;
+  function mkLifePolicy(o){
+    o = o || {};
+    return {id:++lifePolUid, owner:(o.owner === 'spouse' ? 'spouse' : 'client'), insured:(o.insured === 'spouse' ? 'spouse' : 'client'), company:String(o.company || ''),
+            benefit:num(o.benefit), beneficiary:String(o.beneficiary || ''), type:LIFE_TYPES.some(function(t){ return t[0] === o.type; }) ? o.type : 'term',
+            cash:num(o.cash), years:num(o.years), prem:num(o.prem)};
+  }
+  function mkLtcPolicy(o){
+    o = o || {};
+    return {id:++ltcPolUid, owner:(o.owner === 'spouse' ? 'spouse' : 'client'), company:String(o.company || ''), daily:num(o.daily), term:num(o.term), prem:num(o.prem)};
+  }
+  function lifePolicyTotals(who){
+    var t = {n:0, benefit:0, cash:0, prem:0, premOwned:0};
+    lifePolicies.forEach(function(x){ if(x.insured === who){ t.n++; t.benefit += x.benefit; t.cash += x.cash; } if(x.owner === who) t.premOwned += x.prem; t.prem += x.prem; });
+    return t;
+  }
+  function ltcPolicyTotals(who){
+    var t = {n:0, monthly:0, total:0, prem:0, premOwned:0};
+    ltcPolicies.forEach(function(x){ if(x.owner === who){ t.n++; t.monthly += x.daily * 30; t.total += x.daily * 365 * x.term; t.premOwned += x.prem; } t.prem += x.prem; });
+    return t;
+  }
+  /* the Existing life insurance and Existing LTC coverage fields follow the policies while any are listed for the person */
+  function syncPolicyFields(){
+    [['client','C'],['spouse','S']].forEach(function(w){
+      var lp = lifePolicyTotals(w[0]), el = $('lifeExist' + w[1]);
+      el.readOnly = lp.n > 0; el.classList.toggle('auto', lp.n > 0);
+      if(lp.n > 0) el.value = fmtN.format(Math.round(lp.benefit));
+      var tp = ltcPolicyTotals(w[0]), le = $('ltcCov' + w[1]);
+      le.readOnly = tp.n > 0; le.classList.toggle('auto', tp.n > 0);
+      if(tp.n > 0) le.value = fmtN.format(Math.round(tp.monthly));
+    });
+  }
   var DEBT_TYPES = [['mortgage','Mortgage'],['heloc','HELOC'],['card','Credit card'],['signature','Signature loan'],
                     ['auto','Auto loan'],['student','Student loan'],['other','Other debt']];
   var debts = [], debtUid = 0;
@@ -12093,6 +12213,59 @@
     return t;
   }
   function monthLabel(ym){ return longDate(ym + '-01').replace(/ \d+,/, ''); }
+  /* ---- the policy lists (sections 08 and 09) */
+  function whoOpts(sel){
+    var spouse = hasSpouse(null);
+    return '<option value="client"' + (sel === 'client' ? ' selected' : '') + '>' + esc(($('clientFirst').value || '').trim() || 'Client') + '</option>'
+      + (spouse ? '<option value="spouse"' + (sel === 'spouse' ? ' selected' : '') + '>' + esc(($('spouseFirst').value || '').trim() || 'Spouse') + '</option>' : '');
+  }
+  function renderLifePolicies(){
+    $('lifePolBody').innerHTML = lifePolicies.length
+      ? lifePolicies.map(function(x){
+          var types = LIFE_TYPES.map(function(t){ return '<option value="' + t[0] + '"' + (t[0] === x.type ? ' selected' : '') + '>' + t[1] + '</option>'; }).join('');
+          return '<tr data-lpol="' + x.id + '">'
+            + '<td><select class="pwho" data-lk="owner">' + whoOpts(x.owner) + '</select></td>'
+            + '<td><input class="pname" data-lk="company" value="' + esc(x.company) + '" placeholder="Carrier"></td>'
+            + '<td><select class="pwho" data-lk="insured">' + whoOpts(x.insured) + '</select></td>'
+            + '<td class="num"><input class="num" inputmode="numeric" data-lk="benefit" value="' + (x.benefit ? fmtN.format(Math.round(x.benefit)) : '') + '" placeholder="0"></td>'
+            + '<td><input class="pname" data-lk="beneficiary" value="' + esc(x.beneficiary) + '" placeholder="Beneficiary"></td>'
+            + '<td><select class="pwho" data-lk="type">' + types + '</select></td>'
+            + '<td class="num"><input class="num" inputmode="numeric" data-lk="cash" value="' + (x.cash ? fmtN.format(Math.round(x.cash)) : '') + '" placeholder="0"' + (x.type === 'term' ? ' disabled' : '') + '></td>'
+            + '<td class="num"><input class="num" inputmode="decimal" data-lk="years" value="' + (x.years ? String(x.years) : '') + '" placeholder="0"' + (x.type === 'term' ? '' : ' disabled') + '></td>'
+            + '<td class="num"><input class="num" inputmode="numeric" data-lk="prem" value="' + (x.prem ? fmtN.format(Math.round(x.prem)) : '') + '" placeholder="0"></td>'
+            + '<td><button type="button" class="row-x" data-lpdel aria-label="Remove policy">&times;</button></td></tr>';
+        }).join('')
+      : '<tr><td colspan="10"><div class="empty-state">No policies on file — add a line for each life insurance policy in force.</div></td></tr>';
+    renderPolicyTotals();
+  }
+  function renderLtcPolicies(){
+    $('ltcPolBody').innerHTML = ltcPolicies.length
+      ? ltcPolicies.map(function(x){
+          return '<tr data-tpol="' + x.id + '">'
+            + '<td><select class="pwho" data-tk="owner">' + whoOpts(x.owner) + '</select></td>'
+            + '<td><input class="pname" data-tk="company" value="' + esc(x.company) + '" placeholder="Carrier"></td>'
+            + '<td class="num"><input class="num" inputmode="numeric" data-tk="daily" value="' + (x.daily ? fmtN.format(Math.round(x.daily)) : '') + '" placeholder="0"></td>'
+            + '<td class="num"><input class="num" inputmode="decimal" data-tk="term" value="' + (x.term ? String(x.term) : '') + '" placeholder="0"></td>'
+            + '<td class="num" data-ttot="' + x.id + '"></td>'
+            + '<td class="num"><input class="num" inputmode="numeric" data-tk="prem" value="' + (x.prem ? fmtN.format(Math.round(x.prem)) : '') + '" placeholder="0"></td>'
+            + '<td><button type="button" class="row-x" data-tpdel aria-label="Remove policy">&times;</button></td></tr>';
+        }).join('')
+      : '<tr><td colspan="7"><div class="empty-state">No policies on file — add a line for each long term care policy in force.</div></td></tr>';
+    renderPolicyTotals();
+  }
+  function renderPolicyTotals(){
+    if(!$('lifePolFoot')) return;
+    var spouse = hasSpouse(null), ppl = spouse ? ['client','spouse'] : ['client'];
+    var lifeRows = ppl.map(function(w){ var t = lifePolicyTotals(w); return t.n ? '<tr><td colspan="3">' + esc(ownerLabel(w)) + ' insured<small>' + t.n + ' polic' + (t.n === 1 ? 'y' : 'ies') + '</small></td><td class="num"><b>' + money(t.benefit) + '</b></td><td colspan="2"></td><td class="num">' + money(t.cash) + '</td><td></td><td class="num">' + money(t.premOwned) + '<small>owned</small></td><td></td></tr>' : ''; }).join('');
+    var lp = lifePolicyTotals('client');
+    $('lifePolFoot').innerHTML = lifePolicies.length ? lifeRows + '<tr><td colspan="8">Monthly premiums, all policies<small>Life Insurance line of the section 05 budget</small></td><td class="num"><b>' + money(lp.prem) + '</b></td><td></td></tr>' : '';
+    $('lifePolMsg').textContent = lifePolicies.length ? 'The death benefits by insured fill the Existing life insurance fields above; the premiums fill the Life Insurance budget line in section 05 unless an amount is typed there.' : '';
+    ltcPolicies.forEach(function(x){ var td = $('ltcPolBody').querySelector('[data-ttot="' + x.id + '"]'); if(td) td.textContent = x.daily > 0.5 && x.term > 0 ? money(x.daily * 365 * x.term) : '\u2014'; });
+    var ltcRows = ppl.map(function(w){ var t = ltcPolicyTotals(w); return t.n ? '<tr><td colspan="2">' + esc(ownerLabel(w)) + '<small>' + t.n + ' polic' + (t.n === 1 ? 'y' : 'ies') + ' \u00b7 ' + money(t.monthly) + ' a month of benefit</small></td><td class="num">' + money(t.monthly / 30) + '</td><td></td><td class="num"><b>' + money(t.total) + '</b></td><td class="num">' + money(t.premOwned) + '</td><td></td></tr>' : ''; }).join('');
+    var tp = ltcPolicyTotals('client');
+    $('ltcPolFoot').innerHTML = ltcPolicies.length ? ltcRows + '<tr><td colspan="5">Monthly premiums, all policies<small>Long Term Care Insurance line of the section 05 budget</small></td><td class="num"><b>' + money(tp.prem) + '</b></td><td></td></tr>' : '';
+    $('ltcPolMsg').textContent = ltcPolicies.length ? 'The daily benefits fill the Existing LTC coverage fields above (daily benefit \u00d7 30, capped by the benefit term in the estimate); the premiums fill the Long Term Care Insurance budget line in section 05 unless an amount is typed there.' : '';
+  }
   function renderDebtTable(){
     $('debtBody').innerHTML = debts.length
       ? debts.map(function(x){
@@ -12162,6 +12335,59 @@
     var id = +tr.getAttribute('data-debt');
     return debts.filter(function(x){ return x.id === id; })[0] || null;
   }
+  $('lifePolAdd').addEventListener('click', function(){
+    lifePolicies.push(mkLifePolicy({})); renderLifePolicies(); render();
+    var rows = $('lifePolBody').querySelectorAll('tr[data-lpol] input.pname'); if(rows.length) rows[rows.length - 1].focus();
+  });
+  var lifePolFor = function(el){ var tr = el.closest('tr[data-lpol]'); if(!tr) return null; var id = +tr.getAttribute('data-lpol'); return lifePolicies.filter(function(x){ return x.id === id; })[0] || null; };
+  $('lifePolBody').addEventListener('input', function(e){
+    var k = e.target.getAttribute('data-lk'), x = lifePolFor(e.target); if(!k || !x) return;
+    if(k === 'benefit' || k === 'cash' || k === 'prem' || k === 'years') x[k] = Math.max(0, num(e.target.value));
+    else if(k === 'company' || k === 'beneficiary') x[k] = e.target.value;
+    else return;
+    render();
+  });
+  $('lifePolBody').addEventListener('change', function(e){
+    var k = e.target.getAttribute('data-lk'), x = lifePolFor(e.target); if(!k || !x) return;
+    if(k === 'owner' || k === 'insured') x[k] = e.target.value;
+    else if(k === 'type'){ x.type = e.target.value; if(x.type === 'term') x.cash = 0; else x.years = 0; renderLifePolicies(); }
+    else return;
+    render();
+  });
+  $('lifePolBody').addEventListener('blur', function(e){
+    var k = e.target.getAttribute('data-lk');
+    if(k === 'benefit' || k === 'cash' || k === 'prem'){ var v = num(e.target.value); e.target.value = v ? fmtN.format(Math.round(v)) : ''; }
+  }, true);
+  $('lifePolBody').addEventListener('click', function(e){
+    if(!e.target.hasAttribute('data-lpdel')) return;
+    var id = +e.target.closest('tr[data-lpol]').getAttribute('data-lpol');
+    lifePolicies = lifePolicies.filter(function(x){ return x.id !== id; }); renderLifePolicies(); render();
+  });
+  $('ltcPolAdd').addEventListener('click', function(){
+    ltcPolicies.push(mkLtcPolicy({})); renderLtcPolicies(); render();
+    var rows = $('ltcPolBody').querySelectorAll('tr[data-tpol] input.pname'); if(rows.length) rows[rows.length - 1].focus();
+  });
+  var ltcPolFor = function(el){ var tr = el.closest('tr[data-tpol]'); if(!tr) return null; var id = +tr.getAttribute('data-tpol'); return ltcPolicies.filter(function(x){ return x.id === id; })[0] || null; };
+  $('ltcPolBody').addEventListener('input', function(e){
+    var k = e.target.getAttribute('data-tk'), x = ltcPolFor(e.target); if(!k || !x) return;
+    if(k === 'daily' || k === 'term' || k === 'prem') x[k] = Math.max(0, num(e.target.value));
+    else if(k === 'company') x.company = e.target.value;
+    else return;
+    render();
+  });
+  $('ltcPolBody').addEventListener('change', function(e){
+    var k = e.target.getAttribute('data-tk'), x = ltcPolFor(e.target); if(!k || !x) return;
+    if(k === 'owner'){ x.owner = e.target.value; render(); }
+  });
+  $('ltcPolBody').addEventListener('blur', function(e){
+    var k = e.target.getAttribute('data-tk');
+    if(k === 'daily' || k === 'prem'){ var v = num(e.target.value); e.target.value = v ? fmtN.format(Math.round(v)) : ''; }
+  }, true);
+  $('ltcPolBody').addEventListener('click', function(e){
+    if(!e.target.hasAttribute('data-tpdel')) return;
+    var id = +e.target.closest('tr[data-tpol]').getAttribute('data-tpol');
+    ltcPolicies = ltcPolicies.filter(function(x){ return x.id !== id; }); renderLtcPolicies(); render();
+  });
   $('debtAdd').addEventListener('click', function(){
     debts.push(mkDebt({type:debts.length ? 'card' : 'mortgage'}));
     renderDebtTable(); render();
@@ -12530,7 +12756,7 @@
   var scnNames = ['Scenario A', 'Scenario B', 'Scenario C'];
   var scenarios = [null, null, null], activeScn = 0, reportScn = 0;
   function scnDefault(){
-    return {adjMoves:null, INC_ADJ:{yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:'', yWtf:''}, ANN_INC:{}, LTC_BEN:{}, ROOF_G:{},
+    return {adjMoves:null, INC_ADJ:{yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:''}, ANN_INC:{}, LTC_BEN:{}, ROOF_G:{},
             wdOrder:WD_DEFAULT.slice(), rothCfg:{apply:true, target:'auto', start:'auto', order:'roof', irmaa:true}, qcdCfg:qcdDefault()};
   }
   function scnClone(v){ return v == null ? v : JSON.parse(JSON.stringify(v)); }
@@ -12552,7 +12778,7 @@
   function scnRestore(S){
     scnRestoreGlobals(S);
     annSig = ''; ltcBenSig = ''; roofGSig = ''; autoSig = null; autoDirty = true;
-    $('adjYW').value = INC_ADJ.yW || ''; $('adjGPre').value = INC_ADJ.gPre || ''; $('adjGPost').value = INC_ADJ.gPost || ''; $('adjYWtf').checked = INC_ADJ.yWtf === 'yes';
+    $('adjYW').value = INC_ADJ.yW || ''; $('adjGPre').value = INC_ADJ.gPre || ''; $('adjGPost').value = INC_ADJ.gPost || '';
     $('adjWStart').value = INC_ADJ.wStart || '';
   }
   function scnFor(k){ return k === activeScn ? scnSnapshot() : (scenarios[k] || scnDefault()); }
@@ -12734,6 +12960,8 @@
     var solo = !hasSpouse(null);
     if(lastSolo !== null && lastSolo !== solo){ lastSolo = solo; renderAccounts(); }
     lastSolo = solo;
+    syncPolicyFields();
+    renderPolicyTotals();
     renderDebts();
     renderLtc();
     renderLife();
@@ -13371,11 +13599,10 @@
     $(pair[0]).addEventListener('change', function(){ INC_ADJ[pair[1]] = this.value; render(); });
     $(pair[0]).addEventListener('input', function(){ INC_ADJ[pair[1]] = this.value; render(); });
   });
-  $('adjYWtf').addEventListener('change', function(){ INC_ADJ.yWtf = this.checked ? 'yes' : ''; render(); });
   function resetIncomeAdj(){
-    INC_ADJ = {yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:'', yWtf:''};
+    INC_ADJ = {yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:''};
     ANN_INC = {}; annSig = ''; LTC_BEN = {}; ltcBenSig = ''; ROOF_G = {}; roofGSig = '';
-    ['adjYW','adjGPre','adjGPost','adjWStart'].forEach(function(id){ $(id).value = ''; }); $('adjYWtf').checked = false;
+    ['adjYW','adjGPre','adjGPost','adjWStart'].forEach(function(id){ $(id).value = ''; });
   }
   $('adjIncReset').addEventListener('click', function(){ resetIncomeAdj(); render(); });
 
@@ -13482,6 +13709,7 @@
     goals = []; notesText = ''; $('notesText').value = ''; $('goalsMsg').textContent = ''; renderGoals();
     dependents = {adult:[], minor:[]}; renderDependents();
     debts = []; renderDebtTable();
+    lifePolicies = []; ltcPolicies = []; renderLifePolicies(); renderLtcPolicies();
     otherAssets = []; renderOATable();
     ['salaryC','salaryS','deductC','deductS','contribC','contribS','employerC','employerS','raiseC','raiseS','retireC','retireS','contribAcctC','contribAcctS',
      'piaC','piaS']

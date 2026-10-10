@@ -1,4 +1,4 @@
-/* Annuity income and the Walls yield in the tax projection: a federally tax-free Walls yield (section 14),
+/* Annuity income and the Walls yield in the tax projection: a federally tax-free Walls yield (AUM - Tax Free, section 14),
    annuity income taxable unless it is paid from a Roth account, the stress-test and care-event results on the
    scenario cards, the cash flow statement (section 17) and the header graphic. */
 const { chromium } = (function(){ try { return require('playwright'); } catch(e){ return require('playwright-core'); } })();
@@ -75,30 +75,54 @@ const path = require('path');
   console.log('video link:', await p.$eval('#roadVideo',a=>a.href+' '+a.target), '|', await p.$eval('.video-card b',e=>e.textContent));
   if(!(await p.$eval('#roadVideo',a=>/claude\.ai\/artifact\/4betJJT5zWc21C6KhEAQN5/.test(a.href) && a.target==='_blank'))) errs.push('the Reports section should link to The Road to Retirement Fortress video');
   console.log('header background image:', (await p.$eval('.masthead',e=>getComputedStyle(e).backgroundImage)).slice(0,60)); if(!/url\("data:image\/jpeg/.test(await p.$eval('.masthead',e=>getComputedStyle(e).backgroundImage))) errs.push('the header should carry the Fortress graphic as its background');
-  // 2. the Walls yield federally tax-free: no change while the Walls hold only IRA money, a lower federal tax once a non-qualified account is in the Walls
-  await p.$eval('#adjYWtf',e=>{ e.checked=true; e.dispatchEvent(new Event('change',{bubbles:true})); }); await p.waitForTimeout(700);
-  const tfIra=await figs(); console.log('tax-free, IRA-funded Walls:', JSON.stringify(tfIra), '| msg mentions tax-free:', /federally tax-free/.test(await txt('#adjIncMsg')));
-  if(!/federally tax-free/.test(await txt('#adjIncMsg'))) errs.push('the section 14 line should say the yield is federally tax-free');
+  // 2. AUM - Tax Free: a Walls line in that product pays a federally tax-free yield; no change while the Walls hold only IRA money
   const at=await acct('After Tax'); const line=await p.$$eval('#adjBody tr[data-adj]',(rs,id)=>{ const r=rs.find(x=>x.querySelector('select[data-ak=acctId]').value===String(id)); return r? r.dataset.adj : null; }, at);
+  const prodOpts=await p.$eval(`#adjBody tr[data-adj="${line}"] select[data-ok="prod"]`,s=>[...s.options].map(o=>o.value)); console.log('product choices:', JSON.stringify(prodOpts.slice(0,8)));
+  if(!prodOpts.includes('AUM - Tax Free')) errs.push('the product list should offer AUM - Tax Free');
+  if(await p.$('#adjYWtf')) errs.push('the Walls tax-free box should be gone');
   await p.selectOption(`#adjBody tr[data-adj="${line}"] select[data-ak="bucket"]`,'walls'); await p.waitForTimeout(700);
-  const tfNq=await figs(); console.log('tax-free, After Tax in the Walls:', JSON.stringify(tfNq));
-  await p.$eval('#adjYWtf',e=>{ e.checked=false; e.dispatchEvent(new Event('change',{bubbles:true})); }); await p.waitForTimeout(700);
-  const txNq=await figs(); console.log('taxable, After Tax in the Walls:', JSON.stringify(txNq));
-  if(!(tfNq.fed<txNq.fed-100)) errs.push('a federally tax-free yield on non-qualified Walls money should cut the federal tax ('+tfNq.fed+' vs '+txNq.fed+')');
+  const txNq=await figs(); console.log('After Tax in the Walls, AUM:', JSON.stringify(txNq));
+  await p.selectOption(`#adjBody tr[data-adj="${line}"] select[data-ok="prod"]`,'AUM - Tax Free'); await p.waitForTimeout(700);
+  const tfNq=await figs(); console.log('After Tax in the Walls, AUM - Tax Free:', JSON.stringify(tfNq));
+  if(!(tfNq.fed<txNq.fed-100)) errs.push('AUM - Tax Free on non-qualified Walls money should cut the federal tax ('+tfNq.fed+' vs '+txNq.fed+')');
   if(!(tfNq.end>txNq.end)) errs.push('less tax should leave more at the end of plan');
   if(Math.abs(tfNq.state-txNq.state)>1) errs.push('the state model should be unchanged by the federal exemption ('+tfNq.state+' vs '+txNq.state+')');
-  console.log('assumptions mention:', /federally tax-free/.test(await txt('#taxAssume')) ? 'taxable wording (box off)' : 'ok');
-  await p.$eval('#adjYWtf',e=>{ e.checked=true; e.dispatchEvent(new Event('change',{bubbles:true})); }); await p.waitForTimeout(700);
-  if(!/federally tax-free/.test(await txt('#taxAssume'))) errs.push('the section 16 assumptions should say the Walls yield is federally tax-free');
+  if(!/AUM - Tax Free/.test(await txt('#taxAssume'))) errs.push('the section 16 assumptions should name the tax-free share');
   // saved and reloaded with the case
-  const json=await p.$eval('#caseJson',e=>e.value), d=JSON.parse(json); console.log('saved incomeAdj:', JSON.stringify(d.incomeAdj));
-  if(d.incomeAdj.yWtf!=='yes') errs.push('the tax-free flag should save with the case');
+  const json=await p.$eval('#caseJson',e=>e.value); console.log('product saved with the case:', /AUM - Tax Free/.test(json));
+  if(!/AUM - Tax Free/.test(json)) errs.push('the product should save with the case');
   await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(900); await p.click('#expandAll'); await p.waitForTimeout(300);
-  console.log('after reload: box checked', await p.$eval('#adjYWtf',e=>e.checked), '| federal:', (await figs()).fed);
-  if(!(await p.$eval('#adjYWtf',e=>e.checked))) errs.push('reload lost the tax-free flag');
+  console.log('after reload: federal:', (await figs()).fed);
   if(Math.abs((await figs()).fed-tfNq.fed)>1) errs.push('reload changed the federal tax ('+(await figs()).fed+' vs '+tfNq.fed+')');
-  await p.click('#adjIncReset'); await p.waitForTimeout(700); console.log('after reset: box checked', await p.$eval('#adjYWtf',e=>e.checked));
-  if(await p.$eval('#adjYWtf',e=>e.checked)) errs.push('Follow the plan assumptions should clear the flag');
+  const line2=await p.$$eval('#adjBody tr[data-adj]',(rs,id)=>{ const r=rs.find(x=>x.querySelector('select[data-ak=acctId]').value===String(id)); return r? r.dataset.adj : null; }, await acct('After Tax'));
+  await p.selectOption(`#adjBody tr[data-adj="${line2}"] select[data-ok="prod"]`,'AUM'); await p.waitForTimeout(700);
+  if(Math.abs((await figs()).fed-txNq.fed)>1) errs.push('back on AUM the tax should return ('+(await figs()).fed+' vs '+txNq.fed+')');
+  // 2b. existing life insurance and long term care policies feed the calculators and the budget
+  const bud=async pol=>p.$eval(`#budBody tr[data-pol="${pol}"] [data-bk="amt"]`,e=>({v:e.value, auto:e.classList.contains('auto')}));
+  const lifeBefore=await bud('life');   // the sample budget already types a Life Insurance amount: a typed amount is "already in the budget" and wins
+  console.log('budget premium lines before:', JSON.stringify(lifeBefore), JSON.stringify(await bud('ltc')), '| life exist:', await p.$eval('#lifeExistC',e=>e.value), '| ltc cov:', await p.$eval('#ltcCovC',e=>e.value));
+  await p.click('#lifePolAdd'); await p.waitForTimeout(300);
+  const lrow='#lifePolBody tr[data-lpol]'; const lfill=async(k,v)=>{ await p.fill(`${lrow} [data-lk="${k}"]`,v); await p.$eval(`${lrow} [data-lk="${k}"]`,e=>{e.dispatchEvent(new Event('input',{bubbles:true})); e.blur();}); await p.waitForTimeout(300); };
+  await lfill('company','Protective'); await lfill('benefit','500000'); await lfill('years','20'); await lfill('prem','150'); await p.fill(`${lrow} [data-lk="beneficiary"]`,'Jane'); await p.$eval(`${lrow} [data-lk="beneficiary"]`,e=>e.dispatchEvent(new Event('input',{bubbles:true}))); await p.waitForTimeout(400);
+  console.log('life policy: exist field', await p.$eval('#lifeExistC',e=>e.value+(e.readOnly?' (follows)':'')), '| foot:', (await p.$eval('#lifePolFoot',e=>e.textContent.replace(/\s+/g,' ').trim())).slice(0,120), '| budget life line:', JSON.stringify(await bud('life')));
+  if(await p.$eval('#lifeExistC',e=>e.value)!=='500,000' || !(await p.$eval('#lifeExistC',e=>e.readOnly))) errs.push('the client\'s existing coverage should follow the policy');
+  if(!/500,000/.test(await p.$eval('#lifeFoot',e=>e.textContent))) errs.push('the needs analysis should take the policy as coverage in force');
+  const lifeAfter=await bud('life'); if(lifeBefore.auto ? (lifeAfter.v!=='150' || !lifeAfter.auto) : (lifeAfter.v!==lifeBefore.v || lifeAfter.auto)) errs.push('the Life Insurance budget line should carry the premium unless an amount was already typed ('+JSON.stringify(lifeAfter)+')');
+  await p.click('#ltcPolAdd'); await p.waitForTimeout(300);
+  const trow='#ltcPolBody tr[data-tpol]'; const tfill=async(k,v)=>{ await p.fill(`${trow} [data-tk="${k}"]`,v); await p.$eval(`${trow} [data-tk="${k}"]`,e=>{e.dispatchEvent(new Event('input',{bubbles:true})); e.blur();}); await p.waitForTimeout(300); };
+  await tfill('company','Genworth'); await tfill('daily','200'); await tfill('term','3'); await tfill('prem','120'); await p.waitForTimeout(400);
+  console.log('ltc policy: cov field', await p.$eval('#ltcCovC',e=>e.value+(e.readOnly?' (follows)':'')), '| total:', await p.$eval(`${trow} [data-ttot]`,e=>e.textContent), '| budget ltc line:', JSON.stringify(await bud('ltc')));
+  if(await p.$eval('#ltcCovC',e=>e.value)!=='6,000' || !(await p.$eval('#ltcCovC',e=>e.readOnly))) errs.push('the client\'s LTC coverage should follow the policy (daily x 30)');
+  if(await p.$eval(`${trow} [data-ttot]`,e=>e.textContent)!=='$219,000') errs.push('the LTC policy total should be daily x 365 x term');
+  if((await bud('ltc')).v!=='120' || !(await bud('ltc')).auto) errs.push('the Long Term Care Insurance budget line should carry the premium');
+  await p.fill('#budBody tr[data-pol="ltc"] [data-bk="amt"]','200'); await p.$eval('#budBody tr[data-pol="ltc"] [data-bk="amt"]',e=>e.dispatchEvent(new Event('input',{bubbles:true}))); await p.waitForTimeout(400);
+  console.log('typed over the LTC line:', JSON.stringify(await bud('ltc')));
+  if((await bud('ltc')).v!=='200' || (await bud('ltc')).auto) errs.push('a typed budget amount should win over the policy premium');
+  const j2=JSON.parse(await p.$eval('#caseJson',e=>e.value)); console.log('saved policies:', JSON.stringify(j2.lifePolicies), JSON.stringify(j2.ltcPolicies));
+  if(!j2.lifePolicies || j2.lifePolicies[0].benefit!==500000 || !j2.ltcPolicies || j2.ltcPolicies[0].daily!==200) errs.push('policies should save with the case');
+  await p.click(`${lrow} [data-lpdel]`); await p.click(`${trow} [data-tpdel]`); await p.waitForTimeout(500);
+  console.log('after removal: exist field editable', !(await p.$eval('#lifeExistC',e=>e.readOnly)), '| ltc cov editable', !(await p.$eval('#ltcCovC',e=>e.readOnly)));
+  if(await p.$eval('#lifeExistC',e=>e.readOnly) || await p.$eval('#ltcCovC',e=>e.readOnly)) errs.push('without policies the coverage fields should be typed again');
   // 3. annuity income is taxable unless it comes from a Roth account
   const inc=await acct("Investor's Heritage"); const q=await figs();
   await p.selectOption(`#acctBody tr[data-id="${inc}"] select[data-k="tax"]`,'Roth'); await p.waitForTimeout(700);
