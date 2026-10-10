@@ -34,6 +34,9 @@ with Montserrat and Playfair Display installed locally (`assets/fonts/` → `~/.
   data must never be committed or baked in.
 - `docs/advisor-guide.html` — the advisor guide, published as its own artifact. Update it whenever a
   section's behaviour changes; it is written for advisors, in prose, one `<dt>/<dd>` per control.
+  Its numbered sections are also the in-app **User Guide Notes**: `scripts/guide-notes.py` (run by
+  `npm run build`, or `npm run notes`) copies each section body into the mapper between
+  `<!-- guide-notes:NN -->` markers. Edit the guide, never the generated blocks.
 
 Published artifacts (claude.ai): the Blueprint (shared with the org — the **demo**, frozen at v140
 unless Ben asks) and the advisor guide (private). Development builds go to a separate artifact or
@@ -91,7 +94,8 @@ host; the demo is updated only as a deliberate release.
 - Slide builders are IIFEs in page order inside `buildDeck`; `page++` per slide; conditional slides
   (Nitrogen portfolio, QCD, consolidation continuation) must stay conditional.
 - `buildSsReport()` — Social Security Planning Analysis, Letter pages; the internal worksheet PDF
-  (`makePdf`) and the Nitrogen upload text are **not for client distribution** and say so.
+  (`makePdf`) is **not for client distribution** and says so. (The Nitrogen account upload was removed
+  from the Reports section; `buildNitrogenPdf` remains in the file, unused.)
 
 ## Testing expectations
 
