@@ -6,6 +6,7 @@ const path = require('path');
   const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
   await p.goto('file://'+path.resolve(__dirname,'../dist/preview.html'),{waitUntil:'load'}); await p.waitForTimeout(1200);
   await p.click('#expandAll'); await p.waitForTimeout(300);
+  await p.click('#scnTabs [data-scn="0"]'); await p.waitForTimeout(500);   // Scenario A carries the Moat lines in the sample
   const txt=async sel=>(await p.$eval(sel,e=>e.textContent)).replace(/\s+/g,' ').trim();
   const rows=async()=>p.$$eval('#ltcBenBody tr[data-ltc]',rs=>rs.map(r=>({key:r.dataset.ltc,name:r.querySelector('td').textContent.replace(/\s+/g,' ').trim(),amt:r.querySelector('[data-lf=amt]').textContent,mo:r.querySelector('[data-lk=monthly]').placeholder,val:r.querySelector('[data-lk=monthly]').value})));
   console.log(JSON.stringify(await rows(),null,1));

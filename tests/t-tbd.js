@@ -7,6 +7,7 @@ const path = require('path');
   await p.goto('file://'+path.resolve(__dirname,'../dist/preview.html'),{waitUntil:'load'}); await p.waitForTimeout(1200);
   console.log('banner present?', !!(await p.$('#sampleBanner')), '| confidential present?', !!(await p.$('p.confidential')));
   await p.click('#expandAll'); await p.waitForTimeout(300);
+  await p.click('#scnTabs [data-scn="0"]'); await p.waitForTimeout(500);   // Scenario A carries the Moat lines in the sample
   const rows=await p.$$('#adjBody tr[data-adj]'); let moat=null;
   for(const r of rows){ if((await r.$eval('[data-ak=bucket]',e=>e.value))==='moat'){ moat=r; break; } }
   const opts=await moat.$$eval('[data-ok=cust] option',os=>os.map(o=>o.textContent));
