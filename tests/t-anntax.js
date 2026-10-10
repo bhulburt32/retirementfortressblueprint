@@ -76,6 +76,8 @@ const path = require('path');
   if(!(await p.$eval('.masthead #roadVideo',a=>/claude\.ai\/artifact\/4betJJT5zWc21C6KhEAQN5/.test(a.href) && a.target==='_blank'))) errs.push('the header should link to The Road to Retirement Fortress video');
   console.log('header background image:', (await p.$eval('.masthead',e=>getComputedStyle(e).backgroundImage)).slice(0,60)); if(!/url\("data:image\/jpeg/.test(await p.$eval('.masthead',e=>getComputedStyle(e).backgroundImage))) errs.push('the header should carry the Fortress graphic as its background');
   // 2. AUM - Tax Free: a Walls line in that product pays a federally tax-free yield; no change while the Walls hold only IRA money
+  // (at the 3.26% default the Smith plan spends the small After Tax account in its first years, so the comparison runs at 2.5%)
+  await p.fill('#inflation','2.5%'); await p.$eval('#inflation',e=>e.dispatchEvent(new Event('input',{bubbles:true}))); await p.waitForTimeout(700);
   await p.$eval('#rothApply',e=>{ e.checked=false; e.dispatchEvent(new Event('change',{bubbles:true})); }); await p.waitForTimeout(600);   // conversions re-size to federal headroom, so they are off while the state model is compared
   const at=await acct('After Tax'); const line=await p.$$eval('#adjBody tr[data-adj]',(rs,id)=>{ const r=rs.find(x=>x.querySelector('select[data-ak=acctId]').value===String(id)); return r? r.dataset.adj : null; }, at);
   const prodOpts=await p.$eval(`#adjBody tr[data-adj="${line}"] select[data-ok="prod"]`,s=>[...s.options].map(o=>o.value)); console.log('product choices:', JSON.stringify(prodOpts.slice(0,8)));

@@ -11,7 +11,7 @@ const path = require('path');
   await p.click('#scnTabs [data-scn="1"]'); await p.waitForTimeout(600);   // Scenario B: the sample's MYGA and After Tax sit in the Walls there, not in Moat contracts
   const txt=async sel=>(await p.$eval(sel,e=>e.textContent)).replace(/\s+/g,' ').trim();
   const tile=async(box,label)=>p.$eval(box,(e,l)=>{ const d=[...e.querySelectorAll('div')].find(x=>x.querySelector('dt') && x.querySelector('dt').textContent.trim().toLowerCase().startsWith(l)); return d? +d.querySelector('dd').textContent.replace(/[^0-9.-]/g,'') : NaN; }, label);
-  const figs=async()=>({end:await tile('#assetTiles','at end of plan'), today:await tile('#assetTiles','assets today'), seqEnd:await tile('#sensseqTiles','at end of plan'), seqLow:await tile('#sensseqTiles','lowest point')});
+  const figs=async()=>({end:await tile('#assetTiles','at end of plan'), today:await tile('#assetTiles','assets today'), seqEnd:await tile('#sensseqTiles','at end of plan'), seqLow:await tile('#sensseqTiles','lowest point'), wd:await tile('#assetTiles','total withdrawn')});
   const acct=async name=>p.$$eval('#acctBody tr[data-id]',(rs,n)=>{ const r=rs.find(x=>x.querySelector('input[data-k=name]').value.trim()===n); return r? r.dataset.id : null; }, name);
   const setPos=async(id,pos)=>{ await p.selectOption(`#acctBody tr[data-id="${id}"] select[data-k="pos"]`,pos); await p.waitForTimeout(500); };
   const cell=async(id,k,v)=>{ const sel=`#anxBody tr[data-anx="${id}"] [data-ax="${k}"]`; const tag=await p.$eval(sel,e=>e.tagName); if(tag==='SELECT'){ await p.selectOption(sel,v); } else { await p.fill(sel,v); await p.$eval(sel,e=>{e.dispatchEvent(new Event('input',{bubbles:true})); e.blur();}); } await p.waitForTimeout(500); };
@@ -39,7 +39,7 @@ const path = require('path');
   const ih=fixed0; await cell(ih,'rate','10');
   const myga10=await figs(); console.log('MYGA at 10% deferred:', JSON.stringify(myga10)); if(!(myga10.end>base.end)) errs.push('a 10% MYGA rate should lift the ending assets');
   await cell(ih,'interest','taken'); const taken=await figs(); console.log('MYGA interest taken:', JSON.stringify(taken));
-  if(!(taken.end<myga10.end)) errs.push('taking the interest as income should leave less than compounding it');
+  if(!(taken.wd<myga10.wd-100)) errs.push('taking the interest as income should cut the withdrawals ('+taken.wd+' vs '+myga10.wd+')');   // the ending balance can go either way once the plan is drawing on the Walls anyway
   const srcText=await p.$eval('#incSrcNote',e=>e.textContent).catch(()=>''); console.log('income note:', srcText.slice(0,160));
   await cell(ih,'interest','deferred'); await cell(ih,'rate','');
   // 3. a RILA: the floor limits the stress loss, the base case is unchanged
