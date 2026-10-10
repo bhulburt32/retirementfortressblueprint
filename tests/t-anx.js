@@ -20,6 +20,9 @@ const path = require('path');
   // the transfers table carries the current position, following section 06
   console.log('transfers header:', await p.$eval('#adjTable thead',h=>/Current position/.test(h.textContent)), '| first row:', await p.$eval('#adjBody tr[data-adj]',r=>r.querySelector('select[data-ak=acctId] option:checked').textContent.slice(0,30)+' => '+r.querySelector('[data-fpos]').textContent));
   if(!(await p.$eval('#adjTable thead',h=>/Current position/.test(h.textContent)))) errs.push('transfers table lacks the Current position column');
+  const prodOpts=await p.$$eval('#adjBody tr[data-adj]',rs=>rs.slice(0,3).map(r=>[...r.querySelector('select[data-ok=prod]').options].map(o=>o.textContent)));
+  console.log('product lists:', JSON.stringify(prodOpts));
+  prodOpts.forEach(list=>{ const want=['TBD','Checking/Savings','CD','Money Market','AUM','Life Insurance Cash Value'].filter(x=>x!==list[0]); if(JSON.stringify(list.slice(1,1+want.length))!==JSON.stringify(want)) errs.push('product list should open with the generic choices: '+JSON.stringify(list)); if(list.some(x=>/Managed portfolio|^MYGA$|^Savings$/.test(x))) errs.push('old generic products still listed'); });
   if(posOpts.includes('Annuity')) errs.push('the plain Annuity position should be gone');
   // 3. the Annuities subsection follows the annuity positions (the Smith case has three generic ones)
   const rows=async()=>p.$$eval('#anxBody tr[data-anx]',rs=>rs.map(r=>({id:r.dataset.anx, owner:r.querySelector('[data-af=owner]').textContent, name:r.querySelector('[data-af=name]').textContent, type:r.querySelector('select').value,

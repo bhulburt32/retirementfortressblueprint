@@ -1593,7 +1593,7 @@
   <!-- 14. ADJUST THE PROPOSED TRANSFERS -->
   <section id="adjSec">
     <div class="sec-head"><span class="sec-num">14</span><h2>Advisor Adjustments &amp; Transfers</h2></div>
-    <p class="sec-note">Every dollar the waterfall places is listed below. Edit any line and the list becomes the plan — change an amount, send an account to a different level, split it across two, add or drop a line. From that first edit the waterfall stops placing anything; whatever no line covers falls to the Roof as the residual. Everything after this section rebuilds from what you set. The To account, custodian and product columns start as the model's; pick another from the list or choose <b>Custom…</b> to type one — a changed one is shaded, with the model's suggestion noted beneath it. The product list shows the products of whichever custodian or carrier the line uses.</p>
+    <p class="sec-note">Every dollar the waterfall places is listed below. Edit any line and the list becomes the plan — change an amount, send an account to a different level, split it across two, add or drop a line. From that first edit the waterfall stops placing anything; whatever no line covers falls to the Roof as the residual. Everything after this section rebuilds from what you set. The To account, custodian and product columns start as the model's; pick another from the list or choose <b>Custom…</b> to type one — a changed one is shaded, with the model's suggestion noted beneath it. The product list offers TBD, Checking/Savings, CD, Money Market, AUM and Life Insurance Cash Value, then the products of whichever custodian or carrier the line uses.</p>
     <div class="scn-bar">
       <div class="scn-tabs" id="scnTabs"></div>
       <div class="scn-tools">
@@ -3257,10 +3257,10 @@
   }
   function productFor(bucket){
     if(bucket === 'inplace')    return 'Unchanged, no transfer';
-    if(bucket === 'reserve')    return 'Savings or money market';
-    if(bucket === 'foundation') return 'Fixed Indexed Annuity';
-    if(bucket === 'moat')       return 'LTC annuity or life policy';
-    return 'Managed portfolio';
+    if(bucket === 'reserve')    return 'Checking/Savings';
+    if(bucket === 'foundation') return 'Fixed Indexed Annuity';   // the Foundation's product class, and the hook for the Annuity income settings
+    if(bucket === 'moat')       return 'TBD';                     // the LTC contract: a carrier product once the carrier is chosen
+    return 'AUM';
   }
   /* Step 1 — everything consolidates at the receiving custodian. */
   function flagsStep1(a, r){
@@ -4775,7 +4775,7 @@
     return null;
   }
   /* product families offered on every line, ahead of the chosen carrier's own products */
-  var GENERIC_PRODUCTS = ['Savings', 'Checking', 'Money Market', 'CD', 'Fixed Indexed Annuity', 'MYGA', 'Managed portfolio'];
+  var GENERIC_PRODUCTS = ['TBD', 'Checking/Savings', 'CD', 'Money Market', 'AUM', 'Life Insurance Cash Value'];
   function productsFor(cust){
     var k = carrierKeyFor(cust);
     return k ? CARRIER_PRODUCTS[k] : [];
