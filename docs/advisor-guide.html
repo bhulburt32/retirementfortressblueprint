@@ -791,7 +791,8 @@
     <div class="num">06<small>Input</small></div>
     <div class="body">
       <h2>Assets</h2>
-      <p>Three ways in. Pick whichever suits the case:</p>
+      <p>Opening the section opens the account list with it. Three ways in. Pick whichever suits the
+        case:</p>
       <ol class="steps">
         <li><p><b>Upload a spreadsheet.</b> Press <span class="ui">Download template</span> for the
           Alto account template, fill it in, then drop it on the panel or use
@@ -812,8 +813,13 @@
           design is wrong.</li>
         <li><span class="ui">Current position</span> tells the tool what it is looking at. Mark bank
           savings and money market as <b>Cash</b> — that is what the liquidity buffer keys on, and a
-          household with no Cash row gets no buffer. <b>Annuity</b> and <b>LTC / Life</b> get their
-          own handling for assignments and 1035s.</li>
+          household with no Cash row gets no buffer. The annuity positions &mdash; <b>MYGA Annuity</b>,
+          <b>Variable Annuity</b>, <b>Income Annuity (FIA)</b>, <b>Growth Annuity (FIA)</b>, and the
+          plain <b>Annuity</b> older cases carry &mdash; and <b>LTC / Life</b> get their own handling
+          for assignments and 1035s, and every annuity position lists its contract in the
+          <span class="ui">Annuities</span> panel below. An uploaded or pasted position such as
+          <i>MYGA</i>, <i>variable annuity</i>, <i>FIA with income rider</i> or <i>fixed indexed
+          annuity</i> resolves to the matching type.</li>
       </ul>
 
       <p>The <span class="ui">Transfer?</span> column at the end holds an account back. Set it to
@@ -828,6 +834,19 @@
         it; the assumptions line under each one shows the blended rates.</p>
 
       <dl class="fields">
+        <dt>Annuities</dt>
+        <dd>A panel under the accounts with one row per account whose current position is an
+          annuity: the owner and account from the list, then <span class="ui">Company</span> (follows
+          the custodian until typed), <span class="ui">Product</span>, <span class="ui">Type</span>
+          (the account's current position &mdash; change it here or in the list, the other follows),
+          <span class="ui">Rate</span> for a MYGA, <span class="ui">Maturity date</span>,
+          <span class="ui">Monthly income</span> for an income annuity, <span class="ui">Fees</span>
+          as a percent a year, and <span class="ui">Cap rate</span> and <span class="ui">Participation
+          rate</span> for the two FIAs; cells that do not apply to the type are greyed out. The
+          details save with the case and print in the worksheet under <em>Annuity contracts</em>. They
+          are a record: the Growth column in the account list still drives the projections, and a
+          contract already paying out is entered under Other guaranteed income in section&nbsp;04,
+          linked to the account.</dd>
         <dt>Other assets</dt>
         <dd>A second panel under the accounts for real assets outside the Fortress &mdash; primary
           residence, vacation home, rental property, land, a business interest, vehicles or other

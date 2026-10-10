@@ -304,6 +304,15 @@
   #acctTable{min-width:1180px}
   #acctTable td input.pcola{min-width:84px;max-width:96px}
   table.oa td input.pname{min-width:200px}
+  table.anx{min-width:1240px}
+  table.anx th:first-child{width:auto}
+  table.anx td:first-child{font-weight:600;color:var(--ink-2);font-size:14px;white-space:nowrap}
+  table.anx td:first-child small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+  table.anx td input{min-width:88px;max-width:170px}
+  table.anx td input.pct{min-width:70px;max-width:92px}
+  table.anx td input.auto{color:var(--muted)}
+  table.anx td input:disabled{opacity:.35}
+  table.anx td select{min-width:200px}
   #adjTable{min-width:1380px}
   sup.mark{font-size:.5em;vertical-align:super;font-weight:600;color:var(--muted);margin-left:1px}
   /* Section 14 is the widest thing on the page; it keeps to the same column
@@ -1174,7 +1183,7 @@
     </div>
   </section>
   <!-- 6. ACCOUNTS -->
-  <section>
+  <section id="acctSec">
     <div class="sec-head"><span class="sec-num">06</span><h2>Assets</h2></div>
     <p class="sec-note">Tax type drives the waterfall. Owner and current position drive the transfer flags. Set <b>Transfer?</b> to <b>Stay as is</b> for any account the client will not move — it is then held out of the plan entirely. The <b>Growth</b> column is each account's assumed annual growth; leave it blank and the account takes the plan rate for the level its money lands in (Walls, Roof or, if it stays as is, the Walls rate), and a rate typed there is weighted into the projections for that level.</p>
     <div class="panel">
@@ -1243,6 +1252,18 @@
           </div>
         </details>
       </div>
+    </div>
+    <div class="panel panel-pad" style="margin-top:18px">
+      <div class="inc-title">Annuities<small>Contract details for every account whose current position is an annuity &mdash; one row per contract, from the account list above</small></div>
+      <div class="tbl-scroll">
+        <table id="anxTable" class="emp pen anx">
+          <thead>
+            <tr><th>Owner<small>And the account</small></th><th>Company</th><th>Product</th><th>Type</th><th>Rate<small>MYGA</small></th><th>Maturity date</th><th class="num">Monthly income<small>Income annuity</small></th><th>Fees<small>% a year</small></th><th>Cap rate<small>FIA</small></th><th>Participation rate<small>FIA</small></th></tr>
+          </thead>
+          <tbody id="anxBody"></tbody>
+        </table>
+      </div>
+      <p class="hint" id="anxMsg" style="margin-top:10px"></p>
     </div>
     <div class="panel panel-pad" style="margin-top:18px">
       <div class="inc-title">Other assets<small>Real assets outside the Fortress &mdash; the home, other property, a business. Counted in net worth, not in the levels or the projections</small></div>
@@ -1998,7 +2019,18 @@
     [ {tax:'Qualified', bucket:'roof'} ]
   ];
 
-  var POSITIONS = ['Cash','Market','Annuity','LTC / Life','Unassigned'];
+  var POSITIONS = ['Cash','Market','Annuity','MYGA Annuity','Variable Annuity','Income Annuity (FIA)','Growth Annuity (FIA)','LTC / Life','Unassigned'];
+  /* every annuity position: the generic one older cases carry, and the four contract types */
+  var ANNUITY_POS = {'Annuity':1, 'MYGA Annuity':1, 'Variable Annuity':1, 'Income Annuity (FIA)':1, 'Growth Annuity (FIA)':1};
+  function isAnnuityPos(p){ return !!ANNUITY_POS[p]; }
+  function posShort(p){ return ({'MYGA Annuity':'MYGA', 'Variable Annuity':'Variable annuity', 'Income Annuity (FIA)':'Income FIA', 'Growth Annuity (FIA)':'Growth FIA'})[p] || p; }
+  /* the contract details kept on an annuity account (section 06, Annuities) */
+  function annFrom(o){
+    o = (o && typeof o === 'object') ? o : {};
+    var pc = function(v){ return (v == null || v === '') ? null : +v; };
+    return {company:String(o.company || ''), product:String(o.product || ''), rate:pc(o.rate), maturity:String(o.maturity || ''), monthly:pc(o.monthly), fees:pc(o.fees), cap:pc(o.cap), part:pc(o.part)};
+  }
+  function annAny(x){ return !!(x && (x.company || x.product || x.rate != null || x.maturity || x.monthly != null || x.fees != null || x.cap != null || x.part != null)); }
   var TAXTYPES  = ['Qualified','Roth','Non-Qualified'];
   var OWNERS    = ['client','spouse','joint','trust'];
 
@@ -2050,7 +2082,9 @@
       val:  o.val  || 0,
       move: o.move === 'no' ? 'no' : 'yes',
       /* assumed annual growth; null = the plan rate for the level the money lands in */
-      growth: (o.growth == null || o.growth === '') ? null : +o.growth
+      growth: (o.growth == null || o.growth === '') ? null : +o.growth,
+      /* annuity contract details, kept for the annuity positions (section 06, Annuities) */
+      ann: annFrom(o.ann)
     };
   }
 
@@ -2573,7 +2607,7 @@
   function carrierFromAccounts(pos){
     var best = null;
     accounts.forEach(function(a){
-      if(a.pos !== pos || !(a.cust || '').trim()) return;
+      if((pos === 'Annuity' ? !isAnnuityPos(a.pos) : a.pos !== pos) || !(a.cust || '').trim()) return;   // 'Annuity' means any annuity type
       if(!best || a.val > best.val) best = a;
     });
     return best ? best.cust.trim() : '';
@@ -3189,7 +3223,7 @@
     }
     if(custMatch(a.cust, nc)){
       out.push({lvl:'ok', txt:'Already at ' + nc + ' — internal re-registration, no ACATS and no delivering-firm paperwork.'});
-    } else if(a.pos === 'Annuity'){
+    } else if(isAnnuityPos(a.pos)){
       out.push({lvl:'caution', txt:'An in-force annuity does not move by ACATS. Either assign the contract to ' + nc + ' where the carrier and platform both support it, or leave it with the carrier and change the advisor of record. Check the surrender schedule and free-withdrawal amount first.'});
     } else if(a.pos === 'Cash'){
       out.push({lvl:'', txt:'Bank cash does not move by ACATS — open the account at ' + nc + ' first, then fund it by wire or ACH from ' + (a.cust || 'the bank') + '.'});
@@ -3230,7 +3264,7 @@
     if(b === 'moat'){
       if(a.tax === 'Qualified'){
         out.push({lvl:'alert', txt:'Qualified dollars into LTC coverage. Tax-free LTC benefits under a §7702B contract generally require non-qualified money — an IRA-funded solution distributes as taxable income. Re-check the product before quoting.'});
-      } else if(a.pos === 'Annuity'){
+      } else if(isAnnuityPos(a.pos)){
         out.push({lvl:'ok', txt:'1035 exchange from the existing non-qualified annuity into a qualifying LTC annuity at ' + carrier + ' — gain generally transfers without recognition.'});
       } else {
         out.push({lvl:'caution', txt:'Liquidating taxable positions at ' + r.inputs.newCust + ' to fund the ' + carrier + ' contract realizes capital gains — coordinate with the tax preparer on timing.'});
@@ -4025,7 +4059,7 @@
           + ' but titled ' + (a.owner === 'joint' ? 'jointly' : 'to a trust')
           + ' — a retirement account cannot be. Fix the owner before any paperwork goes out.'});
       }
-      if(a.pos === 'Annuity'){
+      if(isAnnuityPos(a.pos)){
         out.push({lvl:'caution', txt:'"' + (a.name || 'Untitled') + '" is an in-force annuity and will not move by ACATS. Assign the contract where the carrier and platform allow it, or 1035 it into the destination contract. Check the surrender schedule first.'});
       }
       if(a.pos === 'Cash' && a.tax === 'Non-Qualified'){
@@ -4354,7 +4388,7 @@
      Walls and Roof. The liquidity buffer (savings), the Foundation income
      sleeve (annuity) and the Moat (LTC annuity or life policy) are out. */
   var MANAGED_BUCKETS = ['walls','roof'];
-  var UNMANAGED_POS   = {'Cash':1, 'Annuity':1, 'LTC / Life':1};
+  var UNMANAGED_POS   = {'Cash':1, 'Annuity':1, 'MYGA Annuity':1, 'Variable Annuity':1, 'Income Annuity (FIA)':1, 'Growth Annuity (FIA)':1, 'LTC / Life':1};
 
   function aumPlan(r){
     var managed = MANAGED_BUCKETS.reduce(function(s, k){ return s + r.funded[k]; }, 0);
@@ -5346,6 +5380,19 @@
       para('Net worth ' + money(r.total + OT.val - ODT.bal) + ': accounts ' + money(r.total) + (OT.val > 0.5 ? ' plus other assets ' + money(OT.val) : '') + (ODT.bal > 0.5 ? ' less debts ' + money(ODT.bal) : '') + '. The Fortress levels and the projections are sized from the accounts alone; other assets are carried for the balance sheet.');
     }
 
+    /* ---------- annuity contracts ---------- */
+    (function(){
+      var ANX = annuityAccounts(); if(!ANX.length) return;
+      need(60 + 13 * ANX.length);
+      h2('Annuity contracts');
+      var xcols = [{t:'Account / owner', w:118, s:7.5}, {t:'Company', w:66, s:7.5}, {t:'Product', w:74, s:7.5}, {t:'Type', w:60, s:7.5}, {t:'Rate', w:34, a:'r', f:'F3', s:7.5}, {t:'Maturity', w:46, s:7.5},
+                   {t:'Monthly', w:48, a:'r', f:'F3', s:7.5}, {t:'Fees', w:34, a:'r', f:'F3', s:7.5}, {t:'Cap', w:34, a:'r', f:'F3', s:7.5}, {t:'Particip.', w:0, a:'r', f:'F3', s:7.5}];
+      var usedX = xcols.reduce(function(a, c){ return a + c.w; }, 0); xcols[xcols.length - 1].w = CW - usedX;
+      var xrows = ANX.map(function(a){ var x = a.ann; return {cells:[(a.name || 'Untitled') + ' (' + ownerLabel(a.owner) + ', ' + money(a.val) + ')', x.company || a.cust || '-', x.product || '-', posShort(a.pos),
+        x.rate != null ? pc2(x.rate) : '-', x.maturity || '-', x.monthly != null ? money(x.monthly) : '-', x.fees != null ? pc2(x.fees) : '-', x.cap != null ? pc2(x.cap) : '-', x.part != null ? pc2(x.part) : '-']}; });
+      table(xcols, xrows, {rowH:13});
+    })();
+
     /* ---------- status quo projection ---------- */
     if(accounts.length){
       var SQ = statusQuoRun(r), SQL = SQ.rows[SQ.rows.length - 1], SQ0 = SQ.rows[0];
@@ -6272,7 +6319,10 @@
   }
   function matchPos(s){
     var v = String(s||'').toLowerCase();
-    if(/annuit|fia\b|myga|spia/.test(v)) return 'Annuity';
+    if(/myga|multi.?year/.test(v)) return 'MYGA Annuity';
+    if(/variable/.test(v) && /annuit|\bva\b/.test(v)) return 'Variable Annuity';
+    if(/fia\b|indexed/.test(v)) return /income|gli|rider/.test(v) ? 'Income Annuity (FIA)' : 'Growth Annuity (FIA)';
+    if(/annuit|spia/.test(v)) return 'Annuity';
     if(/cash|savings|checking|money market|cd\b/.test(v)) return 'Cash';
     if(/ltc|long.term|life|hybrid/.test(v)) return 'LTC / Life';
     if(/market|equit|fund|etf|stock|bond|brokerage|invest/.test(v)) return 'Market';
@@ -6324,7 +6374,9 @@
               adults:dependents.adult.filter(function(d){ return d.name || d.age; }),
               minors:dependents.minor.filter(function(d){ return d.name || d.age; })},
       accounts:accounts.map(function(a){
-        return {name:a.name,owner:a.owner,cust:a.cust,tax:a.tax,pos:a.pos,val:a.val,move:a.move,growth:a.growth};
+        var o = {name:a.name,owner:a.owner,cust:a.cust,tax:a.tax,pos:a.pos,val:a.val,move:a.move,growth:a.growth};
+        if(annAny(a.ann)) o.ann = a.ann;
+        return o;
       }),
       budget:(function(){
         var out = {}, any = false;
@@ -6912,7 +6964,7 @@
     if(a.pos === 'LTC / Life') return null;
     if(a.tax === 'Roth') return 'roth';
     if(a.tax === 'Qualified') return 'deferred';
-    return a.pos === 'Annuity' ? 'deferred' : 'taxable';
+    return isAnnuityPos(a.pos) ? 'deferred' : 'taxable';
   }
   function wdGroups(){
     var g = {taxable:[], deferred:[], roth:[]};
@@ -8275,7 +8327,7 @@
      section 17 runs it, with every account marked as staying put. */
   function sqDefaultGrowth(a, gW, gR){
     if(a.pos === 'Cash') return 0;
-    if(a.pos === 'Annuity') return gW;
+    if(isAnnuityPos(a.pos)) return gW;
     if(a.pos === 'LTC / Life') return 0;
     return gR;
   }
@@ -10197,6 +10249,76 @@
       + '<span class="gap-math">Accounts above ' + money(r.total) + (T.val > 0.5 ? ' + other assets ' + money(T.val) : '') + (D.bal > 0.5 ? ' − debts ' + money(D.bal) + ' (section 07)' : '')
       + '. The Fortress levels and every projection are sized from the accounts only; other assets are carried for the balance sheet and print in the worksheet.</span>';
   }
+  /* ---- Annuities (section 06): one row per account in an annuity position, with the contract
+     details that the account list has no columns for. Owner and type come from the account
+     row; Company follows the custodian until typed. Rate applies to a MYGA, monthly income to
+     an income annuity, cap and participation rates to the two FIAs. ---- */
+  var anxSig = null;
+  var ANX_FIELDS = {rate:['MYGA Annuity'], monthly:['Income Annuity (FIA)'], cap:['Income Annuity (FIA)', 'Growth Annuity (FIA)'], part:['Income Annuity (FIA)', 'Growth Annuity (FIA)']};
+  function anxOn(k, pos){ return !ANX_FIELDS[k] || ANX_FIELDS[k].indexOf(pos) >= 0; }
+  function pc2(v){ return v == null ? '' : (v * 100).toFixed(2).replace(/\.?0+$/, '') + '%'; }
+  function annuityAccounts(){ return accounts.filter(function(a){ return isAnnuityPos(a.pos); }); }
+  function renderAnnuityAssets(){
+    var body = $('anxBody'); if(!body) return;
+    var rows = annuityAccounts();
+    var sig = rows.map(function(a){ return a.id + ':' + a.pos; }).join('|') + '|' + hasSpouse(null);
+    if(anxSig !== sig){
+      anxSig = sig;
+      var typeOpts = function(sel){ return POSITIONS.filter(isAnnuityPos).map(function(p){ return '<option value="' + p + '"' + (p === sel ? ' selected' : '') + '>' + (p === 'Annuity' ? 'Annuity (type not set)' : p) + '</option>'; }).join(''); };
+      body.innerHTML = rows.length ? rows.map(function(a){
+        var x = a.ann, dis = function(k){ return anxOn(k, a.pos) ? '' : ' disabled'; };
+        return '<tr data-anx="' + a.id + '">'
+          + '<td><span data-af="owner"></span><small data-af="name"></small></td>'
+          + '<td><input data-ax="company" value="' + esc(x.company) + '" placeholder="Carrier"></td>'
+          + '<td><input data-ax="product" value="' + esc(x.product) + '" placeholder="Product"></td>'
+          + '<td><select data-ax="pos">' + typeOpts(a.pos) + '</select></td>'
+          + '<td><input class="pct" inputmode="decimal" data-ax="rate" value="' + pc2(x.rate) + '" placeholder="0.00%"' + dis('rate') + '></td>'
+          + '<td><input class="mon" type="month" data-ax="maturity" value="' + esc(x.maturity) + '"></td>'
+          + '<td class="num"><input class="num" inputmode="numeric" data-ax="monthly" value="' + (x.monthly != null ? fmtN.format(Math.round(x.monthly)) : '') + '" placeholder="0"' + dis('monthly') + '></td>'
+          + '<td><input class="pct" inputmode="decimal" data-ax="fees" value="' + pc2(x.fees) + '" placeholder="0.00%"></td>'
+          + '<td><input class="pct" inputmode="decimal" data-ax="cap" value="' + pc2(x.cap) + '" placeholder="0.00%"' + dis('cap') + '></td>'
+          + '<td><input class="pct" inputmode="decimal" data-ax="part" value="' + pc2(x.part) + '" placeholder="100%"' + dis('part') + '></td>'
+          + '</tr>';
+      }).join('') : '<tr><td colspan="10"><div class="empty-state">No annuity positions — set an account’s current position to MYGA, Variable, Income (FIA) or Growth (FIA) annuity in the account list and it appears here.</div></td></tr>';
+    }
+    rows.forEach(function(a){
+      var tr = body.querySelector('tr[data-anx="' + a.id + '"]'); if(!tr) return;
+      tr.querySelector('[data-af="owner"]').textContent = ownerLabel(a.owner);
+      tr.querySelector('[data-af="name"]').textContent = (a.name || 'Untitled account') + ' · ' + money(a.val);
+      var co = tr.querySelector('[data-ax="company"]');
+      if(document.activeElement !== co){ var own = a.ann.company.trim() !== ''; co.value = own ? a.ann.company : (a.cust || ''); co.classList.toggle('auto', !own); }
+    });
+    var n = rows.length, named = rows.filter(function(a){ return a.pos !== 'Annuity'; }).length;
+    $('anxMsg').textContent = !n ? ''
+      : n + ' annuity contract' + (n === 1 ? '' : 's') + (named < n ? ' · ' + (n - named) + ' without a type yet' : '') + '. Company follows the custodian until typed. The Growth column in the account list still drives the projections; income from a contract in payment is entered under Other guaranteed income in section 04, linked to the account.';
+  }
+  function anxFor(el){
+    var tr = el.closest('tr[data-anx]'); if(!tr) return null;
+    return acctById(+tr.getAttribute('data-anx')) || null;
+  }
+  $('anxBody').addEventListener('input', function(e){
+    var k = e.target.getAttribute('data-ax'), a = anxFor(e.target); if(!k || !a || k === 'pos') return;
+    var v = e.target.value;
+    if(k === 'company' || k === 'product' || k === 'maturity') a.ann[k] = v;
+    else if(k === 'monthly') a.ann.monthly = v.trim() === '' ? null : num(v);
+    else a.ann[k] = v.trim() === '' ? null : pctIn(v);
+    if(k === 'company') e.target.classList.remove('auto');
+    $('caseJson').value = caseData();
+  });
+  $('anxBody').addEventListener('change', function(e){
+    var k = e.target.getAttribute('data-ax'), a = anxFor(e.target); if(!k || !a) return;
+    if(k === 'pos'){   // the type is the account's current position: change it in both tables
+      a.pos = e.target.value;
+      var sel = $('acctBody').querySelector('tr[data-id="' + a.id + '"] select[data-k="pos"]'); if(sel) sel.value = a.pos;
+      anxSig = null; render();
+    } else if(k === 'maturity'){ a.ann.maturity = e.target.value; $('caseJson').value = caseData(); }
+  });
+  $('anxBody').addEventListener('blur', function(e){
+    var k = e.target.getAttribute('data-ax'), a = anxFor(e.target); if(!k || !a) return;
+    if(k === 'monthly') e.target.value = a.ann.monthly != null ? fmtN.format(Math.round(a.ann.monthly)) : '';
+    else if(k === 'rate' || k === 'fees' || k === 'cap' || k === 'part') e.target.value = pc2(a.ann[k]);
+    else if(k === 'company' && e.target.value.trim() === ''){ a.ann.company = ''; e.target.value = a.cust || ''; e.target.classList.add('auto'); }
+  }, true);
   function oaFor(el){
     var tr = el.closest('tr[data-oa]'); if(!tr) return null;
     var id = +tr.getAttribute('data-oa');
@@ -10599,6 +10721,7 @@
     renderStrip(r, 'stripAdj');
     renderAdjAlloc(base, r);
     renderOA(r);
+    renderAnnuityAssets();
     renderIncomeAdj(r);
     var TXR = renderTax(r);
     renderAssets(r, TXR);
@@ -12222,7 +12345,7 @@
     var stateName = TX.stateName || 'State';
     var frame = function(s, eyebrow, title, dark, o){ dkFrame(doc, s, eyebrow, title, dark, page, o, logo); };
     var dash = '—';
-    var blended = totalVal > 0.5 ? accounts.reduce(function(a, x){ return a + x.val * (x.growth != null ? x.growth : (x.pos === 'Market' ? i.growthR : x.pos === 'Annuity' ? i.growthW : 0)); }, 0) / totalVal : i.growthR;
+    var blended = totalVal > 0.5 ? accounts.reduce(function(a, x){ return a + x.val * (x.growth != null ? x.growth : (x.pos === 'Market' ? i.growthR : isAnnuityPos(x.pos) ? i.growthW : 0)); }, 0) / totalVal : i.growthR;
     var bt = budgetTotals(), detailed = bt.entered > 0.5;
     var lineVal = function(c, k){ var L = budLine(c, k), v = Math.max(0, L.amt || 0), m = medInfo(c.items[k]); if(m && !medActive(m)) v = 0; return v; };
 
@@ -12409,7 +12532,7 @@
     (function(){
       var s = doc.slide(); page++;
       frame(s, '', 'Your Assets and Net Worth');
-      var arows = accounts.slice(0, 8).map(function(a){ return [a.name || 'Untitled', ownerLabel(a.owner), a.cust || dash, a.pos === 'Cash' ? 'Cash' : a.tax, a.pos, a.growth != null ? pc1(a.growth) : 'plan rate', money(a.val)]; });
+      var arows = accounts.slice(0, 8).map(function(a){ return [a.name || 'Untitled', ownerLabel(a.owner), a.cust || dash, a.pos === 'Cash' ? 'Cash' : a.tax, posShort(a.pos), a.growth != null ? pc1(a.growth) : 'plan rate', money(a.val)]; });
       if(accounts.length > 8) arows.push([accounts.length - 8 + ' more account' + (accounts.length - 8 === 1 ? '' : 's'), '', '', '', '', '', money(accounts.slice(8).reduce(function(a, x){ return a + x.val; }, 0))]);
       arows.push({cls:'tot', cells:['Total investable accounts', '', '', '', '', '', money(totalVal)]});
       dkLabel(s, 0.9, 1.95, 9, 'Investable accounts');
@@ -13188,6 +13311,9 @@
   function secOpen(sec, open){
     sec.classList.toggle('closed', !open);
     tglSet(sec.querySelector('.sec-head .tgl-btn'), open);
+    if(open && sec.id === 'acctSec'){   // the account list opens with the Assets section
+      var h = sec.querySelector('.tgl-head.tbl-head'); if(h && h.classList.contains('closed')) headOpen(h, true);
+    }
     if(open) window.dispatchEvent(new Event('resize'));
   }
   function headOpen(head, open){

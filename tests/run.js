@@ -14,6 +14,7 @@ const SUITE = [
   't-sens',      // sensitivity analysis
   't-prorate',   // first-year proration
   't-anngroup',  // annuity contracts combined by To account
+  't-anx',       // section 06: account list opens with the section, annuity position types, the Annuities subsection
   't-ltcmerge',  // one LTC contract per insured
   't-ltcscn',    // care-event projections
   't-jobs',      // additional employment incomes
