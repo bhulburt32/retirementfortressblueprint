@@ -74,7 +74,7 @@ const path = require('path');
   if((await p.$$eval('#penBody tr[data-pen]',rs=>rs.length))!==penRows0) errs.push('removing the added pension should restore the list');
   console.log('video link:', await p.$eval('#roadVideo',a=>a.href+' '+a.target), '|', await p.$eval('.video-card b',e=>e.textContent));
   if(!(await p.$eval('#roadVideo',a=>/claude\.ai\/artifact\/4betJJT5zWc21C6KhEAQN5/.test(a.href) && a.target==='_blank'))) errs.push('the Reports section should link to The Road to Retirement Fortress video');
-  console.log('hero image:', await p.$eval('#heroImg',e=>e.naturalWidth+'x'+e.naturalHeight)); if(!(await p.$eval('#heroImg',e=>e.naturalWidth>0))) errs.push('the header graphic did not load');
+  console.log('header background image:', (await p.$eval('.masthead',e=>getComputedStyle(e).backgroundImage)).slice(0,60)); if(!/url\("data:image\/jpeg/.test(await p.$eval('.masthead',e=>getComputedStyle(e).backgroundImage))) errs.push('the header should carry the Fortress graphic as its background');
   // 2. the Walls yield federally tax-free: no change while the Walls hold only IRA money, a lower federal tax once a non-qualified account is in the Walls
   await p.$eval('#adjYWtf',e=>{ e.checked=true; e.dispatchEvent(new Event('change',{bubbles:true})); }); await p.waitForTimeout(700);
   const tfIra=await figs(); console.log('tax-free, IRA-funded Walls:', JSON.stringify(tfIra), '| msg mentions tax-free:', /federally tax-free/.test(await txt('#adjIncMsg')));
@@ -122,6 +122,28 @@ const path = require('path');
   if(!(lineRoth.fed<lineBefore.fed-100)) errs.push('an annuity line paid from a Roth account should not be taxed ('+lineRoth.fed+' vs '+lineBefore.fed+')');
   await p.selectOption('#annBody tr[data-ann] select[data-ak2="acctId"]', ''); await p.waitForTimeout(700);
   if(Math.abs((await figs()).fed-lineBefore.fed)>1) errs.push('unlinking the line should restore the tax');
+  // 1f. birthdates set the ages; a tax-deferred withdrawal before 59½ carries the 10% penalty; the Nitrogen upload is gone; the navy header
+  console.log('nitrogen button:', (await p.$('#makeNitrogen')) ? 'present' : 'gone', '| logo:', (await p.$eval('#brandImg',e=>e.src.slice(0,22))), '| header background:', /url\(/.test(await p.$eval('.masthead',e=>getComputedStyle(e).backgroundImage)));
+  if(await p.$('#makeNitrogen')) errs.push('the Nitrogen account upload should be gone from Reports');
+  if(!/^data:image\/png/.test(await p.$eval('#brandImg',e=>e.src)) || !/url\(/.test(await p.$eval('.masthead',e=>getComputedStyle(e).backgroundImage))) errs.push('the header should carry the transparent logo over the Fortress background');
+  const ages0=[await p.$eval('#clientAge',e=>e.value), await p.$eval('#spouseAge',e=>e.value)];
+  for(const [id,v] of [['clientDob','1969-05-10'],['spouseDob','1971-02-01']]){ await p.fill('#'+id,v); await p.$eval('#'+id,e=>e.dispatchEvent(new Event('change',{bubbles:true}))); await p.waitForTimeout(500); }
+  console.log('ages from birthdates:', await p.$eval('#clientAge',e=>e.value+(e.readOnly?' (calculated)':'')), await p.$eval('#spouseAge',e=>e.value), '| pension calculator DOB:', await p.$eval('#pbcDob',e=>e.value));
+  if(await p.$eval('#clientAge',e=>e.value)!=='57' || await p.$eval('#spouseAge',e=>e.value)!=='55' || !(await p.$eval('#clientAge',e=>e.readOnly))) errs.push('the ages should be calculated from the birthdates at the plan date');
+  if(!JSON.parse(await p.$eval('#caseJson',e=>e.value)).household.clientDob) errs.push('the birthdate should save with the case');
+  await p.click('#wdList button[data-wd="up"][data-k="1"]'); await p.waitForTimeout(700);   // tax-deferred first, so the early years draw on the IRAs
+  const th=await p.$eval('#taxTable thead',e=>[...e.querySelectorAll('th')].map(t=>t.textContent.trim()));
+  const tr=await p.$$eval('#taxTable tbody tr',rs=>rs.map(r=>[...r.querySelectorAll('td')].map(t=>t.textContent.trim())));
+  const iPen=th.findIndex(h=>/Early withdrawal penalty/.test(h)), iWd=th.findIndex(h=>/^Withdrawals/.test(h));
+  console.log('penalty column:', iPen>=0, '| first rows:', tr.slice(0,3).map(r=>r[1]+' wd '+r[iWd]+' pen '+(iPen>=0?r[iPen]:'-')).join(' ; '));
+  if(iPen<0) errs.push('the tax table should show the early-withdrawal penalty column');
+  else tr.filter(r=>r[1].split('/').every(a=>+a<59)).forEach(r=>{ const def=+(r[iWd].split('/')[1]||'0').replace(/[^0-9.]/g,''), pen=+r[iPen].replace(/[^0-9.]/g,''); if(def>0.5 && Math.abs(pen-def*0.10)>2) errs.push('penalty should be 10% of the tax-deferred draw while both are under 59 ('+r[0]+': '+pen+' vs '+def+')'); });
+  if(!tr.some(r=>r[1].split('/').every(a=>+a<59) && +(r[iWd].split('/')[1]||'0').replace(/[^0-9.]/g,'')>0.5)) errs.push('no tax-deferred draw before 59 to test the penalty on');
+  const after595=tr.filter(r=>r[1].split('/').every(a=>+a>=61)); if(iPen>=0 && after595.some(r=>+r[iPen].replace(/[^0-9.]/g,'')>0.5)) errs.push('no penalty should apply once both are past 59½');
+  await p.click('#wdList button[data-wd="down"][data-k="0"]'); await p.waitForTimeout(500);
+  for(const id of ['clientDob','spouseDob']){ await p.fill('#'+id,''); await p.$eval('#'+id,e=>e.dispatchEvent(new Event('change',{bubbles:true}))); }
+  await p.fill('#clientAge',ages0[0]); await p.$eval('#clientAge',e=>e.dispatchEvent(new Event('input',{bubbles:true}))); await p.fill('#spouseAge',ages0[1]); await p.$eval('#spouseAge',e=>e.dispatchEvent(new Event('input',{bubbles:true}))); await p.waitForTimeout(700);
+  console.log('restored ages:', await p.$eval('#clientAge',e=>e.value), await p.$eval('#spouseAge',e=>e.value), '| end of plan:', await tile('#assetTiles','at end of plan'));
   // 4. the worksheet and the deck still build
   const [dl]=await Promise.all([p.waitForEvent('download',{timeout:60000}), p.click('#makePdf')]); console.log('worksheet:', dl.suggestedFilename());
   const [pop]=await Promise.all([ctx.waitForEvent('page',{timeout:30000}), p.click('#makeDeck')]); await pop.waitForLoadState('load'); await pop.waitForTimeout(800);

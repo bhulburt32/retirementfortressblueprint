@@ -403,7 +403,7 @@
       <p>You give it a household's income picture and a list of their existing accounts. It sizes the
         four Fortress levels from those numbers, then maps every account to a destination — which
         registration it consolidates into, which carrier it ends up with, and what stays put. Out the
-        other end come five documents: three for the client, two for the file.</p>
+        other end come four documents: three for the client, one for the file.</p>
       <p>It does <em>not</em> replace your judgment. The allocation it proposes is a starting point
         you are expected to override, and section&nbsp;14 exists for exactly that.</p>
 
@@ -519,7 +519,12 @@
 
       <dl class="fields">
         <dt>Client and spouse</dt>
-        <dd>First and last name, age and sex for each. Age and sex set the long-term care benefit
+        <dd>First and last name, date of birth, age and sex for each. Enter the <span class="ui">Date of
+          birth</span> and the age is calculated &mdash; whole years at the plan date in section&nbsp;01
+          &mdash; and the age cell follows it; leave the date blank and the age is typed as before.
+          The date also fixes the exact 59&frac12; date for the early-withdrawal penalty in
+          section&nbsp;16 and feeds the Social Security optimizer and the pension calculator in
+          section&nbsp;04 when their own date is blank. Age and sex set the long-term care benefit
           defaults in sections&nbsp;08 and 09. Leave every spouse field blank for a single client and
           nothing in the plan is titled Joint or Spouse.</dd>
 
@@ -1501,6 +1506,10 @@
           deduction and the capital-gains thresholds indexed at the plan's inflation rate; the Social
           Security thresholds are not indexed, so up to 85% of benefits becomes taxable over time.
           Wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs are ordinary income;
+          a tax-deferred withdrawal taken before 59&frac12; carries the 10% additional federal tax
+          (the birthday from the section&nbsp;02 date of birth, or taken as mid-year without one; the
+          withdrawal is grossed up for it, the table shows it in its own column and the assumptions
+          line totals it);
           the Foundation annuity is taxed by its funding (qualified money fully, a non-qualified annuity
           half, Roth money not at all), and annuity income already in force the same way by the account
           that pays it &mdash; a section&nbsp;04 line with no account, or a qualified contract, fully; a
@@ -1649,7 +1658,7 @@
   <section>
     <div class="num">21<small>Output</small></div>
     <div class="body">
-      <h2>The five downloads</h2>
+      <h2>The four downloads</h2>
       <p>Three of these go to a client (a fourth, the risk profile report, opens from
         section&nbsp;12). The other two are marked
         <em>not for client distribution</em> on every page. <span class="ui">Scenario for the
@@ -1721,12 +1730,6 @@
           <p>The full audit trail — assumptions, targets versus funding, both transfer steps, every
             item flagged for confirmation, and any transfer you set by hand recorded against the
             waterfall's own proposal.</p>
-        </div>
-        <div class="exp internal">
-          <span class="tag">Internal only</span>
-          <b>Nitrogen account upload</b>
-          <p>A bare list of ending positions named
-            <span class="ui">Owner's Custodian Tax type (Level)</span> for keying into risk analysis.</p>
         </div>
       </div>
 

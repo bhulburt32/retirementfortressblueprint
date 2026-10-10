@@ -94,7 +94,8 @@ host; the demo is updated only as a deliberate release.
 - Slide builders are IIFEs in page order inside `buildDeck`; `page++` per slide; conditional slides
   (Nitrogen portfolio, QCD, consolidation continuation) must stay conditional.
 - `buildSsReport()` — Social Security Planning Analysis, Letter pages; the internal worksheet PDF
-  (`makePdf`) and the Nitrogen upload text are **not for client distribution** and say so.
+  (`makePdf`) is **not for client distribution** and says so. (The Nitrogen account upload was removed
+  from the Reports section; `buildNitrogenPdf` remains in the file, unused.)
 
 ## Testing expectations
 
