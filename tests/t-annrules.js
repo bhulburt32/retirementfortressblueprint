@@ -8,6 +8,7 @@ const path = require('path');
   const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
   await p.goto('file://'+path.resolve(__dirname,'../dist/preview.html'),{waitUntil:'load'}); await p.waitForTimeout(900);
   await p.click('#expandAll'); await p.waitForTimeout(400);
+  await p.click('#scnTabs [data-scn="1"]'); await p.waitForTimeout(600);   // Scenario B: the sample's MYGA and After Tax sit in the Walls there, not in Moat contracts
   const txt=async sel=>(await p.$eval(sel,e=>e.textContent)).replace(/\s+/g,' ').trim();
   const tile=async(box,label)=>p.$eval(box,(e,l)=>{ const d=[...e.querySelectorAll('div')].find(x=>x.querySelector('dt') && x.querySelector('dt').textContent.trim().toLowerCase().startsWith(l)); return d? +d.querySelector('dd').textContent.replace(/[^0-9.-]/g,'') : NaN; }, label);
   const figs=async()=>({end:await tile('#assetTiles','at end of plan'), today:await tile('#assetTiles','assets today'), seqEnd:await tile('#sensseqTiles','at end of plan'), seqLow:await tile('#sensseqTiles','lowest point')});
@@ -57,14 +58,14 @@ const path = require('path');
   // 4b. a MYGA matures: the interest stops and the money earns its level's rate from then on
   await cell(ih,'rate','10'); await cell(ih,'interest','taken'); const takenOpen=await figs();
   await cell(ih,'maturity','2029-01'); const takenMat=await figs(); console.log('MYGA taken, matures 2029:', JSON.stringify(takenMat), '| open-ended:', JSON.stringify(takenOpen));
-  if(!(takenMat.end>takenOpen.end)) errs.push('after maturity the MYGA should grow at the level rate instead of paying 0% growth ('+takenMat.end+' vs '+takenOpen.end+')');
+  if(Math.abs(takenMat.end-takenOpen.end)<1) errs.push('the maturity should change the outcome: the interest stops and the money earns the level rate ('+takenMat.end+' vs '+takenOpen.end+')');   // which way depends on the rate against the level's growth
   await cell(ih,'interest','deferred'); const defMat=await figs(); console.log('MYGA 10% deferred, matures 2029:', JSON.stringify(defMat));
   if(!(defMat.end<myga10.end && defMat.end>base.end)) errs.push('a 10% MYGA that matures in 2029 should land between the baseline and an open-ended 10% ('+defMat.end+')');
   await cell(ih,'rate',''); await cell(ih,'maturity','');
   // 4c. Stay as is keeps its Fortress level, stays at its institution
   const at=await acct('After Tax'); await p.selectOption(`#acctBody tr[data-id="${at}"] select[data-k="move"]`,'no'); await p.waitForTimeout(600);
   const held=await figs(); const hold=await p.$eval('#holdings',e=>e.textContent.replace(/\s+/g,' '));
-  const levelOf=await p.$$eval('#adjBody tr[data-adj]',(rs,id)=>rs.filter(r=>r.querySelector('select[data-ak=acctId]').value===String(id)).map(r=>r.querySelector('select[data-ak=bucket]').value+' | '+(r.nextElementSibling? r.nextElementSibling.textContent.replace(/\s+/g,' ').trim().slice(0,80):'')), at);
+  const levelOf=await p.$$eval('#adjBody tr[data-adj]',(rs,id)=>rs.filter(r=>r.querySelector('select[data-ak=acctId]').value===String(id)).map(r=>r.querySelector('select[data-ak=bucket]').value+' | '+(r.nextElementSibling? r.nextElementSibling.textContent.replace(/\s+/g,' ').trim().slice(0,140):'')), at);
   console.log('After Tax held:', JSON.stringify(held), '| line:', JSON.stringify(levelOf), '| in holdings:', /After Tax/.test(hold), '| outside layer:', /Held outside the plan/.test(await p.$eval('#assetLegend',e=>e.textContent)));
   if(!levelOf.length || /inplace/.test(levelOf[0]) || !/no transfer/.test(levelOf[0])) errs.push('a held account should keep its level with a no-transfer note');
   if(/Held outside the plan/.test(await p.$eval('#assetLegend',e=>e.textContent))) errs.push('a held account should not sit outside the plan');

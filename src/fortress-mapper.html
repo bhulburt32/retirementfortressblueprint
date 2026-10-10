@@ -99,6 +99,7 @@
   .masthead .prepared{color:rgba(255,255,255,.88)} .masthead .prepared span{color:rgba(255,255,255,.65)}
   .masthead .theme-btn{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.45);color:#fff}
   .masthead .theme-btn:hover{background:rgba(255,255,255,.26);border-color:#fff;color:#fff}
+  tr.sso-fixed td{background:var(--surface-2)}
   .masthead a.video-btn{text-decoration:none;display:inline-flex;align-items:center;gap:8px;background:#D9A93C;border-color:#D9A93C;color:#001F5B}
   .masthead a.video-btn:hover{background:#e6b955;border-color:#e6b955;color:#001F5B}
   .masthead a.video-btn .play{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#001F5B;color:#fff;font-size:10px;padding-left:2px}
@@ -336,6 +337,7 @@
   .inc-title+.tgl-body>.tbl-scroll:first-child{margin-top:0}
   .btn-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
   /* the Pension Benefits Calculator (section 04) */
+  .pol-box{margin:0 0 4px} .pol-box .inc-title.gap{margin-top:0}
   .pbc-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin:12px 0}
   .pbc-title{font-size:13px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;display:flex;align-items:center;gap:10px}
   .pbc-dot{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex:none}
@@ -977,6 +979,7 @@
     </div>
     <div class="head-actions">
       <a class="theme-btn video-btn" id="roadVideo" href="https://claude.ai/artifact/4betJJT5zWc21C6KhEAQN5" target="_blank" rel="noopener" title="The Fortress story as a short video — opens on claude.ai in a new tab"><span class="play">&#9654;</span> The Road to Retirement Fortress</a>
+      <button class="theme-btn" id="makeEdu" type="button" title="Alto’s Protecting Your Retirement Income slides, the same for every client — opens in a new tab">Educational slides</button>
       <button class="theme-btn" id="newCase" type="button">Start new case</button>
       <button class="theme-btn" id="themeBtn" type="button">Switch theme</button>
     </div>
@@ -1226,9 +1229,13 @@
         strategies are ranked on the 22%-from-2032 reduction used in section&nbsp;18, with the no-cut
         total alongside. Tiles name the top strategy, its lifetime benefit, the surviving spouse's
         income under it, and where the plan's own claiming ages rank among everything tested; the
-        table lists the five best with each person's monthly amounts, lifetime totals and the age at
-        which each catches up to filing earliest; a chart runs the cumulative benefits (the plan's
-        own ages as a dashed line when they are outside the five), and <span class="ui">Break-even
+        table lists the five best, then four strategies that always show with their true rank
+        (shaded): <b>File early</b>, both at 62; <b>File late</b>, both at 70; the client early at 62
+        and the spouse late at 70; the client late at 70 and the spouse early at 62 &mdash; a person
+        already past an age files at the earliest age still open to them &mdash; each with the
+        person's monthly amounts, lifetime totals and the age at which it catches up to filing
+        earliest; a chart runs the cumulative benefits (the plan's own ages as a dashed line when they
+        are not among the strategies shown), and <span class="ui">Break-even
         ages</span> opens the full strategy-versus-strategy table. <span class="ui">Use the top
         strategy in the plan</span> sets the benefit starting ages above to strategy #1 (whole years),
         so the income projections, the Foundation sizing and every report follow. The optimizer's
@@ -1738,8 +1745,8 @@
           set of three charts: the male needs care, the female needs care, both need care (one chart
           for a single client). Costs come from the section&nbsp;12 estimate &mdash; the state medians
           or the costs typed there, the average durations for a man and a woman, the care start age
-          and the cost inflation &mdash; at <b>70%</b> of the projected cost when one person needs care
-          and <b>49%</b> of the combined cost when both do, net of any benefits already in force. With
+          and the cost inflation &mdash; the full projected cost when one person needs care and the
+          full combined cost when both do, net of any benefits already in force. With
           no Fortress in place the whole cost comes out of the accounts in the withdrawal order, with
           the tax on the draw. Each chart carries tiles for the cost of care, what is drawn from the
           accounts and the end-of-plan figure (or the year the accounts run out), and the projection
@@ -1931,7 +1938,7 @@
         coverage recommended; <span class="ui">Complete detailed life insurance needs analysis</span>
         opens the rest, and a case that used it reopens with it showing.</p>
 
-      <p><b>Existing life insurance policies</b>, at the foot of the section, lists each policy in
+      <p><b>Existing life insurance policies</b>, at the top of the section, lists each policy in
         force: owner, company, insured, death benefit, beneficiary, type (Term, Whole Life, IUL), cash
         value (permanent policies), years remaining (term) and the monthly premium, with
         <span class="ui">Add a life insurance policy</span> for each. While any are listed, the death
@@ -1984,9 +1991,25 @@
     </details>
     <!-- /guide-notes:08 -->
     <div class="panel panel-pad">
-      <div class="assump first">
-        <label class="f"><span>Existing life insurance — client<small>Death benefit in force, individual and group combined &middot; follows the policies listed below when any are entered</small></span><input type="text" inputmode="numeric" id="lifeExistC" value="0"></label>
-        <label class="f"><span>Existing life insurance — spouse<small>Death benefit in force &middot; follows the policies below</small></span><input type="text" inputmode="numeric" id="lifeExistS" value="0"></label>
+      <div class="pol-box">
+      <div class="inc-title gap">Existing life insurance policies<small>Each policy in force &middot; the death benefits by insured feed the fields below, the premiums the section 05 budget</small></div>
+      <div class="tbl-scroll">
+        <table id="lifePolTable" class="emp pen">
+          <thead>
+            <tr><th>Owner</th><th>Company</th><th>Insured</th><th class="num">Death benefit</th><th>Beneficiary</th><th>Type</th><th class="num">Cash value</th><th class="num">Years remaining<small>Term</small></th><th class="num">Monthly premium</th><th></th></tr>
+          </thead>
+          <tbody id="lifePolBody"></tbody>
+          <tfoot id="lifePolFoot"></tfoot>
+        </table>
+      </div>
+      <div class="btn-row" style="margin-top:10px">
+        <button type="button" id="lifePolAdd">Add a life insurance policy</button>
+        <span class="hint" id="lifePolMsg"></span>
+      </div>
+      </div>
+      <div class="assump" style="margin-top:18px">
+        <label class="f"><span>Existing life insurance — client<small>Death benefit in force, individual and group combined &middot; follows the policies listed above when any are entered</small></span><input type="text" inputmode="numeric" id="lifeExistC" value="0"></label>
+        <label class="f"><span>Existing life insurance — spouse<small>Death benefit in force &middot; follows the policies above</small></span><input type="text" inputmode="numeric" id="lifeExistS" value="0"></label>
       </div>
       <div class="btn-row" style="margin-top:14px">
         <button type="button" id="lifeToggle" aria-expanded="false" aria-controls="lifeDetail">Complete detailed life insurance needs analysis</button>
@@ -2039,20 +2062,6 @@
         <div class="inc-title gap">Underwriting outlook</div>
         <div id="lifeNotes" style="margin-top:12px"></div>
       </div>
-      <div class="inc-title gap">Existing life insurance policies<small>Each policy in force &middot; the death benefits by insured feed the fields above, the premiums the section 05 budget</small></div>
-      <div class="tbl-scroll">
-        <table id="lifePolTable" class="emp pen">
-          <thead>
-            <tr><th>Owner</th><th>Company</th><th>Insured</th><th class="num">Death benefit</th><th>Beneficiary</th><th>Type</th><th class="num">Cash value</th><th class="num">Years remaining<small>Term</small></th><th class="num">Monthly premium</th><th></th></tr>
-          </thead>
-          <tbody id="lifePolBody"></tbody>
-          <tfoot id="lifePolFoot"></tfoot>
-        </table>
-      </div>
-      <div class="btn-row" style="margin-top:10px">
-        <button type="button" id="lifePolAdd">Add a life insurance policy</button>
-        <span class="hint" id="lifePolMsg"></span>
-      </div>
     </div>
   </section>
   <!-- 9. LONG TERM CARE -->
@@ -2061,7 +2070,7 @@
     <!-- guide-notes:09 -->
     <details class="guide-notes"><summary>User Guide Notes<small>how to use this section</small></summary>
       <div class="guide-body">
-      <p><b>Existing long term care policies</b>, at the foot of the section, lists each policy in
+      <p><b>Existing long term care policies</b>, at the top of the section, lists each policy in
         force: owner and insured, company, daily benefit, benefit term in years and the monthly
         premium, with <span class="ui">Add a long term care policy</span> for each and the total
         benefit (daily benefit &times; 365 &times; years) worked out per line. While any are listed,
@@ -2070,18 +2079,19 @@
         at their total benefit when the benefit term is shorter than the care; the premiums of all
         policies fill the <b>Long Term Care Insurance</b> line of the section&nbsp;05 budget until an
         amount is typed there. Everything saves with the case.</p>
-      <p>The section opens with the two <span class="ui">Average LTC cost</span> fields that size the
-        Moat, the Moat premium readout, and Alto's Long-Term Care Needs Estimator folded away behind
+      <p>After the policies come the two <span class="ui">LTC need to insure</span> fields that size the
+        Moat, with a <span class="ui">Share to self-fund</span> beside them, the Moat premium readout, and Alto's Long-Term Care Needs Estimator folded away behind
         <span class="ui">Complete detailed long term care needs analysis</span>. Press it and two
         blocks open beneath; a case that used the analysis reopens with it showing.</p>
 
       <dl class="fields">
-        <dt>Average LTC cost to plan for</dt>
+        <dt>LTC need to insure</dt>
         <dd>The long-term care need per person, which the Moat is sized to cover. By default it is
-          the average lifetime cost of care from age 65 (HHS ASPE: $85,400 for a man, $154,300 for a
-          woman) grown at 4.5% a year from the person's current age in section&nbsp;02 to age 80
-          &mdash; about $188,600 for a 62-year-old man, $372,100 for a 60-year-old woman &mdash; and it
-          follows the age and sex as you change them, until you type over it, or press
+          the result of the needs analysis below &mdash; the projected cost of care for that person
+          less any coverage in force &mdash; multiplied by one minus the <span class="ui">Share to
+          self-fund</span> (0% unless you set one), rounded to the nearest $1,000, shown grey while it
+          follows; it moves with every input of the analysis, the ages and sex and the policies listed
+          above, until you type over it, or press
           <span class="ui">Use the uncovered need as the LTC benefit</span> to take the estimate
           (rounded to the nearest $1,000); that works whether or not the analysis is open, and a
           line beneath the buttons shows the current estimate. Tick <span class="ui">Keep the LTC
@@ -2122,9 +2132,26 @@
     </details>
     <!-- /guide-notes:09 -->
     <div class="panel panel-pad">
-      <div class="assump first">
-        <label class="f"><span>Average LTC cost — client<small>Default: the average lifetime cost of care, $85,400 men / $154,300 women, grown at 4.5% a year to age 80</small></span><input type="text" inputmode="numeric" id="ltcClient" value="200,000"></label>
-        <label class="f"><span>Average LTC cost — spouse<small>Same default from the spouse’s age and sex · 0 for no coverage</small></span><input type="text" inputmode="numeric" id="ltcSpouse" value="350,000"></label>
+      <div class="pol-box">
+      <div class="inc-title gap">Existing long term care policies<small>Each policy in force &middot; the daily benefits feed the Existing LTC coverage below, the premiums the section 05 budget</small></div>
+      <div class="tbl-scroll">
+        <table id="ltcPolTable" class="emp pen">
+          <thead>
+            <tr><th>Owner / insured</th><th>Company</th><th class="num">Daily benefit</th><th class="num">Benefit term<small>Years</small></th><th class="num">Total benefit</th><th class="num">Monthly premium</th><th></th></tr>
+          </thead>
+          <tbody id="ltcPolBody"></tbody>
+          <tfoot id="ltcPolFoot"></tfoot>
+        </table>
+      </div>
+      <div class="btn-row" style="margin-top:10px">
+        <button type="button" id="ltcPolAdd">Add a long term care policy</button>
+        <span class="hint" id="ltcPolMsg"></span>
+      </div>
+      </div>
+      <div class="assump" style="margin-top:18px">
+        <label class="f"><span>LTC need to insure — client<small>Default: the needs analysis below (cost of care less coverage in force) &times; (1 &minus; the share to self-fund); type to override</small></span><input type="text" inputmode="numeric" id="ltcClient" value="200,000"></label>
+        <label class="f"><span>LTC need to insure — spouse<small>Same default from the spouse’s own analysis · 0 for no coverage</small></span><input type="text" inputmode="numeric" id="ltcSpouse" value="350,000"></label>
+        <label class="f"><span>Share to self-fund<small>Taken off each person’s need before it sizes the Moat contracts</small></span><input type="text" inputmode="decimal" id="ltcSelf" value="0%" autocomplete="off"></label>
       </div>
       <div class="btn-row" style="margin-top:14px">
         <button type="button" id="ltcToggle" aria-expanded="false" aria-controls="ltcDetail">Complete detailed long term care needs analysis</button>
@@ -2173,7 +2200,7 @@
             <tr><td>Nursing home<small>Years</small></td>
               <td><input type="text" inputmode="decimal" id="ltcDNHC" class="auto" value=""></td>
               <td><input type="text" inputmode="decimal" id="ltcDNHS" class="auto" value=""></td></tr>
-            <tr><td>Existing LTC coverage<small>Monthly benefit, today's dollars &middot; follows the policies listed below when any are entered</small></td>
+            <tr><td>Existing LTC coverage<small>Monthly benefit, today's dollars &middot; follows the policies listed above when any are entered</small></td>
               <td><input type="text" inputmode="numeric" id="ltcCovC" value="0"></td>
               <td><input type="text" inputmode="numeric" id="ltcCovS" value="0"></td></tr>
           </tbody>
@@ -2189,20 +2216,6 @@
           <tfoot id="ltcBreakFoot"></tfoot>
         </table>
       </div>
-      </div>
-      <div class="inc-title gap">Existing long term care policies<small>Each policy in force &middot; the daily benefits feed the Existing LTC coverage above, the premiums the section 05 budget</small></div>
-      <div class="tbl-scroll">
-        <table id="ltcPolTable" class="emp pen">
-          <thead>
-            <tr><th>Owner / insured</th><th>Company</th><th class="num">Daily benefit</th><th class="num">Benefit term<small>Years</small></th><th class="num">Total benefit</th><th class="num">Monthly premium</th><th></th></tr>
-          </thead>
-          <tbody id="ltcPolBody"></tbody>
-          <tfoot id="ltcPolFoot"></tfoot>
-        </table>
-      </div>
-      <div class="btn-row" style="margin-top:10px">
-        <button type="button" id="ltcPolAdd">Add a long term care policy</button>
-        <span class="hint" id="ltcPolMsg"></span>
       </div>
     </div>
   </section>
@@ -2618,9 +2631,15 @@
           the amount-weighted blend of the rows, which the hint beneath reports and sections&nbsp;16
           and 17 use; the scenario strip shows the blended rate for each scenario.</dd>
         <dt>Walls income assumptions</dt>
-        <dd>Four fields for the Walls as adjusted: the <span class="ui">Walls yield</span>, when
+        <dd>Two lines. <b>Taxable income accounts</b> &mdash; every Walls line except those in AUM -
+          Tax Free &mdash; take four fields: the <span class="ui">Walls yield</span>, when
           <span class="ui">Walls income starts</span>, and the Walls growth rate <span class="ui">before
-          income starts</span> and <span class="ui">after</span>. Every field is blank by default
+          income starts</span> and <span class="ui">after</span>. <b>Tax-free income accounts</b> &mdash;
+          the Walls lines in AUM - Tax Free, with the amount shown &mdash; take their own
+          <span class="ui">Tax-free yield</span> and growth before and after income starts, each
+          following the taxable line while blank; their income starts with the Walls, their yield is
+          federally tax-free, and the projections, the asset growth and the line beneath the fields
+          all use them. Every field is blank by default
           and then follows the plan &mdash; the Walls growth <em>before</em> income starts is a plan
           assumption of 5%, the growth <em>after</em> is section&nbsp;03's Walls growth rate, and the
           start is the first retirement date; the plan figure is shown under each label. Type a value and the projections in sections&nbsp;15, 16 and 17,
@@ -2721,12 +2740,19 @@
           </table>
         </div>
         <p class="hint" id="roofGHint" style="margin:8px 0 0"></p>
-        <div class="inc-title gap">Walls income assumptions<small>Yield, start date and growth for the Walls as adjusted &middot; blank follows section 03 and the first retirement date</small></div>
-        <div class="assump first" style="margin-top:14px">
+        <div class="inc-title gap">Walls income assumptions<small>Yield, start date and growth for the Walls as adjusted, the taxable and the tax-free income accounts apart &middot; blank follows section 03 and the first retirement date</small></div>
+        <p class="hint" style="margin:14px 0 4px"><b>Taxable income accounts</b> &mdash; every Walls line except those in AUM - Tax Free</p>
+        <div class="assump first">
           <label class="f"><span>Walls yield<small>Plan assumption <span id="adjYWDef"></span></small></span><input type="text" inputmode="decimal" id="adjYW" placeholder="plan" autocomplete="off"></label>
           <label class="f"><span>Walls income starts<small>Default: first retirement, <span id="adjWStartDef"></span></small></span><input type="month" id="adjWStart"></label>
           <label class="f"><span>Walls growth before income starts<small>Plan assumption <span id="adjGPreDef"></span></small></span><input type="text" inputmode="decimal" id="adjGPre" placeholder="plan" autocomplete="off"></label>
           <label class="f"><span>Walls growth after income starts<small>Plan assumption <span id="adjGPostDef"></span></small></span><input type="text" inputmode="decimal" id="adjGPost" placeholder="plan" autocomplete="off"></label>
+        </div>
+        <p class="hint" style="margin:16px 0 4px"><b>Tax-free income accounts</b> &mdash; the Walls lines in AUM - Tax Free (<span id="adjTfAmt">none in this plan</span>) &middot; their yield is federally tax-free &middot; income starts with the Walls &middot; blank follows the taxable line</p>
+        <div class="assump first">
+          <label class="f"><span>Tax-free yield<small>Follows the taxable yield, <span id="adjYWtDef"></span></small></span><input type="text" inputmode="decimal" id="adjYWt" placeholder="follows" autocomplete="off"></label>
+          <label class="f"><span>Growth before income starts<small>Follows the taxable line, <span id="adjGPreTDef"></span></small></span><input type="text" inputmode="decimal" id="adjGPreT" placeholder="follows" autocomplete="off"></label>
+          <label class="f"><span>Growth after income starts<small>Follows the taxable line, <span id="adjGPostTDef"></span></small></span><input type="text" inputmode="decimal" id="adjGPostT" placeholder="follows" autocomplete="off"></label>
         </div>
         <div class="btn-row" style="margin-top:12px">
           <button type="button" id="adjIncReset">Follow the plan assumptions</button>
@@ -3226,7 +3252,7 @@
         reports</span> at the top of the section picks which of the three scenarios they are built
         from &mdash; the same choice as <span class="ui">Use for reports</span> in section&nbsp;14. When
         it is not the scenario showing, the page switches to it while the documents build and
-        switches back; the educational slides are the same whichever is chosen.</p>
+        switches back; the educational slides (their button sits in the header) are the same whichever is chosen.</p>
 
       <div class="exports">
         <div class="exp client">
@@ -3268,7 +3294,8 @@
             Planning Analysis</em>: a cover with the client names, date and advisor; an introduction
             and key terms (PIA, full retirement age, COLA, life expectancy, spousal and survivor
             benefits, with the FRA and percentage-of-PIA reference tables); the inputs and
-            assumptions; the five strategies with their claiming events and lifetime totals, and where
+            assumptions; the five best strategies and the four always-shown ones (both at 62, both at 70,
+            one early and the other late) with their claiming events and lifetime totals, and where
             the plan's own ages rank; bar charts of lifetime benefits with and without the reduction,
             the surviving spouse's first full-year income, the cumulative chart and the break-even
             table; a year-by-year schedule for each strategy; how to file; and what the analysis leaves
@@ -3329,7 +3356,6 @@
         <button type="button" class="primary" id="makeSS">Social Security optimizer report</button>
         <button type="button" class="primary" id="rqReport">Risk profile report</button>
         <button type="button" class="primary" id="makePension">Pension benefits report</button>
-        <button type="button" class="primary" id="makeEdu">Educational slides</button>
         <span class="hint" id="pdfMsg">Builds from the figures currently on this page.</span>
       </div>
       <p class="hint" style="margin:12px 0 0;padding-top:11px;border-top:1px solid var(--line)">
@@ -3351,7 +3377,7 @@
         report — cover, key terms, the inputs, the five best strategies with their claiming events, the comparison
         charts and break-even ages, a year-by-year schedule for each, how to file and the disclosures — opened in a
         new tab and printed from the browser.<br>
-        The <b>educational slides</b> are Alto's <i>Protecting Your Retirement Income</i> deck as a 21-page
+        The <b>educational slides</b> (the button in the header) are Alto's <i>Protecting Your Retirement Income</i> deck as a 21-page
         PDF — the three core principles, market cycles and sequence risk, the protected-income approach,
         fixed and indexed annuities, downside protection, the Fortress levels and the national long-term
         care picture — the same for every
@@ -3635,6 +3661,7 @@
       spouseSex: $('spouseSex').value,
       lifeCV:    $('lifeCV').value,
       ltcClient: num($('ltcClient').value),
+      ltcSelf: ltcSelfShare(),
       ltcSpouse: num($('ltcSpouse').value),
       newCust: $('newCust').value,
       annuityCarrier: carrierFromAccounts('Annuity'),
@@ -4142,7 +4169,8 @@
     }
     /* the report (section 21): the last estimate on a letter page, the calculator's own wording and disclaimer */
     pbcReport = function(){
-      if(!last) throw new Error('Calculate a benefit in the section 04 Pension Benefits Calculator first.');
+      if(!last) calculate();   // the inputs are there: calculate on the way
+      if(!last) throw new Error('Calculate a benefit in the section 04 Pension Benefits Calculator first \u2014 pick the pension system and fill in the dates and service.');
       var i = readInputs(), E = esc, advisor = (i.advisor || '').trim(), dateTxt = longDate(i.prepDate || todayISO());
       var disc = $('pbcResults').querySelector('.pbc-disclaimer'), discHtml = disc ? disc.innerHTML : '';
       return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Pension Benefit Estimate \u2014 ' + E(last.name) + '</title>'
@@ -5389,7 +5417,7 @@
      starts paying, and the Walls growth rate before and after income begins.
      Each is blank by default and then follows section 03 and the first
      retirement date. They drive the projections, not the sizing in section 13. */
-  var INC_ADJ = {yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:''};
+  var INC_ADJ = {yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:'', yWt:'', gPreT:'', gPostT:''};
   var WALLS_PRE_GROWTH = 0.05;   // the plan's Walls growth before their income starts; section 03's Walls rate applies once it does
   /* Per-annuity income settings for the Foundation lines in section 14, keyed
      by the account's row order, the level and the line's ordinal. Every field
@@ -5511,6 +5539,10 @@
       fStart: yrs(INC_ADJ.fStart), wStart: yrs(INC_ADJ.wStart),
       gPre: INC_ADJ.gPre !== '' ? pctIn(INC_ADJ.gPre) : WALLS_PRE_GROWTH,
       gPost: INC_ADJ.gPost !== '' ? pctIn(INC_ADJ.gPost) : gW,
+      /* the tax-free income accounts (Walls lines in AUM - Tax Free): their own yield and growth, each following the taxable line when blank */
+      yWt: INC_ADJ.yWt !== '' ? pctIn(INC_ADJ.yWt) : (INC_ADJ.yW !== '' ? pctIn(INC_ADJ.yW) : r.yW),
+      gPreT: INC_ADJ.gPreT !== '' ? pctIn(INC_ADJ.gPreT) : (INC_ADJ.gPre !== '' ? pctIn(INC_ADJ.gPre) : WALLS_PRE_GROWTH),
+      gPostT: INC_ADJ.gPostT !== '' ? pctIn(INC_ADJ.gPostT) : (INC_ADJ.gPost !== '' ? pctIn(INC_ADJ.gPost) : gW),
       any: Object.keys(INC_ADJ).some(function(k){ return INC_ADJ[k] !== ''; })
     };
   }
@@ -5532,12 +5564,29 @@
     try { lineLedger(r).lines.forEach(function(L){ if(L.a && L.m.bucket === 'roof' && map[L.a.id] == null) map[L.a.id] = roofGKeyOf(L); }); } catch(e){}
     return map;
   }
+  /* the Walls money whose line is in AUM - Tax Free (section 14): the total and the amount by account, memoised on the run */
+  function taxFreeWalls(r){
+    if(r._tf) return r._tf;
+    var tot = 0, by = {};
+    if(!r.statusQuo && typeof lineLedger === 'function') lineLedger(r).lines.forEach(function(L){
+      if(L.a && L.eff > 0.5 && L.m.bucket === 'walls' && String(L.prod || '').trim() === AUM_TAX_FREE){ tot += L.eff; by[L.a.id] = (by[L.a.id] || 0) + L.eff; }
+    });
+    return (r._tf = {total:Math.min(tot, r.funded ? r.funded.walls : tot), by:by});
+  }
   function effGrowth(r, t){           // t: the plan year the rates are for (a matured MYGA is market money from then); the start of plan when omitted
     var i = r.inputs, A = incomeAdj(r), gW = A.gPost, gWpre = A.gPre, gR = i.growthR || 0;
     var acc = {w:[0, 0], r:[0, 0], i:[0, 0]}, any = false, roofMap = null;
+    var tfLeft = {}, TFB = taxFreeWalls(r).by; Object.keys(TFB).forEach(function(k){ tfLeft[k] = TFB[k]; });
     (r.moves || []).forEach(function(m){
       var key = m.bucket === 'walls' ? 'w' : m.bucket === 'roof' ? 'r' : m.bucket === 'inplace' ? 'i' : null;
       if(!key || !(m.amt > 0.5) || isLifePos(m.acct.pos)) return;
+      if(key === 'w' && !r.statusQuo && tfLeft[m.acct.id] > 0.5){   // a Walls line in AUM - Tax Free grows on the tax-free line's assumptions
+        var tfAmt = Math.min(m.amt, tfLeft[m.acct.id]), txAmt = m.amt - tfAmt; tfLeft[m.acct.id] -= tfAmt;
+        acc.w[0] += txAmt * acctGrowth(m.acct, gW, t) + tfAmt * acctGrowth(m.acct, A.gPostT, t); acc.w[1] += m.amt;
+        acc.wPre = acc.wPre || [0, 0]; acc.wPre[0] += txAmt * acctGrowth(m.acct, gWpre, t) + tfAmt * acctGrowth(m.acct, A.gPreT, t); acc.wPre[1] += m.amt;
+        if(Math.abs(acctGrowth(m.acct, A.gPostT, t) - gW) > 1e-9 || Math.abs(acctGrowth(m.acct, gW, t) - gW) > 1e-9) any = true;
+        return;
+      }
       var dflt = r.statusQuo ? sqDefaultGrowth(m.acct, i.growthW || 0, gR) : (key === 'r' ? gR : key === 'i' ? (i.growthW || 0) : gW);
       var g = acctGrowth(m.acct, dflt, t);
       if(Math.abs(g - dflt) > 1e-9) any = true;
@@ -5670,10 +5719,16 @@
       /* Walls balance for the yield: grows at the pre-income rate until the
          Walls start paying, then at the post-income rate. */
       var preYrs = Math.min(t, wStart), postYrs = Math.max(0, t - wStart);
-      var wallsBal = r.funded.walls * Math.pow(1 + A.gPre, preYrs) * Math.pow(1 + A.gPost, postYrs);
+      /* the taxable and the tax-free income accounts (Walls lines in AUM - Tax Free) each on their own yield and growth */
+      var TFW = taxFreeWalls(r), wTf = Math.min(TFW.total, r.funded.walls), wTx = r.funded.walls - wTf;
+      var wallsBal = wTx * Math.pow(1 + A.gPre, preYrs) * Math.pow(1 + A.gPost, postYrs);
+      var wallsBalT = wTf * Math.pow(1 + A.gPreT, preYrs) * Math.pow(1 + A.gPostT, postYrs);
       if(r.stress && r.stress.seq){            // sensitivity: the bad years replace that year's Walls growth (blended by what the Walls hold)
         var SQ = r.stress.seq;
-        for(var sy = SQ.from; sy < Math.min(t, SQ.from + SQ.years); sy++){ var gs = (sy + 1 <= wStart) ? A.gPre : A.gPost; wallsBal *= (1 + stressRates(r, SQ, sy).w) / (1 + gs); }
+        for(var sy = SQ.from; sy < Math.min(t, SQ.from + SQ.years); sy++){
+          var gs = (sy + 1 <= wStart) ? A.gPre : A.gPost, gsT = (sy + 1 <= wStart) ? A.gPreT : A.gPostT, sw = stressRates(r, SQ, sy).w;
+          wallsBal *= (1 + sw) / (1 + gs); wallsBalT *= (1 + sw) / (1 + gsT);
+        }
       }
       /* The Foundation annuities pay from their start dates and
          its value falls by what it pays out. With guaranteed lifetime income
@@ -5693,10 +5748,11 @@
       });
       row.sleeve = sPay;
       row.sleeveBal = sBal;
-      row.wallsYield = wallsBal * A.yW * onW;
+      row.wallsYield = (wallsBal * A.yW + wallsBalT * A.yWt) * onW;
+      row.wallsYieldTF = wallsBalT * A.yWt * onW;      // the tax-free accounts' part, federally tax-free
       /* the plan has ended (a care-event projection where no one is left): no expenses or income from then */
       row.household = endT == null ? 1 : act(null, endT);
-      if(endT != null){ var hh = row.household; row.needs *= hh; row.wants *= hh; row.wallsYield *= hh; row.ng *= hh; if(t >= endT){ row.ann = 0; row.annTax = 0; row.sleeve = 0; } }
+      if(endT != null){ var hh = row.household; row.needs *= hh; row.wants *= hh; row.wallsYield *= hh; row.wallsYieldTF *= hh; row.ng *= hh; if(t >= endT){ row.ann = 0; row.annTax = 0; row.sleeve = 0; } }
       row.roof = r.funded.roof * Math.pow(1 + G.r, t);
       row.annuity = row.sleeve + row.ann;             // the Foundation annuity plus any contracts already paying
       row.foundation = row.ss + row.pen + row.annuity;
@@ -5930,12 +5986,15 @@
     $('adjYWDef').textContent = pc1(r.yW);
     $('adjGPreDef').textContent = pc1(WALLS_PRE_GROWTH); $('adjGPostDef').textContent = pc1(i.growthW || 0);
     $('adjWStartDef').textContent = retTxt;
-    ['adjYW','adjGPre','adjGPost','adjWStart'].forEach(function(id){ $(id).classList.toggle('auto', $(id).value.trim() === ''); });
+    ['adjYW','adjGPre','adjGPost','adjWStart','adjYWt','adjGPreT','adjGPostT'].forEach(function(id){ $(id).classList.toggle('auto', $(id).value.trim() === ''); });
+    var TFW = taxFreeWalls(r); $('adjYWtDef').textContent = pc1(A.yW); $('adjGPreTDef').textContent = pc1(A.gPre); $('adjGPostTDef').textContent = pc1(A.gPost);
+    $('adjTfAmt').textContent = TFW.total > 0.5 ? money(TFW.total) + ' of ' + money(r.funded.walls) : 'none in this plan';
     var wRow = P.rows[Math.min(P.N, Math.ceil(P.wStart))];
     $('adjIncMsg').textContent = ((A.any || AS.any || Object.keys(ROOF_G).some(function(k){ return String(ROOF_G[k]).trim() !== ''; })) ? 'Adjusted: ' : 'Following the plan assumptions: ')
       + 'the Foundation annuit' + (AS.count === 1 ? 'y pays' : 'ies pay') + ' about ' + money(AS.total) + ' a year at the start'
       + '; the Walls pay ' + pc1(A.yW) + ' of their balance from ' + (A.wStart != null ? longDate(INC_ADJ.wStart + '-01').replace(/ \d+,/, '') : 'the first retirement')
-      + ' \u2014 about ' + money(wRow ? wRow.wallsYield / Math.max(0.01, clamp01(Math.ceil(P.wStart) + 1 - P.wStart)) : r.funded.walls * A.yW) + ' in the first full year \u2014 growing ' + pc1(A.gPre) + ' before income starts and ' + pc1(A.gPost) + ' after.'
+      + ' \u2014 about ' + money(wRow ? wRow.wallsYield / Math.max(0.01, clamp01(Math.ceil(P.wStart) + 1 - P.wStart)) : r.funded.walls * A.yW) + ' in the first full year \u2014 growing ' + pc1(A.gPre) + ' before income starts and ' + pc1(A.gPost) + ' after'
+      + (TFW.total > 0.5 ? '; the tax-free income accounts (' + money(TFW.total) + ' in AUM - Tax Free) pay ' + pc1(A.yWt) + ', federally tax-free, growing ' + pc1(A.gPreT) + ' before and ' + pc1(A.gPostT) + ' after' : '') + '.'
   }
   function renderAdjAlloc(base, r){
     $('adjAllocMsg').innerHTML = r.adjusted
@@ -7469,7 +7528,7 @@
     });
     xrows.push({cells:['Total', '', money(TX.lifetimeGross), '', '', '', '', '', '', money(TX.lifetime), money(TX.lifetimeState), pc(TX.avgTotalEffective)], bold:true, rule:true});
     table(xcols, xrows, {rowH:12});
-    para('2026 federal law (OBBBA): standard deduction ' + money(TAX_2026[TX.status].std) + (TX.status === 'mfj' ? ' plus $1,650 per spouse 65+' : ' plus $2,050 at 65') + ', the $6,000 senior deduction for 2025-2028, brackets and thresholds indexed at ' + pc(i.inflation || 0) + '; up to 85% of Social Security taxable by the provisional-income formula. Ordinary income: wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs (a 10% penalty on tax-deferred withdrawals before 59\u00bd' + (TX.lifetimePenalty > 0.5 ? ', ' + money(TX.lifetimePenalty) + ' over the plan' : '') + '); the Foundation annuity ' + Math.round(TX.foundTaxShare * 100) + '% taxable, annuity income in force by the account that pays it (Roth tax-free); the non-qualified share of the Walls yield' + (TX.wallsTaxFree > 0.001 ? ' (' + Math.round(TX.wallsTaxFree * 100) + '% of it in AUM - Tax Free, federally tax-free)' : '') + ' and half of each taxable-account withdrawal taxed as long-term gains. Withdrawals follow the order above and are grossed up for the tax they cause; RMDs use the Uniform Lifetime Table on tax-deferred market balances. Both spouses assumed living to the end of plan; no itemising, credits or IRMAA. State tax follows a planning model of the state\'s 2025 rates, brackets, deductions or exemptions and retirement-income exclusions, Social Security exempt unless the state taxes it, local taxes excluded. A planning estimate, not tax advice.');
+    para('2026 federal law (OBBBA): standard deduction ' + money(TAX_2026[TX.status].std) + (TX.status === 'mfj' ? ' plus $1,650 per spouse 65+' : ' plus $2,050 at 65') + ', the $6,000 senior deduction for 2025-2028, brackets and thresholds indexed at ' + pc(i.inflation || 0) + '; up to 85% of Social Security taxable by the provisional-income formula. Ordinary income: wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs (a 10% penalty on tax-deferred withdrawals before 59\u00bd' + (TX.lifetimePenalty > 0.5 ? ', ' + money(TX.lifetimePenalty) + ' over the plan' : '') + '); the Foundation annuity ' + Math.round(TX.foundTaxShare * 100) + '% taxable, annuity income in force by the account that pays it (Roth tax-free); the non-qualified share of the Walls yield' + (TX.wallsTaxFree > 0.001 ? ' (the tax-free income accounts, ' + Math.round(TX.wallsTaxFree * 100) + '% of the Walls in AUM - Tax Free, federally tax-free)' : '') + ' and half of each taxable-account withdrawal taxed as long-term gains. Withdrawals follow the order above and are grossed up for the tax they cause; RMDs use the Uniform Lifetime Table on tax-deferred market balances. Both spouses assumed living to the end of plan; no itemising, credits or IRMAA. State tax follows a planning model of the state\'s 2025 rates, brackets, deductions or exemptions and retirement-income exclusions, Social Security exempt unless the state taxes it, local taxes excluded. A planning estimate, not tax advice.');
 
     /* ---------- estate plan ---------- */
     var EF = estateFacts();
@@ -8428,6 +8487,7 @@
       // sex change overwrite them
       if(h.ltcClient != null){ $('ltcClient').value = fmtN.format(h.ltcClient); ltcTouched.ltcClient = true; }
       if(h.ltcSpouse != null){ $('ltcSpouse').value = fmtN.format(h.ltcSpouse); ltcTouched.ltcSpouse = true; }
+      $('ltcSelf').value = h.ltcSelf != null ? (h.ltcSelf * 100).toFixed(0) + '%' : '0%';
       if(h.lifeCV)          $('lifeCV').value  = h.lifeCV;
       if(h.newCust)         $('newCust').value = h.newCust;
     }
@@ -8586,7 +8646,7 @@
     resetIncomeAdj();
     if(d.incomeAdj){
       Object.keys(INC_ADJ).forEach(function(k){ if(d.incomeAdj[k] != null) INC_ADJ[k] = String(d.incomeAdj[k]); });
-      $('adjYW').value = INC_ADJ.yW; $('adjGPre').value = INC_ADJ.gPre; $('adjGPost').value = INC_ADJ.gPost;
+      $('adjYW').value = INC_ADJ.yW; $('adjGPre').value = INC_ADJ.gPre; $('adjGPost').value = INC_ADJ.gPost; $('adjYWt').value = INC_ADJ.yWt || ''; $('adjGPreT').value = INC_ADJ.gPreT || ''; $('adjGPostT').value = INC_ADJ.gPostT || '';
       $('adjWStart').value = INC_ADJ.wStart;
     }
     ROOF_G = {}; roofGSig = '';
@@ -8618,7 +8678,7 @@
     } else {
       scenarios[0] = null;   // an older case file: what was loaded above is Scenario A
     }
-    $('adjYW').value = INC_ADJ.yW || ''; $('adjGPre').value = INC_ADJ.gPre || ''; $('adjGPost').value = INC_ADJ.gPost || ''; $('adjWStart').value = INC_ADJ.wStart || '';
+    $('adjYW').value = INC_ADJ.yW || ''; $('adjGPre').value = INC_ADJ.gPre || ''; $('adjGPost').value = INC_ADJ.gPost || ''; $('adjYWt').value = INC_ADJ.yWt || ''; $('adjGPreT').value = INC_ADJ.gPreT || ''; $('adjGPostT').value = INC_ADJ.gPostT || ''; $('adjWStart').value = INC_ADJ.wStart || '';
   }
 
 
@@ -8733,7 +8793,7 @@
             state:ltcStateName(), infl:pctIn($('ltcInfl').value), room:$('ltcRoom').value, mem:pctIn($('ltcMem').value), hours:num($('ltcHours').value) || 44,
             costs:{home:num($('ltcCHome').value), al:num($('ltcCAL').value), nh:num($('ltcCNH').value)}};
   }
-  function ltcBenefitFor(p){ return Math.round(p.gap / 1000) * 1000; }
+  function ltcBenefitFor(p){ return Math.round(p.gap * (1 - ltcSelfShare()) / 1000) * 1000; }
   function applyLtcEstimate(est){
     est = est || ltcEstimate();
     if(est.client){ $('ltcClient').value = fmtN.format(ltcBenefitFor(est.client)); ltcTouched.ltcClient = true; }
@@ -9195,12 +9255,7 @@
     var foundAll = foundQ + foundNQ + foundRoth, foundTaxShare = foundAll > 0 ? (foundQ + foundNQ * NQ_ANNUITY_TAXABLE) / foundAll : 1;
     /* section 14: the share of the non-qualified Walls money whose line is in AUM - Tax Free (municipal bonds): that
        part of the yield is federally tax-free; the rest of the non-qualified share is long-term gains as before */
-    var wallsTF = 0;
-    if(!r.statusQuo && typeof lineLedger === 'function'){
-      var nqW = 0, tfW = 0;
-      lineLedger(r).lines.forEach(function(L){ if(L.a && L.eff > 0.5 && L.m.bucket === 'walls' && wdTierOf(L.a) === 'taxable'){ nqW += L.eff; if(String(L.prod || '').trim() === AUM_TAX_FREE) tfW += L.eff; } });
-      wallsTF = nqW > 0.5 ? tfW / nqW : 0;
-    }
+    var wallsTF = (!r.statusQuo && r.funded.walls > 0.5) ? Math.min(1, taxFreeWalls(r).total / r.funded.walls) : 0;   // the share of the Walls in AUM - Tax Free, for the assumptions text
     var wQshare = {client: wallsTot > 0 ? wallsQ.client / wallsTot : 0, spouse: wallsTot > 0 ? wallsQ.spouse / wallsTot : 0};
     var wNQshare = wallsTot > 0 ? wallsNQ / wallsTot : 0;
     var sum3 = function(b){ return b.w + b.r + b.f + b.i; };
@@ -9264,7 +9319,7 @@
       var wallsOrd = row.wallsYield * (wQ.client + wQ.spouse), wallsNQy = row.wallsYield * (wallsNow > 0.5 ? bal.taxable.w / wallsNow : 0);
       /* the non-qualified share of the yield: long-term gains, or, federally tax-free, out of federal income but still in Social Security's
          provisional income and in the state model; the share paid from IRA money (wallsOrd) is a taxable distribution either way */
-      var wallsExempt = wallsNQy * wallsTF, wallsCG = wallsNQy - wallsExempt;
+      var wallsExempt = Math.min(wallsNQy, row.wallsYieldTF || 0), wallsCG = wallsNQy - wallsExempt;   // the tax-free accounts' yield leaves federal income, within the non-qualified share
       var annOrd = row.annTax != null ? row.annTax : row.ann;   // the taxable part of annuity income already in force
       var qualDraw = {client: row.wallsYield * wQ.client, spouse: row.wallsYield * wQ.spouse};
       /* required minimum distributions on the tax-deferred market balances — and, from 70½, qualified
@@ -9742,7 +9797,7 @@
      optional dates of birth for month-level precision.
      ============================================================ */
   var ssoCfg = {lifeC:'', lifeS:'', rate:'', cutOn:true, dobC:'', dobS:''};
-  var SSO_LIFE = {male:85, female:88}, SSO_COLORS = ['#1E3062', '#ED1C24', '#2A7A5B', '#B7791F', '#7A8496'];
+  var SSO_LIFE = {male:85, female:88}, SSO_COLORS = ['#1E3062', '#ED1C24', '#2A7A5B', '#B7791F', '#7A8496', '#5B8FD0', '#C45BAA', '#3FA7A3', '#8C6D3F'];
   function ssoDefault(){ return {lifeC:'', lifeS:'', rate:'', cutOn:true, dobC:'', dobS:''}; }
   function ssoFrom(o){ o = o || {}; return {lifeC:o.lifeC == null ? '' : String(o.lifeC), lifeS:o.lifeS == null ? '' : String(o.lifeS), rate:o.rate == null ? '' : String(o.rate), cutOn:o.cutOn !== false, dobC:String(o.dobC || ''), dobS:String(o.dobS || '')}; }
   /* SSA rules beyond fraMonths() above */
@@ -9859,6 +9914,23 @@
       all.forEach(function(r){ r.alt = noCutRank[key(r.claims)]; });
     } else all = noCutAll;
     results = all.slice(0, 5);
+    var rankOf = function(r, list){ var n = 1; list.forEach(function(o){ if(o.pv > r.pv + 0.5) n++; }); return n; };
+    results.forEach(function(r){ r.rank = rankOf(r, all); });
+    /* four strategies always shown, whatever their rank: both at 62, both at 70, one early and the other late
+       (a person already past an age files at the earliest age still open to them) */
+    var at = function(p, age){ var lo = Math.min.apply(null, p.candidates), hi = Math.max.apply(null, p.candidates); return Math.max(lo, Math.min(hi, age * 12)); };
+    var fixedDefs = people.length === 1
+      ? [['File early: at 62', [at(people[0], 62)]], ['File late: at 70', [at(people[0], 70)]]]
+      : [['File early: both at 62', [at(people[0], 62), at(people[1], 62)]], ['File late: both at 70', [at(people[0], 70), at(people[1], 70)]],
+         [people[0].name + ' early at 62, ' + people[1].name + ' late at 70', [at(people[0], 62), at(people[1], 70)]],
+         [people[0].name + ' late at 70, ' + people[1].name + ' early at 62', [at(people[0], 70), at(people[1], 62)]]];
+    fixedDefs.forEach(function(d){
+      var k = key(d[1]), have = results.filter(function(r){ return key(r.claims) === k; })[0];
+      if(have){ have.tag = have.tag ? have.tag + ' \u00b7 ' + d[0] : d[0]; return; }
+      var r = ssoSimulate(people, d[1], mrate, cola, cut, m0);
+      if(cut){ var rNo = ssoSimulate(people, d[1], mrate, cola, null, m0); r.alt = noCutRank[k] || {rank:rankOf(rNo, noCutAll), r:rNo}; }
+      r.rank = rankOf(r, all); r.tag = d[0]; r.fixed = true; results.push(r);
+    });
     var earliest = people.map(function(p){ return p.candidates[0]; });
     var baseline = ssoSimulate(people, earliest, mrate, cola, cut, m0), baselineNoCut = cut ? ssoSimulate(people, earliest, mrate, cola, null, m0) : null;
     /* the plan's own claiming ages from the Social Security table, ranked against every tested strategy */
@@ -9867,10 +9939,10 @@
     all.forEach(function(r){ if(r.pv > planRun.pv + 0.5) planRank++; });
     var planIdx = -1; all.forEach(function(r, k){ if(key(r.claims) === key(planClaims)) planIdx = k; });
     return {people:people, results:results, all:all, baseline:baseline, baselineNoCut:baselineNoCut, cut:cut, cola:cola, rate:rate, today:today, m0:m0,
-            plan:{claims:planClaims, run:planRun, rank:planRank, tested:planIdx >= 0, alt:cut ? ssoSimulate(people, planClaims, mrate, cola, null, m0) : null}};
+            plan:{claims:planClaims, run:planRun, rank:planRank, tested:planIdx >= 0, shown:results.some(function(r){ return key(r.claims) === key(planClaims); }), alt:cut ? ssoSimulate(people, planClaims, mrate, cola, null, m0) : null}};
   }
-  function ssoTitle(S, r){ return S.people.map(function(p, k){ return p.name + ' at ' + ssoAgeStr(r.claims[k]) + (r.claims[k] === p.fra ? ' (FRA)' : ''); }).join(', '); }
-  function ssoShort(S, r){ return S.people.map(function(p, k){ return ssoAgeStr(r.claims[k]); }).join(' / '); }
+  function ssoTitle(S, r){ return S.people.map(function(p, k){ return p.name + ' at ' + ssoAgeStr(r.claims[k]) + (r.claims[k] === p.fra ? ' (FRA)' : ''); }).join(', ') + (r.tag ? ' \u2014 ' + r.tag : ''); }
+  function ssoShort(S, r){ return S.people.map(function(p, k){ return ssoAgeStr(r.claims[k]); }).join(' / ') + (r.tag ? ' \u2014 ' + r.tag : ''); }
   function ssoEvents(S, r){
     var ev = [], people = S.people, couple = people.length === 2, today = S.today;
     var addM = function(m){ var d = new Date(today.getFullYear(), today.getMonth() + m, 1); return longDate(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-01').replace(/ \d+,/, ''); };
@@ -9944,7 +10016,7 @@
         detail = lines.join(' · ');
       }
       var be = ssoCrossover(r, S.baseline, p0), same = r.claims.every(function(c, j){ return c === S.baseline.claims[j]; });
-      return '<tr' + (k === 0 ? ' style="font-weight:600"' : '') + '><td>' + (k + 1) + '</td><td><b>' + esc(ssoShort(S, r)) + '</b><small style="display:block;color:var(--muted);font-weight:400">' + esc(detail) + '</small></td>'
+      return '<tr' + (k === 0 ? ' style="font-weight:600"' : '') + (r.fixed ? ' class="sso-fixed"' : '') + '><td>' + r.rank + '</td><td><b>' + esc(ssoShort(S, r)) + '</b><small style="display:block;color:var(--muted);font-weight:400">' + esc(detail) + '</small></td>'
         + '<td class="num"><b>' + money(r.pv) + '</b>' + (k > 0 ? '<small style="display:block;color:var(--muted);font-weight:400">−' + money(best.pv - r.pv) + ' vs #1</small>' : '') + '</td>'
         + (cut ? '<td class="num">' + money(r.alt.r.pv) + '<small style="display:block;color:var(--muted);font-weight:400">ranks #' + r.alt.rank + ' with no cut</small></td>' : '')
         + '<td class="num">' + (same ? '—' : '<span style="color:' + (be.ok ? 'var(--c-moat)' : 'var(--st-alert)') + '">' + esc(be.text) + '</span>') + '</td></tr>';
@@ -9964,14 +10036,14 @@
       var pts = r.series.map(function(v, t){ return X(t).toFixed(1) + ',' + Y(v).toFixed(1); }).join(' ');
       svg += '<polyline points="' + pts + '" fill="none" stroke="' + SSO_COLORS[k] + '" stroke-width="' + (k === 0 ? 2.5 : 1.6) + '" stroke-opacity="' + (k === 0 ? 1 : 0.8) + '"/>';
     });
-    if(!P.tested || P.rank > 5){
+    if(!P.shown){
       var ptsP = P.run.series.map(function(v, t){ return X(t).toFixed(1) + ',' + Y(v).toFixed(1); }).join(' ');
       svg += '<polyline points="' + ptsP + '" fill="none" stroke="var(--ink)" stroke-width="1.4" stroke-dasharray="6 4" stroke-opacity=".7"/>';
     }
     svg += '<rect x="' + L + '" y="' + Tp + '" width="' + pw + '" height="' + ph + '" fill="transparent"/>';
     svgEl.innerHTML = svg;
     $('ssoLegend').innerHTML = R.map(function(r, k){ return '<span class="pj-key"><i class="sw" style="background:' + SSO_COLORS[k] + ';height:3px;margin-top:6px"></i>' + (k + 1) + '. ' + esc(ssoShort(S, r)) + '</span>'; }).join('')
-      + ((!P.tested || P.rank > 5) ? '<span class="pj-key"><i class="sw" style="background:none;border-top:2px dashed var(--ink);height:0;margin-top:6px"></i>The plan’s ages (' + esc(ssoShort(S, P.run)) + ')</span>' : '')
+      + (!P.shown ? '<span class="pj-key"><i class="sw" style="background:none;border-top:2px dashed var(--ink);height:0;margin-top:6px"></i>The plan’s ages (' + esc(ssoShort(S, P.run)) + ')</span>' : '')
       + '<span class="pj-key"><small>running total of benefits received, with COLA' + (cut ? ' and the cut' : '') + ' · where lines cross is the break-even age</small></span>';
     var tip = $('ssoTip');
     svgEl.onmousemove = function(ev){
@@ -9979,7 +10051,7 @@
       var t = Math.max(0, Math.min(len - 1, Math.round((fx - L) / pw * (len - 1))));
       tip.hidden = false;
       tip.innerHTML = '<b>' + esc(p0.name) + ' age ' + ssoAgeStr(p0.ageNow + t) + '</b>' + R.map(function(r, k){ return '<div><span>' + (k + 1) + '. ' + esc(ssoShort(S, r)) + '</span><span>' + money(r.series[Math.min(t, r.series.length - 1)]) + '</span></div>'; }).join('')
-        + ((!P.tested || P.rank > 5) ? '<div><span>Plan ' + esc(ssoShort(S, P.run)) + '</span><span>' + money(P.run.series[Math.min(t, P.run.series.length - 1)]) + '</span></div>' : '');
+        + (!P.shown ? '<div><span>Plan ' + esc(ssoShort(S, P.run)) + '</span><span>' + money(P.run.series[Math.min(t, P.run.series.length - 1)]) + '</span></div>' : '');
       var px = (ev.clientX - rect.left), left = px + 14; if(left + 260 > rect.width) left = px - 274;
       tip.style.left = left + 'px'; tip.style.top = Math.max(0, (ev.clientY - rect.top) - 30) + 'px';
     };
@@ -9987,9 +10059,9 @@
     /* break-even table */
     var lbl = function(r){ return ssoShort(S, r); }, sameB = function(r){ return r.claims.every(function(c, j){ return c === S.baseline.claims[j]; }); };
     var cell = function(c){ return '<td class="num"' + (c.always ? '' : ' style="color:' + (c.ok ? 'var(--c-moat)' : 'var(--st-alert)') + ';font-weight:600"') + '>' + esc(c.text) + '</td>'; };
-    var h = '<thead><tr><th>Strategy</th><th class="num">vs filing earliest (' + esc(lbl(S.baseline)) + ')' + (cut ? ' — with cut' : '') + '</th>' + (cut ? '<th class="num">— no cut</th>' : '') + R.map(function(_, k){ return '<th class="num">vs #' + (k + 1) + '</th>'; }).join('') + '</tr></thead><tbody>';
+    var h = '<thead><tr><th>Strategy</th><th class="num">vs filing earliest (' + esc(lbl(S.baseline)) + ')' + (cut ? ' — with cut' : '') + '</th>' + (cut ? '<th class="num">— no cut</th>' : '') + R.map(function(o, k){ return '<th class="num">vs #' + o.rank + '</th>'; }).join('') + '</tr></thead><tbody>';
     R.forEach(function(r, k){
-      h += '<tr><td>#' + (k + 1) + ' — ' + esc(lbl(r)) + '</td>' + (sameB(r) ? '<td class="num">—</td>' : cell(ssoCrossover(r, S.baseline, p0)));
+      h += '<tr><td>#' + r.rank + ' — ' + esc(lbl(r)) + '</td>' + (sameB(r) ? '<td class="num">—</td>' : cell(ssoCrossover(r, S.baseline, p0)));
       if(cut) h += sameB(r) ? '<td class="num">—</td>' : cell(ssoCrossover(r.alt.r, S.baselineNoCut, p0));
       R.forEach(function(o, j){ h += k === j ? '<td class="num">—</td>' : cell(ssoCrossover(r, o, p0)); });
       h += '</tr>';
@@ -10019,7 +10091,7 @@
     var pc = function(v){ return (v * 100).toFixed(1).replace(/\.0$/, '') + '%'; };
     var addM = function(m){ return new Date(today.getFullYear(), today.getMonth() + m, 1); };
     var ageAtJan1 = function(p, y){ if(p.dob){ var m = (y - p.dob.getFullYear()) * 12 - p.dob.getMonth(); if(1 < p.dob.getDate()) m--; return Math.floor(m / 12); } return Math.floor((p.ageNow + (y - today.getFullYear()) * 12 - today.getMonth()) / 12); };
-    var title = function(r){ return ssoTitle(S, r); }, shortL = function(r, k){ return (k + 1) + '. ' + ssoShort(S, r); };
+    var title = function(r){ return ssoTitle(S, r); }, shortL = function(r, k){ return r.rank + '. ' + ssoShort(S, r); };
     /* yearly schedule for one strategy */
     function yearly(r){
       var rows = {};
@@ -10072,19 +10144,19 @@
       var vals = R.map(function(r){ var o = yearly(r).filter(function(x){ return x.y === yFirst; })[0]; return o ? o.tot : 0; });
       if(vals.some(function(v){ return v > 0; })) survChart = '<h3>First full-year income for the surviving spouse (' + yFirst + ')</h3><p class="cap">Annual income ' + E(people[1 - dIdx].name) + ' would receive in the first full calendar year after ' + E(people[dIdx].name) + ' passes, under each strategy.</p>' + bars(R.map(shortL), vals, function(v){ return '$' + N(v); });
     }
-    var scen = R.map(function(r, k){ return '<div class="scen"><h4>' + (k + 1) + '. ' + E(title(r)) + '</h4><ul>' + ssoEvents(S, r).map(function(e){ return '<li>' + E(e.text) + '</li>'; }).join('') + '</ul><p class="lt"><b>Lifetime benefit: ' + M(r.cum) + '</b>' + (cut ? ' with ' + Math.round(cut.pct * 100) + '% reduction from ' + cut.year + ' &nbsp;·&nbsp; ' + M(r.alt.r.cum) + ' with no reduction' : '') + (S.rate > 0 ? ' &nbsp;·&nbsp; present value ' + M(r.pv) : '') + '</p></div>'; }).join('');
+    var scen = R.map(function(r, k){ return '<div class="scen"><h4>' + r.rank + '. ' + E(title(r)) + '</h4><ul>' + ssoEvents(S, r).map(function(e){ return '<li>' + E(e.text) + '</li>'; }).join('') + '</ul><p class="lt"><b>Lifetime benefit: ' + M(r.cum) + '</b>' + (cut ? ' with ' + Math.round(cut.pct * 100) + '% reduction from ' + cut.year + ' &nbsp;·&nbsp; ' + M(r.alt.r.cum) + ' with no reduction' : '') + (S.rate > 0 ? ' &nbsp;·&nbsp; present value ' + M(r.pv) : '') + '</p></div>'; }).join('');
     var planRow = S.plan.rank > 1 ? '<div class="scen plan"><h4>The claiming ages currently in your Retirement Fortress plan: ' + E(title(S.plan.run)) + '</h4><p class="lt">Lifetime benefit ' + M(S.plan.run.cum) + (cut ? ' with the reduction' : '') + ' — ranks #' + S.plan.rank + ' of the ' + S.all.length + ' strategies tested, ' + M(R[0].cum - S.plan.run.cum) + ' less than strategy 1.' + (S.plan.tested ? '' : ' One of these ages is already past, so it is shown for reference rather than ranked.') + '</p></div>' : '<p class="cap">The claiming ages in your Retirement Fortress plan are strategy 1.</p>';
     var lbl = function(r){ return ssoShort(S, r); }, same = function(r){ return r.claims.every(function(c, k){ return c === S.baseline.claims[k]; }); };
     var be = '<table class="be"><tr><th>Strategy</th><th>Catches up to filing earliest (' + E(lbl(S.baseline)) + ')' + (cut ? ' — with reduction' : '') + '</th>' + (cut ? '<th>— no reduction</th>' : '') + R.map(function(_, k){ return '<th>vs. #' + (k + 1) + '</th>'; }).join('') + '</tr>';
     R.forEach(function(r, k){
       var cell = function(c){ return '<td class="' + (c.always ? '' : (c.ok ? 'ok' : 'miss')) + '">' + E(c.text) + '</td>'; };
-      be += '<tr><td>#' + (k + 1) + ' — ' + E(lbl(r)) + '</td>' + (same(r) ? '<td>—</td>' : cell(ssoCrossover(r, S.baseline, p0)));
+      be += '<tr><td>#' + r.rank + ' — ' + E(lbl(r)) + '</td>' + (same(r) ? '<td>—</td>' : cell(ssoCrossover(r, S.baseline, p0)));
       if(cut) be += same(r) ? '<td>—</td>' : cell(ssoCrossover(r.alt.r, S.baselineNoCut, p0));
       R.forEach(function(o, j){ be += k === j ? '<td>—</td>' : cell(ssoCrossover(r, o, p0)); });
       be += '</tr>';
     });
     be += '</table>';
-    var detail = R.map(function(r, k){ return '<section class="page"><h2>' + (k + 1) + '. ' + E(title(r)) + '</h2><ul class="ev">' + ssoEvents(S, r).map(function(e){ return '<li>' + E(e.text) + '</li>'; }).join('') + '</ul><p class="lt"><b>Lifetime benefit: ' + M(r.cum) + '</b></p>' + tableHTML(r) + '<p class="cap">Amounts include the ' + pc(S.cola) + ' COLA assumption' + (cut ? ' and the ' + Math.round(cut.pct * 100) + '% reduction beginning January ' + cut.year : '') + '. The Monthly column shows the first and last monthly amount of the year when they differ. Figures are estimates in future dollars.</p></section>'; }).join('');
+    var detail = R.map(function(r, k){ return '<section class="page"><h2>' + r.rank + '. ' + E(title(r)) + '</h2><ul class="ev">' + ssoEvents(S, r).map(function(e){ return '<li>' + E(e.text) + '</li>'; }).join('') + '</ul><p class="lt"><b>Lifetime benefit: ' + M(r.cum) + '</b></p>' + tableHTML(r) + '<p class="cap">Amounts include the ' + pc(S.cola) + ' COLA assumption' + (cut ? ' and the ' + Math.round(cut.pct * 100) + '% reduction beginning January ' + cut.year : '') + '. The Monthly column shows the first and last monthly amount of the year when they differ. Figures are estimates in future dollars.</p></section>'; }).join('');
     var info = '<table class="kv">'
       + '<tr><th>Prepared for</th><td>' + E(client) + '</td></tr>'
       + (advisor ? '<tr><th>Prepared by</th><td>' + E(advisor) + ', Alto Financial Group</td></tr>' : '')
@@ -10330,7 +10402,7 @@
         }).join('')
       + '</tbody><tfoot><tr><td colspan="2">Total</td><td class="num">' + money(X0.lifetimeGross) + '</td><td colspan="7"></td><td class="num"><b>' + money(X0.lifetime) + '</b></td><td class="num">' + pct(X0.avgEffective) + '</td><td class="num">' + money(X0.lifetimeState) + '</td><td class="num"><b>' + money(X0.lifetime + X0.lifetimeState) + '</b></td><td class="num">' + pct(X0.avgTotalEffective) + '</td>' + (anyUnf ? '<td></td>' : '') + '</tr></tfoot>';
 
-    $('taxAssume').innerHTML = '<b>Assumptions.</b> 2026 federal law: standard deduction ' + money(TAX_2026[X0.status].std) + (X0.status === 'mfj' ? ' plus $1,650 for each spouse 65 or older' : ' plus $2,050 at 65') + ', brackets ' + T.brackets.map(function(b){ return Math.round(b[0] * 100) + '%'; }).join(' / ') + ', and the $6,000 senior deduction for 2025–2028 (phasing out above ' + money(T.seniorPhase) + ' of AGI); brackets, the standard deduction and the capital-gains thresholds are indexed at the ' + pct(i.inflation || 0) + ' inflation assumption, the Social Security thresholds are not. Up to 85% of Social Security is taxable by the provisional-income formula. Wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs are ordinary income; a tax-deferred withdrawal before 59\u00bd carries the 10% additional federal tax' + (X0.lifetimePenalty > 0.5 ? ' (' + money(X0.lifetimePenalty) + ' over the plan)' : '') + ', the birthday from the section 02 date of birth or, without one, taken as mid-year; the Foundation annuity is ' + Math.round(X0.foundTaxShare * 100) + '% taxable (qualified money fully, a non-qualified annuity half, Roth money not at all), and annuity income already in force the same way by the account that pays it; the Walls yield follows the Walls funding mix, with the non-qualified share taxed as long-term gains' + (X0.wallsTaxFree > 0.001 ? ' except the ' + Math.round(X0.wallsTaxFree * 100) + '% of it in AUM - Tax Free, which is federally tax-free (it still counts toward the taxation of Social Security and in the state model)' : '') + '; half of each taxable-account withdrawal is assumed to be gain. RMDs use the Uniform Lifetime Table from age ' + rmdAge(X0.year0 - i.clientAge) + ' on the tax-deferred market balances (the Foundation annuity’s payments satisfy its own). Both spouses are assumed living to the end of plan; no itemising, credits or Medicare IRMAA. <b>State tax</b> uses a planning model of each state\u2019s 2025 rates, brackets, standard deduction or exemptions and retirement-income exclusions, indexed the same way, with Social Security exempt except where the state taxes it; local income taxes are left out. A planning estimate, not tax advice.';
+    $('taxAssume').innerHTML = '<b>Assumptions.</b> 2026 federal law: standard deduction ' + money(TAX_2026[X0.status].std) + (X0.status === 'mfj' ? ' plus $1,650 for each spouse 65 or older' : ' plus $2,050 at 65') + ', brackets ' + T.brackets.map(function(b){ return Math.round(b[0] * 100) + '%'; }).join(' / ') + ', and the $6,000 senior deduction for 2025–2028 (phasing out above ' + money(T.seniorPhase) + ' of AGI); brackets, the standard deduction and the capital-gains thresholds are indexed at the ' + pct(i.inflation || 0) + ' inflation assumption, the Social Security thresholds are not. Up to 85% of Social Security is taxable by the provisional-income formula. Wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs are ordinary income; a tax-deferred withdrawal before 59\u00bd carries the 10% additional federal tax' + (X0.lifetimePenalty > 0.5 ? ' (' + money(X0.lifetimePenalty) + ' over the plan)' : '') + ', the birthday from the section 02 date of birth or, without one, taken as mid-year; the Foundation annuity is ' + Math.round(X0.foundTaxShare * 100) + '% taxable (qualified money fully, a non-qualified annuity half, Roth money not at all), and annuity income already in force the same way by the account that pays it; the Walls yield follows the Walls funding mix, with the non-qualified share taxed as long-term gains' + (X0.wallsTaxFree > 0.001 ? ' except the yield of the tax-free income accounts (the ' + Math.round(X0.wallsTaxFree * 100) + '% of the Walls in AUM - Tax Free, on their own yield and growth), which is federally tax-free (it still counts toward the taxation of Social Security and in the state model)' : '') + '; half of each taxable-account withdrawal is assumed to be gain. RMDs use the Uniform Lifetime Table from age ' + rmdAge(X0.year0 - i.clientAge) + ' on the tax-deferred market balances (the Foundation annuity’s payments satisfy its own). Both spouses are assumed living to the end of plan; no itemising, credits or Medicare IRMAA. <b>State tax</b> uses a planning model of each state\u2019s 2025 rates, brackets, standard deduction or exemptions and retirement-income exclusions, indexed the same way, with Social Security exempt except where the state taxes it; local income taxes are left out. A planning estimate, not tax advice.';
     return X0;
   }
 
@@ -10815,13 +10887,12 @@
      the other person needs care, both need care. Costs follow the section
      12 estimate — the state medians (or the costs typed there), the
      average durations for a man and a woman, the care start age and the
-     cost inflation — at 70% of the projected cost for one person and 49%
-     of the combined cost when both need care, net of any benefits already
+     cost inflation — the full projected cost, one person or both, net of any benefits already
      in force. In section 17 the insured's Moat benefit pays first and the
      rest comes out of the accounts in the withdrawal order; in section 06
      there is no Moat, so the whole cost falls on the accounts.
      ============================================================ */
-  var LTC_SCN_ONE = 0.70, LTC_SCN_BOTH = 0.49;
+  var LTC_SCN_ONE = 1.0, LTC_SCN_BOTH = 1.0;   // the full projected cost of care, one person or both
   function ltcCostSchedule(p, frac, N){
     var out = [], t; for(t = 0; t <= N; t++) out.push(0);
     if(!p || p.noAge || !(frac > 0)) return out;
@@ -10987,13 +11058,13 @@
     var sexWord = function(p){ return sexOf(p) === 'female' ? 'female' : 'male'; };
     var one = ppl.map(function(p){
       return {key:p.who, people:[p], frac:LTC_SCN_ONE, sex:sexOf(p),
-              title:p.name + ' needs care', sub:sexWord(p) + ' · ' + p.totalYears.toFixed(1) + ' years of care from age ' + p.start + ' (' + (p.yrs > 0 ? 'in ' + p.yrs + ' years' : 'now') + ') · ' + Math.round(LTC_SCN_ONE * 100) + '% of the projected cost'};
+              title:p.name + ' needs care', sub:sexWord(p) + ' · ' + p.totalYears.toFixed(1) + ' years of care from age ' + p.start + ' (' + (p.yrs > 0 ? 'in ' + p.yrs + ' years' : 'now') + ') · the full projected cost'};
     });
     one.sort(function(a, b){ return (a.sex === 'male' ? 0 : 1) - (b.sex === 'male' ? 0 : 1); });
     var scn = one.slice();
     if(ppl.length > 1){
       scn.push({key:'both', people:ppl, frac:LTC_SCN_BOTH, sex:'both', title:'Both need care',
-                sub:ppl.map(function(p){ return p.name + ' ' + p.totalYears.toFixed(1) + ' years from age ' + p.start; }).join(', ') + ' · ' + Math.round(LTC_SCN_BOTH * 100) + '% of the combined projected cost'});
+                sub:ppl.map(function(p){ return p.name + ' ' + p.totalYears.toFixed(1) + ' years from age ' + p.start; }).join(', ') + ' · the full combined projected cost'});
     }
     return {est:est, people:ppl, scenarios:scn};
   }
@@ -11132,7 +11203,7 @@
     var parts = mode === 'sq' ? sqParts : function(x){ var o = {}; ASSET_LAYERS.forEach(function(Ly){ o[Ly.k] = x.layers[Ly.k]; }); o.total = x.layers.total; return o; };
     var compare = baseX.rows.map(function(x){ return x.layers.total; });
     var baseLast = baseX.rows[baseX.rows.length - 1], baseDep = baseX.rows.filter(function(x){ return x.unfunded > 0.5; })[0];
-    lead.innerHTML = (mode === 'plan' ? 'The section 17 projection' : 'The same projection as above') + ', with a long term care event added. Costs follow the section 12 estimate — ' + esc(S.est.state === 'USA National' ? 'national' : S.est.state) + ' median costs, the average durations for a man and a woman, the care start age' + (S.est.infl ? ' and ' + (S.est.infl * 100).toFixed(1) + '% cost inflation' : '') + ' — at <b>' + Math.round(LTC_SCN_ONE * 100) + '%</b> of the projected cost when one person needs care and <b>' + Math.round(LTC_SCN_BOTH * 100) + '%</b> of the combined cost when both do, net of benefits already in force. '
+    lead.innerHTML = (mode === 'plan' ? 'The section 17 projection' : 'The same projection as above') + ', with a long term care event added. Costs follow the section 12 estimate — ' + esc(S.est.state === 'USA National' ? 'national' : S.est.state) + ' median costs, the average durations for a man and a woman, the care start age' + (S.est.infl ? ' and ' + (S.est.infl * 100).toFixed(1) + '% cost inflation' : '') + ' — the full projected cost when one person needs care and the full combined cost when both do, net of benefits already in force. '
       + (mode === 'plan' ? (poolTot > 0.5 ? 'The Moat pays first (' + ['client','spouse'].filter(function(w){ return ltcPoolTotal(pool[w]) > 0.5; }).map(function(w){ return esc(ownerLabel(w)) + ' ' + money(ltcPoolTotal(pool[w])); }).join(', ') + ' of benefit, on the section 14 terms); anything above the benefit comes out of the accounts in the section 16 order, with the tax on the draw.' : 'No Moat is funded in the plan as adjusted, so the whole cost comes out of the accounts in the section 16 order, with the tax on the draw.')
                          : 'With no Fortress in place the whole cost comes out of the accounts in the section 16 order, with the tax on the draw.')
       + ' The dashed line is the ' + (mode === 'plan' ? 'section 17' : '') + ' projection' + (mode === 'plan' ? '' : ' above') + ', without a care event.';
@@ -12850,7 +12921,7 @@
   var scnNames = ['Scenario A', 'Scenario B', 'Scenario C'];
   var scenarios = [null, null, null], activeScn = 0, reportScn = 0;
   function scnDefault(){
-    return {adjMoves:null, INC_ADJ:{yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:''}, ANN_INC:{}, LTC_BEN:{}, ROOF_G:{},
+    return {adjMoves:null, INC_ADJ:{yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:'', yWt:'', gPreT:'', gPostT:''}, ANN_INC:{}, LTC_BEN:{}, ROOF_G:{},
             wdOrder:WD_DEFAULT.slice(), rothCfg:{apply:true, target:'auto', start:'auto', order:'roof', irmaa:true}, qcdCfg:qcdDefault()};
   }
   function scnClone(v){ return v == null ? v : JSON.parse(JSON.stringify(v)); }
@@ -12872,7 +12943,7 @@
   function scnRestore(S){
     scnRestoreGlobals(S);
     annSig = ''; ltcBenSig = ''; roofGSig = ''; autoSig = null; autoDirty = true;
-    $('adjYW').value = INC_ADJ.yW || ''; $('adjGPre').value = INC_ADJ.gPre || ''; $('adjGPost').value = INC_ADJ.gPost || '';
+    $('adjYW').value = INC_ADJ.yW || ''; $('adjGPre').value = INC_ADJ.gPre || ''; $('adjGPost').value = INC_ADJ.gPost || ''; $('adjYWt').value = INC_ADJ.yWt || ''; $('adjGPreT').value = INC_ADJ.gPreT || ''; $('adjGPostT').value = INC_ADJ.gPostT || '';
     $('adjWStart').value = INC_ADJ.wStart || '';
   }
   function scnFor(k){ return k === activeScn ? scnSnapshot() : (scenarios[k] || scnDefault()); }
@@ -13056,6 +13127,7 @@
     lastSolo = solo;
     syncPolicyFields();
     renderPolicyTotals();
+    applyLtcDefaults();
     renderDebts();
     renderLtc();
     renderLife();
@@ -13501,19 +13573,24 @@
      once a field is edited we stop rewriting it. */
   var ltcTouched = {ltcClient:false, ltcSpouse:false};
 
+  function ltcSelfShare(){ return Math.max(0, Math.min(1, pctIn($('ltcSelf').value || '0'))); }
+  /* the need the Moat insures: the section 09 needs analysis (cost of care less coverage in force) × (1 − the share
+     to self-fund), until an amount is typed */
   function applyLtcDefaults(){
-    var cAge = num($('clientAge').value), sAge = $('spouseAge').value.trim() === '' ? cAge : num($('spouseAge').value);
-    if(!ltcTouched.ltcClient){
-      $('ltcClient').value = fmtN.format(ltcDefaultNeed($('clientSex').value, cAge));
-    }
-    if(!ltcTouched.ltcSpouse){
-      $('ltcSpouse').value = fmtN.format(ltcDefaultNeed($('spouseSex').value, sAge));
-    }
+    var est = ltcEstimate(), self = ltcSelfShare();
+    [['ltcClient', est.client], ['ltcSpouse', est.spouse]].forEach(function(k){
+      var el = $(k[0]);
+      if(ltcTouched[k[0]]){ el.classList.remove('auto'); return; }
+      var p = k[1], v = (p && !p.noAge) ? Math.round(p.gap * (1 - self) / 1000) * 1000 : 0;
+      el.value = fmtN.format(v); el.classList.add('auto');
+    });
   }
 
   ['ltcClient','ltcSpouse'].forEach(function(id){
-    $(id).addEventListener('input', function(){ ltcTouched[id] = true; });
+    $(id).addEventListener('input', function(){ ltcTouched[id] = true; $(id).classList.remove('auto'); });
   });
+  $('ltcSelf').addEventListener('input', function(){ applyLtcDefaults(); render(); });
+  $('ltcSelf').addEventListener('blur', function(){ $('ltcSelf').value = (ltcSelfShare() * 100).toFixed(0) + '%'; });
   $('clientSex').addEventListener('change', function(){ applyLtcDefaults(); render(); });
   $('spouseSex').addEventListener('change', function(){ applyLtcDefaults(); render(); });
 
@@ -13698,7 +13775,7 @@
   $('scnGrid').addEventListener('click', function(e){ var b = e.target.closest('[data-scn-view]'); if(b) switchScenario(+b.getAttribute('data-scn-view')); });
   $('scnGrid').addEventListener('change', function(e){ if(e.target.name === 'scnReport'){ reportScn = +e.target.value; scnChrome(); $('caseJson').value = caseData(); } });
   $('reportScn').addEventListener('change', function(){ reportScn = +this.value; scnChrome(); render(); });
-  [['adjYW','yW'],['adjGPre','gPre'],['adjGPost','gPost']].forEach(function(pair){
+  [['adjYW','yW'],['adjGPre','gPre'],['adjGPost','gPost'],['adjYWt','yWt'],['adjGPreT','gPreT'],['adjGPostT','gPostT']].forEach(function(pair){
     $(pair[0]).addEventListener('input', function(){ INC_ADJ[pair[1]] = this.value.trim(); render(); });
     $(pair[0]).addEventListener('blur', function(){ if(this.value.trim() !== ''){ this.value = (pctIn(this.value) * 100).toFixed(1) + '%'; INC_ADJ[pair[1]] = this.value; } });
   });
@@ -13707,9 +13784,9 @@
     $(pair[0]).addEventListener('input', function(){ INC_ADJ[pair[1]] = this.value; render(); });
   });
   function resetIncomeAdj(){
-    INC_ADJ = {yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:''};
+    INC_ADJ = {yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:'', yWt:'', gPreT:'', gPostT:''};
     ANN_INC = {}; annSig = ''; LTC_BEN = {}; ltcBenSig = ''; ROOF_G = {}; roofGSig = '';
-    ['adjYW','adjGPre','adjGPost','adjWStart'].forEach(function(id){ $(id).value = ''; });
+    ['adjYW','adjGPre','adjGPost','adjWStart','adjYWt','adjGPreT','adjGPostT'].forEach(function(id){ $(id).value = ''; });
   }
   $('adjIncReset').addEventListener('click', function(){ resetIncomeAdj(); render(); });
 
@@ -13842,7 +13919,7 @@
     $('lifeCV').value = 'no';
     $('clientSex').value = 'male';
     $('spouseSex').value = 'female';
-    ltcTouched.ltcClient = false; ltcTouched.ltcSpouse = false;
+    ltcTouched.ltcClient = false; ltcTouched.ltcSpouse = false; $('ltcSelf').value = '0%';
     resetLtcInputs(); resetLifeInputs(); wdOrder = WD_DEFAULT.slice(); rothCfg = {apply:true, target:'auto', start:'auto', order:'roof', irmaa:true}; qcdCfg = qcdDefault();
     risk = {score:'', tol:'', selected:{}, custom:[]}; $('riskScore').value = ''; $('riskTol').value = ''; $('riskTol').classList.remove('auto'); rq = {a:{}, amt:''};
     nitro = null; $('nitroText').value = ''; $('nitroMsg').textContent = '';
@@ -14672,7 +14749,7 @@
     frame(s, '', title);
     var S = ltcScenarios(r), pool = mode === 'plan' ? ltcPools(r) : {client:[], spouse:[]}, poolTot = ltcPoolTotal(pool.client) + ltcPoolTotal(pool.spouse);
     var pfx = mode === 'sq' ? 'sqLtc' : 'assetLtc', n = S.scenarios.length;
-    var lead = (mode === 'sq' ? 'The projection two pages back with a care event added \u2014 the previous page\u2019s costs: ' : 'The previous page with a long term care event added \u2014 ') + (S.est.state === 'USA National' ? 'national' : S.est.state) + ' median costs and the average durations for a man and a woman from the care estimate, at ' + Math.round(LTC_SCN_ONE * 100) + '% of the projected cost for one person and ' + Math.round(LTC_SCN_BOTH * 100) + '% of the combined cost for both, net of benefits in force. '
+    var lead = (mode === 'sq' ? 'The projection two pages back with a care event added \u2014 the previous page\u2019s costs: ' : 'The previous page with a long term care event added \u2014 ') + (S.est.state === 'USA National' ? 'national' : S.est.state) + ' median costs and the average durations for a man and a woman from the care estimate, the full projected cost for one person and the full combined cost for both, net of benefits in force. '
       + (mode === 'plan' ? (poolTot > 0.5 ? 'The Moat pays first; the rest comes out of the accounts in the withdrawal order, with the tax on the draw.' : 'No Moat is funded, so the cost comes out of the accounts in the withdrawal order.')
                          : 'With no Fortress in place the cost comes out of the accounts in the withdrawal order, with the tax on the draw.')
       + ' Each person who needs care is assumed to pass away at the end of care (the dashed line is the projection without one); the survivor\u2019s income adjusts from then.';
@@ -15330,13 +15407,15 @@
         y = 2.45; lines = 0;
       };
       var group = function(t){ s.text(0.9, y, 18.2, 0.4, [{runs:[{t:t, sz:16, b:true, color:DECK_C.red}]}]); y += 0.45; };
+      var longLine = function(b){ return String(b || '').length > 58; };   // two lines of 16 pt in the destination column
       var line = function(a, b, c, d){
         lines++;
-        s.text(hx[0], y, hw[0], rh, [{runs:[{t:a, sz:16, color:DECK_C.ink2}]}], {valign:'middle'});
-        s.text(hx[1], y, hw[1], rh, [{runs:[{t:b, sz:16, color:DECK_C.ink}]}], {valign:'middle'});
-        s.text(hx[2], y, hw[2], rh, [{runs:[{t:c, sz:17, color:DECK_C.navy, font:'Georgia'}], align:'r'}], {valign:'middle'});
-        s.text(hx[3], y, hw[3], rh, [{runs:[{t:d, sz:17, color:DECK_C.navy, font:'Georgia'}], align:'r'}], {valign:'middle'});
-        s.hline(0.9, y + rh + 0.03, 18.2, DECK_C.panel, 0.5); y += rh + 0.08;
+        var h = longLine(b) ? rh + 0.34 : rh;
+        s.text(hx[0], y, hw[0], h, [{runs:[{t:a, sz:16, color:DECK_C.ink2}]}], {valign:'middle'});
+        s.text(hx[1], y, hw[1], h, [{runs:[{t:b, sz:16, color:DECK_C.ink}]}], {valign:'middle'});
+        s.text(hx[2], y, hw[2], h, [{runs:[{t:c, sz:17, color:DECK_C.navy, font:'Georgia'}], align:'r'}], {valign:'middle'});
+        s.text(hx[3], y, hw[3], h, [{runs:[{t:d, sz:17, color:DECK_C.navy, font:'Georgia'}], align:'r'}], {valign:'middle'});
+        s.hline(0.9, y + h + 0.03, 18.2, DECK_C.panel, 0.5); y += h + 0.08;
       };
       var consolidating = plan.order.filter(function(k){ return !plan.regs[k].info.stay && !plan.regs[k].info.direct; });
       var consolidTotal = consolidating.reduce(function(a, k){ return a + plan.regs[k].total; }, 0);
@@ -15351,13 +15430,14 @@
         g.srcOrder.forEach(function(id){
           var src = g.sources[id], a = src.acct;
           var fCarrier = (g.info.custom && g.info.cust) ? g.info.cust : (i.annuityCarrier || 'the carrier');   // a custom To account names its own carrier
-          var onward = (g.byBucket.foundation ? 'Foundation ' + fmtKM(g.byBucket.foundation) + (g.info.custom ? ' as the annuity at ' : ' on to ') + fCarrier : '') + (g.byBucket.moat ? (g.byBucket.foundation ? '; ' : '') + 'Moat ' + fmtKM(g.byBucket.moat) + ' on to the LTC carrier' : '');
+          var onward = (g.byBucket.foundation ? 'Foundation ' + fmtKM(g.byBucket.foundation) + (g.info.custom ? ' as the annuity at ' : ' to ') + fCarrier : '') + (g.byBucket.moat ? (g.byBucket.foundation ? '; ' : '') + 'Moat ' + fmtKM(g.byBucket.moat) + ' to the LTC carrier' : '');
           var kept = ['walls', 'roof'].filter(function(b){ return g.byBucket[b] > 0.5; }).map(function(b){ return (b === 'walls' ? 'Walls ' : 'Roof ') + fmtKM(g.byBucket[b]); }).join(', ');
           var ending = g.total - (g.byBucket.foundation || 0) - (g.byBucket.moat || 0);
           rows1.push([(a.name || 'Account') + ' · ' + ownerLabel(a.owner) + (a.cust ? ' · ' + a.cust : ''), g.info.name + ' — ' + [onward, kept ? kept + ' managed' : ''].filter(Boolean).join('; '), money(src.amt), g.srcOrder.length > 1 ? '' : (ending > 0.5 ? money(ending) : dash)]);
         });
       });
-      var pages1 = Math.max(1, Math.ceil(rows1.length / perSlide)), per1 = Math.ceil(rows1.length / pages1);   // spread evenly over the slides needed
+      var per1Max = rows1.some(function(rw){ return longLine(rw[1]); }) ? 7 : perSlide;   // taller rows, fewer to a slide
+      var pages1 = Math.max(1, Math.ceil(rows1.length / per1Max)), per1 = Math.ceil(rows1.length / pages1);   // spread evenly over the slides needed
       open(firstTitle);
       group(head1);
       if(!rows1.length) line('Nothing to consolidate', 'Every account stays where it is or goes straight to a carrier', dash, dash);
@@ -15810,7 +15890,7 @@
   /* The default case: the block from section 22 of a saved case, loaded over the sample on every
      open exactly as Load pasted case would. Replace the string to change the case the page opens with;
      set it to null to open with the built-in illustrative household instead. */
-  var DEFAULT_CASE = '{"household":{"clientFirst":"Jeff","clientLast":"Smith","spouseFirst":"Jane","spouseLast":"Smith","advisor":"Daniel Asti","prepDate":"2026-10-08","needs":83709,"wants":32544,"bufMonths":6,"sizeYears":5,"sizeMode":"avg","yieldF":0.06,"foundGLI":true,"yieldW":0.06,"inflation":0.025,"endAge":100,"growthW":0.015,"growthR":0.06,"medB":202.9,"medD":38.99,"clientAge":63,"spouseAge":61,"clientSex":"male","spouseSex":"female","lifeCV":"no","ltcClient":180500,"ltcSpouse":356100,"newCust":"Fidelity","annuityCarrier":"Athene","ltcCarrier":"","employment":{"client":{"salary":0,"retire":"2026-10","deduct":0,"contrib":0,"employer":0,"contribAcct":"","raise":0},"spouse":{"salary":0,"retire":"2026-10","deduct":0,"contrib":0,"employer":0,"contribAcct":"","raise":0},"extra":[]},"benefits":{"ss":{"cola":0.025,"optimizer":{"lifeC":"","lifeS":"","rate":"","cutOn":true,"dobC":"","dobS":""},"client":{"pia":3491,"age":67},"spouse":{"pia":1083,"age":62}},"nonGuar":[{"who":"client","name":"inheritance","amt":0,"start":"2027-05","end":"2027-05","ongoing":false,"raise":0,"note":""}],"pensions":[{"who":"spouse","name":"Jane\'s PERS Pension","amt":1830,"start":"2027-09","cola":0,"surv":100}],"annuities":[{"who":"client","name":"Investor\'s Heritage","amt":366,"start":"2028-05","end":"","life":true,"cola":0,"surv":100,"acctId":""},{"who":"client","name":"Sentinel","amt":233,"start":"2026-06","end":"","life":true,"cola":0,"surv":100,"acctId":""}]},"ss":56156.7,"pension":21960,"otherInc":7188},"goals":[{"title":"Make savings last for life","detail":"Jeff and Jane want their money to support them well past age 94, covering about $50,000 a year in everyday spending plus $1,500 a month of fun money, without a market drop cutting their plan short by around 10 years.","src":"claude"},{"title":"Keep more of it from taxes","detail":"Jeff wants to cut the roughly $683,000 in projected lifetime taxes. The next 8 to 10 years, before required withdrawals begin, are a chance to use lower tax rates, including on Social Security.","src":"claude"},{"title":"Jane to Retire at 60 and 8 months","detail":"Jane wants to stop working at 60 years 8 months and take her pension at 62, about $1,830 a month. They want the pension choice to keep income going for whichever of them lives longer.","src":"advisor"},{"title":"Get the best from Social Security","detail":"Jeff started at $2,677 a month in February and worries he gave up benefits by claiming early. They want to know whether to reverse it, and when Jane should start hers.","src":"claude"},{"title":"Pass wealth on to family","detail":"Jeff wants to help his three granddaughters and children, avoid Pennsylvania inheritance tax, and have wills and trusts in place, learning from what happened with his sister and brother-in-law\'s estate.","src":"claude"}],"notes":"Learning Meeting: Jeff Smith\\n\\nMay 27, 2026\\n\\n9:33 AM - 11:34 AM\\n\\nParticipants:\\n\\n\\n\\n\\n\\nJeff\\n\\n\\n\\nDaniel Dietrich\\n\\n\\n\\nDan Asti\\n\\n\\n\\n\\n\\nLearning Meeting: Jeff Smith\\n\\nMay 27, 2026\\n\\n9:33 AM - 11:34 AM\\n\\n\\n\\nClients\\n\\nJeff(19%)\\n\\nFinancial Advisors\\n\\nDaniel Dietrich(13%),Dan Asti(68%)\\n\\n\\n\\n\\n\\nMeeting Purpose\\n\\nThis was an introductory learning meeting with Jeff Smith, a 63-year-old recently retired client, facilitated by Daniel Dietrich and Dan Asti. The discussion centered on Jeff\'s current financial position, retirement income planning needs, Social Security and PSERS pension optimization for himself and his wife Jane, estate and legacy planning considerations, tax planning opportunities, investment product review, and the next steps for engaging in a comprehensive retirement income planning process with Alto.\\n\\nNon-Financial Personal Information\\n\\n\\n\\n\\n\\nJeff is 63 years old\\n\\n\\n\\nJeff\'s wife Jane is 60 years old\\n\\n\\n\\nJane works at a charter school and wants to be done working\\n\\n\\n\\nJane will be done with her job at 60 years and 8 months\\n\\n\\n\\nJeff experienced the loss of family members including his sister who passed in August and his brother-in-law Pat\\n\\n\\n\\nJeff\'s brother-in-law Pat wanted to give Christmas gifts before he passed\\n\\n\\n\\nJeff has been back and forth to Erie constantly where his sister and brother-in-law lived\\n\\n\\n\\nJeff had to sell his sister and brother-in-law\'s house in Erie\\n\\n\\n\\nJeff is the executor of his sister and brother-in-law\'s estate\\n\\n\\n\\nJeff has three granddaughters under the age of 2\\n\\n\\n\\nJeff was with all three granddaughters on Memorial Day\\n\\n\\n\\nJane\'s four grandparents were all in their 90s\\n\\n\\n\\nJane\'s parents are currently 88 and 89 years old\\n\\n\\n\\nJane\'s dad is starting to decline at 88\\n\\n\\n\\nJeff and Jane are planning a Disney vacation in October\\n\\n\\n\\nJeff and Jane have things they want to do for many years\\n\\n\\n\\nJeff\'s wife Jane likes to save money in envelopes\\n\\n\\n\\nJeff attends seminar things now because he has more time than he\'s ever had in the past\\n\\n\\n\\nJeff wants to learn different things\\n\\n\\n\\nJeff\'s company changed names three times in the past four years\\n\\n\\n\\nJeff took Social Security in February at age 63\\n\\n\\n\\nJeff has no debt and their annual expenses for necessities are around $35,000\\n\\n\\n\\nJeff lives north of the meeting location\\n\\nFinancial Facts by Topic\\n\\nTax Planning\\n\\n\\n\\n\\n\\nJeff took Social Security in February and is concerned about giving up benefits by taking it early\\n\\n\\n\\nJeff is worried about paying 85% tax on Social Security benefits unless not making any money\\n\\n\\n\\nJeff learned about gift tax issues when his brother-in-law gave $10,000 gifts instead of splitting them as $3,000 to individuals and $3,000 to spouses to avoid Pennsylvania inheritance tax\\n\\n\\n\\nJeff is in a tax bracket where he feels he carries more weight than other income levels\\n\\n\\n\\nThe financial planning software shows Jeff will pay approximately $683,000 in lifetime taxation under current scenario\\n\\n\\n\\nJeff has tax rate opportunities in early retirement years before higher tax brackets kick in later\\n\\nEstate Planning\\n\\n\\n\\n\\n\\nJeff learned hard lessons about estate planning when his sister passed in August and brother-in-law Pat wanted to give Christmas gifts before his own death\\n\\n\\n\\nJeff is concerned about not losing money to Pennsylvania inheritance tax\\n\\n\\n\\nThe estate Jeff is inheriting from will pay all taxes, so he should receive net amounts\\n\\n\\n\\nJeff mentioned his brother-in-law had conversations that put estate planning in place during his final months\\n\\nProfile & Goals\\n\\n\\n\\n\\n\\nJeff is 63 years old and his wife Jane is 60, with Jeff recently retired and Jane planning to retire at 60 and 8 months\\n\\n\\n\\nJeff has been attending financial seminars to learn about wealth management and legacy planning after experiencing losses from family deaths\\n\\n\\n\\nJeff and Jane want to do things for their three granddaughters under age two and plan activities that will require withdrawing money from accounts\\n\\n\\n\\nJeff is in a wealth category where he feels he takes more tax hits than lower or higher income brackets\\n\\n\\n\\nJeff wants to learn strategies to avoid losing money to taxes and inheritance issues\\n\\nEducation Planning\\n\\nNo relevant information detected.\\n\\nEquity Compensation\\n\\nNo relevant information detected.\\n\\nInvestment Management\\n\\n\\n\\n\\n\\nJeff has been working with someone on income stream planning for 2-3 years but has been afraid to pull the trigger\\n\\n\\n\\nJeff has a 6-year point-to-point variable annuity with Athene worth approximately $242,000 that matures in 2027\\n\\n\\n\\nJeff has an annuity with Equitable\\n\\n\\n\\nJeff has a Sentinel annuity\\n\\n\\n\\nJeff has an Investor\'s Heritage joint annuity\\n\\n\\n\\nJeff has pockets of money not currently allocated from inheritance and extra 401k due to company name changes\\n\\n\\n\\nJeff has a final 401k worth approximately $35,000\\n\\n\\n\\nJeff will receive an inherited IRA worth $82,000 on a 10-year drawdown\\n\\n\\n\\nJeff may receive approximately $60,000 in cash inheritance\\n\\nRetirement Forecasting\\n\\n\\n\\n\\n\\nJeff recently started taking Social Security at $2,677 per month\\n\\n\\n\\nJane\'s Social Security would be $1,083 at age 62 or $1,703 at age 67\\n\\n\\n\\nJane\'s PSERS pension estimated at $1,830 per month if taken at age 62 with option to withdraw $72,000 lump sum\\n\\n\\n\\nJane has 21.5 years of service with PSERS and can retire without penalty at age 62\\n\\n\\n\\nFinancial planning software shows Jeff is good until age 94 under current spending of $1,500 per month fun money\\n\\n\\n\\nSequence of return risk could take 10 years off the retirement plan\\n\\n\\n\\nLong-term care costs at age 80 could have similar impact as market decline\\n\\nCash Flow & Debt Management\\n\\n\\n\\n\\n\\nJeff estimates basic living expenses at $35,000 per year if going to nitty gritty necessities\\n\\n\\n\\nJeff suggests budgeting $50,000 per year for general expenses\\n\\n\\n\\nJeff has no debt currently\\n\\n\\n\\nJeff and Jane create their own debt as they go using credit cards\\n\\n\\n\\nJeff has approximately $130,000 in cash on hand that his wife saves in envelopes\\n\\n\\n\\nJeff is planning to fund a Disney vacation in October\\n\\nInsurance & Risk Management\\n\\n\\n\\n\\n\\nJeff can continue healthcare insurance through his wife\'s charter school employment by paying for it himself\\n\\n\\n\\nJeff is covered under Jane\'s healthcare for 18 months until he reaches age 65\\n\\n\\n\\nJane can continue using the charter school healthcare until she reaches 65\\n\\nFinancial Discussion\\n\\nRetirement Income Planning and Cash Flow Projections\\n\\n\\n\\n\\n\\nUsing Alto\'s proprietary retirement planning software, the advisors built out Jeff\'s income and asset picture. With estimated monthly expenses of approximately $7,000 plus $1,500 in discretionary spending (totaling roughly $102,000 annually) and a 3% inflation rate applied, the baseline projection showed Jeff\'s assets lasting until approximately age 91–94 under normal market conditions. The advisors demonstrated how adjusting discretionary spending — up to $2,500/month or down to $1,500/month — materially shifts the outcome, underscoring the importance of accurate budgeting. Jeff estimated his bare-minimum annual living expenses at $35,000, with a more realistic working budget of approximately $50,000 per year. The software projected cumulative lifetime tax payments of approximately $683,000 under the current structure. Jeff has no current debt and approximately $130,000 in cash on hand. The advisors noted that with proper planning and defensive positioning, Jeff has sufficient assets to support his retirement and potentially transfer wealth to the next generation.\\n\\nSocial Security Optimization\\n\\n\\n\\n\\n\\nJeff began receiving Social Security benefits of $2,677 per month in February 2026 at age 63. The advisors noted that because he started benefits recently, he may still have the option to reverse this decision and delay benefits to increase his monthly amount, though the advisors indicated they would model this to determine whether reversal is worthwhile given his current cash flow needs. Jane\'s estimated Social Security benefit is $1,083 per month at age 62 or $1,703 per month at age 67, based on her December 2025 Social Security statement. The advisors discussed a potential strategy where Jane turns on her own benefit early and later switches to Jeff\'s higher benefit when he would have reached full retirement age. The advisors also noted that the spousal add-on benefit may not provide significant additional value given that Jane\'s own benefit is relatively close to the spousal amount. All projections are estimates based on current information and are subject to change; actual Social Security benefits will depend on individual earnings records and the age at which benefits are claimed.\\n\\nPSERS Pension Planning\\n\\n\\n\\n\\n\\nJane is in the PSERS TD membership class and plans to stop working at age 60 years and 8 months but will defer filing her PSERS retirement application until age 62 to avoid early withdrawal penalties. At age 62, she is estimated to receive approximately $1,830 per month in pension income, with an estimated lump sum withdrawal option of approximately $72,000 (reflecting approximately 21.5 years of service). The advisors discussed the various PSERS pension options. Jeff and Jane had been leaning toward Option 1, which includes a depleting death benefit currently valued at approximately $319,000. The advisors explained that Option 1\'s death benefit decreases by the amount of each monthly pension payment received and typically depletes within approximately 10 years. Given Jane\'s strong family longevity — all four of her grandparents lived into their 90s and her parents are currently 88–89 years old — the advisors recommended reconsidering Option 1 in favor of a joint and survivorship option, which would provide continued income to Jeff if Jane predeceases him. The advisors also noted that the tax treatment of the PSERS death benefit (whether it is paid as a life insurance benefit or an IRA balance transfer) requires further research, as it affects the tax consequences. No final recommendation was made; further analysis is needed.\\n\\nSequence of Returns Risk and Market Volatility Protection\\n\\n\\n\\n\\n\\nThe advisors identified sequence of returns risk as Jeff\'s primary retirement concern at this stage. When the advisors applied a 2000-era geometric market risk scenario to the planning model, the projection showed the portfolio could be depleted approximately 10 years earlier than the baseline. The advisors explained that a significant market downturn in the early years of retirement, combined with ongoing withdrawals to fund living expenses, can substantially erode portfolio longevity. They discussed the concept of a defensive allocation — using a portion of assets in products with downside protection (such as indexed or fixed products) — to help preserve the portfolio base during market downturns. The advisors noted that if markets experience a prolonged decline and the client has no defensive buffer, the combination of declining asset values and ongoing withdrawals creates a compounding negative effect. They emphasized that this risk diminishes over time as the portfolio matures, with tax risk becoming the more prominent concern in later years (approximately 10–15 years into retirement). Past market performance is not indicative of future results, and all projections are illustrative estimates subject to change.\\n\\nLong-Term Care Planning and Healthcare Cost Inflation\\n\\n\\n\\n\\n\\nThe advisors modeled a long-term care scenario in which costs of approximately $10,000 per month begin at age 80. When healthcare inflation was increased to 7% in the model (noted as a conservative estimate given that healthcare inflation has historically run at 8–15% annually), the projection showed assets potentially depleting by age 81. The advisors noted that the average annual out-of-pocket medical expense for seniors is approximately $13,000, and that healthcare cost inflation continues to outpace general inflation significantly. Jeff is currently covered under Jane\'s charter school healthcare plan for 18 months following his retirement, which will carry him to age 65 and Medicare eligibility. Jane can continue coverage under the charter school plan until she reaches age 65. The advisors recommended evaluating whether the charter school plan is the most cost-effective option compared to marketplace alternatives, though they noted it is likely competitive. The advisors emphasized the importance of building a defensive position to address potential long-term care costs without depleting the core retirement portfolio. All healthcare cost projections are estimates and actual costs will vary based on individual health circumstances and future cost trends.\\n\\nTax Planning Opportunities\\n\\n\\n\\n\\n\\nThe advisors identified a meaningful tax planning window for Jeff over the next 8–10 years. The software analysis showed Jeff\'s current effective tax rate at approximately 7–22%, projected to increase to 24% and higher in later years as required minimum distributions (RMDs) begin and Social Security taxation increases. Dan Asti explained that Jeff is currently in an opportunity window before RMDs begin, during which strategic Roth conversions and other tax planning strategies could be implemented to reduce lifetime tax burden. The advisors noted that approximately $683,000 in projected lifetime taxes could be reduced with proper planning. They also emphasized the importance of understanding how different withdrawal strategies affect not only current taxes but also future Medicare IRMAA surcharges, which are determined based on income from two years prior. Jeff expressed frustration with his current tax burden, noting that his income bracket appears to carry a disproportionate tax load. The advisors acknowledged this and stressed the importance of strategic, coordinated planning across all accounts and income sources. Tax laws are subject to change, and the impact of any tax strategy should be evaluated in consultation with a qualified tax professional.\\n\\nEstate Planning and Legacy Considerations\\n\\n\\n\\n\\n\\nJeff shared that he learned difficult and costly lessons about estate and inheritance planning following the deaths of his sister and brother-in-law Pat. Specifically, Pat had intended to give $10,000 Christmas gifts to family members before his death, but the family later discovered that Pennsylvania imposes inheritance tax on gifts exceeding $3,000 per person per year. Jeff noted that had they known, they could have structured the gifts as $3,000 from Pat and $3,000 from his sister to each recipient (or split between spouses in the receiving households) to avoid the tax. The advisors discussed generational wealth transfer strategies, including the use of life insurance to pass inherited wealth to the next generation, stepped-up cost basis planning for non-qualified assets, and the importance of proper trust and will structures. The advisors noted that Jeff\'s three young granddaughters represent a meaningful legacy planning opportunity. They also discussed the challenges younger generations face in building wealth, including the widening gap between housing costs and income, and how strategic gifting — such as contributing to a down payment — can have a transformative long-term impact. The advisors noted their estate planning services (wills and trusts) are available at approximately half the cost of traditional attorneys, with comprehensive services available for around $4,000. Estate planning strategies involve complex legal and tax considerations; clients should consult with qualified legal and tax professionals.\\n\\nInvestment Portfolio Review and Fee Analysis\\n\\n\\n\\n\\n\\nThe advisors reviewed Jeff\'s current investment holdings, which include: a six-year point-to-point variable annuity with Sentinel valued at approximately $242,000 (maturing in 2027, annual fee approximately 0.95% or roughly $2,400/year); income annuities with Investors Heritage (joint) and Equitable totaling approximately $100,000; an inherited IRA of approximately $82,000–$90,000 subject to a 10-year drawdown requirement; a 401(k) with approximately $35,000; and approximately $130,000 in cash. Jeff also expects to receive approximately $60,000 in cash from an estate settlement, with the estate paying all associated inheritance taxes. The advisors expressed concern about the six-year point-to-point crediting structure of the Sentinel annuity, explaining that gains are not credited annually but only at the end of the six-year period, eliminating the benefit of annual compounding. They calculated that a straightforward 5% fixed product over five years would grow approximately $242,000 to approximately $308,000; accounting for the annuity\'s estimated $11,000 in fees over the period, the variable annuity would need to achieve approximately a 33% gain to match the fixed alternative on a net basis. The advisors noted the annuity has approximately one year remaining before it is free of surrender charges (2027) and recommended against renewing with another six-year crediting strategy. They also flagged the need to conduct detailed fact-finding calls with all carriers (Athene, Equitable, Sentinel) to fully understand fees, riders, surrender charges, and product terms before making any recommendations. No account movements or changes were recommended at this time. All investment comparisons are illustrative and based on assumptions that may not reflect actual future results; past performance does not guarantee future results.\\n\\n[Repeat as many as relevant topic are in the meeting.]\\n\\n\\n\\nClient\'s Talking Points\\n\\n\\n\\n\\n\\nJeff expressed uncertainty about how to strategically manage inherited funds for his children, particularly regarding whether to apply inheritance money toward their mortgage or invest it given current interest rates.\\n\\n\\n\\nJeff and Jane face significant tax liability exposure, with projections showing approximately $683,000 in cumulative lifetime taxes that could substantially reduce their legacy and retirement flexibility.\\n\\n\\n\\nJeff brought up concerns about sequence of returns risk and healthcare cost inflation potentially depleting his retirement assets, particularly noting that a market downturn combined with rising healthcare expenses could reduce his plan by up to 10 years and force him to rely on home equity in later years.\\n\\n\\n\\nFuture Meetings\\n\\nFinancial Plan Refinement Session\\n\\n2026-06-10T11:00:00\\n\\nAccount Information Gathering Call\\n\\n2026-06-01T12:30:00\\n\\nRisk Assessment and Strategy Discussion\\n\\n2026-06-03T11:00:00","ltc":{"infl":0.045,"room":"pri","mem":0.25,"hours":44,"costs":null,"start":{"client":80,"spouse":80},"cog":{"client":false,"spouse":false},"dur":{"client":null,"spouse":null},"cov":{"client":0,"spouse":0},"link":false,"open":true},"estate":{"will":"no","willDate":"","trust":"no","trustDate":"","funded":"","poa":"no","poaDate":"","mpoa":"no","mpoaDate":"","bene":"no","beneDate":""},"debts":null,"otherAssets":null,"nitrogen":{"name":"Jeff-and-Jane-Smith-Wealth-Report.pdf","text":"","analysis":{"riskNumber":50,"clientRiskNumber":48,"range":{"down":-9.66,"up":14.52},"rangeDollars":{"down":-166433,"up":250292},"value":1723208,"gpa":3.6,"dividend":0.67,"expense":0.56,"allocation":[{"cls":"Stocks","pct":32.03},{"cls":"Bonds","pct":2.8},{"cls":"Cash","pct":18.3},{"cls":"Other","pct":46.87}],"stress":[{"name":"2008 Bear Market","pct":-15.95,"dollars":-274770,"benchmark":-36.81},{"name":"Financial Crisis","pct":-23.79,"dollars":-410009,"benchmark":-54.78},{"name":"2013 Bull Market","pct":12.31,"dollars":212139,"benchmark":32.31},{"name":"Interest Rate Hike","pct":0.91,"dollars":15654,"benchmark":-5.13},{"name":"2020 Pandemic Crash","pct":-14.09,"dollars":-242858,"benchmark":-33.7},{"name":"2022 Inflation Crash","pct":-8.45,"dollars":-145673,"benchmark":-18.17}],"largest":[{"name":"Athene Amplify Var. Annuity - IRA (SPX 6-Year PTP with 20% Buffer)","pct":27.78,"riskNumber":52},{"name":"Allianz Index Advantage Var. Annuity - IRA","pct":17.37,"riskNumber":null},{"name":"Equitable Investment Edge 21 Select Var. Annuity - IRA","pct":12.61,"riskNumber":null},{"name":"Savings Account (Cash / Money Market)","pct":7.54,"riskNumber":1},{"name":"Jeff Fidelity IRA - 1509","pct":6.93,"riskNumber":null}],"summary":"The portfolio totals $1,723,208 across 15 accounts and has a Risk Number of 50, slightly above the clients\' own Risk Number of 48. Its 95% six-month historical range runs from -9.66% (-$166,433) to +14.52% (+$250,292), and the allocation is roughly 32% stocks, 3% bonds, 18% cash and 47% other, which is mostly annuities. In the historical stress tests, the portfolio fell less than the S&P 500, for example -23.79% versus -54.78% in the Financial Crisis and -8.45% versus -18.17% in the 2022 Inflation Crash. It also captured less of the gain in the 2013 bull market (+12.31% versus +32.31%).","holdings":134},"src":"claude","at":"2026-10-08T21:43:38.384Z"},"risk":{"score":"50","tolerance":"48","questionnaire":{"answers":{},"amount":""},"selected":["seq","found","wd","walls","estate","bene"],"custom":[]},"tax":{"withdrawalOrder":["taxable","deferred","roth"],"roth":{"apply":false,"target":"auto","start":"auto","order":"roof","irmaa":true},"qcd":{"apply":true,"client":"","spouse":"","startAge":71,"mode":"budget"}},"life":{"client":{"existing":100000,"relies":true,"years":"","health":"p","tobacco":false,"group":false},"spouse":{"existing":0,"relies":true,"years":"","health":"p","tobacco":false,"group":false},"mortgage":0,"debt":0,"college":0,"replace":0.7,"rate":0.02,"indep":22,"collegeCost":120000,"fin":15000,"open":true},"client":{"state":"PA","adults":[],"minors":[]},"accounts":[{"name":"Inherited IRA","owner":"client","cust":"Citizens","tax":"Qualified","pos":"Market","val":72000,"move":"yes","growth":null},{"name":"After Tax ","owner":"client","cust":"Fidelity/AssetMark","tax":"Non-Qualified","pos":"Market","val":66772,"move":"yes","growth":null},{"name":"Variable Annuity1","owner":"client","cust":"Equitable","tax":"Non-Qualified","pos":"Market","val":72330,"move":"yes","growth":null},{"name":"Fixed Annuity","owner":"client","cust":"ISDA Financial Life","tax":"Non-Qualified","pos":"MYGA Annuity","val":46572,"move":"yes","growth":null,"ann":{"company":"","product":"","rate":0.05,"interest":"deferred","maturity":"2029-10","monthly":null,"payout":"single","fees":null,"cap":null,"part":null,"floor":null}},{"name":"RILA Annuity","owner":"client","cust":"Athene","tax":"Qualified","pos":"RILA Annuity","val":404633,"move":"yes","growth":null,"ann":{"company":"","product":"","rate":null,"interest":"deferred","maturity":"","monthly":null,"payout":"single","fees":0.03,"cap":null,"part":null,"floor":null}},{"name":"Variable Annuity2","owner":"client","cust":"Allianz","tax":"Qualified","pos":"Variable Annuity","val":299235,"move":"yes","growth":null,"ann":{"company":"","product":"","rate":null,"interest":"deferred","maturity":"","monthly":null,"payout":"single","fees":0.03,"cap":null,"part":null,"floor":null}},{"name":"Variable Annuity3","owner":"client","cust":"Equitable","tax":"Qualified","pos":"Variable Annuity","val":58452,"move":"yes","growth":null,"ann":{"company":"","product":"","rate":null,"interest":"deferred","maturity":"","monthly":null,"payout":"single","fees":0.03,"cap":null,"part":null,"floor":null}},{"name":"Variable Annuity4 ","owner":"client","cust":"Equitable","tax":"Qualified","pos":"Variable Annuity","val":219397,"move":"yes","growth":null,"ann":{"company":"","product":"","rate":null,"interest":"deferred","maturity":"","monthly":null,"payout":"single","fees":0.03,"cap":null,"part":null,"floor":null}},{"name":"Jeff\'s IRA","owner":"client","cust":"Fidelity/AssetMark","tax":"Qualified","pos":"Market","val":67109,"move":"yes","growth":null},{"name":"Jeff\'s 2nd IRA","owner":"client","cust":"Fidelity/AssetMark","tax":"Qualified","pos":"Market","val":41121,"move":"yes","growth":null},{"name":"Jeff\'s Roth IRA","owner":"client","cust":"Fidelity/AssetMark","tax":"Roth","pos":"Market","val":6470,"move":"yes","growth":null},{"name":"Jane\'s Roth IRA","owner":"spouse","cust":"Fidelity/AssetMark","tax":"Roth","pos":"Market","val":47533,"move":"yes","growth":null},{"name":"Joint Checking","owner":"joint","cust":"Citizens","tax":"Non-Qualified","pos":"Cash","val":130000,"move":"yes","growth":null},{"name":"Inherited IRA Cash","owner":"client","cust":"Citizens","tax":"Qualified","pos":"Cash","val":10000,"move":"yes","growth":null},{"name":"Investor\'s Heritage","owner":"client","cust":"Investors Heritage","tax":"Qualified","pos":"Income Annuity (FIA)","val":49482,"move":"no","growth":null,"ann":{"company":"","product":"","rate":null,"interest":"deferred","maturity":"","monthly":400,"payout":"joint","fees":0.01,"cap":0.03,"part":null,"floor":null}},{"name":"Sentinel","owner":"client","cust":"Sentinel","tax":"Qualified","pos":"Income Annuity (FIA)","val":51151,"move":"no","growth":null,"ann":{"company":"","product":"","rate":null,"interest":"deferred","maturity":"","monthly":200,"payout":"joint","fees":0.01,"cap":0.03,"part":null,"floor":null}},{"name":"Jane\'s Pension","owner":"spouse","cust":"PSERS","tax":"Qualified","pos":"Market","val":72000,"move":"yes","growth":null},{"name":"Future Inheritancd","owner":"client","cust":"TBD","tax":"Non-Qualified","pos":"Cash","val":60000,"move":"yes","growth":null}],"budget":{"lines":{"hh:1":{"amt":389,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"hh:2":{"amt":73,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"hh:3":{"amt":1000,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"hh:7":{"amt":181,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"hh:9":{"amt":226,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"hh:10":{"amt":200,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"dl:0":{"amt":400,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"dl:1":{"amt":450,"nw":"want","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"hc:0":{"amt":1000,"nw":"need","start":"","end":"2027-10","note":"","label":"","auto":false,"autoStart":false},"hc:6":{"amt":155,"nw":"need","start":"2041-06","end":"","note":"","label":"","auto":false,"autoStart":false},"hc:8":{"amt":7,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"tr:1":{"amt":205,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"tr:2":{"amt":500,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"tr:3":{"amt":241,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"db:0":{"amt":779,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"eo:2":{"amt":242,"nw":"want","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"eo:4":{"amt":2000,"nw":"want","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"eo:5":{"amt":20,"nw":"want","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"eo:7":{"amt":1000,"nw":"need","start":"2030-09","end":"","note":"","label":"Health Insurance HOP","auto":false,"autoStart":false},"eo:8":{"amt":136,"nw":"need","start":"","end":"","note":"","label":"Misc. Taxes","auto":false,"autoStart":false}},"link":true,"open":true},"scenarios":[{"adjMoves":[{"acct":14,"bucket":"foundation","amt":49482},{"acct":15,"bucket":"foundation","amt":51151},{"acct":12,"bucket":"reserve","amt":41854.5},{"acct":4,"bucket":"foundation","amt":228494.03158229153},{"acct":12,"bucket":"moat","amt":57704.60358056266,"person":"client"},{"acct":12,"bucket":"moat","amt":30440.89641943734,"person":"spouse"},{"acct":2,"bucket":"moat","amt":72330,"person":"spouse"},{"acct":1,"bucket":"moat","amt":10061.803200334514,"person":"spouse"},{"acct":11,"bucket":"roof","amt":47533},{"acct":10,"bucket":"roof","amt":6470},{"acct":5,"bucket":"walls","amt":299235},{"acct":7,"bucket":"walls","amt":219397},{"acct":4,"bucket":"walls","amt":23768},{"acct":17,"bucket":"roof","amt":60000},{"acct":1,"bucket":"roof","amt":56710.196799665486},{"acct":3,"bucket":"roof","amt":46572},{"acct":4,"bucket":"roof","amt":152370.96841770847},{"acct":0,"bucket":"roof","amt":72000},{"acct":16,"bucket":"roof","amt":72000},{"acct":8,"bucket":"roof","amt":67109},{"acct":6,"bucket":"roof","amt":58452},{"acct":9,"bucket":"roof","amt":41121},{"acct":13,"bucket":"roof","amt":10000}],"incomeAdj":{"yF":"","fStart":"","yW":"","wStart":"","gPre":"","gPost":""},"annuityIncome":{"to:Jeff\'s Income Anuity":{"gli":"yes","start":"2026-10","monthly":"980","cola":"","wd":""},"to:Jeff Rollover IRA":{"gli":"yes","start":"","monthly":"1,142"}},"ltcBenefits":{"who:client":{"monthly":"3,008","age":"80","years":"5.0"},"who:spouse":{"monthly":"5,900","age":"80","years":"5.0"}},"roofGrowth":{},"withdrawalOrder":["taxable","deferred","roth"],"roth":{"apply":true,"target":0.12,"start":"auto","order":"roof","irmaa":true},"qcd":{"apply":true,"client":"","spouse":"","startAge":71,"mode":"budget"},"name":"Scenario A"},{"adjMoves":[{"acct":14,"bucket":"foundation","amt":49482},{"acct":15,"bucket":"foundation","amt":51151},{"acct":12,"bucket":"reserve","amt":41854.5},{"acct":4,"bucket":"foundation","amt":228494.03158229153},{"acct":12,"bucket":"roof","amt":57704.60358056266},{"acct":12,"bucket":"roof","amt":30440.89641943734},{"acct":2,"bucket":"roof","amt":72330},{"acct":1,"bucket":"roof","amt":10061.803200334514},{"acct":11,"bucket":"roof","amt":47533},{"acct":10,"bucket":"roof","amt":6470},{"acct":5,"bucket":"walls","amt":299235},{"acct":7,"bucket":"walls","amt":219397},{"acct":4,"bucket":"walls","amt":23768},{"acct":17,"bucket":"roof","amt":60000},{"acct":1,"bucket":"roof","amt":56710.196799665486},{"acct":3,"bucket":"roof","amt":46572},{"acct":4,"bucket":"roof","amt":152370.96841770847},{"acct":0,"bucket":"roof","amt":72000},{"acct":16,"bucket":"roof","amt":72000},{"acct":8,"bucket":"roof","amt":67109},{"acct":6,"bucket":"roof","amt":58452},{"acct":9,"bucket":"roof","amt":41121},{"acct":13,"bucket":"roof","amt":10000}],"incomeAdj":{"yF":"","fStart":"","yW":"","wStart":"","gPre":"","gPost":""},"annuityIncome":{},"ltcBenefits":{},"roofGrowth":{},"withdrawalOrder":["taxable","deferred","roth"],"roth":{"apply":false,"target":"auto","start":"auto","order":"roof","irmaa":true},"qcd":{"apply":true,"client":"","spouse":"","startAge":71,"mode":"budget"},"name":"Scenario B"},{"adjMoves":null,"incomeAdj":{"yF":"","fStart":"","yW":"","wStart":"","gPre":"","gPost":""},"annuityIncome":{},"ltcBenefits":{},"roofGrowth":{},"withdrawalOrder":["taxable","deferred","roth"],"roth":{"apply":true,"target":"auto","start":"auto","order":"roof","irmaa":true},"qcd":{"apply":true,"client":"","spouse":"","startAge":71,"mode":"budget"},"name":"Scenario C"}],"activeScenario":1,"reportScenario":0,"incomeAdj":null,"annuityIncome":null,"ltcBenefits":null,"roofGrowth":null,"transfers":[{"acct":14,"bucket":"foundation","amt":49482},{"acct":15,"bucket":"foundation","amt":51151},{"acct":12,"bucket":"reserve","amt":41854.5},{"acct":4,"bucket":"foundation","amt":228494.03158229153},{"acct":12,"bucket":"roof","amt":57704.60358056266},{"acct":12,"bucket":"roof","amt":30440.89641943734},{"acct":2,"bucket":"roof","amt":72330},{"acct":1,"bucket":"roof","amt":10061.803200334514},{"acct":11,"bucket":"roof","amt":47533},{"acct":10,"bucket":"roof","amt":6470},{"acct":5,"bucket":"walls","amt":299235},{"acct":7,"bucket":"walls","amt":219397},{"acct":4,"bucket":"walls","amt":23768},{"acct":17,"bucket":"roof","amt":60000},{"acct":1,"bucket":"roof","amt":56710.196799665486},{"acct":3,"bucket":"roof","amt":46572},{"acct":4,"bucket":"roof","amt":152370.96841770847},{"acct":0,"bucket":"roof","amt":72000},{"acct":16,"bucket":"roof","amt":72000},{"acct":8,"bucket":"roof","amt":67109},{"acct":6,"bucket":"roof","amt":58452},{"acct":9,"bucket":"roof","amt":41121},{"acct":13,"bucket":"roof","amt":10000}]}';
+  var DEFAULT_CASE = '{"household":{"clientFirst":"Jeff","clientLast":"Smith","spouseFirst":"Jane","spouseLast":"Smith","advisor":"Daniel Asti","prepDate":"2026-10-08","needs":83709,"wants":32544,"bufMonths":6,"sizeYears":5,"sizeMode":"avg","yieldF":0.06,"foundGLI":true,"yieldW":0.06,"inflation":0.025,"endAge":100,"growthW":0.015,"growthR":0.06,"medB":202.9,"medD":38.99,"clientDob":"1962-10-10","spouseDob":"1965-01-02","clientAge":63,"spouseAge":61,"clientSex":"male","spouseSex":"female","lifeCV":"no","ltcClient":975000,"ltcSpouse":861000,"newCust":"Fidelity","annuityCarrier":"Athene","ltcCarrier":"","employment":{"client":{"salary":0,"retire":"2026-10","deduct":0,"contrib":0,"employer":0,"contribAcct":"","raise":0},"spouse":{"salary":0,"retire":"2026-10","deduct":0,"contrib":0,"employer":0,"contribAcct":"","raise":0},"extra":[]},"benefits":{"ss":{"cola":0.025,"optimizer":{"lifeC":"","lifeS":"","rate":"","cutOn":true,"dobC":"","dobS":""},"client":{"pia":3491,"age":67},"spouse":{"pia":1083,"age":62}},"nonGuar":[{"who":"client","name":"inheritance","amt":0,"start":"2027-05","end":"2027-05","ongoing":false,"raise":0,"note":""}],"pensions":[{"who":"spouse","name":"Jane\'s PERS Pension","amt":1830,"start":"2027-09","cola":0,"surv":100}],"annuities":[{"who":"client","name":"Investor\'s Heritage","amt":366,"start":"2028-05","end":"","life":true,"cola":0,"surv":100,"acctId":""},{"who":"client","name":"Sentinel","amt":233,"start":"2026-06","end":"","life":true,"cola":0,"surv":100,"acctId":""}]},"ss":56156.7,"pension":21960,"otherInc":7188},"goals":[{"title":"Make savings last for life","detail":"Jeff and Jane want their money to support them well past age 94, covering about $50,000 a year in everyday spending plus $1,500 a month of fun money, without a market drop cutting their plan short by around 10 years.","src":"claude"},{"title":"Keep more of it from taxes","detail":"Jeff wants to cut the roughly $683,000 in projected lifetime taxes. The next 8 to 10 years, before required withdrawals begin, are a chance to use lower tax rates, including on Social Security.","src":"claude"},{"title":"Jane to Retire at 60 and 8 months","detail":"Jane wants to stop working at 60 years 8 months and take her pension at 62, about $1,830 a month. They want the pension choice to keep income going for whichever of them lives longer.","src":"advisor"},{"title":"Get the best from Social Security","detail":"Jeff started at $2,677 a month in February and worries he gave up benefits by claiming early. They want to know whether to reverse it, and when Jane should start hers.","src":"claude"},{"title":"Pass wealth on to family","detail":"Jeff wants to help his three granddaughters and children, avoid Pennsylvania inheritance tax, and have wills and trusts in place, learning from what happened with his sister and brother-in-law\'s estate.","src":"claude"}],"meetingNotes":[{"date":"2026-05-27","text":"Learning Meeting: Jeff Smith\\n\\nMay 27, 2026\\n\\n9:33 AM - 11:34 AM\\n\\nParticipants:\\n\\n\\n\\n\\n\\nJeff\\n\\n\\n\\nDaniel Dietrich\\n\\n\\n\\nDan Asti\\n\\n\\n\\n\\n\\nLearning Meeting: Jeff Smith\\n\\nMay 27, 2026\\n\\n9:33 AM - 11:34 AM\\n\\n\\n\\nClients\\n\\nJeff(19%)\\n\\nFinancial Advisors\\n\\nDaniel Dietrich(13%),Dan Asti(68%)\\n\\n\\n\\n\\n\\nMeeting Purpose\\n\\nThis was an introductory learning meeting with Jeff Smith, a 63-year-old recently retired client, facilitated by Daniel Dietrich and Dan Asti. The discussion centered on Jeff\'s current financial position, retirement income planning needs, Social Security and PSERS pension optimization for himself and his wife Jane, estate and legacy planning considerations, tax planning opportunities, investment product review, and the next steps for engaging in a comprehensive retirement income planning process with Alto.\\n\\nNon-Financial Personal Information\\n\\n\\n\\n\\n\\nJeff is 63 years old\\n\\n\\n\\nJeff\'s wife Jane is 60 years old\\n\\n\\n\\nJane works at a charter school and wants to be done working\\n\\n\\n\\nJane will be done with her job at 60 years and 8 months\\n\\n\\n\\nJeff experienced the loss of family members including his sister who passed in August and his brother-in-law Pat\\n\\n\\n\\nJeff\'s brother-in-law Pat wanted to give Christmas gifts before he passed\\n\\n\\n\\nJeff has been back and forth to Erie constantly where his sister and brother-in-law lived\\n\\n\\n\\nJeff had to sell his sister and brother-in-law\'s house in Erie\\n\\n\\n\\nJeff is the executor of his sister and brother-in-law\'s estate\\n\\n\\n\\nJeff has three granddaughters under the age of 2\\n\\n\\n\\nJeff was with all three granddaughters on Memorial Day\\n\\n\\n\\nJane\'s four grandparents were all in their 90s\\n\\n\\n\\nJane\'s parents are currently 88 and 89 years old\\n\\n\\n\\nJane\'s dad is starting to decline at 88\\n\\n\\n\\nJeff and Jane are planning a Disney vacation in October\\n\\n\\n\\nJeff and Jane have things they want to do for many years\\n\\n\\n\\nJeff\'s wife Jane likes to save money in envelopes\\n\\n\\n\\nJeff attends seminar things now because he has more time than he\'s ever had in the past\\n\\n\\n\\nJeff wants to learn different things\\n\\n\\n\\nJeff\'s company changed names three times in the past four years\\n\\n\\n\\nJeff took Social Security in February at age 63\\n\\n\\n\\nJeff has no debt and their annual expenses for necessities are around $35,000\\n\\n\\n\\nJeff lives north of the meeting location\\n\\nFinancial Facts by Topic\\n\\nTax Planning\\n\\n\\n\\n\\n\\nJeff took Social Security in February and is concerned about giving up benefits by taking it early\\n\\n\\n\\nJeff is worried about paying 85% tax on Social Security benefits unless not making any money\\n\\n\\n\\nJeff learned about gift tax issues when his brother-in-law gave $10,000 gifts instead of splitting them as $3,000 to individuals and $3,000 to spouses to avoid Pennsylvania inheritance tax\\n\\n\\n\\nJeff is in a tax bracket where he feels he carries more weight than other income levels\\n\\n\\n\\nThe financial planning software shows Jeff will pay approximately $683,000 in lifetime taxation under current scenario\\n\\n\\n\\nJeff has tax rate opportunities in early retirement years before higher tax brackets kick in later\\n\\nEstate Planning\\n\\n\\n\\n\\n\\nJeff learned hard lessons about estate planning when his sister passed in August and brother-in-law Pat wanted to give Christmas gifts before his own death\\n\\n\\n\\nJeff is concerned about not losing money to Pennsylvania inheritance tax\\n\\n\\n\\nThe estate Jeff is inheriting from will pay all taxes, so he should receive net amounts\\n\\n\\n\\nJeff mentioned his brother-in-law had conversations that put estate planning in place during his final months\\n\\nProfile & Goals\\n\\n\\n\\n\\n\\nJeff is 63 years old and his wife Jane is 60, with Jeff recently retired and Jane planning to retire at 60 and 8 months\\n\\n\\n\\nJeff has been attending financial seminars to learn about wealth management and legacy planning after experiencing losses from family deaths\\n\\n\\n\\nJeff and Jane want to do things for their three granddaughters under age two and plan activities that will require withdrawing money from accounts\\n\\n\\n\\nJeff is in a wealth category where he feels he takes more tax hits than lower or higher income brackets\\n\\n\\n\\nJeff wants to learn strategies to avoid losing money to taxes and inheritance issues\\n\\nEducation Planning\\n\\nNo relevant information detected.\\n\\nEquity Compensation\\n\\nNo relevant information detected.\\n\\nInvestment Management\\n\\n\\n\\n\\n\\nJeff has been working with someone on income stream planning for 2-3 years but has been afraid to pull the trigger\\n\\n\\n\\nJeff has a 6-year point-to-point variable annuity with Athene worth approximately $242,000 that matures in 2027\\n\\n\\n\\nJeff has an annuity with Equitable\\n\\n\\n\\nJeff has a Sentinel annuity\\n\\n\\n\\nJeff has an Investor\'s Heritage joint annuity\\n\\n\\n\\nJeff has pockets of money not currently allocated from inheritance and extra 401k due to company name changes\\n\\n\\n\\nJeff has a final 401k worth approximately $35,000\\n\\n\\n\\nJeff will receive an inherited IRA worth $82,000 on a 10-year drawdown\\n\\n\\n\\nJeff may receive approximately $60,000 in cash inheritance\\n\\nRetirement Forecasting\\n\\n\\n\\n\\n\\nJeff recently started taking Social Security at $2,677 per month\\n\\n\\n\\nJane\'s Social Security would be $1,083 at age 62 or $1,703 at age 67\\n\\n\\n\\nJane\'s PSERS pension estimated at $1,830 per month if taken at age 62 with option to withdraw $72,000 lump sum\\n\\n\\n\\nJane has 21.5 years of service with PSERS and can retire without penalty at age 62\\n\\n\\n\\nFinancial planning software shows Jeff is good until age 94 under current spending of $1,500 per month fun money\\n\\n\\n\\nSequence of return risk could take 10 years off the retirement plan\\n\\n\\n\\nLong-term care costs at age 80 could have similar impact as market decline\\n\\nCash Flow & Debt Management\\n\\n\\n\\n\\n\\nJeff estimates basic living expenses at $35,000 per year if going to nitty gritty necessities\\n\\n\\n\\nJeff suggests budgeting $50,000 per year for general expenses\\n\\n\\n\\nJeff has no debt currently\\n\\n\\n\\nJeff and Jane create their own debt as they go using credit cards\\n\\n\\n\\nJeff has approximately $130,000 in cash on hand that his wife saves in envelopes\\n\\n\\n\\nJeff is planning to fund a Disney vacation in October\\n\\nInsurance & Risk Management\\n\\n\\n\\n\\n\\nJeff can continue healthcare insurance through his wife\'s charter school employment by paying for it himself\\n\\n\\n\\nJeff is covered under Jane\'s healthcare for 18 months until he reaches age 65\\n\\n\\n\\nJane can continue using the charter school healthcare until she reaches 65\\n\\nFinancial Discussion\\n\\nRetirement Income Planning and Cash Flow Projections\\n\\n\\n\\n\\n\\nUsing Alto\'s proprietary retirement planning software, the advisors built out Jeff\'s income and asset picture. With estimated monthly expenses of approximately $7,000 plus $1,500 in discretionary spending (totaling roughly $102,000 annually) and a 3% inflation rate applied, the baseline projection showed Jeff\'s assets lasting until approximately age 91–94 under normal market conditions. The advisors demonstrated how adjusting discretionary spending — up to $2,500/month or down to $1,500/month — materially shifts the outcome, underscoring the importance of accurate budgeting. Jeff estimated his bare-minimum annual living expenses at $35,000, with a more realistic working budget of approximately $50,000 per year. The software projected cumulative lifetime tax payments of approximately $683,000 under the current structure. Jeff has no current debt and approximately $130,000 in cash on hand. The advisors noted that with proper planning and defensive positioning, Jeff has sufficient assets to support his retirement and potentially transfer wealth to the next generation.\\n\\nSocial Security Optimization\\n\\n\\n\\n\\n\\nJeff began receiving Social Security benefits of $2,677 per month in February 2026 at age 63. The advisors noted that because he started benefits recently, he may still have the option to reverse this decision and delay benefits to increase his monthly amount, though the advisors indicated they would model this to determine whether reversal is worthwhile given his current cash flow needs. Jane\'s estimated Social Security benefit is $1,083 per month at age 62 or $1,703 per month at age 67, based on her December 2025 Social Security statement. The advisors discussed a potential strategy where Jane turns on her own benefit early and later switches to Jeff\'s higher benefit when he would have reached full retirement age. The advisors also noted that the spousal add-on benefit may not provide significant additional value given that Jane\'s own benefit is relatively close to the spousal amount. All projections are estimates based on current information and are subject to change; actual Social Security benefits will depend on individual earnings records and the age at which benefits are claimed.\\n\\nPSERS Pension Planning\\n\\n\\n\\n\\n\\nJane is in the PSERS TD membership class and plans to stop working at age 60 years and 8 months but will defer filing her PSERS retirement application until age 62 to avoid early withdrawal penalties. At age 62, she is estimated to receive approximately $1,830 per month in pension income, with an estimated lump sum withdrawal option of approximately $72,000 (reflecting approximately 21.5 years of service). The advisors discussed the various PSERS pension options. Jeff and Jane had been leaning toward Option 1, which includes a depleting death benefit currently valued at approximately $319,000. The advisors explained that Option 1\'s death benefit decreases by the amount of each monthly pension payment received and typically depletes within approximately 10 years. Given Jane\'s strong family longevity — all four of her grandparents lived into their 90s and her parents are currently 88–89 years old — the advisors recommended reconsidering Option 1 in favor of a joint and survivorship option, which would provide continued income to Jeff if Jane predeceases him. The advisors also noted that the tax treatment of the PSERS death benefit (whether it is paid as a life insurance benefit or an IRA balance transfer) requires further research, as it affects the tax consequences. No final recommendation was made; further analysis is needed.\\n\\nSequence of Returns Risk and Market Volatility Protection\\n\\n\\n\\n\\n\\nThe advisors identified sequence of returns risk as Jeff\'s primary retirement concern at this stage. When the advisors applied a 2000-era geometric market risk scenario to the planning model, the projection showed the portfolio could be depleted approximately 10 years earlier than the baseline. The advisors explained that a significant market downturn in the early years of retirement, combined with ongoing withdrawals to fund living expenses, can substantially erode portfolio longevity. They discussed the concept of a defensive allocation — using a portion of assets in products with downside protection (such as indexed or fixed products) — to help preserve the portfolio base during market downturns. The advisors noted that if markets experience a prolonged decline and the client has no defensive buffer, the combination of declining asset values and ongoing withdrawals creates a compounding negative effect. They emphasized that this risk diminishes over time as the portfolio matures, with tax risk becoming the more prominent concern in later years (approximately 10–15 years into retirement). Past market performance is not indicative of future results, and all projections are illustrative estimates subject to change.\\n\\nLong-Term Care Planning and Healthcare Cost Inflation\\n\\n\\n\\n\\n\\nThe advisors modeled a long-term care scenario in which costs of approximately $10,000 per month begin at age 80. When healthcare inflation was increased to 7% in the model (noted as a conservative estimate given that healthcare inflation has historically run at 8–15% annually), the projection showed assets potentially depleting by age 81. The advisors noted that the average annual out-of-pocket medical expense for seniors is approximately $13,000, and that healthcare cost inflation continues to outpace general inflation significantly. Jeff is currently covered under Jane\'s charter school healthcare plan for 18 months following his retirement, which will carry him to age 65 and Medicare eligibility. Jane can continue coverage under the charter school plan until she reaches age 65. The advisors recommended evaluating whether the charter school plan is the most cost-effective option compared to marketplace alternatives, though they noted it is likely competitive. The advisors emphasized the importance of building a defensive position to address potential long-term care costs without depleting the core retirement portfolio. All healthcare cost projections are estimates and actual costs will vary based on individual health circumstances and future cost trends.\\n\\nTax Planning Opportunities\\n\\n\\n\\n\\n\\nThe advisors identified a meaningful tax planning window for Jeff over the next 8–10 years. The software analysis showed Jeff\'s current effective tax rate at approximately 7–22%, projected to increase to 24% and higher in later years as required minimum distributions (RMDs) begin and Social Security taxation increases. Dan Asti explained that Jeff is currently in an opportunity window before RMDs begin, during which strategic Roth conversions and other tax planning strategies could be implemented to reduce lifetime tax burden. The advisors noted that approximately $683,000 in projected lifetime taxes could be reduced with proper planning. They also emphasized the importance of understanding how different withdrawal strategies affect not only current taxes but also future Medicare IRMAA surcharges, which are determined based on income from two years prior. Jeff expressed frustration with his current tax burden, noting that his income bracket appears to carry a disproportionate tax load. The advisors acknowledged this and stressed the importance of strategic, coordinated planning across all accounts and income sources. Tax laws are subject to change, and the impact of any tax strategy should be evaluated in consultation with a qualified tax professional.\\n\\nEstate Planning and Legacy Considerations\\n\\n\\n\\n\\n\\nJeff shared that he learned difficult and costly lessons about estate and inheritance planning following the deaths of his sister and brother-in-law Pat. Specifically, Pat had intended to give $10,000 Christmas gifts to family members before his death, but the family later discovered that Pennsylvania imposes inheritance tax on gifts exceeding $3,000 per person per year. Jeff noted that had they known, they could have structured the gifts as $3,000 from Pat and $3,000 from his sister to each recipient (or split between spouses in the receiving households) to avoid the tax. The advisors discussed generational wealth transfer strategies, including the use of life insurance to pass inherited wealth to the next generation, stepped-up cost basis planning for non-qualified assets, and the importance of proper trust and will structures. The advisors noted that Jeff\'s three young granddaughters represent a meaningful legacy planning opportunity. They also discussed the challenges younger generations face in building wealth, including the widening gap between housing costs and income, and how strategic gifting — such as contributing to a down payment — can have a transformative long-term impact. The advisors noted their estate planning services (wills and trusts) are available at approximately half the cost of traditional attorneys, with comprehensive services available for around $4,000. Estate planning strategies involve complex legal and tax considerations; clients should consult with qualified legal and tax professionals.\\n\\nInvestment Portfolio Review and Fee Analysis\\n\\n\\n\\n\\n\\nThe advisors reviewed Jeff\'s current investment holdings, which include: a six-year point-to-point variable annuity with Sentinel valued at approximately $242,000 (maturing in 2027, annual fee approximately 0.95% or roughly $2,400/year); income annuities with Investors Heritage (joint) and Equitable totaling approximately $100,000; an inherited IRA of approximately $82,000–$90,000 subject to a 10-year drawdown requirement; a 401(k) with approximately $35,000; and approximately $130,000 in cash. Jeff also expects to receive approximately $60,000 in cash from an estate settlement, with the estate paying all associated inheritance taxes. The advisors expressed concern about the six-year point-to-point crediting structure of the Sentinel annuity, explaining that gains are not credited annually but only at the end of the six-year period, eliminating the benefit of annual compounding. They calculated that a straightforward 5% fixed product over five years would grow approximately $242,000 to approximately $308,000; accounting for the annuity\'s estimated $11,000 in fees over the period, the variable annuity would need to achieve approximately a 33% gain to match the fixed alternative on a net basis. The advisors noted the annuity has approximately one year remaining before it is free of surrender charges (2027) and recommended against renewing with another six-year crediting strategy. They also flagged the need to conduct detailed fact-finding calls with all carriers (Athene, Equitable, Sentinel) to fully understand fees, riders, surrender charges, and product terms before making any recommendations. No account movements or changes were recommended at this time. All investment comparisons are illustrative and based on assumptions that may not reflect actual future results; past performance does not guarantee future results.\\n\\n[Repeat as many as relevant topic are in the meeting.]\\n\\n\\n\\nClient\'s Talking Points\\n\\n\\n\\n\\n\\nJeff expressed uncertainty about how to strategically manage inherited funds for his children, particularly regarding whether to apply inheritance money toward their mortgage or invest it given current interest rates.\\n\\n\\n\\nJeff and Jane face significant tax liability exposure, with projections showing approximately $683,000 in cumulative lifetime taxes that could substantially reduce their legacy and retirement flexibility.\\n\\n\\n\\nJeff brought up concerns about sequence of returns risk and healthcare cost inflation potentially depleting his retirement assets, particularly noting that a market downturn combined with rising healthcare expenses could reduce his plan by up to 10 years and force him to rely on home equity in later years.\\n\\n\\n\\nFuture Meetings\\n\\nFinancial Plan Refinement Session\\n\\n2026-06-10T11:00:00\\n\\nAccount Information Gathering Call\\n\\n2026-06-01T12:30:00\\n\\nRisk Assessment and Strategy Discussion\\n\\n2026-06-03T11:00:00"}],"ltc":{"infl":0.045,"room":"semi","mem":0.25,"hours":44,"costs":null,"start":{"client":80,"spouse":80},"cog":{"client":true,"spouse":false},"dur":{"client":null,"spouse":null},"cov":{"client":0,"spouse":0},"link":true,"open":true},"estate":{"will":"no","willDate":"","trust":"no","trustDate":"","funded":"","poa":"no","poaDate":"","mpoa":"no","mpoaDate":"","bene":"no","beneDate":""},"debts":null,"lifePolicies":null,"ltcPolicies":null,"otherAssets":null,"nitrogen":{"name":"Jeff-and-Jane-Smith-Wealth-Report.pdf","text":"","analysis":{"riskNumber":50,"clientRiskNumber":48,"range":{"down":-9.66,"up":14.52},"rangeDollars":{"down":-166433,"up":250292},"value":1723208,"gpa":3.6,"dividend":0.67,"expense":0.56,"allocation":[{"cls":"Stocks","pct":32.03},{"cls":"Bonds","pct":2.8},{"cls":"Cash","pct":18.3},{"cls":"Other","pct":46.87}],"stress":[{"name":"2008 Bear Market","pct":-15.95,"dollars":-274770,"benchmark":-36.81},{"name":"Financial Crisis","pct":-23.79,"dollars":-410009,"benchmark":-54.78},{"name":"2013 Bull Market","pct":12.31,"dollars":212139,"benchmark":32.31},{"name":"Interest Rate Hike","pct":0.91,"dollars":15654,"benchmark":-5.13},{"name":"2020 Pandemic Crash","pct":-14.09,"dollars":-242858,"benchmark":-33.7},{"name":"2022 Inflation Crash","pct":-8.45,"dollars":-145673,"benchmark":-18.17}],"largest":[{"name":"Athene Amplify Var. Annuity - IRA (SPX 6-Year PTP with 20% Buffer)","pct":27.78,"riskNumber":52},{"name":"Allianz Index Advantage Var. Annuity - IRA","pct":17.37,"riskNumber":null},{"name":"Equitable Investment Edge 21 Select Var. Annuity - IRA","pct":12.61,"riskNumber":null},{"name":"Savings Account (Cash / Money Market)","pct":7.54,"riskNumber":1},{"name":"Jeff Fidelity IRA - 1509","pct":6.93,"riskNumber":null}],"summary":"The portfolio totals $1,723,208 across 15 accounts and has a Risk Number of 50, slightly above the clients\' own Risk Number of 48. Its 95% six-month historical range runs from -9.66% (-$166,433) to +14.52% (+$250,292), and the allocation is roughly 32% stocks, 3% bonds, 18% cash and 47% other, which is mostly annuities. In the historical stress tests, the portfolio fell less than the S&P 500, for example -23.79% versus -54.78% in the Financial Crisis and -8.45% versus -18.17% in the 2022 Inflation Crash. It also captured less of the gain in the 2013 bull market (+12.31% versus +32.31%).","holdings":134},"src":"claude","at":"2026-10-08T21:43:38.384Z"},"risk":{"score":"50","tolerance":"","questionnaire":{"answers":{"q1":1,"q2":0,"q3":1,"q5":2,"q6":1,"q7":2,"q8":0,"q9":1,"q12":1,"q10":1,"q11":0},"amount":""},"selected":["seq","found","wd","walls","estate","bene","score"],"custom":[]},"tax":{"withdrawalOrder":["taxable","deferred","roth"],"roth":{"apply":true,"target":0.22,"start":"auto","order":"roof","irmaa":true},"qcd":{"apply":true,"client":"","spouse":"","startAge":71,"mode":"budget"}},"life":{"client":{"existing":100000,"relies":true,"years":"","health":"p","tobacco":false,"group":false},"spouse":{"existing":0,"relies":true,"years":"","health":"p","tobacco":false,"group":false},"mortgage":0,"debt":0,"college":0,"replace":0.7,"rate":0.02,"indep":22,"collegeCost":120000,"fin":15000,"open":true},"client":{"state":"PA","adults":[],"minors":[]},"accounts":[{"name":"Inherited IRA","owner":"client","cust":"Citizens","tax":"Qualified","pos":"Market","val":72000,"move":"yes","growth":null},{"name":"After Tax ","owner":"client","cust":"Fidelity/AssetMark","tax":"Non-Qualified","pos":"Market","val":66772,"move":"yes","growth":null},{"name":"Variable Annuity1","owner":"client","cust":"Equitable","tax":"Non-Qualified","pos":"Market","val":72330,"move":"yes","growth":null},{"name":"Fixed Annuity","owner":"client","cust":"ISDA Financial Life","tax":"Non-Qualified","pos":"MYGA Annuity","val":46572,"move":"yes","growth":null,"ann":{"company":"","product":"","rate":0.05,"interest":"deferred","maturity":"2029-10","monthly":null,"payout":"single","fees":null,"cap":null,"part":null,"floor":null}},{"name":"RILA Annuity","owner":"client","cust":"Athene","tax":"Qualified","pos":"RILA Annuity","val":404633,"move":"yes","growth":null,"ann":{"company":"","product":"","rate":null,"interest":"deferred","maturity":"","monthly":null,"payout":"single","fees":0.03,"cap":null,"part":null,"floor":null}},{"name":"Variable Annuity2","owner":"client","cust":"Allianz","tax":"Qualified","pos":"Variable Annuity","val":299235,"move":"yes","growth":null,"ann":{"company":"","product":"","rate":null,"interest":"deferred","maturity":"","monthly":null,"payout":"single","fees":0.03,"cap":null,"part":null,"floor":null}},{"name":"Variable Annuity3","owner":"client","cust":"Equitable","tax":"Qualified","pos":"Variable Annuity","val":58452,"move":"yes","growth":null,"ann":{"company":"","product":"","rate":null,"interest":"deferred","maturity":"","monthly":null,"payout":"single","fees":0.03,"cap":null,"part":null,"floor":null}},{"name":"Variable Annuity4 ","owner":"client","cust":"Equitable","tax":"Qualified","pos":"Variable Annuity","val":219397,"move":"yes","growth":null,"ann":{"company":"","product":"","rate":null,"interest":"deferred","maturity":"","monthly":null,"payout":"single","fees":0.03,"cap":null,"part":null,"floor":null}},{"name":"Jeff\'s IRA","owner":"client","cust":"Fidelity/AssetMark","tax":"Qualified","pos":"Market","val":67109,"move":"yes","growth":null},{"name":"Jeff\'s 2nd IRA","owner":"client","cust":"Fidelity/AssetMark","tax":"Qualified","pos":"Market","val":41121,"move":"yes","growth":null},{"name":"Jeff\'s Roth IRA","owner":"client","cust":"Fidelity/AssetMark","tax":"Roth","pos":"Market","val":6470,"move":"yes","growth":null},{"name":"Jane\'s Roth IRA","owner":"spouse","cust":"Fidelity/AssetMark","tax":"Roth","pos":"Market","val":47533,"move":"yes","growth":null},{"name":"Joint Checking","owner":"joint","cust":"Citizens","tax":"Non-Qualified","pos":"Cash","val":130000,"move":"yes","growth":null},{"name":"Inherited IRA Cash","owner":"client","cust":"Citizens","tax":"Qualified","pos":"Cash","val":10000,"move":"yes","growth":null},{"name":"Investor\'s Heritage","owner":"client","cust":"Investors Heritage","tax":"Qualified","pos":"Income Annuity (FIA)","val":49482,"move":"no","growth":null,"ann":{"company":"","product":"","rate":null,"interest":"deferred","maturity":"","monthly":400,"payout":"joint","fees":0.01,"cap":0.03,"part":null,"floor":null}},{"name":"Sentinel","owner":"client","cust":"Sentinel","tax":"Qualified","pos":"Income Annuity (FIA)","val":51151,"move":"no","growth":null,"ann":{"company":"","product":"","rate":null,"interest":"deferred","maturity":"","monthly":200,"payout":"joint","fees":0.01,"cap":0.03,"part":null,"floor":null}},{"name":"Jane\'s Pension","owner":"spouse","cust":"PSERS","tax":"Qualified","pos":"Market","val":72000,"move":"yes","growth":null},{"name":"Future Inheritancd","owner":"client","cust":"TBD","tax":"Non-Qualified","pos":"Cash","val":60000,"move":"yes","growth":null}],"budget":{"lines":{"hh:1":{"amt":389,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"hh:2":{"amt":73,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"hh:3":{"amt":1000,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"hh:7":{"amt":181,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"hh:9":{"amt":226,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"hh:10":{"amt":200,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"dl:0":{"amt":400,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"dl:1":{"amt":450,"nw":"want","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"hc:0":{"amt":1000,"nw":"need","start":"","end":"2027-10","note":"","label":"","auto":false,"autoStart":false},"hc:6":{"amt":155,"nw":"need","start":"2041-06","end":"","note":"","label":"","auto":false,"autoStart":false},"hc:8":{"amt":7,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"tr:1":{"amt":205,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"tr:2":{"amt":500,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"tr:3":{"amt":241,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"db:0":{"amt":779,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"eo:2":{"amt":242,"nw":"want","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"eo:4":{"amt":2000,"nw":"want","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"eo:5":{"amt":20,"nw":"want","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"eo:7":{"amt":1000,"nw":"need","start":"2030-09","end":"","note":"","label":"Health Insurance HOP","auto":false,"autoStart":false},"eo:8":{"amt":136,"nw":"need","start":"","end":"","note":"","label":"Misc. Taxes","auto":false,"autoStart":false}},"link":true,"open":true},"scenarios":[{"adjMoves":[{"acct":14,"bucket":"foundation","amt":49482},{"acct":15,"bucket":"foundation","amt":51151},{"acct":12,"bucket":"reserve","amt":41854.5},{"acct":4,"bucket":"foundation","amt":228494.03158229153},{"acct":12,"bucket":"moat","amt":88145.5,"person":"client"},{"acct":2,"bucket":"moat","amt":72330,"person":"client"},{"acct":1,"bucket":"moat","amt":66772,"person":"client"},{"acct":17,"bucket":"moat","amt":60000,"person":"client"},{"acct":3,"bucket":"moat","amt":24453.267263427086,"person":"client"},{"acct":3,"bucket":"moat","amt":22118.732736572914,"person":"spouse"},{"acct":11,"bucket":"roof","amt":47533},{"acct":10,"bucket":"roof","amt":6470},{"acct":5,"bucket":"walls","amt":299235},{"acct":7,"bucket":"walls","amt":219397},{"acct":4,"bucket":"walls","amt":23768},{"acct":4,"bucket":"moat","amt":152370.96841770847,"person":"spouse"},{"acct":0,"bucket":"moat","amt":72000,"person":"spouse"},{"acct":16,"bucket":"moat","amt":26323.98705864628,"person":"spouse"},{"acct":8,"bucket":"roof","amt":67109},{"acct":6,"bucket":"roof","amt":58452},{"acct":16,"bucket":"roof","amt":45676.01294135372},{"acct":9,"bucket":"roof","amt":41121},{"acct":13,"bucket":"roof","amt":10000}],"incomeAdj":{"yF":"","fStart":"","yW":"","wStart":"","gPre":"","gPost":""},"annuityIncome":{"to:Jeff\'s Income Anuity":{"gli":"yes","start":"2026-10","monthly":"980","cola":"","wd":""},"to:Jeff Rollover IRA":{"gli":"yes","start":"","monthly":"1,142","cola":"","wd":""}},"ltcBenefits":{"who:client":{"monthly":"16,250","age":"80","years":"5.0","infl":"","growth":""},"who:spouse":{"monthly":"15,250","age":"80","years":"5.0","infl":"","growth":""}},"roofGrowth":{},"withdrawalOrder":["taxable","deferred","roth"],"roth":{"apply":true,"target":0.12,"start":"auto","order":"roof","irmaa":true},"qcd":{"apply":true,"client":"","spouse":"","startAge":71,"mode":"budget"},"name":"With Moat and 12% Roth Target"},{"adjMoves":[{"acct":14,"bucket":"foundation","amt":49482},{"acct":15,"bucket":"foundation","amt":51151},{"acct":12,"bucket":"reserve","amt":41854.5},{"acct":4,"bucket":"foundation","amt":228494.03158229153},{"acct":12,"bucket":"reserve","amt":57704.60358056266},{"acct":12,"bucket":"reserve","amt":30440.89641943734},{"acct":2,"bucket":"roof","amt":72330},{"acct":1,"bucket":"walls","amt":10061.803200334514,"prod":"AUM - Tax Free"},{"acct":11,"bucket":"roof","amt":47533},{"acct":10,"bucket":"roof","amt":6470},{"acct":5,"bucket":"walls","amt":299235},{"acct":7,"bucket":"walls","amt":219397},{"acct":4,"bucket":"walls","amt":23768},{"acct":17,"bucket":"walls","amt":60000,"prod":"AUM - Tax Free"},{"acct":1,"bucket":"walls","amt":56710.196799665486,"prod":"AUM - Tax Free"},{"acct":3,"bucket":"walls","amt":46572,"prod":"AUM - Tax Free"},{"acct":4,"bucket":"roof","amt":152370.96841770847},{"acct":0,"bucket":"roof","amt":72000},{"acct":16,"bucket":"roof","amt":72000},{"acct":8,"bucket":"roof","amt":67109},{"acct":6,"bucket":"roof","amt":58452},{"acct":9,"bucket":"roof","amt":41121},{"acct":13,"bucket":"roof","amt":10000}],"incomeAdj":{"yF":"","fStart":"","yW":"","wStart":"","gPre":"","gPost":""},"annuityIncome":{"to:Jeff Rollover IRA":{"start":"2026-10","monthly":"1,142"}},"ltcBenefits":{},"roofGrowth":{},"withdrawalOrder":["taxable","deferred","roth"],"roth":{"apply":false,"target":"auto","start":"auto","order":"roof","irmaa":true},"qcd":{"apply":true,"client":"","spouse":"","startAge":71,"mode":"budget"},"name":"No Moat without Roth Conversions"},{"adjMoves":[{"acct":14,"bucket":"foundation","amt":49482},{"acct":15,"bucket":"foundation","amt":51151},{"acct":12,"bucket":"reserve","amt":41854.5},{"acct":4,"bucket":"foundation","amt":228494.03158229153},{"acct":12,"bucket":"moat","amt":88145.5,"person":"client"},{"acct":2,"bucket":"moat","amt":72330,"person":"client"},{"acct":1,"bucket":"moat","amt":66772,"person":"client"},{"acct":17,"bucket":"moat","amt":60000,"person":"client"},{"acct":3,"bucket":"moat","amt":24453.267263427086,"person":"client"},{"acct":3,"bucket":"moat","amt":22118.732736572914,"person":"spouse"},{"acct":11,"bucket":"roof","amt":47533},{"acct":10,"bucket":"roof","amt":6470},{"acct":5,"bucket":"walls","amt":299235},{"acct":7,"bucket":"walls","amt":219397},{"acct":4,"bucket":"walls","amt":23768},{"acct":4,"bucket":"moat","amt":152370.96841770847,"person":"spouse"},{"acct":0,"bucket":"moat","amt":72000,"person":"spouse"},{"acct":16,"bucket":"moat","amt":26323.98705864628,"person":"spouse"},{"acct":8,"bucket":"roof","amt":67109},{"acct":6,"bucket":"roof","amt":58452},{"acct":16,"bucket":"roof","amt":45676.01294135372},{"acct":9,"bucket":"roof","amt":41121},{"acct":13,"bucket":"roof","amt":10000}],"incomeAdj":{"yF":"","fStart":"","yW":"","wStart":"","gPre":"","gPost":""},"annuityIncome":{"to:Jeff\'s Income Anuity":{"gli":"yes","start":"2026-10","monthly":"980","cola":"","wd":""},"to:Jeff Rollover IRA":{"gli":"yes","start":"","monthly":"1,142","cola":"","wd":""}},"ltcBenefits":{"who:client":{"monthly":"16,250","age":"80","years":"5.0","infl":"","growth":""},"who:spouse":{"monthly":"15,200","age":"80","years":"5.0","infl":"","growth":""}},"roofGrowth":{},"withdrawalOrder":["taxable","deferred","roth"],"roth":{"apply":true,"target":0.22,"start":"auto","order":"roof","irmaa":true},"qcd":{"apply":true,"client":"","spouse":"","startAge":71,"mode":"budget"},"name":"With Moat and 22% Roth Target"}],"activeScenario":2,"reportScenario":0,"incomeAdj":null,"annuityIncome":{"to:Jeff\'s Income Anuity":{"gli":"yes","start":"2026-10","monthly":"980","cola":"","wd":""},"to:Jeff Rollover IRA":{"gli":"yes","start":"","monthly":"1,142","cola":"","wd":""}},"ltcBenefits":{"who:client":{"monthly":"16,250","age":"80","years":"5.0","infl":"","growth":""},"who:spouse":{"monthly":"15,200","age":"80","years":"5.0","infl":"","growth":""}},"roofGrowth":null,"transfers":[{"acct":14,"bucket":"foundation","amt":49482},{"acct":15,"bucket":"foundation","amt":51151},{"acct":12,"bucket":"reserve","amt":41854.5},{"acct":4,"bucket":"foundation","amt":228494.03158229153},{"acct":12,"bucket":"moat","amt":88145.5,"person":"client"},{"acct":2,"bucket":"moat","amt":72330,"person":"client"},{"acct":1,"bucket":"moat","amt":66772,"person":"client"},{"acct":17,"bucket":"moat","amt":60000,"person":"client"},{"acct":3,"bucket":"moat","amt":24453.267263427086,"person":"client"},{"acct":3,"bucket":"moat","amt":22118.732736572914,"person":"spouse"},{"acct":11,"bucket":"roof","amt":47533},{"acct":10,"bucket":"roof","amt":6470},{"acct":5,"bucket":"walls","amt":299235},{"acct":7,"bucket":"walls","amt":219397},{"acct":4,"bucket":"walls","amt":23768},{"acct":4,"bucket":"moat","amt":152370.96841770847,"person":"spouse"},{"acct":0,"bucket":"moat","amt":72000,"person":"spouse"},{"acct":16,"bucket":"moat","amt":26323.98705864628,"person":"spouse"},{"acct":8,"bucket":"roof","amt":67109},{"acct":6,"bucket":"roof","amt":58452},{"acct":16,"bucket":"roof","amt":45676.01294135372},{"acct":9,"bucket":"roof","amt":41121},{"acct":13,"bucket":"roof","amt":10000}]}';
   if(typeof DEFAULT_CASE !== 'undefined' && DEFAULT_CASE){
     try{ loadCase(typeof DEFAULT_CASE === 'string' ? DEFAULT_CASE : JSON.stringify(DEFAULT_CASE)); }
     catch(err){ if(window.console) console.warn('Default case did not load', err); }

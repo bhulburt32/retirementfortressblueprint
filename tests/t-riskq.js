@@ -15,6 +15,8 @@ const path = require('path');
   console.log('tolerance before:', JSON.stringify(await v('riskTol')), 'auto', await isAuto('riskTol'));
   console.log('theme at load:', await p.$eval('html',h=>h.dataset.theme), '| score colour:', await p.$eval('#rqPanel .rq-big',e=>getComputedStyle(e).color));
   if((await p.$eval('html',h=>h.dataset.theme))!=='dark') errs.push('dark should be the default theme');
+  // the sample case carries a completed questionnaire: clear it so the plan's own answers show
+  await p.click('#rqClear'); await p.waitForTimeout(300); if(await p.$eval('#rqClear',b=>b.classList.contains('armed'))){ await p.click('#rqClear'); await p.waitForTimeout(400); }
   const plan=await p.$$eval('#rqForm .rq-auto',n=>n.map(x=>x.getAttribute('data-auto')+': '+x.textContent)); console.log('plan answers:', JSON.stringify(plan));
   console.log('checked at load:', await p.$$eval('#rqForm input:checked',o=>o.map(x=>x.name+'='+x.value+(x.closest('.rq-opt').classList.contains('auto')?' auto':''))));
   if((await p.$$eval('#rqForm input:checked',o=>o.length))!==2) errs.push('q6 and q7 should be answered from the plan');

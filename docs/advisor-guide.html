@@ -672,9 +672,13 @@
         strategies are ranked on the 22%-from-2032 reduction used in section&nbsp;18, with the no-cut
         total alongside. Tiles name the top strategy, its lifetime benefit, the surviving spouse's
         income under it, and where the plan's own claiming ages rank among everything tested; the
-        table lists the five best with each person's monthly amounts, lifetime totals and the age at
-        which each catches up to filing earliest; a chart runs the cumulative benefits (the plan's
-        own ages as a dashed line when they are outside the five), and <span class="ui">Break-even
+        table lists the five best, then four strategies that always show with their true rank
+        (shaded): <b>File early</b>, both at 62; <b>File late</b>, both at 70; the client early at 62
+        and the spouse late at 70; the client late at 70 and the spouse early at 62 &mdash; a person
+        already past an age files at the earliest age still open to them &mdash; each with the
+        person's monthly amounts, lifetime totals and the age at which it catches up to filing
+        earliest; a chart runs the cumulative benefits (the plan's own ages as a dashed line when they
+        are not among the strategies shown), and <span class="ui">Break-even
         ages</span> opens the full strategy-versus-strategy table. <span class="ui">Use the top
         strategy in the plan</span> sets the benefit starting ages above to strategy #1 (whole years),
         so the income projections, the Foundation sizing and every report follow. The optimizer's
@@ -937,8 +941,8 @@
           set of three charts: the male needs care, the female needs care, both need care (one chart
           for a single client). Costs come from the section&nbsp;12 estimate &mdash; the state medians
           or the costs typed there, the average durations for a man and a woman, the care start age
-          and the cost inflation &mdash; at <b>70%</b> of the projected cost when one person needs care
-          and <b>49%</b> of the combined cost when both do, net of any benefits already in force. With
+          and the cost inflation &mdash; the full projected cost when one person needs care and the
+          full combined cost when both do, net of any benefits already in force. With
           no Fortress in place the whole cost comes out of the accounts in the withdrawal order, with
           the tax on the draw. Each chart carries tiles for the cost of care, what is drawn from the
           accounts and the end-of-plan figure (or the year the accounts run out), and the projection
@@ -989,7 +993,7 @@
         coverage recommended; <span class="ui">Complete detailed life insurance needs analysis</span>
         opens the rest, and a case that used it reopens with it showing.</p>
 
-      <p><b>Existing life insurance policies</b>, at the foot of the section, lists each policy in
+      <p><b>Existing life insurance policies</b>, at the top of the section, lists each policy in
         force: owner, company, insured, death benefit, beneficiary, type (Term, Whole Life, IUL), cash
         value (permanent policies), years remaining (term) and the monthly premium, with
         <span class="ui">Add a life insurance policy</span> for each. While any are listed, the death
@@ -1044,7 +1048,7 @@
     <div class="num">09<small>Input</small></div>
     <div class="body">
       <h2>Long Term Care</h2>
-      <p><b>Existing long term care policies</b>, at the foot of the section, lists each policy in
+      <p><b>Existing long term care policies</b>, at the top of the section, lists each policy in
         force: owner and insured, company, daily benefit, benefit term in years and the monthly
         premium, with <span class="ui">Add a long term care policy</span> for each and the total
         benefit (daily benefit &times; 365 &times; years) worked out per line. While any are listed,
@@ -1053,18 +1057,19 @@
         at their total benefit when the benefit term is shorter than the care; the premiums of all
         policies fill the <b>Long Term Care Insurance</b> line of the section&nbsp;05 budget until an
         amount is typed there. Everything saves with the case.</p>
-      <p>The section opens with the two <span class="ui">Average LTC cost</span> fields that size the
-        Moat, the Moat premium readout, and Alto's Long-Term Care Needs Estimator folded away behind
+      <p>After the policies come the two <span class="ui">LTC need to insure</span> fields that size the
+        Moat, with a <span class="ui">Share to self-fund</span> beside them, the Moat premium readout, and Alto's Long-Term Care Needs Estimator folded away behind
         <span class="ui">Complete detailed long term care needs analysis</span>. Press it and two
         blocks open beneath; a case that used the analysis reopens with it showing.</p>
 
       <dl class="fields">
-        <dt>Average LTC cost to plan for</dt>
+        <dt>LTC need to insure</dt>
         <dd>The long-term care need per person, which the Moat is sized to cover. By default it is
-          the average lifetime cost of care from age 65 (HHS ASPE: $85,400 for a man, $154,300 for a
-          woman) grown at 4.5% a year from the person's current age in section&nbsp;02 to age 80
-          &mdash; about $188,600 for a 62-year-old man, $372,100 for a 60-year-old woman &mdash; and it
-          follows the age and sex as you change them, until you type over it, or press
+          the result of the needs analysis below &mdash; the projected cost of care for that person
+          less any coverage in force &mdash; multiplied by one minus the <span class="ui">Share to
+          self-fund</span> (0% unless you set one), rounded to the nearest $1,000, shown grey while it
+          follows; it moves with every input of the analysis, the ages and sex and the policies listed
+          above, until you type over it, or press
           <span class="ui">Use the uncovered need as the LTC benefit</span> to take the estimate
           (rounded to the nearest $1,000); that works whether or not the analysis is open, and a
           line beneath the buttons shows the current estimate. Tick <span class="ui">Keep the LTC
@@ -1392,9 +1397,15 @@
           the amount-weighted blend of the rows, which the hint beneath reports and sections&nbsp;16
           and 17 use; the scenario strip shows the blended rate for each scenario.</dd>
         <dt>Walls income assumptions</dt>
-        <dd>Four fields for the Walls as adjusted: the <span class="ui">Walls yield</span>, when
+        <dd>Two lines. <b>Taxable income accounts</b> &mdash; every Walls line except those in AUM -
+          Tax Free &mdash; take four fields: the <span class="ui">Walls yield</span>, when
           <span class="ui">Walls income starts</span>, and the Walls growth rate <span class="ui">before
-          income starts</span> and <span class="ui">after</span>. Every field is blank by default
+          income starts</span> and <span class="ui">after</span>. <b>Tax-free income accounts</b> &mdash;
+          the Walls lines in AUM - Tax Free, with the amount shown &mdash; take their own
+          <span class="ui">Tax-free yield</span> and growth before and after income starts, each
+          following the taxable line while blank; their income starts with the Walls, their yield is
+          federally tax-free, and the projections, the asset growth and the line beneath the fields
+          all use them. Every field is blank by default
           and then follows the plan &mdash; the Walls growth <em>before</em> income starts is a plan
           assumption of 5%, the growth <em>after</em> is section&nbsp;03's Walls growth rate, and the
           start is the first retirement date; the plan figure is shown under each label. Type a value and the projections in sections&nbsp;15, 16 and 17,
@@ -1697,7 +1708,7 @@
         reports</span> at the top of the section picks which of the three scenarios they are built
         from &mdash; the same choice as <span class="ui">Use for reports</span> in section&nbsp;14. When
         it is not the scenario showing, the page switches to it while the documents build and
-        switches back; the educational slides are the same whichever is chosen.</p>
+        switches back; the educational slides (their button sits in the header) are the same whichever is chosen.</p>
 
       <div class="exports">
         <div class="exp client">
@@ -1739,7 +1750,8 @@
             Planning Analysis</em>: a cover with the client names, date and advisor; an introduction
             and key terms (PIA, full retirement age, COLA, life expectancy, spousal and survivor
             benefits, with the FRA and percentage-of-PIA reference tables); the inputs and
-            assumptions; the five strategies with their claiming events and lifetime totals, and where
+            assumptions; the five best strategies and the four always-shown ones (both at 62, both at 70,
+            one early and the other late) with their claiming events and lifetime totals, and where
             the plan's own ages rank; bar charts of lifetime benefits with and without the reduction,
             the surviving spouse's first full-year income, the cumulative chart and the break-even
             table; a year-by-year schedule for each strategy; how to file; and what the analysis leaves

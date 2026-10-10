@@ -76,6 +76,7 @@ const path = require('path');
   if(!(await p.$eval('.masthead #roadVideo',a=>/claude\.ai\/artifact\/4betJJT5zWc21C6KhEAQN5/.test(a.href) && a.target==='_blank'))) errs.push('the header should link to The Road to Retirement Fortress video');
   console.log('header background image:', (await p.$eval('.masthead',e=>getComputedStyle(e).backgroundImage)).slice(0,60)); if(!/url\("data:image\/jpeg/.test(await p.$eval('.masthead',e=>getComputedStyle(e).backgroundImage))) errs.push('the header should carry the Fortress graphic as its background');
   // 2. AUM - Tax Free: a Walls line in that product pays a federally tax-free yield; no change while the Walls hold only IRA money
+  await p.$eval('#rothApply',e=>{ e.checked=false; e.dispatchEvent(new Event('change',{bubbles:true})); }); await p.waitForTimeout(600);   // conversions re-size to federal headroom, so they are off while the state model is compared
   const at=await acct('After Tax'); const line=await p.$$eval('#adjBody tr[data-adj]',(rs,id)=>{ const r=rs.find(x=>x.querySelector('select[data-ak=acctId]').value===String(id)); return r? r.dataset.adj : null; }, at);
   const prodOpts=await p.$eval(`#adjBody tr[data-adj="${line}"] select[data-ok="prod"]`,s=>[...s.options].map(o=>o.value)); console.log('product choices:', JSON.stringify(prodOpts.slice(0,8)));
   if(!prodOpts.includes('AUM - Tax Free')) errs.push('the product list should offer AUM - Tax Free');
@@ -97,6 +98,7 @@ const path = require('path');
   const line2=await p.$$eval('#adjBody tr[data-adj]',(rs,id)=>{ const r=rs.find(x=>x.querySelector('select[data-ak=acctId]').value===String(id)); return r? r.dataset.adj : null; }, await acct('After Tax'));
   await p.selectOption(`#adjBody tr[data-adj="${line2}"] select[data-ok="prod"]`,'AUM'); await p.waitForTimeout(700);
   if(Math.abs((await figs()).fed-txNq.fed)>1) errs.push('back on AUM the tax should return ('+(await figs()).fed+' vs '+txNq.fed+')');
+  await p.$eval('#rothApply',e=>{ e.checked=true; e.dispatchEvent(new Event('change',{bubbles:true})); }); await p.waitForTimeout(600);
   // 2b. existing life insurance and long term care policies feed the calculators and the budget
   const bud=async pol=>p.$eval(`#budBody tr[data-pol="${pol}"] [data-bk="amt"]`,e=>({v:e.value, auto:e.classList.contains('auto')}));
   const lifeBefore=await bud('life');   // the sample budget already types a Life Insurance amount: a typed amount is "already in the budget" and wins
