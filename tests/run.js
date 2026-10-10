@@ -18,6 +18,7 @@ const SUITE = [
   't-ltcscn',    // care-event projections
   't-jobs',      // additional employment incomes
   't-tbd',       // TBD carrier option; top banner removed
+  't-riskq',     // risk profile questionnaire, the tolerance cell that follows it, the client report
   't-tglbtn',    // Adjust Target Allocations button
 ];
 const only = process.argv.slice(2);

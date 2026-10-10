@@ -5,30 +5,32 @@
 <style>
   :root{
     color-scheme:light;
-    --navy:#1C3060;           /* Alto's logo blue */
-    --bg:#E9ECEF;
-    --surface:#FCFCFB;
-    --surface-2:#F1F4F6;
-    --ink:#141D26;
-    --ink-2:#33414E;
-    --muted:#5E6C78;
-    --line:#D6DCE1;
-    --line-strong:#B7C2CA;
-    --accent:#8A6410;
-    --accent-soft:#EFE6D2;
-    --track:#DCE2E7;
+    /* Alto's palette, shared with the risk profile questionnaire: navy, gold and red on a
+       cool grey page; the Fortress level colours below are the same on every report. */
+    --navy:#1F3162;
+    --bg:#F5F6F9;
+    --surface:#FFFFFF;
+    --surface-2:#EEF1F8;
+    --ink:#18213B;
+    --ink-2:#3A4461;
+    --muted:#5A6276;
+    --line:#DADDE6;
+    --line-strong:#C3C9D8;
+    --accent:#C5A044;
+    --accent-soft:#F3ECD8;
+    --track:#DADDE6;
     --c-foundation:#1F6FB2;
     --c-foundation-soft:#8CBBE2;
     --c-walls:#C0632B;
     --c-moat:#1F8A70;
-    --btn:#1E7F5C;--btn-dk:#176449;
+    --btn:#1F3162;--btn-dk:#16244A;
     --c-roof:#8B5CA6;
-    --st-ok:#2F7D52;
-    --st-caution:#9A5B08;
-    --st-alert:#A5342B;
-    --st-ok-bg:#E4F0E9;
-    --st-caution-bg:#F6ECDA;
-    --st-alert-bg:#F6E3E1;
+    --st-ok:#2E7D4F;
+    --st-caution:#B7791F;
+    --st-alert:#D82629;
+    --st-ok-bg:#E6F1EA;
+    --st-caution-bg:#F7EEDC;
+    --st-alert-bg:#FBE5E5;
     --shadow:0 1px 2px rgba(20,29,38,.06), 0 8px 24px -12px rgba(20,29,38,.18);
     --radius:6px;
   }
@@ -38,29 +40,29 @@
      thing the advisor set up. */
   :root[data-theme="dark"]{
     color-scheme:dark;
-    --bg:#101519;
-    --surface:#1A2127;
-    --surface-2:#212A31;
-    --ink:#E6ECF1;
-    --ink-2:#C2CDD6;
-    --muted:#8FA0AD;
-    --line:#2B353D;
-    --line-strong:#3E4B55;
-    --accent:#C79A3E;
-    --accent-soft:#2A2A20;
-    --track:#28323A;
+    --bg:#10162A;
+    --surface:#182140;
+    --surface-2:#1F2A52;
+    --ink:#E8EBF3;
+    --ink-2:#C9CFE0;
+    --muted:#A3AAC0;
+    --line:#2C365A;
+    --line-strong:#3C4874;
+    --accent:#D9B865;
+    --accent-soft:#2E2A1E;
+    --track:#2C365A;
     --c-foundation:#4A90CC;
     --c-foundation-soft:#31688F;
     --c-walls:#D07634;
     --c-moat:#2FA485;
-    --btn:#2A9A72;--btn-dk:#227B5B;
+    --btn:#2F4785;--btn-dk:#3B569C;
     --c-roof:#A87CC4;
-    --st-ok:#4FA877;
-    --st-caution:#C99A3F;
-    --st-alert:#D97066;
-    --st-ok-bg:#182821;
-    --st-caution-bg:#2A2418;
-    --st-alert-bg:#2C1D1C;
+    --st-ok:#6CC08F;
+    --st-caution:#E3B260;
+    --st-alert:#F0676A;
+    --st-ok-bg:#1B2E27;
+    --st-caution-bg:#2E2718;
+    --st-alert-bg:#331F23;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
   }
 
@@ -250,7 +252,7 @@
   table.debt td select.pwho{min-width:140px}
 
   /* ---------- buttons ---------- */
-  /* Every action button is Alto green; .primary is the darker shade. */
+  /* Every action button is Alto navy; .primary is the darker shade. */
   button{
     font-family:"Public Sans",sans-serif;font-size:15px;font-weight:600;
     border-radius:4px;cursor:pointer;padding:8px 13px;
@@ -729,6 +731,41 @@
   .risk-row input[type=checkbox]{width:18px;height:18px;accent-color:var(--navy)}
   .risk-row .row-x{padding:4px 9px}
   .risk-empty{color:var(--muted);font-style:italic;font-size:14px}
+  /* risk profile questionnaire (section 12) */
+  .rq{margin-top:14px}
+  .rq-top{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:flex-start;margin-bottom:14px}
+  .rq-top label.f{flex:0 1 280px}
+  .rq-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+  @media (max-width:980px){.rq-grid{grid-template-columns:minmax(0,1fr)}}
+  .rq-sec{margin:0 0 18px}
+  .rq-sec h4{margin:0 0 8px;font-family:Bitter,Georgia,serif;font-size:16px;color:var(--ink);display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+  .rq-sec h4 small{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .rq-q{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);padding:14px 16px;margin:0 0 10px}
+  .rq-q .qt{font-weight:600;font-size:15px;margin:0 0 3px}
+  .rq-q .qt .dn{color:var(--st-alert);font-family:"IBM Plex Mono",monospace;font-weight:600}
+  .rq-q .qh{color:var(--muted);font-size:13px;margin:0 0 10px}
+  .rq-opts{display:grid;gap:7px}
+  .rq-opt{display:flex;gap:10px;align-items:flex-start;padding:8px 11px;border:1px solid var(--line);border-radius:4px;cursor:pointer;font-size:14px;background:var(--surface)}
+  .rq-opt:hover{border-color:var(--line-strong)}
+  .rq-opt.on{background:var(--surface-2);border-color:var(--navy)}
+  .rq-opt input{width:16px;height:16px;margin:3px 0 0;accent-color:var(--navy);flex:none}
+  .rq-opt .ol{min-width:0;flex:1}
+  .rq-opt .os{display:block;font-size:12.5px;color:var(--muted);font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+  .rq-opt .range{font-family:"IBM Plex Mono",monospace;font-weight:600;font-variant-numeric:tabular-nums}
+  .rq-opt .range .dn{color:var(--st-alert)} .rq-opt .range .up{color:var(--st-ok)}
+  .rq-panel{position:sticky;top:16px;background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--navy);border-radius:var(--radius);padding:16px 18px}
+  .rq-panel .eyebrow{margin:0 0 4px}
+  .rq-big{font-family:Bitter,Georgia,serif;font-size:56px;line-height:1;color:var(--navy);font-variant-numeric:tabular-nums}
+  .rq-band{display:inline-block;margin-top:8px;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:var(--surface-2);color:var(--navy)}
+  .rq-gauge{position:relative;height:10px;border-radius:5px;margin:16px 0 6px;background:linear-gradient(90deg,#3E7CB1,#2E7D4F 35%,#C5A044 65%,#D82629)}
+  .rq-gauge .pin{position:absolute;top:-5px;width:4px;height:20px;background:var(--ink);border-radius:2px;transform:translateX(-2px)}
+  .rq-ticks{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
+  .rq-kv{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:13.5px;margin:14px 0 0}
+  .rq-kv dt{color:var(--muted)} .rq-kv dd{margin:0;font-weight:600;text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+  .rq-flag{margin-top:12px;font-size:13px;padding:9px 12px;border-radius:4px;border-left:3px solid var(--st-caution);background:var(--surface-2)}
+  .rq-flag.ok{border-left-color:var(--st-ok)}
+  .rq-prog{font-size:12.5px;color:var(--muted);margin-top:10px}
+  #riskTol.auto,#rqAmt.auto{color:var(--muted)}
   .wd-list{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:10px}
   .wd-tier{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px 16px;align-items:start;padding:14px 16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface-2)}
   .wd-rank{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;color:var(--navy);line-height:1}
@@ -1477,6 +1514,23 @@
         <label class="f"><span>Risk tolerance<small>1&ndash;100, what the client is comfortable with</small></span><input type="text" inputmode="numeric" id="riskTol" value=""></label>
       </div>
       <div class="moat-readout" id="riskReadout"></div>
+      <div class="inc-title gap">Risk profile questionnaire<small>Twelve questions that produce a 1&ndash;99 risk score on the Risk Number scale &middot; a completed questionnaire fills the risk tolerance above unless one is typed</small></div>
+      <div class="rq" id="rq">
+        <div class="rq-top">
+          <label class="f"><span>Portfolio being assessed<small>The dollar amounts in the questions scale to this; blank follows the accounts in section 06</small></span><input type="text" inputmode="numeric" id="rqAmt" value=""></label>
+          <p class="hint" style="margin:0;flex:1 1 320px">Real dollar amounts, one-year outcome ranges, and how the client weighs gains against losses. Willingness counts 65% and capacity 35%; a willingness well above capacity is limited to capacity plus 15. The score frames the conversation &mdash; confirm the client&rsquo;s official Risk Number before building or changing a portfolio.</p>
+        </div>
+        <div class="rq-grid">
+          <div class="rq-form" id="rqForm"></div>
+          <aside class="rq-panel" id="rqPanel" aria-live="polite"></aside>
+        </div>
+        <div class="btn-row" style="margin-top:14px">
+          <button type="button" id="rqReport" class="primary">Risk profile report</button>
+          <button type="button" id="rqCopy">Copy summary</button>
+          <button type="button" id="rqClear">Clear answers</button>
+          <span class="hint" id="rqMsg">For advisor use. An Alto-designed approximation of the Risk Number scale, not produced by or affiliated with Nitrogen; the client report names no vendor.</span>
+        </div>
+      </div>
       <div class="inc-title gap">Nitrogen Wealth report<small>Upload the client&rsquo;s current-portfolio analysis (PDF) &middot; the page reads it and summarises the portfolio in aggregate, its Risk Number and the stress tests</small></div>
       <div class="btn-row" style="margin-top:12px">
         <input type="file" id="nitroFile" accept=".pdf,.txt,application/pdf,text/plain" hidden>
@@ -5394,8 +5448,13 @@
 
     /* ---------- risk tolerance ---------- */
     var RS = riskSummary(r);
-    if(RS.facts.gap != null || RS.items.length){
+    if(RS.facts.gap != null || RS.items.length || RS.quiz){
       h2('Risk tolerance and identified risks');
+      if(RS.quiz){
+        var Qz = RS.quiz;
+        para('Risk profile questionnaire: score ' + Qz.rn + ' (' + Qz.band + '), willingness ' + Qz.W + ', capacity ' + Qz.C + (Qz.capped ? ', limited to capacity + 15' : '') + '. Illustrative one-year range ' + Qz.d.toFixed(1) + '% to +' + Qz.u.toFixed(1) + '% on ' + money(Qz.A) + '. An Alto approximation of the Risk Number scale; confirm the official assessment.', {rgb:INK});
+        rqAnswerLines(false).forEach(function(x){ para('Q' + x.n + '. ' + x.q + ' - ' + (x.a == null ? '(no answer)' : x.a), {rgb:INK}); });
+      }
       if(RS.facts.gap != null) para('Current risk score ' + RS.facts.score + ' against a risk tolerance of ' + RS.facts.tol + ' (1-100): the portfolio carries ' + Math.abs(RS.facts.gap) + ' points ' + (RS.facts.gap > 0 ? 'more' : RS.facts.gap < 0 ? 'less' : 'of') + ' risk ' + (RS.facts.gap === 0 ? 'matching' : 'than') + ' the client\'s tolerance. ' + Math.round(RS.facts.marketPct * 100) + '% of assets are in market positions today.', {rgb:INK});
       RS.items.forEach(function(it, k){ para((k + 1) + '.  ' + it.text + ' - ' + it.sub, {rgb:INK}); });
     }
@@ -6248,7 +6307,7 @@
       debts:debts.length ? debts.map(function(x){ return {type:x.type, name:x.name, bal:x.bal, rate:x.rate, pmt:x.pmt, mat:x.mat}; }) : null,
       otherAssets:otherAssets.length ? otherAssets.map(function(x){ return {type:x.type, name:x.name, val:x.val, growth:x.growth, note:x.note}; }) : null,
       nitrogen:nitro ? {name:nitro.name, text:nitro.text, analysis:nitro.analysis, src:nitro.src, at:nitro.at} : null,
-      risk:{score:$('riskScore').value.trim(), tolerance:$('riskTol').value.trim(), selected:Object.keys(risk.selected).filter(function(k){ return risk.selected[k]; }), custom:risk.custom.filter(function(c){ return c.text.trim(); })},
+      risk:{score:$('riskScore').value.trim(), tolerance:$('riskTol').classList.contains('auto') ? '' : $('riskTol').value.trim(), questionnaire:{answers:rq.a, amount:rq.amt}, selected:Object.keys(risk.selected).filter(function(k){ return risk.selected[k]; }), custom:risk.custom.filter(function(c){ return c.text.trim(); })},
       tax:{withdrawalOrder:wdOrder.slice(), roth:{apply:rothCfg.apply, target:rothCfg.target, start:rothCfg.start, order:rothCfg.order, irmaa:rothCfg.irmaa}, qcd:qcdFrom(qcdCfg)},
       life:(function(){
         var per = function(P){ return {existing:num($('lifeExist' + P).value), relies:$('lifeRelies' + P).checked, years:$('lifeYears' + P).value.trim(),
@@ -6387,9 +6446,14 @@
     if(d.estate){ EST_KEYS.forEach(function(pr){ if(d.estate[pr[1]] != null) $(pr[0]).value = String(d.estate[pr[1]]).slice(0, 4); }); }
     nitro = (d.nitrogen && typeof d.nitrogen === 'object' && d.nitrogen.analysis) ? {name:String(d.nitrogen.name || 'Nitrogen report'), text:String(d.nitrogen.text || ''), analysis:d.nitrogen.analysis, src:d.nitrogen.src === 'claude' ? 'claude' : 'text', at:d.nitrogen.at || ''} : null;
     $('nitroText').value = nitro ? nitro.text : ''; $('nitroMsg').textContent = nitro ? 'Loaded with the case.' : '';
-    risk = {score:'', tol:'', selected:{}, custom:[]}; $('riskScore').value = ''; $('riskTol').value = '';
+    risk = {score:'', tol:'', selected:{}, custom:[]}; $('riskScore').value = ''; $('riskTol').value = ''; $('riskTol').classList.remove('auto'); rq = {a:{}, amt:''};
     if(d.risk){
       $('riskScore').value = d.risk.score == null ? '' : String(d.risk.score); $('riskTol').value = d.risk.tolerance == null ? '' : String(d.risk.tolerance);
+      if(d.risk.questionnaire && typeof d.risk.questionnaire === 'object'){
+        var RQd = d.risk.questionnaire;
+        if(RQd.answers && typeof RQd.answers === 'object') Object.keys(RQd.answers).forEach(function(k){ var q = rqQ(k), v = RQd.answers[k]; if(q && typeof v === 'number' && q.o[v]) rq.a[k] = v; });
+        rq.amt = RQd.amount == null ? '' : String(RQd.amount);
+      }
       (Array.isArray(d.risk.selected) ? d.risk.selected : []).forEach(function(k){ risk.selected[k] = true; });
       (Array.isArray(d.risk.custom) ? d.risk.custom : []).forEach(function(c){ risk.custom.push({on:c.on !== false, text:String(c.text || '')}); });
     }
@@ -8992,6 +9056,158 @@
     {id:'bene',   text:function(){ return 'No account beneficiaries, or beneficiaries more than 5 years out of date'; }, sub:function(f){ return f.est.e.bene ? 'Section 10: ' + (f.est.e.bene === 'all' ? 'beneficiaries on every account' : f.est.e.bene === 'some' ? 'beneficiaries on some accounts only' : f.est.e.bene === 'no' ? 'no beneficiaries listed' : 'beneficiaries unsure') + (f.est.beneYears != null ? ', last updated ' + Math.round(f.est.beneYears) + ' years ago' : '') + '.' : 'Retirement accounts, annuities and life policies pass by beneficiary designation, not by will (answer in section 10).'; }, sug:function(f){ return f.est.beneRisk; }}
   ];
   var risk = {score:'', tol:'', selected:{}, custom:[]};
+
+  /* ============================================================
+     Risk profile questionnaire (section 12). Twelve questions that produce
+     a 1-99 score on the Risk Number scale: willingness (65%) and capacity
+     (35%), each a weighted mean of option scores, the result limited to
+     capacity + 15 when willingness runs well ahead. A completed questionnaire
+     fills the risk tolerance cell (grey, like any value that follows the
+     plan) until the advisor types one. Answers and the portfolio amount
+     save with the case. Dollar amounts in the questions scale to the
+     portfolio being assessed - the accounts in section 06 unless typed.
+     ============================================================ */
+  var RQ_Q = [
+    {sec:'Your one-year comfort zone', tag:'Willingness · 65%', items:[
+      {id:'q1', dim:'w', w:3, t:'Over the next 12 months, which range of outcomes would you be most comfortable with?', h:'There is roughly a 95% chance the result lands somewhere inside each range.',
+       o:[{r:[-4,7],s:10},{r:[-10,14],s:30},{r:[-17,23],s:50},{r:[-25,32],s:70},{r:[-35,45],s:90}]},
+      {id:'q2', dim:'w', w:3, t:'One year from now, your portfolio is down 20%. What do you most likely do?', pctNote:20,
+       o:[{l:'Move everything to cash so it can’t fall further',s:5},{l:'Sell part of it to limit further losses',s:25},{l:'Stay put and wait for a recovery',s:55},{l:'Rebalance back to my target mix',s:75},{l:'Add money while prices are lower',s:95}]},
+      {id:'q3', dim:'w', w:2, t:'What is the largest one-year decline you could see on your statement and still sleep well?',
+       o:[{p:5,s:10},{p:10,s:30},{p:17,s:50},{p:25,s:70},{p:35,s:90,plus:true}]},
+      {id:'q4', dim:'w', w:2, t:'A coin-flip opportunity could cost you 5% of your portfolio. How much would the winning side need to pay before you’d take it?', h:'This measures how heavily you weigh losses against gains.', lossPct:5,
+       o:[{m:3,s:10,plus:true,l:'I wouldn’t take it unless the gain is 3× the loss or more'},{m:2.5,s:30},{m:2,s:50},{m:1.5,s:70},{m:1.2,s:90}]},
+      {id:'q5', dim:'w', w:4, t:'Of your major objectives, which is most important to you?',
+       o:[{l:'Grow my assets',sub:'I’m focused on long-term growth and can ride out market swings',s:85,k:'Grow'},{l:'Protect my assets with growth',sub:'I want growth, but keeping what I have comes first',s:50,k:'Protect with growth'},{l:'Avoid losses',sub:'Preserving my principal matters more than earning more',s:15,k:'Avoid losses'}]}
+    ]},
+    {sec:'Your ability to take risk', tag:'Capacity · 35%', items:[
+      {id:'q6', dim:'c', w:1.5, t:'When will you begin taking regular withdrawals from this portfolio?',
+       o:[{l:'Already withdrawing',s:20},{l:'Within 3 years',s:35},{l:'In 3 to 7 years',s:55},{l:'In 7 to 15 years',s:75},{l:'More than 15 years, or never',s:90}]},
+      {id:'q7', dim:'c', w:1.5, t:'How much of your essential monthly expenses will be covered by guaranteed income?', h:'Social Security, pensions and annuities — the Foundation of your Retirement Fortress.',
+       o:[{l:'Less than 25%',s:15},{l:'25% to 50%',s:35},{l:'50% to 75%',s:55},{l:'75% to 99%',s:75},{l:'All of it, with income to spare',s:90}]},
+      {id:'q8', dim:'c', w:1, t:'What share of your total investable assets does this portfolio represent?',
+       o:[{l:'More than 75%',s:25},{l:'50% to 75%',s:45},{l:'25% to 50%',s:65},{l:'Less than 25%',s:85}]},
+      {id:'q9', dim:'c', w:1, t:'How many months of essential expenses do you hold in cash outside this portfolio?',
+       o:[{l:'None',s:15},{l:'Less than 3 months',s:35},{l:'3 to 6 months',s:60},{l:'More than 6 months',s:80}]},
+      {id:'q12', dim:'c', w:1, t:'I want to be prepared for unexpected immediate expenses of:', h:'Money you might need on short notice — a roof, a car, helping family, a medical bill.',
+       o:[{l:'Less than $25,000',s:75},{l:'$25,000 to $50,000',s:50},{l:'More than $50,000',s:25}]}
+    ]},
+    {sec:'Your experience', tag:'Willingness · included above', items:[
+      {id:'q10', dim:'w', w:1, t:'During the 2020 and 2022 market declines, what did you actually do?',
+       o:[{l:'Sold most or all of my investments',s:10},{l:'Moved some money to cash',s:30},{l:'Held steady',s:60},{l:'Invested more',s:85},{l:'I wasn’t invested at the time',s:50}]},
+      {id:'q11', dim:'w', w:0.75, t:'How would you describe your investment experience?',
+       o:[{l:'Limited — I rely on my advisor',s:30},{l:'Moderate — I understand the basics',s:50},{l:'Experienced — I follow markets regularly',s:70},{l:'Extensive — I’ve managed my own portfolio',s:85}]}
+    ]}
+  ];
+  var RQ_ALL = RQ_Q.reduce(function(a, S){ return a.concat(S.items); }, []);
+  function rqQ(id){ for(var k = 0; k < RQ_ALL.length; k++) if(RQ_ALL[k].id === id) return RQ_ALL[k]; return null; }
+  var RQ_CATS = [['Conservative', 1, 29], ['Moderately Conservative', 30, 44], ['Moderate', 45, 59], ['Moderately Aggressive', 60, 74], ['Aggressive', 75, 99]];
+  function rqBand(n){ for(var k = 0; k < RQ_CATS.length; k++) if(n <= RQ_CATS[k][2]) return RQ_CATS[k][0]; return RQ_CATS[RQ_CATS.length - 1][0]; }
+  /* calibration anchors: score -> illustrative one-year downside, %, at roughly 95% probability */
+  var RQ_ANCH = [[1, -1.5], [25, -8.5], [50, -17], [75, -28], [99, -45]];
+  function rqDownside(n){ for(var i = 1; i < RQ_ANCH.length; i++){ var a = RQ_ANCH[i - 1][0], da = RQ_ANCH[i - 1][1], b = RQ_ANCH[i][0], db = RQ_ANCH[i][1]; if(n <= b) return da + (db - da) * (n - a) / (b - a); } return -45; }
+  var RQ_BAND_TXT = {
+    'Conservative':'Your answers show that keeping your savings stable matters most to you. A portfolio at this level aims for small swings in value, accepting lower long-term growth in exchange for steadiness.',
+    'Moderately Conservative':'You want some growth, but you prefer to keep swings in value modest. A portfolio at this level leans toward stability while still giving your money room to grow.',
+    'Moderate':'You are looking for a balance between growing your savings and protecting them. A portfolio at this level accepts moderate ups and downs in pursuit of steady long-term growth.',
+    'Moderately Aggressive':'You are willing to accept meaningful ups and downs in exchange for higher expected long-term growth. A portfolio at this level will have years with noticeable declines along the way.',
+    'Aggressive':'You are comfortable with large swings in value in pursuit of maximum long-term growth. A portfolio at this level can see sharp declines in difficult years and needs time to recover.'};
+  var rq = {a:{}, amt:''};        // answers: question id -> option index; amt: the portfolio typed, '' follows section 06
+  var rqSig = null;               // what the form was last built for (the amount drives the dollar labels)
+  function rqAmount(){ return rq.amt.trim() !== '' ? Math.max(0, num(rq.amt)) : accounts.reduce(function(a, x){ return a + (x.val || 0); }, 0); }
+  function rqNeg(v){ return '−' + money(Math.abs(v)); }
+  /* an option's label, with the dollar figures for the portfolio */
+  function rqOptHtml(q, o, A){
+    if(o.r) return '<span class="range"><span class="dn">' + o.r[0] + '%</span> to <span class="up">+' + o.r[1] + '%</span></span><span class="os">' + rqNeg(A * o.r[0] / 100) + ' to +' + money(A * o.r[1] / 100) + '</span>';
+    if(o.p) return '<span class="range">' + money(A * o.p / 100) + (o.plus ? ' or more' : '') + '</span><span class="os">a ' + o.p + '% decline</span>';
+    if(o.m){ var L = A * q.lossPct / 100; return o.l ? esc(o.l) + '<span class="os">risk ' + money(L) + ' to gain ' + money(L * o.m) + '+</span>' : '<span class="range">Gain of ' + money(L * o.m) + '</span><span class="os">' + o.m + '× the ' + money(L) + ' at risk</span>'; }
+    return esc(o.l) + (o.sub ? '<span class="os">' + esc(o.sub) + '</span>' : '');
+  }
+  /* an option in words, for the summary, the worksheet and the client report */
+  function rqOptText(q, o, A, client){
+    if(o.r) return client ? o.r[0] + '% to +' + o.r[1] + '%' : o.r[0] + '% to +' + o.r[1] + '% (' + rqNeg(A * o.r[0] / 100) + ' to +' + money(A * o.r[1] / 100) + ')';
+    if(o.p) return money(A * o.p / 100) + (o.plus ? ' or more' : '') + ' (' + o.p + '%)';
+    if(o.m) return o.l ? o.l : o.m + '× the amount at risk';
+    return o.l;
+  }
+  function rqScore(){
+    var a = rq.a, ws = 0, ww = 0, cs = 0, cw = 0, n = 0;
+    RQ_ALL.forEach(function(q){ var k = a[q.id]; if(k == null || !q.o[k]) return; n++; var sc = q.o[k].s; if(q.dim === 'w'){ ws += sc * q.w; ww += q.w; } else { cs += sc * q.w; cw += q.w; } });
+    var S = {n:n, total:RQ_ALL.length, rn:null, complete:n === RQ_ALL.length};
+    if(!ww || !cw) return S;
+    var W = ws / ww, C = cs / cw, raw = 0.65 * W + 0.35 * C, capped = false;
+    if(W - C > 15 && raw > C + 15){ raw = C + 15; capped = true; }
+    var rn = Math.max(1, Math.min(99, Math.round(1 + raw * 0.98)));
+    var obj = a.q5 != null ? rqQ('q5').o[a.q5] : null;
+    S.rn = rn; S.band = rqBand(rn); S.W = Math.round(1 + W * 0.98); S.C = Math.round(1 + C * 0.98); S.capped = capped; S.wideC = C - W > 20;
+    S.d = rqDownside(rn); S.u = -S.d * 1.3; S.A = rqAmount();
+    S.obj = obj ? obj.k : null;
+    S.objMis = !!(obj && ((obj.k === 'Avoid losses' && rn >= 45) || (obj.k === 'Grow' && rn < 45) || (obj.k === 'Protect with growth' && (rn < 30 || rn >= 75))));
+    return S;
+  }
+  /* the risk tolerance cell follows a completed questionnaire until a value is typed */
+  function rqApply(){
+    var el = $('riskTol'), S = rqScore(), done = S.complete && S.rn != null;
+    if(document.activeElement !== el){
+      if(!done && el.classList.contains('auto')){ el.value = ''; el.classList.remove('auto'); }
+      if(done && (el.value.trim() === '' || el.classList.contains('auto'))){ el.value = String(S.rn); el.classList.add('auto'); }
+    }
+    return S;
+  }
+  function rqFlag(S){
+    if(S.rn == null) return null;
+    if(S.objMis) return {cls:'', t:'The client named “' + S.obj + '” as their primary objective, but the score lands in ' + S.band + '. Ask about this before recording the score; the objective and the scenario answers are pointing in different directions.'};
+    if(S.capped) return {cls:'', t:'Willingness is well above capacity. The score is limited to capacity + 15. Discuss the gap before the official assessment.'};
+    if(S.wideC) return {cls:'', t:'Capacity is well above willingness. The client can afford more risk than they want. Explore whether this reflects past experience or a planning gap.'};
+    if(!S.complete) return {cls:'', t:'Partial score. Answer every question before recording it.'};
+    return {cls:'ok', t:'Willingness and capacity are aligned. Target portfolios within about 5 points of this score.'};
+  }
+  function renderRiskQuiz(S){
+    var form = $('rqForm'), panel = $('rqPanel'); if(!form) return;
+    var A = rqAmount(), sig = A + '|' + hasSpouse(null);
+    if(document.activeElement !== $('rqAmt')) $('rqAmt').value = rq.amt.trim() !== '' ? rq.amt : fmtN.format(Math.round(A));
+    $('rqAmt').classList.toggle('auto', rq.amt.trim() === '');
+    if(rqSig !== sig){
+      rqSig = sig;
+      var n = 0;
+      form.innerHTML = RQ_Q.map(function(Sx){
+        return '<div class="rq-sec"><h4>' + esc(Sx.sec) + '<small>' + esc(Sx.tag) + '</small></h4>' + Sx.items.map(function(q){
+          n++;
+          return '<fieldset class="rq-q" style="border:1px solid var(--line);margin:0 0 10px;min-width:0"><legend class="qt" style="padding:0 4px">' + n + '. ' + esc(q.t) + (q.pctNote ? ' <span class="dn">(' + rqNeg(A * q.pctNote / 100) + ')</span>' : '') + '</legend>'
+            + (q.h ? '<p class="qh">' + esc(q.h) + '</p>' : '') + '<div class="rq-opts">'
+            + q.o.map(function(o, i){ return '<label class="rq-opt"><input type="radio" name="rq_' + q.id + '" value="' + i + '"><span class="ol">' + rqOptHtml(q, o, A) + '</span></label>'; }).join('')
+            + '</div></fieldset>';
+        }).join('') + '</div>';
+      }).join('');
+    }
+    RQ_ALL.forEach(function(q){
+      var k = rq.a[q.id], opts = form.querySelectorAll('input[name="rq_' + q.id + '"]');
+      for(var i = 0; i < opts.length; i++){ opts[i].checked = (k === i); opts[i].closest('.rq-opt').classList.toggle('on', k === i); }
+    });
+    var fl = rqFlag(S), tolEl = $('riskTol'), typed = tolEl.value.trim() !== '' && !tolEl.classList.contains('auto');
+    panel.innerHTML = '<div class="eyebrow">Risk score</div><div class="rq-big">' + (S.rn == null ? '–' : S.rn) + '</div>'
+      + '<span class="rq-band">' + (S.rn == null ? 'Answer the questions' : esc(S.band)) + '</span>'
+      + '<div class="rq-gauge"><div class="pin" style="left:' + (S.rn == null ? 0 : (S.rn - 1) / 98 * 100) + '%"></div></div><div class="rq-ticks"><span>1</span><span>25</span><span>50</span><span>75</span><span>99</span></div>'
+      + '<dl class="rq-kv"><dt>Primary objective</dt><dd>' + (S.obj ? esc(S.obj) : '–') + '</dd><dt>Willingness</dt><dd>' + (S.rn == null ? '–' : S.W) + '</dd><dt>Capacity</dt><dd>' + (S.rn == null ? '–' : S.C) + '</dd>'
+      + '<dt>Implied 1-yr range</dt><dd>' + (S.rn == null ? '–' : S.d.toFixed(1) + '% to +' + S.u.toFixed(1) + '%') + '</dd><dt>In dollars</dt><dd>' + (S.rn == null ? '–' : rqNeg(S.A * S.d / 100) + ' to +' + money(S.A * S.u / 100)) + '</dd></dl>'
+      + (fl ? '<div class="rq-flag ' + fl.cls + '">' + esc(fl.t) + '</div>' : '')
+      + '<div class="rq-prog">' + S.n + ' of ' + S.total + ' questions answered' + (S.complete ? (typed ? ' · the risk tolerance above was typed and is used instead of this score' : ' · filling the risk tolerance above') : '') + '</div>'
+      + '<p class="hint" style="margin:10px 0 0;font-size:12px">Illustrative one-year range at roughly 95% probability, interpolated from calibration anchors.</p>';
+  }
+  /* the answers in words: the worksheet, the summary and the client report share it */
+  function rqAnswerLines(client){
+    var A = rqAmount();
+    return RQ_ALL.map(function(q, k){ var i = rq.a[q.id]; return {n:k + 1, q:q.t, a:i == null ? null : rqOptText(q, q.o[i], A, client)}; });
+  }
+  function rqSummaryText(){
+    var S = rqScore(); if(S.rn == null) return '';
+    var i = readInputs(), name = ((i.clientFirst || '') + ' ' + (i.clientLast || '')).trim() || 'Client';
+    return 'ALTO RISK PROFILE — ' + name + '\nDate: ' + longDate(todayISO()) + (i.advisor ? ' · Advisor: ' + i.advisor : '') + '\nPortfolio assessed: ' + money(S.A)
+      + '\n\nRisk score: ' + S.rn + ' (' + S.band + ')\nPrimary objective: ' + (S.obj || '(no answer)') + '\nWillingness: ' + S.W + ' · Capacity: ' + S.C + (S.capped ? ' · capped by capacity' : '')
+      + '\nIllustrative 1-year range: ' + S.d.toFixed(1) + '% to +' + S.u.toFixed(1) + '%\nAnswered: ' + S.n + ' of ' + S.total + '\n\n'
+      + rqAnswerLines(false).map(function(x){ return 'Q' + x.n + ': ' + (x.a == null ? '(no answer)' : x.a); }).join('\n')
+      + '\n\nAlto approximation. Confirm the official Risk Number before building or changing a portfolio.';
+  }
   function riskFacts(r){
     var i = r.inputs, sc = num($('riskScore').value), tl = num($('riskTol').value);
     var hasScore = $('riskScore').value.trim() !== '' && $('riskTol').value.trim() !== '';
@@ -9244,7 +9460,7 @@
       renderNitro(); $('caseJson').value = caseData();
       var R = A && A.riskNumber, C = A && A.clientRiskNumber, changed = false;
       if(R){ $('riskScore').value = String(R); changed = true; }          // the portfolio's Risk Number is the current risk score
-      if(C){ $('riskTol').value = String(C); changed = true; }            // the client's own Risk Number is the risk tolerance
+      if(C){ $('riskTol').value = String(C); $('riskTol').classList.remove('auto'); changed = true; }            // the client's own Risk Number is the risk tolerance, typed over the questionnaire's
       if(changed) render();
     };
     var fallback = nitroParse(text);
@@ -9313,7 +9529,7 @@
   }
 
   function renderRisk(r){
-    var f = riskFacts(r);
+    var S = rqApply(), f = riskFacts(r);
     renderNitro();
     $('riskReadout').innerHTML = f.gap == null
       ? '<span class="gap-label">Risk gap</span><b>—</b><span class="gap-math">Enter the current risk score and the risk tolerance, each from 1 to 100.</span>'
@@ -9321,6 +9537,9 @@
         + (f.gap > 0 ? 'The portfolio carries <b>' + f.gap + ' points</b> more risk than the client is comfortable with (score ' + f.score + ', tolerance ' + f.tol + ').'
           : f.gap < 0 ? 'The portfolio carries <b>' + (-f.gap) + ' points</b> less risk than the client would accept (score ' + f.score + ', tolerance ' + f.tol + ').'
           : 'The portfolio’s risk matches the client’s tolerance (' + f.score + ').') + '</span>';
+    if(S.rn != null) $('riskReadout').innerHTML += '<span class="gap-math" style="flex-basis:100%">Questionnaire: <b>' + S.rn + '</b> · ' + esc(S.band) + ' · willingness ' + S.W + ', capacity ' + S.C
+      + (S.complete ? ($('riskTol').classList.contains('auto') ? ' — filling the risk tolerance above.' : ' — a typed risk tolerance is used instead.') : ' — ' + (S.total - S.n) + ' question' + (S.total - S.n === 1 ? '' : 's') + ' still unanswered.') + '</span>';
+    renderRiskQuiz(S);
     $('riskList').innerHTML = RISK_ITEMS.map(function(it){
       var on = !!risk.selected[it.id], sug = it.sug ? it.sug(f) : false;
       return '<label class="risk-item' + (on ? ' on' : '') + '"><input type="checkbox" data-risk="' + it.id + '"' + (on ? ' checked' : '') + '>'
@@ -9345,7 +9564,8 @@
     var out = [];
     RISK_ITEMS.forEach(function(it){ if(risk.selected[it.id]){ tmp.innerHTML = it.text(f); out.push({text:tmp.textContent, sub:it.sub(f)}); } });
     risk.custom.forEach(function(c){ if(c.on && c.text.trim()) out.push({text:c.text.trim(), sub:'Identified by the advisor'}); });
-    return {facts:f, items:out};
+    var S = rqScore();
+    return {facts:f, items:out, quiz:S.complete && S.rn != null ? S : null};
   }
 
   /* ============================================================
@@ -10823,6 +11043,22 @@
     $(id).addEventListener('input', function(){ var el = $(id); el.value = el.value.replace(/[^0-9]/g, '').slice(0, 4); render(); });
     $(id).addEventListener('blur', function(){ var el = $(id); if(el.value && el.value.length < 4){ el.value = ''; render(); } });
   });
+  $('riskTol').addEventListener('input', function(){ this.classList.remove('auto'); });     // typed is a setting; blank follows the questionnaire again
+  $('riskTol').addEventListener('blur', function(){ if(this.value.trim() === '') render(); });
+  $('rqForm').addEventListener('change', function(e){
+    var m = /^rq_(q\d+)$/.exec(e.target.name || ''); if(!m) return;
+    rq.a[m[1]] = +e.target.value; render();
+  });
+  $('rqAmt').addEventListener('input', function(){ rq.amt = this.value; render(); });
+  $('rqAmt').addEventListener('blur', function(){ if(this.value.trim() !== ''){ rq.amt = fmtN.format(Math.round(num(this.value))); this.value = rq.amt; } render(); });
+  $('rqClear').addEventListener('click', function(){ rq.a = {}; $('rqMsg').textContent = 'Answers cleared.'; render(); });
+  $('rqCopy').addEventListener('click', function(){
+    var t = rqSummaryText(), msg = $('rqMsg');
+    if(!t){ msg.textContent = 'Answer at least one question in each section first.'; return; }
+    var done = function(){ msg.textContent = 'Summary copied — paste it into the client’s CRM notes.'; };
+    var fallback = function(){ var b = document.createElement('textarea'); b.value = t; b.style.position = 'fixed'; b.style.left = '-9999px'; document.body.appendChild(b); b.select(); try { document.execCommand('copy'); done(); } catch(e){ msg.textContent = 'Copy was blocked by the browser.'; } document.body.removeChild(b); };
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, fallback); else fallback();
+  });
   ['riskScore','riskTol'].forEach(function(id){
     $(id).addEventListener('input', render);
     $(id).addEventListener('blur', function(){ var el = $(id), before = el.value, v = Math.round(num(el.value)); el.value = el.value.trim() === '' ? '' : String(Math.max(1, Math.min(100, v || 1))); if(el.value !== before) render(); });
@@ -11057,7 +11293,7 @@
     $('spouseSex').value = 'female';
     ltcTouched.ltcClient = false; ltcTouched.ltcSpouse = false;
     resetLtcInputs(); resetLifeInputs(); wdOrder = WD_DEFAULT.slice(); rothCfg = {apply:true, target:'auto', start:'auto', order:'roof', irmaa:true}; qcdCfg = qcdDefault();
-    risk = {score:'', tol:'', selected:{}, custom:[]}; $('riskScore').value = ''; $('riskTol').value = '';
+    risk = {score:'', tol:'', selected:{}, custom:[]}; $('riskScore').value = ''; $('riskTol').value = ''; $('riskTol').classList.remove('auto'); rq = {a:{}, amt:''};
     nitro = null; $('nitroText').value = ''; $('nitroMsg').textContent = '';
     EST_IDS.forEach(function(id){ $(id).value = ''; });
     applyLtcDefaults();
@@ -12251,7 +12487,7 @@
       var s = doc.slide(); page++;
       frame(s, '', 'Your Risk Tolerance, and the Risks We Found');
       dkTile(s, 0.9, 2.05, 4.3, 1.9, 'Current risk score', RF.gap != null ? String(RF.score) : dash, 'The portfolio as held today, 1–100');
-      dkTile(s, 5.4, 2.05, 4.3, 1.9, 'Risk tolerance', RF.gap != null ? String(RF.tol) : dash, 'What you are comfortable with, 1–100');
+      dkTile(s, 5.4, 2.05, 4.3, 1.9, 'Risk tolerance', RF.gap != null ? String(RF.tol) : dash, RS.quiz ? RS.quiz.band + ' · willingness ' + RS.quiz.W + ', capacity ' + RS.quiz.C : 'What you are comfortable with, 1–100');
       dkTile(s, 9.9, 2.05, 4.3, 1.9, 'Risk gap', RF.gap != null ? (RF.gap > 0 ? '+' : '') + RF.gap : dash, RF.gap == null ? 'Scores not yet entered' : RF.gap > 0 ? 'More risk than you are comfortable with' : RF.gap < 0 ? 'Less risk than you would accept' : 'Portfolio matches tolerance', {valueColor:RF.gap > 0 ? DECK_C.red : DECK_C.navy});
       dkTile(s, 14.4, 2.05, 4.7, 1.9, 'Market exposure', marketPct + '% → ' + exposurePlan + '%', 'Today, then with the Fortress in place');
       var items = RS.items.slice(0, 6), tmp = document.createElement('div');
@@ -12771,6 +13007,71 @@
     var blob = new Blob([html], {type:'text/html'});
     if(openInTab(blob)){ msg.textContent = 'Executive summary report opened in a new tab \u2014 use the browser\u2019s Print \u2192 Save as PDF there if a PDF is needed.'; return; }
     savePdf($('makeDeck'), function(){ return blob; }, fname, 'executive summary report', 'text/html', 'This view does not allow new tabs, so the executive summary report was saved as an HTML file \u2014 open it in your browser and print from there.');
+  });
+  /* Risk profile report: the questionnaire's result as a client letter, Letter pages, no vendor named */
+  function buildRiskReport(){
+    var S = rqScore();
+    if(S.rn == null) throw new Error('Answer at least one question in each section of the questionnaire first.');
+    var i = readInputs(), E = esc, today = new Date();
+    var couple = hasSpouse(i), client = (function(){ var c = (i.clientFirst || 'Client').trim(), sp = couple ? (i.spouseFirst || 'Spouse').trim() : ''; return couple ? c + ' and ' + sp + (i.clientLast ? ' ' + i.clientLast : '') : c + (i.clientLast ? ' ' + i.clientLast : ''); })();
+    var advisor = (i.advisor || '').trim(), dateTxt = longDate(i.prepDate || todayISO());
+    var pick = function(id, useK){ var q = rqQ(id), k = rq.a[id]; if(k == null) return 'Not answered'; var o = q.o[k]; return useK && o.k ? o.k : rqOptText(q, o, S.A, true); };
+    var ans = [['Most important objective', pick('q5', true)], ['Range you’re most comfortable with in a year', pick('q1')], ['If your portfolio fell 20% in a year', pick('q2')], ['Largest one-year decline you could accept', pick('q3')],
+               ['When withdrawals begin', pick('q6')], ['Essential expenses covered by guaranteed income', pick('q7')], ['Unexpected expenses to be ready for', pick('q12')]];
+    var lo = -S.A * S.d / 100, hi = S.A * S.u / 100;
+    var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Risk Profile — ' + E(client) + '</title>'
+      + '<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">'
+      + '<style>'
+      + ':root{--navy:#1F3162;--gold:#C5A044;--red:#D82629;--good:#2E7D4F;--ink:#18213B;--muted:#5A6276;--line:#DADDE6;--sel:#EEF1F8}'
+      + '*{box-sizing:border-box}body{margin:0;font-family:Montserrat,"Helvetica Neue",Arial,sans-serif;color:var(--ink);font-size:12.5px;line-height:1.55;background:#eef0f3}'
+      + '.sheet{background:#fff;max-width:8.5in;margin:24px auto;padding:.7in .75in;box-shadow:0 2px 12px rgba(0,0,0,.08)}'
+      + 'h1,h2,h3{font-family:"Playfair Display",Georgia,serif;color:var(--navy);font-weight:600;margin:0}h2{font-size:19px;margin:0 0 6px}p{margin:0 0 8px;max-width:70ch}'
+      + '.band{background:var(--navy);color:#fff;padding:26px 32px;margin:-.7in -.75in 28px;border-bottom:5px solid var(--gold);display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}'
+      + '.band .sub{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#E6D3A0}.band .firm{font-family:"Playfair Display",Georgia,serif;font-size:20px}.band .meta{font-size:11.5px;text-align:right;color:#DCE2F0}'
+      + 'section{margin:0 0 22px;page-break-inside:avoid}.eyebrow{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700}'
+      + '.hero{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px;align-items:center}.big{font-family:"Playfair Display",Georgia,serif;font-size:72px;line-height:1;color:var(--navy)}'
+      + '.pill{display:inline-block;margin-top:6px;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:var(--sel);color:var(--navy)}'
+      + '.gauge{position:relative;height:10px;border-radius:5px;margin:14px 0 6px;background:linear-gradient(90deg,#3E7CB1,#2E7D4F 35%,#C5A044 65%,#D82629)}.gauge .pin{position:absolute;top:-5px;width:4px;height:20px;background:var(--ink);border-radius:2px;transform:translateX(-2px)}'
+      + '.ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}'
+      + '.cats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-top:8px}.cats div{padding:9px 6px;text-align:center;font-size:10.5px;line-height:1.3;background:var(--sel);color:var(--muted);border-radius:4px}.cats div b{display:block;font-size:10px;font-weight:600;margin-top:3px}.cats div.on{background:var(--navy);color:#fff;font-weight:700}.cats div.on b{color:#E6D3A0}'
+      + '.rng{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}.rng>div{border:1px solid var(--line);border-radius:6px;padding:10px 14px}.rng .lab{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}.rng .val{font-family:"Playfair Display",Georgia,serif;font-size:22px}.rng .note{font-size:11px;color:var(--muted)}'
+      + '.tb{display:grid;grid-template-columns:100px minmax(0,1fr) 34px;gap:10px;align-items:center;margin-top:8px}.tb .track{height:9px;background:var(--sel);border-radius:5px;overflow:hidden}.tb .fill{height:100%;background:var(--navy)}.tb .fill.c{background:var(--gold)}'
+      + '.answers{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:7px 18px;margin:6px 0 0}.answers dt{color:var(--muted)}.answers dd{margin:0;font-weight:600}'
+      + '.fort{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:8px}.fort div{border-top:3px solid var(--navy);background:var(--sel);padding:10px;border-radius:0 0 6px 6px;font-size:11.5px}.fort b{display:block;font-family:"Playfair Display",Georgia,serif;font-size:14px;color:var(--navy)}'
+      + 'ol{margin:0;padding-left:20px}li{margin:0 0 4px}.foot{margin-top:24px;padding-top:10px;border-top:1px solid var(--line);font-size:10px;color:var(--muted)}'
+      + '.toolbar{position:sticky;top:0;background:var(--navy);color:#fff;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;font-size:13px;z-index:5}.toolbar button{background:#fff;color:var(--navy);border:0;border-radius:6px;padding:7px 14px;font:inherit;font-weight:600;cursor:pointer}'
+      + '@media print{body{background:#fff}.sheet{box-shadow:none;margin:0;max-width:none;padding:0}.toolbar{display:none}@page{size:letter;margin:.6in .65in}.band{margin:0 0 24px}}'
+      + '</style></head><body>'
+      + '<div class="toolbar"><span>Risk Profile — ' + E(client) + '</span><button onclick="window.print()">Print / Save as PDF</button></div>'
+      + '<div class="sheet">'
+      + '<div class="band"><div><div class="sub">Retirement Fortress · Risk Profile</div><div class="firm">Alto Financial Group</div></div><div class="meta">Prepared for <strong>' + E(client) + '</strong><br>' + E(dateTxt) + (advisor ? '<br>' + E(advisor) : '') + '</div></div>'
+      + '<section class="hero"><div><div class="eyebrow">Your risk score</div><div class="big">' + S.rn + '</div><span class="pill">' + E(S.band) + '</span></div>'
+      + '<div><h2>What your score means</h2><p>' + E(RQ_BAND_TXT[S.band]) + '</p><div class="gauge"><div class="pin" style="left:' + ((S.rn - 1) / 98 * 100).toFixed(1) + '%"></div></div><div class="ticks"><span>1 · Conservative</span><span>50</span><span>99 · Aggressive</span></div></div></section>'
+      + '<section><h2>Your risk category</h2><p>Your score places you in the <strong>' + E(S.band) + '</strong> category, one of five we use to match clients with portfolios.</p>'
+      + '<div class="cats">' + RQ_CATS.map(function(c){ return '<div class="' + (c[0] === S.band ? 'on' : '') + '">' + c[0] + '<b>' + c[1] + '–' + c[2] + '</b></div>'; }).join('') + '</div></section>'
+      + '<section><h2>What a typical year could look like</h2><p>Based on your score, a portfolio matched to you on your ' + money(S.A) + ' might range roughly between these outcomes in about 19 out of 20 years. About 1 year in 20 could fall outside this range.</p>'
+      + '<div class="rng"><div><div class="lab">Difficult year</div><div class="val" style="color:var(--red)">' + rqNeg(lo) + '</div><div class="note">about −' + (-S.d).toFixed(0) + '%</div></div><div><div class="lab">Strong year</div><div class="val" style="color:var(--good)">+' + money(hi) + '</div><div class="note">about +' + S.u.toFixed(0) + '%</div></div></div></section>'
+      + '<section><h2>Two sides of your risk profile</h2><p>We look at how much risk you <em>want</em> to take and how much risk your situation can <em>afford</em>. When the two differ, we plan around the lower one.</p>'
+      + '<div class="tb"><span>Willingness</span><div class="track"><div class="fill" style="width:' + S.W + '%"></div></div><span>' + S.W + '</span></div><div class="tb"><span>Capacity</span><div class="track"><div class="fill c" style="width:' + S.C + '%"></div></div><span>' + S.C + '</span></div></section>'
+      + '<section><h2>What you told us</h2><dl class="answers">' + ans.map(function(x){ return '<dt>' + E(x[0]) + '</dt><dd>' + E(x[1]) + '</dd>'; }).join('') + '</dl></section>'
+      + '<section><h2>Where your score fits in your Retirement Fortress</h2><p>Your score guides the investment portion of your plan. It doesn’t apply to the guaranteed income that covers your essentials.</p>'
+      + '<div class="fort"><div><b>Foundation</b>Guaranteed income for essential expenses. Not market-based.</div><div><b>Walls</b>Income-oriented investments for your wants. Guided by your score.</div><div><b>Roof</b>Growth investments for your wishes. Guided by your score.</div><div><b>Moat</b>Protection against long-term care costs.</div></div></section>'
+      + '<section><h2>Next steps</h2><ol><li>Review this profile together and confirm it reflects how you feel about risk.</li><li>Compare your current investments to your score to see whether they take more or less risk than you want.</li><li>Revisit your profile each year and after any major life change.</li></ol></section>'
+      + '<div class="foot"><p>This risk profile is based on your answers to Alto Financial Group’s questionnaire and is for educational purposes. The ranges shown are hypothetical, are not guarantees of future results, and do not represent any specific investment. Actual results will vary, and losses may exceed the ranges shown.</p>'
+      + '<p>Investment advisory products and services made available through AE Wealth Management, LLC (AEWM), a Registered Investment Adviser. AEWM only transacts business in states where it is properly registered or is excluded or exempted from registration requirements.</p>'
+      + '<p>This report is for informational and educational purposes only and does not constitute tax, legal or individualized investment advice. Neither Alto Financial Group, AEWM nor their representatives assume liability for any loss arising from reliance on the information in this report.</p>'
+      + '<p>© ' + today.getFullYear() + ' Alto Financial Group. All rights reserved.</p></div>'
+      + '</div></body></html>';
+    return html;
+  }
+  $('rqReport').addEventListener('click', function(){
+    var msg = $('rqMsg'), fname = pdfName('risk-profile').replace(/\.pdf$/, '.html');
+    var html;
+    try { html = buildRiskReport(); }
+    catch(err){ msg.textContent = err.message; return; }
+    var blob = new Blob([html], {type:'text/html'});
+    if(openInTab(blob)){ msg.textContent = 'Risk profile report opened in a new tab — use the browser’s Print → Save as PDF there if a PDF is needed.'; return; }
+    savePdf($('rqReport'), function(){ return blob; }, fname, 'risk profile report', 'text/html', 'This view does not allow new tabs, so the risk profile report was saved as an HTML file — open it in your browser and print from there.');
   });
   $('makeSS').addEventListener('click', function(){
     var msg = $('pdfMsg'), fname = pdfName('social-security-planning-analysis').replace(/\.pdf$/, '.html');

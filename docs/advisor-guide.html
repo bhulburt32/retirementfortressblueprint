@@ -1048,11 +1048,38 @@
     <div class="body">
       <h2>Risk</h2>
       <p>Two scores on a 1&ndash;100 scale &mdash; the client's <span class="ui">current risk
-        score</span> from the questionnaire or portfolio analysis, and their <span class="ui">risk
-        tolerance</span> &mdash; with the gap read out beneath. Then the risks the advisor identifies
-        in the current situation, ticked from a fixed list, plus any added by hand.</p>
+        score</span> from the portfolio analysis, and their <span class="ui">risk
+        tolerance</span>, from the questionnaire below or typed &mdash; with the gap read out beneath.
+        Then the risks the advisor identifies in the current situation, ticked from a fixed list,
+        plus any added by hand.</p>
 
       <dl class="fields">
+        <dt>Risk profile questionnaire</dt>
+        <dd>Twelve questions, answered with the client, that produce a 1&ndash;99 risk score on the
+          same scale and logic as the Risk Number: real dollar amounts, one-year outcome ranges and
+          how the client weighs gains against losses. <span class="ui">Portfolio being
+          assessed</span> sets the dollar figures in the questions; left blank it follows the total
+          of the accounts in section&nbsp;06. The first five questions measure <em>willingness</em>
+          (65% of the score), the next five <em>capacity</em> (35%), and two on experience count with
+          willingness; each answer carries a score, the two sides are weighted averages, and a
+          willingness more than 15 points above capacity is limited to capacity plus 15. The panel on
+          the right shows the score as it builds, its category (Conservative to Aggressive in five
+          bands), the primary objective, willingness and capacity, and an illustrative one-year
+          range in percent and dollars, with a note when the objective and the scenario answers
+          disagree, when one side runs well ahead of the other, or when questions remain. A completed
+          questionnaire fills <span class="ui">Risk tolerance</span> above in grey, like any value
+          that follows the plan; a typed tolerance (or the client's own Risk Number from an uploaded
+          report) is used instead, and clearing the cell brings the questionnaire's score back. The
+          gap readout, the executive summary's risk page (the category, willingness and capacity
+          under the tolerance tile) and the worksheet (the score and every answer) all follow it.
+          <span class="ui">Risk profile report</span> opens a client-facing letter in a new tab
+          &mdash; the score and category, what a typical year could look like on the portfolio
+          assessed, willingness against capacity, the answers in plain words, where the score fits in
+          the Fortress and next steps, with no vendor named; <span class="ui">Copy summary</span>
+          puts a text summary with every answer on the clipboard for the CRM; <span class="ui">Clear
+          answers</span> starts over. Answers and the portfolio amount save with the case. The
+          questionnaire is an Alto approximation for framing the conversation; confirm the official
+          Risk Number before building or changing a portfolio.</dd>
         <dt>Nitrogen Wealth report</dt>
         <dd>Press <span class="ui">Upload Nitrogen report</span> and choose the PDF of the client's
           current-portfolio analysis (a text file works too). The page reads the PDF's text itself
@@ -1499,7 +1526,8 @@
     <div class="num">21<small>Output</small></div>
     <div class="body">
       <h2>The five downloads</h2>
-      <p>Three of these go to a client. The other two are marked
+      <p>Three of these go to a client (a fourth, the risk profile report, opens from
+        section&nbsp;12). The other two are marked
         <em>not for client distribution</em> on every page. <span class="ui">Scenario for the
         reports</span> at the top of the section picks which of the three scenarios they are built
         from &mdash; the same choice as <span class="ui">Use for reports</span> in section&nbsp;14. When
