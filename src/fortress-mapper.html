@@ -1661,7 +1661,7 @@
         <div class="inc-title gap">LTC benefits<small>One line for each contract in the Moat above &middot; blank follows the Moat sizing: the person&rsquo;s benefit over a 5-year benefit period, from age 80, no inflation</small></div>
         <div class="tbl-wrap" style="margin-top:10px">
           <table id="ltcBenTable" class="adj-ann">
-            <thead><tr><th>Contract</th><th class="num">Premium</th><th class="num">Monthly benefit</th><th class="num">At age</th><th class="num">Benefit period (years)</th><th class="num">Inflation</th></tr></thead>
+            <thead><tr><th>Contract</th><th class="num">Premium</th><th class="num">Monthly benefit</th><th class="num">At age</th><th class="num">Benefit period (years)</th><th class="num">Inflation</th><th class="num">Growth<small>Contract value</small></th></tr></thead>
             <tbody id="ltcBenBody"></tbody>
           </table>
         </div>
@@ -1817,7 +1817,7 @@
   <!-- 17. PROJECTED ASSETS -->
   <section id="assetSec">
     <div class="sec-head"><span class="sec-num">17</span><h2>Projected Retirement Assets</h2></div>
-    <p class="sec-note">What is left each year after the withdrawals in section 16, in total and by Fortress level, through the end of plan. The Walls grow at the Walls growth rate and the Roof at the Roof growth rate from section 03; the Foundation annuity and the Moat hold their value while they pay out; the liquidity buffer is cash.</p>
+    <p class="sec-note">What is left each year after the withdrawals in section 16, in total and by Fortress level, through the end of plan. The Walls grow at the Walls growth rate and the Roof at the Roof growth rate from section 03; the Foundation annuity holds its value while it pays out; the Moat grows at its LTC contracts&rsquo; growth rate (3% unless set in section 14); the liquidity buffer is cash.</p>
     <div class="panel panel-pad">
       <div class="tax-tiles" id="assetTiles"></div>
       <div class="pj-legend" id="assetLegend"></div>
@@ -1831,20 +1831,20 @@
         <div class="inner"><div class="tbl-scroll"><table id="assetTable" class="pj-table"></table></div></div>
       </details>
       <p class="hint" id="assetAssume" style="margin-top:12px"></p>
-      <div class="ltc-lead">
-        <h3>If a long term care event occurs</h3>
-        <p class="hint" id="assetLtcLead" style="margin:0"></p>
-        <div id="assetLtc"></div>
-      </div>
     </div>
   </section>
   <!-- 18. SENSITIVITY ANALYSIS -->
   <section id="sensSec">
     <div class="sec-head"><span class="sec-num">18</span><h2>Sensitivity Analysis</h2></div>
-    <p class="sec-note">Three stress tests on the section 17 projection, one at a time: a bad sequence of returns at the start of retirement, a Social Security benefit cut, and higher long-term inflation. Each chart carries the base case as a dashed line.</p>
+    <p class="sec-note">Three stress tests on the section 17 projection, one at a time: a bad sequence of returns at the start of retirement, a Social Security benefit cut, and higher long-term inflation. Each chart carries the base case as a dashed line. Beneath them, the same projection with a long term care event added.</p>
     <div class="panel panel-pad">
       <p class="hint" id="sensLead" style="margin:0"></p>
       <div id="sens"></div>
+      <div class="ltc-lead">
+        <h3>If a long term care event occurs</h3>
+        <p class="hint" id="assetLtcLead" style="margin:0"></p>
+        <div id="assetLtc"></div>
+      </div>
     </div>
   </section>
   <!-- 19. TRANSFER SEQUENCE -->
@@ -5616,7 +5616,7 @@
     /* ---------- projected assets ---------- */
     h2('Projected retirement assets (after withdrawals, by Fortress level)');
     var AL = TX.rows[TX.rows.length - 1].layers, A0 = TX.rows[0].layers;
-    para('Assets ' + (AL.total >= A0.total ? 'grow' : 'fall') + ' from ' + money(A0.total) + ' today to ' + money(AL.total) + ' at the end of plan. Walls at ' + pc(effGrowth(r).w) + ' after the Walls yield, Roof at ' + pc(effGrowth(r).r) + ', accounts left in place at ' + pc(effGrowth(r).i) + (effGrowth(r).any ? ' (plan rates blended with the account rates in section 06)' : '') + ', the liquidity buffer as cash; the Foundation annuity falls by the income it pays' + (i.foundGLI ? ' (guaranteed lifetime income continues after it is exhausted)' : ' (income stops once it is exhausted)') + ' and the Moat is shown at the amount placed while it pays out. Withdrawals are the section 16 draws in the withdrawal order; RMD money not needed for spending and tax is reinvested, after tax, in the Roof. Future dollars, before market variation.', {rgb:INK});
+    para('Assets ' + (AL.total >= A0.total ? 'grow' : 'fall') + ' from ' + money(A0.total) + ' today to ' + money(AL.total) + ' at the end of plan. Walls at ' + pc(effGrowth(r).w) + ' after the Walls yield, Roof at ' + pc(effGrowth(r).r) + ', accounts left in place at ' + pc(effGrowth(r).i) + (effGrowth(r).any ? ' (plan rates blended with the account rates in section 06)' : '') + ', the liquidity buffer as cash; the Foundation annuity falls by the income it pays' + (i.foundGLI ? ' (guaranteed lifetime income continues after it is exhausted)' : ' (income stops once it is exhausted)') + ' and the Moat grows at ' + pc(moatGrowth(r)) + ' while it pays out. Withdrawals are the section 16 draws in the withdrawal order; RMD money not needed for spending and tax is reinvested, after tax, in the Roof. Future dollars, before market variation.', {rgb:INK});
     var anyOutP = TX.rows.some(function(x){ return x.layers.outside > 0.5; });
     var acols2 = [{t:'Year', w:34, s:7}, {t:'Ages', w:46, s:7}, {t:'Withdrawn', w:58, a:'r', f:'F3', s:7}, {t:'Buffer', w:56, a:'r', f:'F3', s:7},
                   {t:'Foundation', w:60, a:'r', f:'F3', s:7}, {t:'Walls', w:60, a:'r', f:'F3', s:7}, {t:'Roof', w:64, a:'r', f:'F3', s:7}, {t:'Moat', w:56, a:'r', f:'F3', s:7}];
@@ -6702,7 +6702,7 @@
     if(d.roofGrowth && typeof d.roofGrowth === 'object') Object.keys(d.roofGrowth).forEach(function(k){ ROOF_G[k] = String(d.roofGrowth[k] || ''); });
     LTC_BEN = {}; ltcBenSig = '';
     if(d.ltcBenefits && typeof d.ltcBenefits === 'object'){
-      Object.keys(d.ltcBenefits).forEach(function(k){ var v = d.ltcBenefits[k] || {}; LTC_BEN[k] = {monthly:String(v.monthly || ''), age:String(v.age || ''), years:String(v.years || ''), infl:String(v.infl || '')}; });
+      Object.keys(d.ltcBenefits).forEach(function(k){ var v = d.ltcBenefits[k] || {}; LTC_BEN[k] = {monthly:String(v.monthly || ''), age:String(v.age || ''), years:String(v.years || ''), infl:String(v.infl || ''), growth:String(v.growth || '')}; });
     }
     if(d.annuityIncome && typeof d.annuityIncome === 'object'){
       ANN_INC = {};
@@ -7329,6 +7329,7 @@
       ltcPool = {client:normPool(LTC.pool && LTC.pool.client), spouse:normPool(LTC.pool && LTC.pool.spouse)};
       ltcPool0 = ltcPoolTotal(ltcPool.client) + ltcPoolTotal(ltcPool.spouse);
     }
+    var moatG = moatGrowth(r);   // the Moat's value grows at its contracts' rate while it pays out
     var ltcPoolLeft = function(){ var f = function(arr){ return arr.reduce(function(a, k){ return a + (k.total != null ? k.total : k.cap * k.left); }, 0); }; return f(ltcPool.client) + f(ltcPool.spouse); };
     rows.forEach(function(row, t){
       if(t > 0){
@@ -7502,7 +7503,7 @@
       var allB = [bal.taxable, bal.roth, bal.deferred.client, bal.deferred.spouse];
       var layer = function(k){ return allB.reduce(function(a, b){ return a + b[k]; }, 0); };
       var moatLeft = (ltcPool && ltcPool0 > 0.5) ? Math.max(0, Math.min(1, ltcPoolLeft() / ltcPool0)) : 1;
-      var layers = {buffer:layer('f'), sleeve:(row.sleeveBal != null ? row.sleeveBal : r.funded.foundation), walls:layer('w'), roof:layer('r'), moat:r.funded.moat * moatLeft, outside:layer('i') + lifeHeld};
+      var layers = {buffer:layer('f'), sleeve:(row.sleeveBal != null ? row.sleeveBal : r.funded.foundation), walls:layer('w'), roof:layer('r'), moat:r.funded.moat * Math.pow(1 + moatG, t) * moatLeft, outside:layer('i') + lifeHeld};
       layers.total = layers.buffer + layers.sleeve + layers.walls + layers.roof + layers.moat + layers.outside;
       var stParts = {wages:row.emp + row.ng, gains:wallsCG + wd.taxable * TAXABLE_GAIN_SHARE, pension:row.pen,
                      retirement:row.pen + row.ann + sleeveOrd + wallsOrd + rmdExcess + wd.deferred + (cvInfo ? cvInfo.amt : 0), ssFederal:tx.ssTaxable, gross:gross};
@@ -8800,7 +8801,7 @@
     var change = last.total - first.total;
     $('assetNote').innerHTML = 'Assets ' + (change >= 0 ? 'grow' : 'fall') + ' from <b>' + money(first.total) + '</b> today to <b>' + money(last.total) + '</b> at the end of plan'
       + ' (' + (change >= 0 ? '+' : '−') + money(Math.abs(change)) + '). The Walls go from <b>' + money(first.walls) + '</b> to <b>' + money(last.walls) + '</b> and the Roof from <b>' + money(first.roof) + '</b> to <b>' + money(last.roof) + '</b>;'
-      + ' the Foundation annuity goes from <b>' + money(first.sleeve) + '</b> to <b>' + money(last.sleeve) + '</b> as it pays out' + (i.foundGLI ? (last.sleeve < 0.5 ? ' (its income continues for life)' : '') : (last.sleeve < 0.5 ? ' (its income stops once the value is gone)' : '')) + ', and the Moat (<b>' + money(first.moat) + '</b>) holds its value while paying out.'
+      + ' the Foundation annuity goes from <b>' + money(first.sleeve) + '</b> to <b>' + money(last.sleeve) + '</b> as it pays out' + (i.foundGLI ? (last.sleeve < 0.5 ? ' (its income continues for life)' : '') : (last.sleeve < 0.5 ? ' (its income stops once the value is gone)' : '')) + ', and the Moat goes from <b>' + money(first.moat) + '</b> to <b>' + money(last.moat) + '</b> at ' + (moatGrowth(r) * 100).toFixed(1) + '% a year while paying out.'
       + (totalWd > 0.5 ? ' Withdrawals beyond the plan’s income total <b>' + money(totalWd) + '</b>, taken in the section 16 order' + (rows.some(function(x){ return x.rmdExcess > 0.5; }) ? ', and RMDs above the plan’s own tax-deferred draw are spent first and otherwise reinvested after tax in the Roof.' : '.') : ' Income covers Needs and Wants every year, so nothing beyond the plan’s own draws is withdrawn.')
       + (depleted ? ' <b>From ' + depleted.year + ' the accounts are exhausted and Needs and Wants are unfunded.</b>' : '');
 
@@ -8813,7 +8814,7 @@
             + '<td class="num">' + money(Ly.buffer) + '</td><td class="num">' + money(Ly.sleeve) + '</td><td class="num">' + money(Ly.walls) + '</td><td class="num">' + money(Ly.roof) + '</td><td class="num">' + money(Ly.moat) + '</td>'
             + (anyOut ? '<td class="num">' + money(Ly.outside) + '</td>' : '') + '<td class="num"><b>' + money(Ly.total) + '</b></td>' + (anyUnf ? '<td class="num">' + (x.unfunded > 0.5 ? money(x.unfunded) : '—') + '</td>' : '') + '</tr>';
         }).join('') + '</tbody>';
-    $('assetAssume').innerHTML = '<b>Assumptions.</b> Balances start from the plan’s own transfers in section 14 and are carried forward a year at a time: the Walls at ' + pct(effGrowth(r).w) + ' (after the Walls yield is paid), the Roof at ' + pct(effGrowth(r).r) + ', accounts left in place at ' + pct(effGrowth(r).i) + (effGrowth(r).any ? ' \u2014 each a balance-weighted blend of the plan rate and the account rates typed in section 06 \u2014' : '') + ', the liquidity buffer as cash with no growth. The Foundation annuity is an income annuity: its value falls by the income it pays each year' + (i.foundGLI ? ', and with guaranteed lifetime income the payment continues at the same level for life once the value reaches zero' : ', and without guaranteed lifetime income the payment stops once the value is gone') + '. The Moat is an LTC contract, shown at the amount placed while it pays out. The first year runs from ' + planStart().label + ', so its income, Needs and Wants are all prorated' + (planStart().frac < 0.999 ? ' (' + Math.round(planStart().frac * 12) + ' months)' : '') + '. Withdrawals are the section 16 draws — whatever Needs and Wants (and the tax on the draw) need beyond wages, Social Security, pensions, annuities, non-guaranteed income, the Foundation annuity and the Walls yield — taken in the withdrawal order, cash first within each tier, then Walls, then Roof. RMDs above the plan’s own tax-deferred draw are spent first and whatever is not needed is reinvested after tax in the Roof. Future dollars, before any market variation; a planning estimate.';
+    $('assetAssume').innerHTML = '<b>Assumptions.</b> Balances start from the plan’s own transfers in section 14 and are carried forward a year at a time: the Walls at ' + pct(effGrowth(r).w) + ' (after the Walls yield is paid), the Roof at ' + pct(effGrowth(r).r) + ', accounts left in place at ' + pct(effGrowth(r).i) + (effGrowth(r).any ? ' \u2014 each a balance-weighted blend of the plan rate and the account rates typed in section 06 \u2014' : '') + ', the liquidity buffer as cash with no growth. The Foundation annuity is an income annuity: its value falls by the income it pays each year' + (i.foundGLI ? ', and with guaranteed lifetime income the payment continues at the same level for life once the value reaches zero' : ', and without guaranteed lifetime income the payment stops once the value is gone') + '. The Moat is an LTC contract, its value growing ' + (moatGrowth(r) * 100).toFixed(1) + '% a year (section 14) while it pays out. The first year runs from ' + planStart().label + ', so its income, Needs and Wants are all prorated' + (planStart().frac < 0.999 ? ' (' + Math.round(planStart().frac * 12) + ' months)' : '') + '. Withdrawals are the section 16 draws — whatever Needs and Wants (and the tax on the draw) need beyond wages, Social Security, pensions, annuities, non-guaranteed income, the Foundation annuity and the Walls yield — taken in the withdrawal order, cash first within each tier, then Walls, then Roof. RMDs above the plan’s own tax-deferred draw are spent first and whatever is not needed is reinvested after tax in the Roof. Future dollars, before any market variation; a planning estimate.';
     return X0;
   }
 
@@ -8860,7 +8861,7 @@
      level.
      The terms drive the Moat benefit shown for the contract and the care-
      event projections in sections 06 and 17. */
-  var LTC_BEN = {}, ltcBenSig = '', LTC_BEN_YEARS = 5;   // default benefit period, years
+  var LTC_BEN = {}, ltcBenSig = '', LTC_BEN_YEARS = 5, LTC_GROWTH_DEFAULT = 0.03;   // default benefit period, years; default growth of a contract's value
   function ltcBenKey(acct, who){ return accounts.indexOf(acct) + ':moat:' + who; }
   function ltcContracts(r){
     /* one contract per insured: every Moat line for that person adds up into it */
@@ -8890,12 +8891,19 @@
       var years = has('years') ? Math.max(0, num(S.years)) : defYears;
       var monthly = has('monthly') ? Math.max(0, num(S.monthly)) : defMonthly;
       var ageAt = has('age') ? Math.max(0, Math.round(num(S.age))) : LTC_COST_AGE;
-      var infl = has('infl') ? pctIn(S.infl) : 0;
-      out.push({key:key, who:w, owner:w, name:g.froms.join(' + '), froms:g.froms, lines:g.lines, srcOwner:w, cust:g.custs.join(' / '), prod:g.prods.join(' / '), to:g.tos.join(' / '),
+      var infl = has('infl') ? pctIn(S.infl) : 0, growth = has('growth') ? pctIn(S.growth) : LTC_GROWTH_DEFAULT;
+      out.push({key:key, who:w, owner:w, name:g.froms.join(' + '), growth:growth, froms:g.froms, lines:g.lines, srcOwner:w, cust:g.custs.join(' / '), prod:g.prods.join(' / '), to:g.tos.join(' / '),
                 amt:g.amt, monthly:monthly, years:years, ageAt:ageAt, infl:infl, total:monthly * 12 * years,
                 set:S, defMonthly:defMonthly, defYears:defYears, any:['monthly','age','years','infl'].some(has)});
     });
     return out;
+  }
+  /* the growth of the Moat's value in the projections: each contract's rate (3% unless set), weighted by premium */
+  function moatGrowth(r){
+    if(!r || r.statusQuo || !r.moves) return LTC_GROWTH_DEFAULT;
+    var cs = ltcContracts(r), amt = 0, acc = 0;
+    cs.forEach(function(c){ amt += c.amt; acc += c.amt * c.growth; });
+    return amt > 0.5 ? acc / amt : LTC_GROWTH_DEFAULT;
   }
   /* the benefit pools the care-event projections draw on: one contract per Moat line, by insured */
   function ltcPools(r){
@@ -8913,18 +8921,19 @@
     var sig = cs.map(function(c){ return c.key + '|' + c.name + '|' + c.to + '|' + c.cust + '|' + c.prod; }).join(';');
     if(sig !== ltcBenSig){
       ltcBenSig = sig;
-      body.innerHTML = !cs.length ? '<tr><td colspan="6"><div class="empty-state">No line in the transfer list above goes to the <b>Moat</b> yet — the LTC contracts appear here once one does.</div></td></tr>' : cs.map(function(c){
+      body.innerHTML = !cs.length ? '<tr><td colspan="7"><div class="empty-state">No line in the transfer list above goes to the <b>Moat</b> yet — the LTC contracts appear here once one does.</div></td></tr>' : cs.map(function(c){
         return '<tr data-ltc="' + esc(c.key) + '">'
           + '<td><b>' + esc(ownerLabel(c.who)) + ' LTC Contract</b><small class="sub">' + esc(['from ' + c.name + (c.lines > 1 ? ' (' + c.lines + ' lines combined)' : ''), c.cust, c.prod].filter(Boolean).join(' · ')) + '</small></td>'
           + '<td class="num" data-lf="amt"></td>'
           + '<td class="num"><input class="num" inputmode="numeric" data-lk="monthly" autocomplete="off" title="Monthly benefit at the age below"></td>'
           + '<td class="num"><input class="num" inputmode="numeric" data-lk="age" placeholder="80" autocomplete="off" title="The age the monthly benefit is quoted at"></td>'
           + '<td class="num"><input class="num" inputmode="decimal" data-lk="years" autocomplete="off" title="Benefit period in years"></td>'
-          + '<td class="num"><input class="num" inputmode="decimal" data-lk="infl" placeholder="0.0%" autocomplete="off" title="Annual increase in the monthly benefit after that age"></td></tr>';
+          + '<td class="num"><input class="num" inputmode="decimal" data-lk="infl" placeholder="0.0%" autocomplete="off" title="Annual increase in the monthly benefit after that age"></td>'
+          + '<td class="num"><input class="num" inputmode="decimal" data-lk="growth" placeholder="3.0%" autocomplete="off" title="Annual growth of the contract\u2019s value in the projections (3% unless set)"></td></tr>';
       }).join('');
       cs.forEach(function(c){
         var tr = body.querySelector('tr[data-ltc="' + CSS.escape(c.key) + '"]');
-        ['monthly','age','years','infl'].forEach(function(k){ var el = tr.querySelector('[data-lk="' + k + '"]'); if(el) el.value = c.set[k] || ''; });
+        ['monthly','age','years','infl','growth'].forEach(function(k){ var el = tr.querySelector('[data-lk="' + k + '"]'); if(el) el.value = c.set[k] || ''; });
       });
     }
     cs.forEach(function(c){
@@ -8932,10 +8941,10 @@
       tr.querySelector('[data-lf="amt"]').textContent = money(c.amt);
       tr.querySelector('[data-lk="monthly"]').placeholder = fmtN.format(c.defMonthly);
       tr.querySelector('[data-lk="years"]').placeholder = c.defYears.toFixed(1);
-      ['monthly','age','years','infl'].forEach(function(k){ var el = tr.querySelector('[data-lk="' + k + '"]'); el.classList.toggle('auto', el.value.trim() === ''); });
+      ['monthly','age','years','infl','growth'].forEach(function(k){ var el = tr.querySelector('[data-lk="' + k + '"]'); el.classList.toggle('auto', el.value.trim() === ''); });
     });
     $('ltcBenHint').textContent = cs.length
-      ? cs.map(function(c){ return ownerLabel(c.who) + ' — ' + money(c.amt) + ' of premium' + (c.lines > 1 ? ' from ' + c.lines + ' lines' : '') + ', ' + ltcBenWords(c); }).join('; ') + '. One contract per insured: every Moat line for that person adds up into it. Blank cells follow the Moat sizing: the person’s target benefit spread over a ' + LTC_BEN_YEARS + '-year benefit period, from age ' + LTC_COST_AGE + ', level. The benefit pays first in the care-event projections; the rest of the cost comes from the accounts.'
+      ? cs.map(function(c){ return ownerLabel(c.who) + ' — ' + money(c.amt) + ' of premium' + (c.lines > 1 ? ' from ' + c.lines + ' lines' : '') + ', ' + ltcBenWords(c) + ', the contract\u2019s value growing ' + (c.growth * 100).toFixed(1) + '% a year'; }).join('; ') + '. One contract per insured: every Moat line for that person adds up into it. Blank cells follow the Moat sizing: the person’s target benefit spread over a ' + LTC_BEN_YEARS + '-year benefit period, from age ' + LTC_COST_AGE + ', level. The benefit pays first in the care-event projections; the rest of the cost comes from the accounts.'
       : 'The Moat’s benefit follows the section 09 sizing until a Moat line is listed above.';
   }
   function roofLines(r){
@@ -9106,10 +9115,10 @@
     var parts = mode === 'sq' ? sqParts : function(x){ var o = {}; ASSET_LAYERS.forEach(function(Ly){ o[Ly.k] = x.layers[Ly.k]; }); o.total = x.layers.total; return o; };
     var compare = baseX.rows.map(function(x){ return x.layers.total; });
     var baseLast = baseX.rows[baseX.rows.length - 1], baseDep = baseX.rows.filter(function(x){ return x.unfunded > 0.5; })[0];
-    lead.innerHTML = 'The same projection as above, with a long term care event added. Costs follow the section 12 estimate — ' + esc(S.est.state === 'USA National' ? 'national' : S.est.state) + ' median costs, the average durations for a man and a woman, the care start age' + (S.est.infl ? ' and ' + (S.est.infl * 100).toFixed(1) + '% cost inflation' : '') + ' — at <b>' + Math.round(LTC_SCN_ONE * 100) + '%</b> of the projected cost when one person needs care and <b>' + Math.round(LTC_SCN_BOTH * 100) + '%</b> of the combined cost when both do, net of benefits already in force. '
+    lead.innerHTML = (mode === 'plan' ? 'The section 17 projection' : 'The same projection as above') + ', with a long term care event added. Costs follow the section 12 estimate — ' + esc(S.est.state === 'USA National' ? 'national' : S.est.state) + ' median costs, the average durations for a man and a woman, the care start age' + (S.est.infl ? ' and ' + (S.est.infl * 100).toFixed(1) + '% cost inflation' : '') + ' — at <b>' + Math.round(LTC_SCN_ONE * 100) + '%</b> of the projected cost when one person needs care and <b>' + Math.round(LTC_SCN_BOTH * 100) + '%</b> of the combined cost when both do, net of benefits already in force. '
       + (mode === 'plan' ? (poolTot > 0.5 ? 'The Moat pays first (' + ['client','spouse'].filter(function(w){ return ltcPoolTotal(pool[w]) > 0.5; }).map(function(w){ return esc(ownerLabel(w)) + ' ' + money(ltcPoolTotal(pool[w])); }).join(', ') + ' of benefit, on the section 14 terms); anything above the benefit comes out of the accounts in the section 16 order, with the tax on the draw.' : 'No Moat is funded in the plan as adjusted, so the whole cost comes out of the accounts in the section 16 order, with the tax on the draw.')
                          : 'With no Fortress in place the whole cost comes out of the accounts in the section 16 order, with the tax on the draw.')
-      + ' The dashed line is the projection above, without a care event.';
+      + ' The dashed line is the ' + (mode === 'plan' ? 'section 17' : '') + ' projection' + (mode === 'plan' ? '' : ' above') + ', without a care event.';
     var html = '';
     S.scenarios.forEach(function(sc){
       var id = pfx + sc.key;
@@ -10796,7 +10805,7 @@
     }
     if(d.incomeAdj && typeof d.incomeAdj === 'object') Object.keys(S.INC_ADJ).forEach(function(k){ if(d.incomeAdj[k] != null) S.INC_ADJ[k] = String(d.incomeAdj[k]); });
     if(d.annuityIncome && typeof d.annuityIncome === 'object') Object.keys(d.annuityIncome).forEach(function(k){ var v = d.annuityIncome[k] || {}; S.ANN_INC[k] = {gli:String(v.gli || ''), start:String(v.start || ''), monthly:String(v.monthly || ''), cola:String(v.cola || ''), wd:String(v.wd || '')}; });
-    if(d.ltcBenefits && typeof d.ltcBenefits === 'object') Object.keys(d.ltcBenefits).forEach(function(k){ var v = d.ltcBenefits[k] || {}; S.LTC_BEN[k] = {monthly:String(v.monthly || ''), age:String(v.age || ''), years:String(v.years || ''), infl:String(v.infl || '')}; });
+    if(d.ltcBenefits && typeof d.ltcBenefits === 'object') Object.keys(d.ltcBenefits).forEach(function(k){ var v = d.ltcBenefits[k] || {}; S.LTC_BEN[k] = {monthly:String(v.monthly || ''), age:String(v.age || ''), years:String(v.years || ''), infl:String(v.infl || ''), growth:String(v.growth || '')}; });
     if(d.roofGrowth && typeof d.roofGrowth === 'object') Object.keys(d.roofGrowth).forEach(function(k){ S.ROOF_G[k] = String(d.roofGrowth[k] || ''); });
     if(Array.isArray(d.withdrawalOrder)){
       var seen = d.withdrawalOrder.filter(function(k, i, arr){ return WD_TIERS[k] && arr.indexOf(k) === i; });
@@ -11412,7 +11421,7 @@
     if(k === 'monthly'){ v = fmtN.format(Math.round(num(e.target.value))); }
     else if(k === 'age'){ v = String(Math.max(0, Math.round(num(e.target.value)))); }
     else if(k === 'years'){ v = Math.max(0, num(e.target.value)).toFixed(1); }
-    else if(k === 'infl'){ v = (pctIn(e.target.value) * 100).toFixed(1) + '%'; }
+    else if(k === 'infl' || k === 'growth'){ v = (pctIn(e.target.value) * 100).toFixed(1) + '%'; }
     else return;
     e.target.value = v; LTC_BEN[key] = LTC_BEN[key] || {}; LTC_BEN[key][k] = v;
     render();
@@ -13027,7 +13036,7 @@
     (function(){
       var s = doc.slide(); page++;
       frame(s, '', 'Your Assets Through Age ' + (i.endAge || 100) + ', With the Fortress in Place');
-      dkBody(s, 0.9, 1.95, 18.2, 1.1, 'The Foundation annuit' + (annuitySummary(r).count === 1 ? 'y pays' : 'ies pay') + ' out income and the value falls as they do' + (annuitySummary(r).gli ? ' — with guaranteed lifetime income the payment continues for life' : '') + '; the Moat holds its value; the Walls pay for Wants and are spent down last; the Roof compounds at ' + pc1(G.r) + ' and absorbs the withdrawals. ' + (TXp ? 'With the Roth conversion strategy applied, the' : 'The') + ' plan ends ' + endYear + ' with ' + money(faLast.layers.total) + (faLast.balances.roth > 0.5 && faLast.balances.deferred < 0.5 && faLast.balances.taxable < 0.5 ? ' — all of it in Roth accounts, tax-free to heirs.' : '.'), {sz:16});
+      dkBody(s, 0.9, 1.95, 18.2, 1.1, 'The Foundation annuit' + (annuitySummary(r).count === 1 ? 'y pays' : 'ies pay') + ' out income and the value falls as they do' + (annuitySummary(r).gli ? ' — with guaranteed lifetime income the payment continues for life' : '') + '; the Moat grows at ' + pc1(moatGrowth(r)) + '; the Walls pay for Wants and are spent down last; the Roof compounds at ' + pc1(G.r) + ' and absorbs the withdrawals. ' + (TXp ? 'With the Roth conversion strategy applied, the' : 'The') + ' plan ends ' + endYear + ' with ' + money(faLast.layers.total) + (faLast.balances.roth > 0.5 && faLast.balances.deferred < 0.5 && faLast.balances.taxable < 0.5 ? ' — all of it in Roth accounts, tax-free to heirs.' : '.'), {sz:16});
       dkAppLegend(s, 1.0, 3.15, 12.6, 'assetLegend');
       if(!dkSvg(s, 0.9, 4.15, 12.7, 5.75, 'assetSvg')) dkBody(s, 0.9, 3.9, 12.6, 1, 'The projection chart is not available for this case.', {sz:16, i:true});
       dkTile(s, 14.0, 3.15, 5.1, 1.6, 'At full retirement (' + faRet.year + ')', money(faRet.layers.total), 'Ages ' + ages(faRet), {big:22});
