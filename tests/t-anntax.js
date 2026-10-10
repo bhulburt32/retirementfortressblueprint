@@ -53,6 +53,27 @@ const path = require('path');
   await p.click('#acctSec details.guide-notes summary'); await p.waitForTimeout(200);
   console.log('section 06 notes open:', await p.$eval('#acctSec details.guide-notes',d=>d.open), '|', (await p.$eval('#acctSec .guide-body',e=>e.textContent.replace(/\s+/g,' ').trim())).slice(0,120));
   if(!(await p.$eval('#acctSec details.guide-notes',d=>d.open))) errs.push('the notes should open on a click');
+  // 1e. the Pension Benefits Calculator (section 04): a PSERS T-D case, then added to the pension list; the video card in Reports
+  const penRows0=await p.$$eval('#penBody tr[data-pen]',rs=>rs.length);
+  await p.selectOption('#pbcState','PA-PSERS'); await p.waitForTimeout(200);
+  for(const [id,v] of [['pbcDob','1965-03-15'],['pbcStart','1990-08-20'],['pbcRet','2027-06-30']]){ await p.fill('#'+id,v); await p.$eval('#'+id,e=>e.dispatchEvent(new Event('change',{bubbles:true}))); }
+  await p.selectOption('#pbcClass','TD'); await p.waitForTimeout(100); await p.fill('#pbcAfc','80000'); await p.fill('#pbcSpAge','60'); await p.selectOption('#pbcOpt','j50');
+  console.log('calculator derived: age', await p.$eval('#pbcRetAge',e=>e.value), '| yos', await p.$eval('#pbcYos',e=>e.value), '| suggestion:', await p.$eval('#pbcSuggest',e=>e.textContent));
+  await p.click('#pbcCalc'); await p.waitForTimeout(300);
+  const pbcOut=await p.$eval('#pbcOut',e=>e.textContent.replace(/\s+/g,' ').trim()); console.log('calculator result:', pbcOut.slice(0,260));
+  const monthly=await p.$eval('#pbcOut .pbc-metric dd',e=>+e.textContent.replace(/[^0-9.]/g,'')), maxMonthly=await p.$$eval('#pbcOut .pbc-metric dd',ds=>+ds[2].textContent.replace(/[^0-9.]/g,''));
+  console.log('monthly', monthly, '| single-life max', maxMonthly, '| disclaimer present:', await p.$eval('#pbcResults .pbc-disclaimer',e=>/IMPORTANT DISCLAIMER/.test(e.textContent)));
+  if(Math.abs(maxMonthly-6150)>1) errs.push('PSERS T-D: 36.9 years x 2.5% x 80,000 should give 6,150 a month single life ('+maxMonthly+')');
+  if(!(monthly<maxMonthly)) errs.push('a joint and 50% option should reduce the monthly benefit');
+  if(!/Normal retirement eligible/.test(pbcOut)) errs.push('a 62-year-old with 36.9 years should be eligible for normal retirement');
+  await p.click('#pbcUse'); await p.waitForTimeout(600);
+  const penRows=await p.$$eval('#penBody tr[data-pen]',rs=>rs.map(r=>({name:r.querySelector('[data-pk=name]').value, amt:r.querySelector('[data-pk=amt]').value, start:r.querySelector('[data-pk=start]').value, surv:r.querySelector('[data-pk=surv]').value})));
+  console.log('pension rows:', penRows0, '->', penRows.length, JSON.stringify(penRows[penRows.length-1]), '|', await txt('#pbcMsg'));
+  const added=penRows[penRows.length-1]; if(penRows.length!==penRows0+1 || !added || Math.abs(+added.amt.replace(/,/g,'')-monthly)>1 || added.start!=='2027-06' || added.surv!=='50') errs.push('Add to pension income should add the line with the monthly benefit, the retirement month and the survivor share');
+  const lastPen=await p.$$eval('#penBody tr[data-pen]',rs=>rs[rs.length-1].dataset.pen); await p.click(`#penBody tr[data-pen="${lastPen}"] [data-pdel]`); await p.waitForTimeout(400);
+  if((await p.$$eval('#penBody tr[data-pen]',rs=>rs.length))!==penRows0) errs.push('removing the added pension should restore the list');
+  console.log('video link:', await p.$eval('#roadVideo',a=>a.href+' '+a.target), '|', await p.$eval('.video-card b',e=>e.textContent));
+  if(!(await p.$eval('#roadVideo',a=>/claude\.ai\/artifact\/4betJJT5zWc21C6KhEAQN5/.test(a.href) && a.target==='_blank'))) errs.push('the Reports section should link to The Road to Retirement Fortress video');
   console.log('hero image:', await p.$eval('#heroImg',e=>e.naturalWidth+'x'+e.naturalHeight)); if(!(await p.$eval('#heroImg',e=>e.naturalWidth>0))) errs.push('the header graphic did not load');
   // 2. the Walls yield federally tax-free: no change while the Walls hold only IRA money, a lower federal tax once a non-qualified account is in the Walls
   await p.$eval('#adjYWtf',e=>{ e.checked=true; e.dispatchEvent(new Event('change',{bubbles:true})); }); await p.waitForTimeout(700);

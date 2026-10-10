@@ -327,6 +327,37 @@
   .tgl-top .hint{align-self:center}
   .inc-title+.tgl-body>.tbl-scroll:first-child{margin-top:0}
   .btn-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  /* the Pension Benefits Calculator (section 04) */
+  .pbc-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin:12px 0}
+  .pbc-title{font-size:13px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+  .pbc-dot{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex:none}
+  .pbc-grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px 18px;margin-bottom:14px}
+  .pbc-grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px 18px}
+  .pbc-grid3 .full{grid-column:1/-1}
+  .pbc-note{background:var(--surface-2);border-left:3px solid var(--accent);padding:10px 13px;border-radius:0 6px 6px 0;font-size:13.5px;margin:0 0 14px;line-height:1.5}
+  .pbc-note.warn{border-left-color:var(--st-alert)} .pbc-note.caution{border-left-color:var(--st-caution)}
+  .pbc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:16px}
+  .pbc-head b{font-size:21px;color:var(--ink);font-family:Bitter,Georgia,serif} .pbc-head small{display:block;font-size:13.5px;color:var(--muted);margin-top:3px}
+  .pbc-tag{font-size:12px;font-weight:600;padding:5px 12px;background:var(--accent);color:#fff;border-radius:20px;white-space:nowrap}
+  .pbc-elig{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:7px;font-size:13.5px;font-weight:600;margin-bottom:14px}
+  .pbc-elig.ok{background:var(--st-ok-bg);color:var(--st-ok)} .pbc-elig.warn{background:var(--st-caution-bg);color:var(--st-caution)} .pbc-elig.no{background:var(--st-alert-bg);color:var(--st-alert)}
+  .pbc-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:0 0 16px}
+  .pbc-metric{background:var(--surface-2);border-radius:8px;padding:14px 12px;text-align:center}
+  .pbc-metric dt{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+  .pbc-metric dd{margin:0;font-size:21px;font-weight:700;color:var(--ink);font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  .pbc-metric small{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+  .pbc-detail{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:0 24px;margin-bottom:14px}
+  .pbc-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .pbc-row span:first-child{color:var(--muted)} .pbc-row span:last-child{font-weight:600;color:var(--ink);text-align:right}
+  .pbc-formula{background:var(--surface-2);border-radius:7px;padding:11px 14px;font-size:13.5px;color:var(--ink);margin:0 0 14px;font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .pbc-foot{display:flex;justify-content:space-between;gap:12px;font-size:11.5px;color:var(--muted);padding-top:12px;border-top:1px solid var(--line)}
+  .pbc-disclaimer{font-size:11.5px;color:var(--muted);margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line);line-height:1.55}
+  /* the video card in Reports */
+  .video-card{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:14px 0 0;padding:14px 16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface-2)}
+  .video-icon{width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:18px;flex:none;padding-left:3px}
+  .video-text{flex:1 1 320px;display:flex;flex-direction:column;gap:3px} .video-text b{font-size:16px;color:var(--ink)} .video-text span{font-size:13.5px;color:var(--muted)}
+  a.btn-link{display:inline-block;font-weight:600;font-size:15px;padding:8px 13px;border-radius:4px;background:var(--btn);color:#fff;text-decoration:none;white-space:nowrap}
+  a.btn-link:hover{background:var(--btn-dk);color:#fff}
 
   /* ---------- tables ---------- */
   .tbl-scroll{overflow-x:auto}
@@ -1202,6 +1233,24 @@
         this income, so a rental covering part of the discretionary budget shrinks the Walls target
         accordingly (the 24-month Needs floor still applies).</p>
 
+      <p>The <b>Pension Benefits Calculator</b> beneath the pension list estimates a public pension
+        from the plan formula &mdash; the systems in Alto's Pension Reference Guide: PSERS and SERS,
+        VRS, SRPS, TSERS, SCRS, TPAF, MTRS, MPSERS, TRS (Illinois and Texas), the three Ohio systems,
+        PERSI, FERS and CSRS, and Wespath. Pick whose pension it is and the <span class="ui">State /
+        pension system</span>, enter the date of birth, the employment start and the expected
+        retirement date (the age at retirement and the years of service are calculated; type over
+        the years if the record says otherwise), the beneficiary's age, then the <span class="ui">Membership
+        class / tier</span> (the hire date suggests one), the average final compensation over the
+        years the formula uses, any split-period service the class asks for, and the
+        <span class="ui">Benefit option</span>. <span class="ui">Calculate estimated benefit</span> shows
+        the monthly and annual benefit, the single-life maximum, the income replacement, the
+        eligibility rule met, the formula, the system's COLA note and a warning where the system
+        does not pay into Social Security (WEP and GPO). <span class="ui">Add to pension income</span>
+        then puts a line in the pension list &mdash; the monthly benefit from the retirement month,
+        the option's survivor percentage, COLA 0% until you set one &mdash; and the projections follow.
+        The survivor factors are general estimates and every figure carries the reference tool's
+        disclaimer: verify with the plan administrator before recommending an option.</p>
+
       <p>The section closes with <b>Your income today and in retirement</b>, the same summary the
         executive summary report carries: four tiles &mdash; household income today, guaranteed
         income in retirement, the share of Needs it covers and the <b>Annual Needs income gap</b>
@@ -1328,6 +1377,54 @@
       </div>
       <div class="btn-row" style="margin-top:10px">
         <button type="button" id="penAdd">Add a pension</button>
+      </div>
+      <div class="inc-title gap">Pension Benefits Calculator<small>Public pension systems &middot; an estimate from the plan formula, added to the pensions above with one click</small></div>
+      <div class="pbc" id="pbc">
+        <div class="pbc-card">
+          <div class="pbc-title"><span class="pbc-dot">1</span> Client &amp; employment information</div>
+          <div class="pbc-grid2">
+            <label class="f"><span>Whose pension</span><select id="pbcWho"><option value="client">Client</option><option value="spouse">Spouse</option></select></label>
+            <label class="f"><span>State / pension system</span><select id="pbcState">
+              <option value="">— Select system —</option>
+              <optgroup label="Pennsylvania"><option value="PA-PSERS">PA — PSERS (Public School)</option><option value="PA-SERS">PA — SERS (State Employees)</option></optgroup>
+              <optgroup label="Mid-Atlantic / Southeast"><option value="VA-VRS">VA — VRS</option><option value="MD-SRPS">MD — SRPS</option><option value="NC-TSERS">NC — TSERS</option><option value="SC-SCRS">SC — SCRS/PEBA</option></optgroup>
+              <optgroup label="Northeast"><option value="NJ-TPAF">NJ — TPAF</option><option value="MA-MTRS">MA — MTRS</option></optgroup>
+              <optgroup label="Midwest / South"><option value="MI-MPSERS">MI — MPSERS</option><option value="IL-TRS">IL — TRS</option><option value="OH-STRS">OH — STRS (Teachers)</option><option value="OH-OPERS">OH — OPERS (Public Employees)</option><option value="OH-SERS">OH — SERS (School Employees)</option><option value="TX-TRS">TX — TRS</option></optgroup>
+              <optgroup label="West"><option value="ID-PERSI">ID — PERSI</option></optgroup>
+              <optgroup label="Federal"><option value="FED-FERS">Federal — FERS</option><option value="FED-CSRS">Federal — CSRS</option></optgroup>
+              <optgroup label="Other"><option value="VA-UMC">VA — United Methodist (Wespath)</option></optgroup>
+            </select></label>
+          </div>
+          <div class="pbc-grid3">
+            <label class="f"><span>Date of birth</span><input type="date" id="pbcDob"></label>
+            <label class="f"><span>Employment start date</span><input type="date" id="pbcStart"></label>
+            <label class="f"><span>Expected retirement date</span><input type="date" id="pbcRet"></label>
+            <label class="f"><span>Age at retirement<small>Calculated from the dates</small></span><input type="text" id="pbcRetAge" class="linked" readonly placeholder="0.0"></label>
+            <label class="f"><span>Years of service<small id="pbcYosHint">Calculated from the dates; type to override</small></span><input type="text" inputmode="decimal" id="pbcYos" placeholder="0.0" autocomplete="off"></label>
+            <label class="f"><span>Spouse / beneficiary age at retirement</span><input type="text" inputmode="numeric" id="pbcSpAge" placeholder="e.g. 62" autocomplete="off"></label>
+          </div>
+        </div>
+        <div class="pbc-card" id="pbcPlanCard" hidden>
+          <div class="pbc-title"><span class="pbc-dot">2</span> Plan details</div>
+          <div id="pbcPlanFields"></div>
+        </div>
+        <div class="pbc-card" id="pbcClaimCard" hidden>
+          <div class="pbc-title"><span class="pbc-dot">3</span> Claiming option</div>
+          <div class="pbc-grid2">
+            <label class="f"><span>Benefit option</span><select id="pbcOpt"><option value="max">Maximum — Single Life Annuity</option><option value="j100">Joint &amp; 100% Survivor</option><option value="j75">Joint &amp; 75% Survivor</option><option value="j50">Joint &amp; 50% Survivor</option></select></label>
+            <label class="f"><span>Notes</span><input type="text" id="pbcNotes" placeholder="Optional advisor notes" autocomplete="off"></label>
+          </div>
+          <p class="hint" style="margin-top:10px">Survivor benefit reductions are actuarially determined by each system. The factors used here are general estimates — confirm with the plan administrator before recommending an option.</p>
+        </div>
+        <div class="btn-row" id="pbcActions" hidden>
+          <button type="button" class="primary" id="pbcCalc">Calculate estimated benefit</button>
+          <button type="button" id="pbcUse" hidden>Add to pension income</button>
+          <span class="hint" id="pbcMsg"></span>
+        </div>
+        <div class="pbc-card" id="pbcResults" hidden>
+          <div id="pbcOut"></div>
+          <p class="pbc-disclaimer"><b>IMPORTANT DISCLAIMER — FOR INFORMATIONAL PURPOSES ONLY:</b> This report is an estimate only, produced using benefit formulas documented in Alto Financial Group's Pension Reference Guide. It is intended solely for general informational and advisor planning purposes and <b>should not be relied upon when making any financial, retirement, legal, or tax decisions.</b> This estimate is not a guarantee, promise, or projection of actual benefits. Final benefit amounts are determined solely by the applicable pension system upon retirement and may differ materially from this estimate. Years of service, average salary figures, eligibility determinations, survivor benefit reduction factors, and COLA provisions must be verified directly with the relevant plan administrator before any decisions are made. Alto Financial Group is a registered investment advisory firm affiliated with AE Wealth Management. This tool does not constitute investment advice, legal advice, tax advice, or a solicitation to buy or sell any security or insurance product. Past benefit formulas are subject to legislative change. Always consult your pension system, a qualified financial advisor, and/or legal counsel before making retirement decisions.</p>
+        </div>
       </div>
       <div class="inc-title gap">Other guaranteed income<small>Annuities, in payment or scheduled</small></div>
       <div class="tbl-scroll">
@@ -3126,6 +3223,10 @@
         </div>
       </div>
 
+      <p><b>The Road to Retirement Fortress</b> is a short video of the Fortress story for the client
+        meeting or as a follow-up link: <span class="ui">Watch the video</span> opens it in a new tab
+        on claude.ai, where a signed-in Alto account is needed.</p>
+
       <div class="note stop">
         <h3>Before the executive summary report leaves the office</h3>
         <p>Its disclosure pages are a draft. Have compliance approve that language — and the AEWM
@@ -3148,6 +3249,11 @@
         <button type="button" class="primary" id="makeSS">Social Security analysis</button>
         <button type="button" class="primary" id="makeEdu">Educational slides</button>
         <span class="hint" id="pdfMsg">Builds from the figures currently on this page.</span>
+      </div>
+      <div class="video-card">
+        <div class="video-icon">&#9654;</div>
+        <div class="video-text"><b>The Road to Retirement Fortress</b><span>The Fortress story as a short video, for the client meeting or as a follow-up link. It opens in a new tab on claude.ai and needs a signed-in Alto account.</span></div>
+        <a class="btn-link" id="roadVideo" href="https://claude.ai/artifact/4betJJT5zWc21C6KhEAQN5" target="_blank" rel="noopener">Watch the video</a>
       </div>
       <p class="hint" style="margin:12px 0 0;padding-top:11px;border-top:1px solid var(--line)">
         The <b>internal worksheet</b> and the <b>Nitrogen upload</b> are marked
@@ -3628,8 +3734,340 @@
         }).join('')
       : '<tr><td colspan="9"><div class="empty-state">No annuity income \u2014 add a line for each contract already paying out, or scheduled to.</div></td></tr>';
   }
+  /* ---- Pension Benefits Calculator (section 04): the benefit formulas of the public pension systems in
+     Alto's Pension Reference Guide — years of service × multiplier × average final compensation, with each
+     system's classes, tiers, caps, eligibility rules and COLA notes — and a button that adds the estimate
+     to the pensions above. The disclaimer under the results is the reference tool's own wording. */
+  var PBC_SYSTEMS = {
+    'PA-PSERS': {name:'Pennsylvania (PSERS — Public School)', short:'PSERS',
+      classes:[
+        {id:'TC', label:'Class T-C (2.0% × 3yr AFC)', m:0.020, afc:3, hireNote:'Before Jul 1, 2011'},
+        {id:'TD', label:'Class T-D (2.5% × 3yr AFC)', m:0.025, afc:3, hireNote:'Before Jul 1, 2011'},
+        {id:'TE', label:'Class T-E (2.0% × 3yr AFC)', m:0.020, afc:3, hireNote:'Jul 1, 2011 – Jun 30, 2019'},
+        {id:'TF', label:'Class T-F (2.5% × 3yr AFC)', m:0.025, afc:3, hireNote:'Jul 1, 2011 – Jun 30, 2019'},
+        {id:'TG', label:'Class T-G (1.25% × 5yr AFC)', m:0.0125, afc:5, hireNote:'Jul 1, 2019+'},
+        {id:'TH', label:'Class T-H (1.0% × 5yr AFC)', m:0.010, afc:5, hireNote:'Jul 1, 2019+'},
+        {id:'DC', label:'DC Plan (Defined Contribution — no DB benefit)', m:0, afc:0, isDC:true, hireNote:'Jul 1, 2019+'}],
+      autoClass:function(hire){ var d = new Date(hire); if(d < new Date('2011-07-01')) return ['TC','TD']; if(d < new Date('2019-07-01')) return ['TE','TF']; return ['TG','TH','DC']; },
+      cola:'Not guaranteed (last COLA: 2002)',
+      calc:function(yos, afc, cls){ return cls.isDC ? null : yos * cls.m * afc; }},
+    'PA-SERS': {name:'Pennsylvania (SERS — State Employees)', short:'SERS',
+      note:'SERS contribution rates differ from PSERS. Use the SERS-DB Member Handbook for exact rates.',
+      classes:[
+        {id:'A',  label:'Class A → T-C equiv. (2.0% × 3yr AFC)', m:0.020, afc:3},
+        {id:'AA', label:'Class AA → T-D equiv. (2.5% × 3yr AFC)', m:0.025, afc:3},
+        {id:'A3', label:'Class A-3 → T-E equiv. (2.0% × 3yr AFC)', m:0.020, afc:3},
+        {id:'A4', label:'Class A-4 → T-F equiv. (2.5% × 3yr AFC)', m:0.025, afc:3},
+        {id:'A5', label:'Class A5 → T-G equiv. (1.25% × 5yr AFC)', m:0.0125, afc:5},
+        {id:'A6', label:'Class A6 → T-H equiv. (1.0% × 5yr AFC)', m:0.010, afc:5}],
+      autoClass:function(hire){ var d = new Date(hire); if(d < new Date('2011-07-01')) return ['A','AA']; if(d < new Date('2019-07-01')) return ['A3','A4']; return ['A5','A6']; },
+      cola:'Not guaranteed (last COLA: 2002)',
+      calc:function(yos, afc, cls){ return yos * cls.m * afc; }},
+    'VA-VRS': {name:'Virginia (VRS)', short:'VRS',
+      classes:[
+        {id:'P1', label:'Plan 1 (1.7% × 3yr AFC)', m:0.017, afc:3, hireNote:'Before Jul 1, 2010 & vested by Jan 1, 2013'},
+        {id:'P2', label:'Plan 2 (1.65% × 5yr AFC)', m:0.0165, afc:5, hireNote:'Before Jan 1, 2014 (not vested by 1/1/2013), or Jan 1, 2014+ in hazardous duty'},
+        {id:'HY', label:'Hybrid — DB component (1.0% × 5yr AFC)', m:0.010, afc:5, hireNote:'Jan 1, 2014+ non-hazardous duty', note:'DB portion only. Additional DC component: 1% employee + 1% employer mandatory (plus voluntary up to 4% matched).'}],
+      autoClass:function(hire){ var d = new Date(hire); if(d < new Date('2010-07-01')) return ['P1']; if(d < new Date('2014-01-01')) return ['P2']; return ['HY']; },
+      cola:'Guaranteed if CPI-U > 0%. Plan 1: 5% cap. Plan 2/Hybrid: 3% cap. (July 2023: Plan 1 received 5%, Plan 2/Hybrid 3%.)',
+      calc:function(yos, afc, cls){ return yos * cls.m * afc; }},
+    'NC-TSERS': {name:'North Carolina (TSERS)', short:'TSERS',
+      classes:[{id:'STD', label:'Standard (1.82% × 4yr AFC)', m:0.0182, afc:4}],
+      autoClass:function(){ return ['STD']; },
+      cola:'Not guaranteed (last COLA: 2017 at 1%)',
+      calc:function(yos, afc, cls){ return yos * cls.m * afc; }},
+    'MD-SRPS': {name:'Maryland (SRPS/SRA)', short:'SRPS',
+      classes:[
+        {id:'PRE', label:'Pre-2011 — Alternate Contributory (1.2%/1.8181% split)', afc:3, hireNote:'Hired before Jul 1, 2011', special:'md_pre'},
+        {id:'POST', label:'Reformed — Contributory (1.5% × 5yr AFC)', m:0.015, afc:5, hireNote:'Hired Jul 1, 2011 or later'}],
+      autoClass:function(hire){ return new Date(hire) < new Date('2011-07-01') ? ['PRE'] : ['POST']; },
+      cola:'Teachers: 3% cap (pre-Jul 2011 service) / 2% cap (post-Jul 2011 service). State non-teacher: 2.5% cap.',
+      calc:function(yos, afc, cls, inputs){
+        if(cls.id === 'POST') return yos * 0.015 * afc;
+        var yosPre98 = Math.min(yos, inputs.yosPre98 || 0), yosPost98 = Math.max(0, yos - yosPre98);   // split at Jun 30, 1998
+        return afc * (0.012 * yosPre98 + 0.018181 * yosPost98);
+      }},
+    'TX-TRS': {name:'Texas (TRS)', short:'TRS', noSS:true,
+      classes:[
+        {id:'T1', label:'Tier 1 (2.3% × avg 3 highest yrs)', m:0.023, afc:3, hireNote:'See TRS tier flowchart'},
+        {id:'T2', label:'Tier 2 (2.3% × avg 5 highest yrs)', m:0.023, afc:5},
+        {id:'T3', label:'Tier 3 (2.3% × avg 5 highest yrs)', m:0.023, afc:5},
+        {id:'T4', label:'Tier 4 (2.3% × avg 3 highest yrs)', m:0.023, afc:3},
+        {id:'T5', label:'Tier 5 (2.3% × avg 5 highest yrs)', m:0.023, afc:5},
+        {id:'T6', label:'Tier 6 (2.3% × avg 3 highest yrs)', m:0.023, afc:3}],
+      autoClass:function(){ return ['T1']; },
+      cola:'Not guaranteed (last COLA: 2013 at 3%, only for members retired before Aug 2004)',
+      calc:function(yos, afc, cls){ return yos * cls.m * afc; }},
+    'NJ-TPAF': {name:'New Jersey (TPAF)', short:'TPAF',
+      classes:[
+        {id:'T1', label:'Tier 1 (YOS÷55 × 3yr FAS)', div:55, afc:3, hireNote:'Before Jul 1, 2007'},
+        {id:'T2', label:'Tier 2 (YOS÷55 × 3yr FAS)', div:55, afc:3, hireNote:'Jul 1, 2007 – Nov 1, 2008'},
+        {id:'T3', label:'Tier 3 (YOS÷55 × 3yr FAS)', div:55, afc:3, hireNote:'Nov 2, 2008 – May 21, 2010'},
+        {id:'T4', label:'Tier 4 (YOS÷60 × 5yr FAS)', div:60, afc:5, hireNote:'May 22, 2010 – Jun 27, 2011'},
+        {id:'T5', label:'Tier 5 (YOS÷60 × 5yr FAS)', div:60, afc:5, hireNote:'Jun 28, 2011+'}],
+      autoClass:function(hire){ var d = new Date(hire); if(d < new Date('2007-07-01')) return ['T1']; if(d < new Date('2008-11-02')) return ['T2']; if(d < new Date('2010-05-22')) return ['T3']; if(d < new Date('2011-06-28')) return ['T4']; return ['T5']; },
+      cola:'Suspended since 2011',
+      calc:function(yos, afc, cls){ return (yos / cls.div) * afc; }},
+    'MA-MTRS': {name:'Massachusetts (MTRS)', short:'MTRS', noSS:true,
+      classes:[
+        {id:'T1', label:'Tier 1 (enrolled before Apr 2, 2012 — 3yr FAS)', afc:3, tier:1, hireNote:'Before Apr 2, 2012'},
+        {id:'T2', label:'Tier 2 (enrolled Apr 2, 2012+ — 5yr FAS)', afc:5, tier:2, hireNote:'Apr 2, 2012+'}],
+      autoClass:function(hire){ return new Date(hire) < new Date('2012-04-02') ? ['T1'] : ['T2']; },
+      cola:'Not guaranteed (last COLA: 2021, 3% of first $13,000 of annual benefit)',
+      calc:function(yos, afc, cls, inputs){
+        var age = inputs.retAge, factor;
+        if(cls.tier === 1){ if(age < 55) return null; factor = Math.min(0.015 + Math.max(0, Math.min(age - 55, 10)) * 0.01, 0.025); }
+        else { if(age < 60) return null; factor = Math.min(0.0145 + Math.max(0, Math.min(age - 60, 7)) * 0.015, 0.025); }
+        return Math.min(yos * factor * afc, 0.80 * afc);
+      }},
+    'MI-MPSERS': {name:'Michigan (MPSERS)', short:'MPSERS',
+      classes:[
+        {id:'MIP', label:'MIP (Jan 1, 1990 – Jul 1, 2010)', afc:3, type:'mip', hireNote:'1990–2010 or elected'},
+        {id:'BASIC', label:'Basic (before Jan 1, 1990)', afc:5, type:'basic', hireNote:'Before 1990'},
+        {id:'PP', label:'Pension Plus (Jul 1, 2010 – Jan 31, 2018)', m:0.015, afc:3, hireNote:'2010–2018', note:'DB component only; also includes hybrid DC.'},
+        {id:'PP2', label:'Pension Plus 2 (Feb 1, 2018+)', m:0.015, afc:3, hireNote:'Feb 2018+', note:'DB component only; also includes hybrid DC.'},
+        {id:'MIDC', label:'DC Plan (no DB benefit)', isDC:true}],
+      autoClass:function(hire){ var d = new Date(hire); if(d < new Date('1990-01-01')) return ['BASIC']; if(d < new Date('2010-07-01')) return ['MIP']; if(d < new Date('2018-02-01')) return ['PP']; return ['PP2']; },
+      cola:'MIP: Guaranteed 3% simple (not compound) each October. Basic: Not guaranteed.',
+      calc:function(yos, afc, cls, inputs){
+        if(cls.isDC) return null;
+        if(cls.type === 'mip' || cls.type === 'basic'){ var yosPre = Math.min(yos, inputs.yosPre2013 || yos), yosPost = Math.max(0, yos - yosPre); return afc * (0.015 * yosPre + 0.0125 * yosPost); }   // split at Feb 1, 2013
+        return yos * cls.m * afc;
+      }},
+    'SC-SCRS': {name:'South Carolina (SCRS/PEBA)', short:'SCRS',
+      classes:[
+        {id:'C2', label:'Class Two (1.82% × 3yr FAS)', m:0.0182, afc:3, hireNote:'Enrolled before Jul 1, 2012'},
+        {id:'C3', label:'Class Three (1.82% × 5yr FAS)', m:0.0182, afc:5, hireNote:'Enrolled Jul 1, 2012+'}],
+      autoClass:function(hire){ return new Date(hire) < new Date('2012-07-01') ? ['C2'] : ['C3']; },
+      cola:'Not guaranteed',
+      calc:function(yos, afc, cls){ return yos * cls.m * afc; }},
+    'ID-PERSI': {name:'Idaho (PERSI)', short:'PERSI',
+      classes:[
+        {id:'GEN', label:'General Member (2.0% × 42-month AFC)', m:0.020, afc:3.5, hireNote:'General employees'},
+        {id:'PF', label:'Police / Firefighter (2.3% × 42-month AFC)', m:0.023, afc:3.5}],
+      autoClass:function(){ return ['GEN']; },
+      cola:'Considered annually; tied to CPI; may not exceed 6%',
+      calc:function(yos, afc, cls){ return yos * cls.m * afc; }},
+    'IL-TRS': {name:'Illinois (TRS)', short:'TRS', noSS:true,
+      classes:[
+        {id:'T1', label:'Tier 1 (2.2% × 4yr AFC, max 75%)', tier:1, afc:4, hireNote:'Hired before Jan 1, 2011'},
+        {id:'T2', label:'Tier 2 (2.2% × 8yr AFC, max 75%)', tier:2, afc:8, hireNote:'Hired Jan 1, 2011+'}],
+      autoClass:function(hire){ return new Date(hire) < new Date('2011-01-01') ? ['T1'] : ['T2']; },
+      cola:'Tier 1: 3% compounded. Tier 2: lesser of 3% or ½ CPI (non-compounding).',
+      calc:function(yos, afc){ return Math.min(yos * 0.022 * afc, 0.75 * afc); }},
+    'OH-STRS': {name:'Ohio (STRS — Teachers)', short:'STRS',
+      classes:[
+        {id:'DB', label:'Defined Benefit (2.2% × 5yr FAS)', m:0.022, afc:5},
+        {id:'COMB', label:'Combined Plan — DB portion (1.0% × 5yr FAS)', m:0.010, afc:5, note:'12% of employee contributions go to DC; 2% fund this DB formula.'},
+        {id:'OHDC', label:'Defined Contribution (no DB benefit)', isDC:true}],
+      autoClass:function(){ return ['DB']; },
+      cola:'Eligible beginning 5th anniversary of retirement. May be declared yearly (last: 1%).',
+      calc:function(yos, afc, cls){ return cls.isDC ? null : yos * cls.m * afc; }},
+    'OH-OPERS': {name:'Ohio (OPERS — Public Employees)', short:'OPERS',
+      classes:[
+        {id:'GA', label:'Group A — Traditional (2.2%/3yr, 2.5% above 30yr)', group:'A', afc:3},
+        {id:'GB', label:'Group B — Traditional (2.2%/3yr, 2.5% above 30yr)', group:'B', afc:3},
+        {id:'GC', label:'Group C — Traditional (2.2%/5yr, 2.5% above 35yr)', group:'C', afc:5},
+        {id:'OHDC', label:'Member Directed (DC Plan)', isDC:true}],
+      autoClass:function(){ return ['GA']; },
+      cola:'3% cap (not compounding)',
+      calc:function(yos, afc, cls){
+        if(cls.isDC) return null;
+        if(cls.group === 'C') return Math.min(yos, 35) * 0.022 * afc + Math.max(0, yos - 35) * 0.025 * afc;
+        return Math.min(yos, 30) * 0.022 * afc + Math.max(0, yos - 30) * 0.025 * afc;
+      }},
+    'OH-SERS': {name:'Ohio (SERS — Non-Teaching School Employees)', short:'SERS',
+      classes:[{id:'STD', label:'Standard (2.2% × 3yr FAS; 2.5% for years above 30)', afc:3}],
+      autoClass:function(){ return ['STD']; },
+      cola:'2.5% cap. Suspended in 2018, 2019, 2020.',
+      calc:function(yos, afc){ return Math.min(yos, 30) * 0.022 * afc + Math.max(0, yos - 30) * 0.025 * afc; }},
+    'FED-FERS': {name:'Federal (FERS)', short:'FERS',
+      classes:[
+        {id:'REG', label:'Regular Employee (1.0% or 1.1% if age 62+ with 20+ YOS)', type:'reg'},
+        {id:'SPEC', label:'Special Category — Law Enforcement / Firefighter / ATC', type:'spec', note:'1.7% × first 20 YOS + 1.0% × additional years.'}],
+      autoClass:function(){ return ['REG']; },
+      cola:'Guaranteed; CPI-W based. Reduced by 1% if retiring before age 62.',
+      calc:function(yos, afc, cls, inputs){
+        if(cls.type === 'spec') return Math.min(yos, 20) * 0.017 * afc + Math.max(0, yos - 20) * 0.010 * afc;
+        var mult = (inputs.retAge >= 62 && yos >= 20) ? 0.011 : 0.010;
+        return yos * mult * afc;
+      }},
+    'FED-CSRS': {name:'Federal (CSRS)', short:'CSRS',
+      classes:[{id:'STD', label:'Standard CSRS', type:'std'}],
+      autoClass:function(){ return ['STD']; },
+      cola:'Guaranteed; full CPI-W adjustment.',
+      calc:function(yos, afc){ var y1 = Math.min(yos, 5), y2 = Math.min(Math.max(0, yos - 5), 5), y3 = Math.max(0, yos - 10); return Math.min((0.015 * y1 + 0.0175 * y2 + 0.020 * y3) * afc, 0.80 * afc); }},
+    'VA-UMC': {name:'Virginia United Methodist (Wespath)', short:'Wespath',
+      classes:[
+        {id:'MPP', label:'MPP — Ministerial Pension Plan (1982–2006)', type:'mpp', note:'35% lump sum + 65% life annuity based on account balance at retirement.'},
+        {id:'CRSP_DB', label:'CRSP — DB Component (2007–2025)', type:'crsp'},
+        {id:'COMPASS', label:'Compass DC Plan (2026+)', isDC:true, type:'compass', note:'$150/mo flat + 3% salary + up to 4% employer match.'}],
+      autoClass:function(hire){ var d = new Date(hire); if(d < new Date('2007-01-01')) return ['MPP']; if(d < new Date('2026-01-01')) return ['CRSP_DB']; return ['COMPASS']; },
+      cola:'CRSP DB: 2% default. MPP: 2%.',
+      calc:function(yos, afc, cls, inputs){
+        if(cls.isDC) return null;
+        if(cls.type === 'crsp'){ var dac = inputs.dac || 80003, yPre = Math.min(yos, inputs.yosPre2014 || 0), yPost = Math.max(0, yos - yPre); return dac * (0.0125 * yPre + 0.010 * yPost); }   // 2007–2013 at 1.25% of DAC, 2014+ at 1.0%
+        return null;   // MPP is account-based
+      }}
+  };
+  /* eligibility, the key rules only: [condition, message] in order, then the fallback */
+  function pbcEligibility(st, cls, yos, age){
+    if(cls.isDC) return {status:'warn', msg:'Defined Contribution plan.'};
+    var R = {
+      'PA-PSERS': [[age >= 65 || yos >= 35, 'Normal retirement eligible'], [age >= 55 && yos >= 25, 'Reduced benefit eligible (age 55, 25 YOS)'], [age >= 55 && yos >= 20, 'Early retirement — contact PSERS for reduction'], 'Eligibility thresholds not met. Verify with PSERS.'],
+      'PA-SERS': [[age >= 65 || yos >= 35, 'Normal retirement eligible'], 'Verify eligibility with SERS handbook.'],
+      'VA-VRS': [[age >= 65 && yos >= 5, 'Normal retirement — unreduced'], [age >= 55 && yos >= 30, 'Plan 1 unreduced (age 55, 30 YOS)'], [age >= 60 && yos >= 5, 'Reduced retirement eligible'], 'Age/service combination does not meet standard thresholds.'],
+      'NC-TSERS': [[age >= 65 && yos >= 5, 'Unreduced retirement eligible'], [age >= 60 && yos >= 25, 'Unreduced retirement eligible (60 with 25 YOS)'], [yos >= 30, 'Unreduced retirement (30 YOS, any age)'], [age >= 50 && yos >= 20, 'Early retirement — reduced benefit'], 'Eligibility thresholds not met.'],
+      'MD-SRPS': [[(age >= 65 && yos >= 2) || yos >= 30, 'Normal retirement eligible'], [age >= 55 && yos >= 15, 'Early retirement eligible (6% reduction per year under 62)'], 'Verify eligibility with SRPS.'],
+      'TX-TRS': [[age >= 65 && yos >= 5, 'Normal age retirement (Rule of 80 or age 65+5)'], [age + yos >= 80 && yos >= 5, 'Rule of 80 — normal retirement eligible'], [age >= 55 && yos >= 5, 'Early age service retirement (reduced)'], 'Verify eligibility with TRS tier flowchart.'],
+      'NJ-TPAF': [[age >= 65 && yos >= 10, 'Normal retirement eligible (Tier 5)'], [age >= 60 && yos >= 10, 'Normal retirement eligible (Tiers 1-4)'], [yos >= 25, 'Early retirement eligible'], 'Verify eligibility with TPAF.'],
+      'MA-MTRS': [[age >= 55 && yos >= 10, 'First eligible (age 55 with 10 YOS — Tier 1)'], [age >= 60 && yos >= 10, 'First eligible (age 60 with 10 YOS — Tier 2)'], [yos >= 20, 'First eligible (20 YOS at any age — Tier 1 only)'], 'Minimum eligibility not met.'],
+      'MI-MPSERS': [[age >= 60 && yos >= 10, 'Eligible (age 60 with 10 YOS — all MIP/Basic)'], [age >= 46 && yos >= 30, 'Eligible (age 46 with 30 YOS — MIP)'], [age >= 55 && yos >= 30, 'Eligible (age 55 with 30 YOS — Basic)'], 'Verify eligibility with MPSERS.'],
+      'SC-SCRS': [[age >= 65 && yos >= 5, 'Normal retirement eligible'], [yos >= 28, 'Normal retirement (28 YOS, Class Two)'], [yos >= 90 - age && yos >= 8, 'Rule of 90 — normal retirement (Class Three)'], 'Verify eligibility with SCRS.'],
+      'ID-PERSI': [[age >= 65 && yos >= 5, 'Normal retirement eligible'], [age >= 55 && age + yos >= 90, 'Rule of 90 — normal retirement eligible'], [age >= 55 && yos >= 5, 'Early retirement (with reduction)'], 'Verify eligibility with PERSI.'],
+      'IL-TRS': [[age >= 62 && yos >= 5, 'Normal retirement eligible'], [age >= 55 && yos >= 35, 'Normal retirement (age 55, 35 YOS — Tier 1)'], [age >= 67 && yos >= 10, 'Normal retirement (age 67, 10 YOS — Tier 2)'], 'Verify eligibility with TRS.'],
+      'OH-STRS': [[age >= 65 && yos >= 5, 'Normal retirement eligible'], [yos >= 34, 'Normal retirement (any age, 34 YOS)'], [age >= 60 && yos >= 5, 'Early retirement eligible'], 'Verify with STRS Ohio.'],
+      'OH-OPERS': [[age >= 65 && yos >= 5, 'Likely eligible — verify with OPERS group'], 'Eligibility varies by group (A/B/C). Verify with OPERS.'],
+      'OH-SERS': [[age >= 67 && yos >= 10, 'Normal retirement eligible'], [age >= 62 && yos >= 10, 'Early retirement eligible'], 'Verify with SERS.'],
+      'FED-FERS': [[age >= 62 && yos >= 5, 'Full retirement eligible'], [age >= 60 && yos >= 20, 'Full retirement eligible'], [age >= 55 && yos >= 30, 'MRA+30 retirement (Minimum Retirement Age)'], 'Verify with OPM.'],
+      'FED-CSRS': [[age >= 62 && yos >= 5, 'Full retirement eligible'], [age >= 60 && yos >= 20, 'Full retirement eligible'], [age >= 55 && yos >= 30, 'Full retirement eligible'], 'Verify with OPM.'],
+      'VA-UMC': [[age >= 62 || yos >= 30, 'Normal retirement eligible'], 'Verify with Wespath / Book of Discipline.']
+    };
+    var rules = R[st] || ['Verify eligibility with the plan administrator.'];
+    for(var k = 0; k < rules.length; k++){
+      if(typeof rules[k] === 'string') return {status:'warn', msg:rules[k]};
+      if(rules[k][0]) return {status:'ok', msg:rules[k][1]};
+    }
+    return {status:'warn', msg:'Verify eligibility with the plan administrator.'};
+  }
+  /* survivor options: approximate actuarial factors, general estimates only */
+  function pbcSurvFactor(opt, memberAge, spAge){
+    if(opt === 'max' || !spAge) return 1.0;
+    var base = {j100:0.870, j75:0.925, j50:0.958}, b = base[opt] || 1.0, adj = ((memberAge || 62) - (spAge || 60)) * 0.003;
+    return Math.max(0.75, Math.min(0.99, b + adj));
+  }
+  var pbcSyncWho = null;   // the calculator's Whose list follows the section 02 names (set below, called by renderPensionTable)
+  (function(){
+    if(!$('pbcState')) return;
+    var yosManual = false, cur = null, last = null;
+    var PAYOUT = {max:'Maximum — Single Life Annuity', j100:'Joint & 100% Survivor', j75:'Joint & 75% Survivor', j50:'Joint & 50% Survivor'}, SURV = {max:0, j100:100, j75:75, j50:50};
+    var yearsBetween = function(a, b){ return Math.max(0, (new Date(b) - new Date(a)) / (365.25 * 24 * 3600 * 1000)); };
+    var val = function(id){ var el = $(id); return el ? num(el.value) : 0; };
+    var cls = function(){ var cfg = cur && PBC_SYSTEMS[cur]; if(!cfg) return null; var id = $('pbcClass') ? $('pbcClass').value : ''; return cfg.classes.filter(function(c){ return c.id === id; })[0] || null; };
+    function syncWho(){
+      var sel = $('pbcWho'), v = sel.value, spouse = hasSpouse(null);
+      sel.innerHTML = '<option value="client">' + esc(($('clientFirst').value || '').trim() || 'Client') + '</option>' + (spouse ? '<option value="spouse">' + esc(($('spouseFirst').value || '').trim() || 'Spouse') + '</option>' : '');
+      sel.value = (v === 'spouse' && spouse) ? 'spouse' : 'client';
+    }
+    function derived(){
+      var dob = $('pbcDob').value, st = $('pbcStart').value, ret = $('pbcRet').value;
+      if(dob && ret) $('pbcRetAge').value = yearsBetween(dob, ret).toFixed(1);
+      if(st && ret && !yosManual){ $('pbcYos').value = yearsBetween(st, ret).toFixed(1); $('pbcYosHint').textContent = 'Calculated from the dates; type to override'; }
+      suggest();
+    }
+    function suggest(){
+      var st = $('pbcStart').value, cfg = cur && PBC_SYSTEMS[cur], el = $('pbcSuggest');
+      if(!el) return;
+      if(!st || !cfg){ el.hidden = true; return; }
+      var sug = cfg.autoClass(st); el.textContent = 'Suggested by the hire date: ' + sug.join(', '); el.hidden = !sug.length;
+    }
+    function stateChange(){
+      cur = $('pbcState').value || null; last = null;
+      ['pbcPlanCard','pbcClaimCard','pbcActions'].forEach(function(id){ $(id).hidden = !cur; });
+      $('pbcResults').hidden = true; $('pbcUse').hidden = true; $('pbcMsg').textContent = '';
+      if(!cur) return;
+      var cfg = PBC_SYSTEMS[cur], html = '';
+      if(cfg.note) html += '<div class="pbc-note">' + esc(cfg.note) + '</div>';
+      if(cfg.noSS) html += '<div class="pbc-note warn">&#9888; This system does <b>not</b> pay into Social Security. Clients may be subject to WEP / GPO if they have Social Security benefits from other employment.</div>';
+      html += '<div class="pbc-grid2"><label class="f"><span>Membership class / tier</span><select id="pbcClass">'
+        + cfg.classes.map(function(c){ return '<option value="' + c.id + '">' + esc(c.label + (c.hireNote ? ' — (' + c.hireNote + ')' : '')) + '</option>'; }).join('')
+        + '</select><small class="hint" id="pbcSuggest" hidden></small></label>'
+        + '<div class="f" id="pbcClassNoteField" hidden><span>Class note</span><div class="hint" id="pbcClassNote" style="padding-top:8px;line-height:1.6"></div></div></div>'
+        + '<div id="pbcSalary"></div>';
+      $('pbcPlanFields').innerHTML = html;
+      $('pbcClass').addEventListener('change', classChange);
+      classChange(); suggest();
+    }
+    function classChange(){
+      var c = cls(); if(!c) return;
+      $('pbcClassNoteField').hidden = !c.note; $('pbcClassNote').textContent = c.note || '';
+      var F = function(id, label, hint, extra){ return '<label class="f' + (extra || '') + '"><span>' + label + (hint ? '<small>' + hint + '</small>' : '') + '</span><input type="text" inputmode="decimal" id="' + id + '" placeholder="0" autocomplete="off"></label>'; };
+      var afcLabel = (c.afc || 3) + '-year average final compensation ($)', html = '<div class="pbc-grid3">';
+      if(c.isDC) html += '<div class="full"><div class="pbc-note caution">This is a <b>Defined Contribution</b> plan — there is no formula-based defined benefit to calculate. The retirement income depends on the account balance at retirement and the distribution strategy.</div></div>';
+      else if(cur === 'MD-SRPS' && c.id === 'PRE') html += F('pbcAfc', afcLabel, '3-consecutive-year highest AFC') + F('pbcYosPre98', 'YOS before Jul 1, 1998') + F('pbcYosPost98', 'YOS after Jun 30, 1998', 'Total should match years of service');
+      else if(cur === 'MI-MPSERS' && (c.id === 'MIP' || c.id === 'BASIC')) html += F('pbcAfc', afcLabel) + F('pbcYosPre2013', 'YOS before Feb 1, 2013', '1.5% multiplier applies') + F('pbcYosPost2013', 'YOS after Jan 31, 2013', '1.25% multiplier applies');
+      else if(cur === 'VA-UMC' && c.id === 'CRSP_DB') html += F('pbcYosPre2014', 'YOS 2007–2013 (1.25% × DAC)') + F('pbcYosPost2014', 'YOS 2014–2025 (1.0% × DAC)') + F('pbcDac', 'Denominational avg compensation (DAC)', '2025 DAC = $80,003');
+      else if(cur === 'VA-UMC' && c.id === 'MPP') html += '<div class="full"><div class="pbc-note">MPP benefit is based on the account balance at retirement. 35% paid as a lump sum; 65% as a life annuity (Life & 70% survivor is the default for married participants). Enter the estimated account value for a rough income estimate.</div></div>' + F('pbcMpp', 'Estimated MPP account balance ($)');
+      else html += F('pbcAfc', afcLabel, 'Average of the ' + (c.afc || 3) + ' highest-earning year(s)');
+      $('pbcSalary').innerHTML = html + '</div>';
+      if($('pbcDac')) $('pbcDac').value = '80,003';
+    }
+    function calculate(){
+      var cfg = cur && PBC_SYSTEMS[cur], c = cls();
+      if(!cfg || !c){ $('pbcMsg').textContent = 'Select a pension system first.'; return; }
+      var yos = num($('pbcYos').value), retAge = num($('pbcRetAge').value), spAge = num($('pbcSpAge').value), opt = $('pbcOpt').value;
+      if(!(yos > 0)){ $('pbcMsg').textContent = 'Enter the years of service.'; return; }
+      if(!(retAge > 0)){ $('pbcMsg').textContent = 'Enter the date of birth and the retirement date.'; return; }
+      var inputs = {retAge:retAge, yos:yos, spouseAge:spAge, yosPre98:val('pbcYosPre98'), yosPre2013:val('pbcYosPre2013'), yosPre2014:val('pbcYosPre2014'), dac:val('pbcDac') || 80003, mppBalance:val('pbcMpp')};
+      var afc = val('pbcAfc'), annual = null, special = '';
+      if(c.isDC){ special = 'DC Plan — the benefit depends on the account value at retirement.'; }
+      else if(cur === 'VA-UMC' && c.id === 'MPP'){ annual = inputs.mppBalance * 0.65 * 0.045; special = 'MPP estimate: ' + money(inputs.mppBalance * 0.35) + ' lump sum + approx. ' + money(annual) + ' annual annuity (65% of the balance at a ~4.5% payout rate). Verify with Wespath for the actual annuity factors.'; }
+      else if(cfg.calc){ annual = cfg.calc(yos, afc, c, inputs); }
+      if(annual === null && !special) special = 'Unable to calculate — please verify the inputs (age and service thresholds, average compensation).';
+      var sf = pbcSurvFactor(opt, retAge, spAge), adjusted = annual ? annual * sf : null;
+      var who = $('pbcWho').value === 'spouse' ? 'spouse' : 'client', name = ownerLabel(who);
+      var elig = pbcEligibility(cur, c, yos, retAge);
+      last = {who:who, name:name, cfg:cfg, cls:c, yos:yos, afc:afc, retAge:retAge, spAge:spAge, opt:opt, annual:annual, adjusted:adjusted, sf:sf, elig:elig, special:special,
+              notes:$('pbcNotes').value.trim(), dob:$('pbcDob').value, start:$('pbcStart').value, ret:$('pbcRet').value};
+      render_(last); $('pbcMsg').textContent = '';
+      $('pbcUse').hidden = !(adjusted > 0.5 && last.ret);
+    }
+    function render_(d){
+      var row = function(l, v){ return '<div class="pbc-row"><span>' + l + '</span><span>' + v + '</span></div>'; };
+      var html = '<div class="pbc-head"><div><b>' + esc(d.name) + '</b><small>' + esc(d.cfg.name) + '</small></div><span class="pbc-tag">' + esc(d.cls.id) + '</span></div>';
+      html += '<div class="pbc-elig ' + (d.elig.status === 'ok' ? 'ok' : 'warn') + '">' + (d.elig.status === 'ok' ? '\u2713' : '\u26a0') + ' ' + esc(d.elig.msg) + '</div>';
+      if(d.special) html += '<div class="pbc-note">' + esc(d.special) + '</div>';
+      if(d.adjusted){
+        var repl = d.afc ? d.adjusted / d.afc * 100 : null;
+        html += '<dl class="pbc-metrics"><div class="pbc-metric"><dt>Monthly benefit</dt><dd>' + money(d.adjusted / 12) + '</dd><small>' + esc(PAYOUT[d.opt]) + '</small></div>'
+          + '<div class="pbc-metric"><dt>Annual benefit</dt><dd>' + money(d.adjusted) + '</dd><small>Gross, before tax</small></div>'
+          + '<div class="pbc-metric"><dt>Max monthly (SLA)</dt><dd>' + money(d.annual / 12) + '</dd><small>Single life annuity</small></div>'
+          + (repl ? '<div class="pbc-metric"><dt>Income replacement</dt><dd>' + repl.toFixed(1) + '%</dd><small>of final average compensation</small></div>' : '') + '</dl>';
+      }
+      html += '<div class="pbc-detail"><div>' + row('Date of birth', esc(d.dob || '\u2014')) + row('Employment start', esc(d.start || '\u2014')) + row('Retirement date', esc(d.ret || '\u2014')) + row('Age at retirement', d.retAge.toFixed(1) + ' years') + '</div>'
+        + '<div>' + row('Years of service', d.yos.toFixed(1)) + (d.afc ? row('Average final compensation', money(d.afc)) : '') + row('Payout option', esc(PAYOUT[d.opt])) + (d.spAge ? row('Beneficiary age', String(d.spAge)) : '') + '</div></div>';
+      if(d.adjusted && d.afc && !d.cls.isDC){
+        var f = '';
+        if(d.cls.m && (['PA-PSERS','PA-SERS','VA-VRS','NC-TSERS','SC-SCRS','ID-PERSI','TX-TRS'].indexOf(cur) >= 0 || cur.indexOf('OH-') === 0)) f = d.yos.toFixed(1) + ' YOS \u00d7 ' + (d.cls.m * 100).toFixed(3) + '% \u00d7 ' + money(d.afc) + ' = ' + money(d.annual) + '/yr';
+        if(cur === 'NJ-TPAF' && d.cls.div) f = '(' + d.yos.toFixed(1) + ' \u00f7 ' + d.cls.div + ') \u00d7 ' + money(d.afc) + ' = ' + money(d.annual) + '/yr';
+        if(f) html += '<div class="pbc-formula">' + f + '</div>';
+      }
+      html += '<div class="pbc-note caution"><b>COLA:</b> ' + esc(d.cfg.cola) + '</div>';
+      if(d.cfg.noSS) html += '<div class="pbc-note warn"><b>Social Security:</b> This system does not pay into Social Security. Clients with Social Security benefits from other employment may be subject to the <b>Windfall Elimination Provision (WEP)</b> and/or the <b>Government Pension Offset (GPO)</b>.</div>';
+      if(d.sf < 1) html += '<p class="hint" style="margin:0 0 10px">Survivor benefit factor applied: ' + (d.sf * 100).toFixed(1) + '% of maximum (estimated). The actual factor is set by the plan administrator.</p>';
+      if(d.notes) html += row('Advisor notes', esc(d.notes));
+      html += '<div class="pbc-foot" style="margin-top:12px"><span>Alto Financial Group \u2014 Pension Reference Tool</span><span>Calculated ' + new Date().toLocaleDateString() + '</span></div>';
+      $('pbcOut').innerHTML = html; $('pbcResults').hidden = false;
+    }
+    /* the estimate becomes a line in Pension income: the monthly benefit from the retirement month, the survivor share of the option, no COLA unless the advisor sets one */
+    function useInPlan(){
+      if(!last || !(last.adjusted > 0.5)) return;
+      var monthly = Math.round(last.adjusted / 12);
+      pensions.push(mkPension({who:last.who, name:last.cfg.short + ' pension', amt:monthly, start:last.ret.slice(0, 7), cola:0, surv:SURV[last.opt]}));
+      renderPensionTable(); render();
+      $('pbcMsg').textContent = 'Added to Pension income above: ' + money(monthly) + ' a month for ' + last.name + ' from ' + longDate(last.ret.slice(0, 7) + '-01').replace(/ \d+,/, '') + ', survivor ' + SURV[last.opt] + '%. The COLA is left at 0% \u2014 set it on the line if the system grants one.';
+    }
+    $('pbcState').addEventListener('change', stateChange);
+    ['pbcDob','pbcStart','pbcRet'].forEach(function(id){ $(id).addEventListener('change', derived); $(id).addEventListener('input', derived); });
+    $('pbcYos').addEventListener('input', function(){ yosManual = this.value.trim() !== ''; $('pbcYosHint').textContent = yosManual ? 'Entered by hand; clear to calculate from the dates' : 'Calculated from the dates; type to override'; if(!yosManual) derived(); });
+    $('pbcWho').addEventListener('focus', syncWho); $('pbcWho').addEventListener('mousedown', syncWho);
+    $('pbcCalc').addEventListener('click', calculate);
+    $('pbcUse').addEventListener('click', useInPlan);
+    pbcSyncWho = syncWho; syncWho();
+  })();
   function renderPensionTable(){
     var spouse = hasSpouse(null);
+    if(pbcSyncWho) pbcSyncWho();
     $('penBody').innerHTML = pensions.length
       ? pensions.map(function(x){
           var surv = [0, 25, 50, 75, 100].map(function(v){ return '<option value="' + v + '"' + (v === x.surv ? ' selected' : '') + '>' + v + '%</option>'; }).join('');
