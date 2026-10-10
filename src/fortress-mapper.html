@@ -3280,9 +3280,9 @@
     <!-- guide-notes:21 -->
     <details class="guide-notes"><summary>User Guide Notes<small>how to use this section</small></summary>
       <div class="guide-body">
-      <p>Three of these go to a client (a fourth, the risk profile report, opens from
-        section&nbsp;12). The other two are marked
-        <em>not for client distribution</em> on every page. <span class="ui">Scenario for the
+      <p>Five of these go to a client &mdash; the executive summary, the take-home summary, the
+        Social Security optimizer report, the risk profile report and the pension benefits report.
+        The internal worksheet is marked <em>not for client distribution</em> on every page. <span class="ui">Scenario for the
         reports</span> at the top of the section picks which of the three scenarios they are built
         from &mdash; the same choice as <span class="ui">Use for reports</span> in section&nbsp;14. When
         it is not the scenario showing, the page switches to it while the documents build and
@@ -3356,6 +3356,22 @@
         </div>
         <div class="exp client">
           <span class="tag">Client-facing</span>
+          <b>Client take-home summary</b>
+          <p>Three Letter pages the client keeps after the discovery meeting, built from the same run
+            and scenario as the executive summary. Page one is where they are today &mdash; accounts,
+            net worth, spending, guaranteed income and how much of their Needs it covers, market
+            exposure, the income gap and the current course if nothing changes. Page two is the risks:
+            the items selected in section&nbsp;11 (or the tool's suggestions when none are), the three
+            stress tests against the plan, long-term care cost and coverage, and life insurance in
+            force against the need. Page three is where the plan takes them: each Fortress level and
+            its drafted amount, current course against the plan, and a gold <b>Nothing is locked in</b>
+            box saying no account moves and nothing is signed until the recommendation meeting, where
+            the plan is fine-tuned together until the client is fully happy with it; then the four
+            steps and questions to think about before the meeting. Every page carries the illustrative
+            footer, and the disclosures page closes it.</p>
+        </div>
+        <div class="exp client">
+          <span class="tag">Client-facing</span>
           <b>Pension benefits report</b>
           <p>The last estimate from the section&nbsp;04 Pension Benefits Calculator as a letter page:
             the benefit by option, eligibility, the inputs, the formula, the COLA note and the
@@ -3370,8 +3386,8 @@
         </div>
       </div>
 
-      <p>Every report &mdash; the executive summary, the Social Security optimizer report, the risk profile
-        report, the pension benefits report and the internal worksheet &mdash; ends with the
+      <p>Every report &mdash; the executive summary, the take-home summary, the Social Security optimizer
+        report, the risk profile report, the pension benefits report and the internal worksheet &mdash; ends with the
         <b>Important Disclosures &ndash; Retirement Fortress Blueprint&trade;</b> page, the same text as
         the gold <span class="ui">Important Disclosures</span> block at the foot of the application
         (open it with the +). The educational slides are a fixed PDF and carry Alto's own slide
@@ -3395,6 +3411,7 @@
       <div class="btn-row">
         <button type="button" id="makePdf">Internal worksheet</button>
         <button type="button" class="primary" id="makeDeck">Executive summary report</button>
+        <button type="button" class="primary" id="makeTakeHome">Client take-home summary</button>
         <button type="button" class="primary" id="makeSS">Social Security optimizer report</button>
         <button type="button" class="primary" id="rqReport">Risk profile report</button>
         <button type="button" class="primary" id="makePension">Pension benefits report</button>
@@ -14427,7 +14444,7 @@
      ============================================================ */
   var downloads = null, dlReady = false;
   var inClaude = !!(window.claude && typeof window.claude.use === 'function');
-  var EXPORT_BTNS = ['makePdf','makeDeck','makeSS','rqReport','makePension','makeEdu','dlTemplate'];
+  var EXPORT_BTNS = ['makePdf','makeDeck','makeTakeHome','makeSS','rqReport','makePension','makeEdu','dlTemplate'];
 
   if(inClaude){
     window.claude.use('downloads').then(function(ns){
@@ -15902,6 +15919,172 @@
     var blob = new Blob([html], {type:'text/html'});
     if(openInTab(blob)){ msg.textContent = 'Executive summary report opened in a new tab \u2014 use the browser\u2019s Print \u2192 Save as PDF there if a PDF is needed.'; return; }
     savePdf($('makeDeck'), function(){ return blob; }, fname, 'executive summary report', 'text/html', 'This view does not allow new tabs, so the executive summary report was saved as an HTML file \u2014 open it in your browser and print from there.');
+  });
+  /* Client take-home summary: three Letter pages a client keeps after the discovery meeting — where
+     they stand today, the risks found, where the plan would take them — with the standing note that
+     nothing is settled until the recommendation meeting. Same run and scenario as the executive summary. */
+  function buildTakeHome(){
+    var r = activeRun(), i = r.inputs, spouse = hasSpouse(i), E = esc, today = new Date();
+    var TXb = projectTax(r, {convert:null}), cfg = rothOptions(TXb), TXp = cfg.apply ? projectTax(r, {convert:cfg}) : null, TX = TXp || TXb;
+    var SQ = statusQuoRun(r), P = projectIncome(r), life = lifeEstimate(), ltc = ltcEstimate(), DT = debtTotals(), OA = oaTotals();
+    var RS = riskSummary(r), RF = RS.facts, contracts = moatContracts(r);
+    var cName = (i.clientFirst || 'Client').trim(), sName = spouse ? (i.spouseFirst || 'Spouse').trim() : '';
+    var names = spouse ? cName + ' and ' + sName + (i.clientLast ? ' ' + i.clientLast : '') : cName + (i.clientLast ? ' ' + i.clientLast : '');
+    var ppl = spouse ? ['client', 'spouse'] : ['client'], pName = function(w){ return w === 'client' ? cName : sName; };
+    var advisor = (i.advisor || '').trim(), dateTxt = prepLong(i), you = spouse ? 'you both' : 'you';
+    var sqRows = SQ.rows, faRows = TX.rows, N = TX.N;
+    var sqLast = sqRows[sqRows.length - 1], faLast = faRows[faRows.length - 1];
+    var sqDep = sqRows.filter(function(x){ return x.unfunded > 0.5; })[0], faDep = faRows.filter(function(x){ return x.unfunded > 0.5; })[0];
+    var totalVal = r.total || 0, marketPct = Math.round((RF.marketPct || 0) * 100), guaranteed = r.guaranteed || 0;
+    var needsCover = Math.round((RF.needsCover || 0) * 100);
+    var protectedAmt = r.funded.foundation + r.funded.moat, exposurePlan = totalVal > 0.5 ? Math.round((r.funded.walls + r.funded.roof) / totalVal * 100) : 0;
+    var firstRetRow = P.rows[Math.min(P.N, Math.ceil(P.lastRet))] || P.rows[P.rows.length - 1];
+    var fCover = firstRetRow.needs > 0.5 ? Math.round(Math.min(1, firstRetRow.foundation / firstRetRow.needs) * 100) : 0;
+    var mon = function(ym){ return ym ? longDate(ym + '-01').replace(/ \d+,/, '') : ''; };
+    var ages = function(row){ return row.ages.join(' / '); };
+    var working = ppl.filter(function(w){ var e = i.employment[w]; return e.salary > 0.5 && e.retire; });
+    var retire = working.length ? working.map(function(w){ return pName(w) + ' in ' + mon(i.employment[w].retire); }).join(', ') + (working.length < ppl.length ? '; ' + ppl.filter(function(w){ return working.indexOf(w) < 0; }).map(pName).join(' and ') + ' already retired' : '')
+                : (spouse ? 'you are both already retired' : 'you are already retired') + ' — no salary on file';
+    /* the income gap before anything changes */
+    var Pq = SQ.income, qrows = Pq.rows, Nq = Pq.N;
+    var inc = qrows.map(function(x){ return x.emp + x.ss + x.pen + x.ann + x.ng; }), exp = qrows.map(function(x){ return x.needs + x.wants; });
+    var gaps = qrows.map(function(x, n){ return Math.max(0, exp[n] - inc[n]); });
+    var first = null, big = 0, tot = 0; gaps.forEach(function(g, n){ if(g > 0.5 && first == null) first = n; if(g > gaps[big]) big = n; tot += g; });
+    var ri = Math.min(Nq, Math.ceil(Pq.lastRet)); if(ri === 0 && qrows.length > 1) ri = 1;   // the first full year, not the prorated one
+    var planCover = r.funded.foundation + 0.5 >= r.targets.foundation ? 100 : Math.round(Math.min(1, (guaranteed + r.funded.foundation * r.yF) / (i.needs || 1)) * 100);   // as the executive summary's comparison page
+    /* the risks and the stress tests */
+    var items = RS.items.slice(0, 6), tmp = document.createElement('div');
+    if(!items.length) RISK_ITEMS.forEach(function(it){ if(it.sug && it.sug(RF)){ tmp.innerHTML = it.text(RF); items.push({text:tmp.textContent, sub:it.sub(RF)}); } });
+    items = items.slice(0, 6);
+    var sens = sensDefs(r, P).map(function(d){ return {d:d, R:sensRun(r, d, TX)}; });
+    var endOf = function(dep, last){ return dep ? 'Accounts run out in ' + dep.year : money(last.layers.total) + ' at the end of plan'; };
+    var ltcCov = ltc.people.reduce(function(a, p){ return a + p.covTotal; }, 0), ltcPlan = contracts.reduce(function(a, c){ return a + c.benefit; }, 0);
+    var lifeNow = life.people.reduce(function(a, p){ return a + p.existing; }, 0), lifeGap = life.people.reduce(function(a, p){ return a + p.gap; }, 0);
+    var dTax = (SQ.lifetime + SQ.lifetimeState) - (TX.lifetime + TX.lifetimeState);
+    var levels = [
+      ['Foundation', 'Guaranteed income for Needs', r.funded.foundation, '#1F6FB2'],
+      ['Liquidity buffer', 'Cash for the unexpected', r.funded.reserve, '#8CBBE2'],
+      ['Walls', 'Income investments for Wants', r.funded.walls, '#C0632B'],
+      ['Roof', 'Growth for Wishes and legacy', r.funded.roof, '#8B5CA6'],
+      ['Moat', 'Long-term care protection', r.funded.moat, '#1F8A70']
+    ].filter(function(L){ return L[2] > 0.5; });
+    var tile = function(lab, val, sub, cls){ return '<div class="tile' + (cls ? ' ' + cls : '') + '"><div class="lab">' + E(lab) + '</div><div class="val">' + E(val) + '</div>' + (sub ? '<div class="sub">' + E(sub) + '</div>' : '') + '</div>'; };
+    var pageHead = function(n, title){ return '<div class="ph"><span>' + E(names) + ' · Take-home summary</span><span>' + E(title) + ' · page ' + n + '</span></div>'; };
+    var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Take-Home Summary — ' + E(names) + '</title>'
+      + '<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">'
+      + '<style>'
+      + ':root{--navy:#1F3162;--gold:#C5A044;--red:#D82629;--good:#2E7D4F;--ink:#18213B;--muted:#5A6276;--line:#DADDE6;--sel:#EEF1F8;--goldsoft:#FBF5E4}'
+      + '*{box-sizing:border-box}body{margin:0;font-family:Montserrat,"Helvetica Neue",Arial,sans-serif;color:var(--ink);font-size:12px;line-height:1.5;background:#eef0f3}'
+      + '.sheet{background:#fff;width:8.5in;min-height:11in;margin:24px auto;padding:.6in .7in;box-shadow:0 2px 12px rgba(0,0,0,.08);page-break-after:always;position:relative}'
+      + 'h1,h2,h3{font-family:"Playfair Display",Georgia,serif;color:var(--navy);font-weight:600;margin:0}h1{font-size:26px;line-height:1.15}h2{font-size:17px;margin:0 0 6px;padding-bottom:4px;border-bottom:2px solid var(--gold)}h3{font-size:13px;margin:0 0 3px}p{margin:0 0 7px}'
+      + '.band{background:var(--navy);color:#fff;padding:20px 28px;margin:-.6in -.7in 20px;border-bottom:5px solid var(--gold);display:flex;justify-content:space-between;align-items:flex-end;gap:16px}'
+      + '.band .sub{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#E6D3A0}.band .firm{font-family:"Playfair Display",Georgia,serif;font-size:19px}.band .meta{font-size:11px;text-align:right;color:#DCE2F0}'
+      + '.ph{display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:5px;margin-bottom:16px}'
+      + 'section{margin:0 0 13px;page-break-inside:avoid}.lead{font-size:12.5px;max-width:72ch}.tiles.lv .val{font-size:16px}.tiles.lv .tile{border-radius:0 0 6px 6px}'
+      + '.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:8px 0 4px}.tile{background:var(--sel);border-radius:6px;padding:9px 11px}.tile .lab{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}.tile .val{font-family:"Playfair Display",Georgia,serif;font-size:19px;color:var(--navy);margin:2px 0 1px;line-height:1.15}.tile .sub{font-size:10.5px;color:var(--muted);line-height:1.35}.tile.warn .val{color:var(--red)}.tile.good .val{color:var(--good)}'
+      + '.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}'
+      + 'table{border-collapse:collapse;width:100%;font-size:11.5px}th{text-align:left;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:4px 6px;border-bottom:1px solid var(--line)}td{padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top}td.n,th.n{text-align:right;white-space:nowrap}td.hi{font-weight:700;color:var(--navy)}td.lv{font-weight:600;white-space:nowrap}td .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:-1px}'
+      + 'ol.risks{margin:4px 0 0;padding-left:20px}ol.risks li{margin:0 0 5px}ol.risks b{color:var(--navy)}ol.risks span{display:block;color:var(--muted);font-size:11px}'
+      + '.box{border:2px solid var(--gold);background:var(--goldsoft);border-radius:8px;padding:10px 16px;margin:2px 0 12px}.box h3{color:#8A6410;font-size:14px;margin-bottom:4px}.box p{max-width:none}'
+      + '.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.steps div{border-top:3px solid var(--navy);background:var(--sel);padding:8px 10px;border-radius:0 0 6px 6px;font-size:10.5px;line-height:1.4}.steps b{display:block;font-family:"Playfair Display",Georgia,serif;font-size:12px;color:var(--navy);margin-bottom:2px}.steps div.on{border-top-color:var(--gold);background:var(--goldsoft)}.steps small{display:block;color:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:9px;margin-bottom:3px}'
+      + 'ul.q{margin:4px 0 0;padding-left:18px}ul.q li{margin:0 0 3px}'
+      + '.foot{position:absolute;left:.7in;right:.7in;bottom:.45in;font-size:9.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:5px}'
+      + '.toolbar{position:sticky;top:0;background:var(--navy);color:#fff;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;font-size:13px;z-index:5}.toolbar button{background:#fff;color:var(--navy);border:0;border-radius:6px;padding:6px 12px;font:inherit;font-weight:700;cursor:pointer}'
+      + '@media print{body{background:#fff}.sheet{box-shadow:none;margin:0;width:auto;min-height:0;padding:0}.toolbar{display:none}@page{size:letter;margin:.5in .65in}.band{margin:0 0 18px}.foot{position:static;margin-top:16px}}'
+      + RFB_DISC_CSS
+      + '</style></head><body>'
+      + '<div class="toolbar"><span>Take-Home Summary — ' + E(names) + '</span><button onclick="window.print()">Print / Save as PDF</button></div>';
+    var foot = '<div class="foot">Illustrative only — hypothetical projections from the information you supplied, not a guarantee of results. Nothing in this summary is final until we complete the recommendation meeting together. See the Important Disclosures on the last page.</div>';
+    /* page 1 — where you are today */
+    html += '<div class="sheet">'
+      + '<div class="band"><div><div class="sub">Retirement Fortress Blueprint™ · Take-Home Summary</div><div class="firm">Alto Financial Group</div></div><div class="meta">Prepared for <strong>' + E(names) + '</strong><br>' + E(dateTxt) + (advisor ? '<br>' + E(advisor) : '') + '</div></div>'
+      + '<h1>Where you are, what we found, and where the plan could take you</h1>'
+      + '<p class="lead" style="margin-top:8px">Thank you for the time you spent with us. This summary is for ' + you + ' to keep: where things stand today, the risks we see in the current course, and where the Retirement Fortress we have begun shaping together could take you. '
+      + 'Every figure comes from the information you shared and assumptions we will walk through together. <strong>Nothing in this document is locked in</strong> — it is the starting point for the recommendation meeting, where we fine-tune the plan with you until you are fully happy with it.</p>'
+      + '<section><h2>Where you are today</h2><div class="tiles">'
+      + tile('Investable accounts', money(totalVal), accounts.length + ' account' + (accounts.length === 1 ? '' : 's') + ' on file')
+      + tile('Net worth', money(totalVal + OA.val - DT.bal), 'Accounts + other assets of ' + fmtKM(OA.val) + ', less debts of ' + fmtKM(DT.bal))
+      + tile('Spending today', money(Math.round((i.needs + i.wants) / 12)) + ' a month', 'Needs ' + fmtKM(i.needs) + ' and Wants ' + fmtKM(i.wants) + ' a year')
+      + tile('Guaranteed income', money(guaranteed) + ' a year', 'Social Security, pensions and other income not tied to the market')
+      + tile('Needs covered by guaranteed income', needsCover + '%', needsCover >= 100 ? 'Your essentials are covered whatever the markets do' : 'The rest of your essentials depend on your accounts', needsCover >= 100 ? 'good' : (needsCover < 60 ? 'warn' : ''))
+      + tile('In market positions', marketPct + '%', money(RF.marketVal || 0) + ' exposed to market swings today', marketPct >= 60 ? 'warn' : '')
+      + '</div><p style="margin-top:6px"><strong>Retirement:</strong> ' + E(retire) + '. The plan runs to age ' + (i.endAge || 100) + ' (' + faLast.year + ').</p></section>'
+      + '<section><h2>Your income gap</h2>'
+      + '<p>' + (first == null ? 'With your income as it stands — salaries to each retirement date, Social Security, pensions and other income — your expenses are covered every year of the plan before anything changes. That is a strong position; the questions become taxes, protection and what you leave behind.'
+                 : 'Your income as it stands — salaries to each retirement date, Social Security, pensions and other income — stops covering your expenses in <strong>' + qrows[first].year + '</strong> (ages ' + ages(qrows[first]) + '). From there the difference has to come out of your accounts, and that is what the plan is built to fund.') + '</p>'
+      + '<div class="tiles">'
+      + tile('Gap in ' + qrows[ri].year + (ri <= 1 ? ', the first full year' : ', at full retirement'), money(gaps[ri]) + ' a year', 'Income ' + fmtKM(inc[ri]) + ' against expenses ' + fmtKM(exp[ri]), gaps[ri] > 0.5 ? 'warn' : 'good')
+      + tile('Largest gap', money(gaps[big]) + ' a year', gaps[big] > 0.5 ? 'In ' + qrows[big].year + ', ages ' + ages(qrows[big]) : 'No shortfall in any year', gaps[big] > 0.5 ? 'warn' : 'good')
+      + tile('Total gap over the plan', money(tot), 'What your accounts must fund, before tax')
+      + '</div></section>'
+      + '<section><h2>If nothing changes</h2>'
+      + '<p>Leaving every account where it is, growing at its own rate, and drawing the shortfall each year in tax order: <strong>' + E(endOf(sqDep, sqLast)) + '</strong>'
+      + (sqDep ? ', at ages ' + ages(sqDep) + '. ' : ' (' + sqLast.year + '). ') + 'Along the way you would pay about <strong>' + money(SQ.lifetime + SQ.lifetimeState) + '</strong> in federal and state income tax'
+      + (marketPct >= 50 ? ', with ' + marketPct + '% of your savings riding on the markets through every downturn' : '') + '.</p>'
+      + '<p>None of this is a prediction. It is the course you are on if nothing is decided — the reference point everything on the next two pages is measured against.</p></section>'
+      + foot + '</div>';
+    /* page 2 — the risks */
+    html += '<div class="sheet">' + pageHead(2, 'The risks we found')
+      + '<section><h2>The risks we found</h2><p>The things that could knock a retirement off course, in the order we would address them. Each has an answer in the plan; none is a reason to rush.</p>'
+      + (items.length ? '<ol class="risks">' + items.map(function(it){ return '<li><b>' + E(it.text) + '</b><span>' + E(it.sub) + '</span></li>'; }).join('') + '</ol>' : '<p><em>No specific risks have been flagged yet; we will go through them together at the next meeting.</em></p>')
+      + '</section>'
+      + '<section><h2>How the plan holds up under stress</h2><p>We tested the plan itself against three things outside anyone’s control. The plan’s own base case is ' + E(endOf(faDep, faLast).toLowerCase()) + '.</p>'
+      + '<table><thead><tr><th>Stress</th><th>What we assumed</th><th class="n">Where you end up</th></tr></thead><tbody>'
+      + sens.map(function(x){ var R = x.R; return '<tr><td class="lv">' + E(x.d.title) + '</td><td>' + E(x.d.sub) + '</td><td class="n' + (R.dep ? ' hi' : '') + '">' + E(R.dep ? 'Accounts run out ' + R.dep.year : money(R.last.layers.total) + (R.diff < 0 ? ' (' + fmtKM(-R.diff) + ' less)' : '')) + '</td></tr>'; }).join('')
+      + '</tbody></table></section>'
+      + '<section><div class="two"><div><h2>Long-term care</h2>'
+      + '<p>The single largest unplanned expense most retirements face. Using the costs in your state' + (ltc.state ? ' (' + E(ltc.state) + ')' : '') + ':</p>'
+      + '<table><thead><tr><th>Who</th><th class="n">Projected cost of care</th><th class="n">Covered today</th></tr></thead><tbody>'
+      + ltc.people.map(function(p){ return '<tr><td class="lv">' + E(p.name) + '</td><td class="n">' + money(p.total) + '</td><td class="n">' + money(p.covTotal) + '</td></tr>'; }).join('')
+      + '<tr><td class="lv">Together</td><td class="n hi">' + money(ltc.total) + '</td><td class="n hi">' + money(ltcCov) + '</td></tr></tbody></table>'
+      + '<p style="margin-top:6px">' + (ltc.gap > 0.5 ? 'The uncovered ' + money(ltc.gap) + ' would come out of your accounts and your estate. The plan’s Moat is sized to carry ' + (ltcPlan > 0.5 ? 'about ' + money(ltcPlan) + ' of it' : 'this risk') + '.' : 'Your existing coverage carries the projected cost; we will confirm the policy terms together.') + '</p></div>'
+      + '<div><h2>Life insurance</h2>'
+      + '<p>What a survivor would need to keep the household whole, against what is in force:</p>'
+      + '<table><thead><tr><th>Who</th><th class="n">In force</th><th class="n">Additional need</th></tr></thead><tbody>'
+      + life.people.map(function(p){ return '<tr><td class="lv">' + E(p.name) + '</td><td class="n">' + money(p.existing) + '</td><td class="n' + (p.gap > 0.5 ? ' hi' : '') + '">' + (p.gap > 0.5 ? money(p.gap) : '—') + '</td></tr>'; }).join('')
+      + '</tbody></table>'
+      + '<p style="margin-top:6px">' + (lifeGap > 0.5 ? 'About ' + money(lifeGap) + ' more coverage would close the gap; the plan prices it before anything is applied for.' : 'The coverage in force (' + money(lifeNow) + ') meets the need as we have estimated it.') + '</p></div></div></section>'
+      + foot + '</div>';
+    /* page 3 — where the plan takes you */
+    html += '<div class="sheet">' + pageHead(3, 'Where this plan would take you')
+      + '<section><h2>Your Retirement Fortress, as drafted</h2><p>Each level has one job. The amounts are where the draft stands today, and every one is open to change at the recommendation meeting.</p>'
+      + '<div class="tiles lv" style="grid-template-columns:repeat(' + levels.length + ',minmax(0,1fr))">'
+      + levels.map(function(L){ return '<div class="tile" style="border-top:3px solid ' + L[3] + '"><div class="lab">' + E(L[0]) + '</div><div class="val">' + money(L[2]) + '</div><div class="sub">' + E(L[1]) + '</div></div>'; }).join('')
+      + '</div></section>'
+      + '<section><h2>Current course versus the plan</h2>'
+      + '<table><thead><tr><th></th><th class="n">Current course</th><th class="n">With the plan</th></tr></thead><tbody>'
+      + '<tr><td>Assets at the end of plan (' + faLast.year + ')</td><td class="n">' + E(sqDep ? 'Run out ' + sqDep.year : money(sqLast.layers.total)) + '</td><td class="n hi">' + E(faDep ? 'Run out ' + faDep.year : money(faLast.layers.total)) + '</td></tr>'
+      + '<tr><td>Savings exposed to market swings</td><td class="n">' + marketPct + '%</td><td class="n hi">' + exposurePlan + '%</td></tr>'
+      + '<tr><td>Needs covered by income not tied to the market</td><td class="n">' + needsCover + '%</td><td class="n hi">' + planCover + '%</td></tr>'
+      + '<tr><td>Long-term care benefit in force</td><td class="n">' + money(ltcCov) + '</td><td class="n hi">' + money(ltcPlan) + '</td></tr>'
+      + '<tr><td>Life insurance in force</td><td class="n">' + money(lifeNow) + '</td><td class="n hi">' + money(lifeNow + lifeGap) + '</td></tr>'
+      + '<tr><td>Lifetime federal and state income tax</td><td class="n">' + money(SQ.lifetime + SQ.lifetimeState) + '</td><td class="n hi">' + money(TX.lifetime + TX.lifetimeState) + (dTax > 0.5 ? ' (' + fmtKM(dTax) + ' less)' : '') + '</td></tr>'
+      + '<tr><td>Held in Roth accounts at the end of plan</td><td class="n">' + money(sqLast.balances.roth) + '</td><td class="n hi">' + money(faLast.balances.roth) + '</td></tr>'
+      + '</tbody></table>'
+      + '<p style="margin-top:6px">In short: ' + money(protectedAmt) + ' moves into income and care protection no market can take away, ' + money(r.funded.walls + r.funded.roof) + ' stays invested for your Wants and Wishes, and your essentials are paid first.</p></section>'
+      + '<div class="box"><h3>Nothing is locked in</h3>'
+      + '<p>What you are holding is a draft, not a decision. No account moves, no contract is applied for and no investment is placed until we sit down together for the <strong>recommendation meeting</strong>, walk through every level of the Fortress and adjust it to fit you. '
+      + 'We will fine-tune it together — the income targets, the amount set aside for protection, the timing of Social Security, the investments themselves — and keep working on it with you until you are fully happy with the plan. Only then does anything get signed.</p>'
+      + '<p style="margin:0"><strong>What happens next:</strong> the recommendation meeting, where the plan is settled with you; then, only after your sign-off, the applications and transfers in the order the plan lays out; then move-in day and four planning meetings a year to keep it a step ahead.</p></div>'
+      + '<section><h2>Worth thinking about before we meet</h2><ul class="q">'
+      + '<li>Is the spending picture right — Needs of about ' + money(Math.round(i.needs / 12)) + ' and Wants of about ' + money(Math.round(i.wants / 12)) + ' a month?</li>'
+      + '<li>How much of your savings should be out of the market’s reach — and which of the risks on page 2 matters most to you?</li>'
+      + '<li>What matters most about what you leave behind, and to whom?</li>'
+      + '</ul></section>'
+      + foot + '</div>'
+      + rfbDiscHtml({page:true})
+      + '</body></html>';
+    return html;
+  }
+  $('makeTakeHome').addEventListener('click', function(){
+    var msg = $('pdfMsg'), fname = pdfName('take-home-summary').replace(/\.pdf$/, '.html');
+    if(!accounts.length){ msg.textContent = 'Add at least one account first.'; return; }
+    var html;
+    try { html = withScnView(reportScn, buildTakeHome); }
+    catch(err){ msg.textContent = 'The take-home summary could not be built: ' + err.message; return; }
+    var blob = new Blob([html], {type:'text/html'});
+    if(openInTab(blob)){ msg.textContent = 'Take-home summary opened in a new tab — use the browser’s Print → Save as PDF there if a PDF is needed.'; return; }
+    savePdf($('makeTakeHome'), function(){ return blob; }, fname, 'take-home summary', 'text/html', 'This view does not allow new tabs, so the take-home summary was saved as an HTML file — open it in your browser and print from there.');
   });
   /* Risk profile report: the questionnaire's result as a client letter, Letter pages, no vendor named */
   function buildRiskReport(){
