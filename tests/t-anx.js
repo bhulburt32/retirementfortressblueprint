@@ -16,7 +16,8 @@ const path = require('path');
   await p.click('#expandAll'); await p.waitForTimeout(300);
   // 2. the position choices
   const posOpts=await p.$eval('#acctBody select[data-k="pos"]',s=>[...s.options].map(o=>o.value)); console.log('positions:', JSON.stringify(posOpts));
-  for(const want of ['MYGA Annuity','Variable Annuity','Income Annuity (FIA)','Growth Annuity (FIA)']) if(!posOpts.includes(want)) errs.push('missing position '+want);
+  for(const want of ['MYGA Annuity','Variable Annuity','Income Annuity (FIA)','Growth Annuity (FIA)','RILA Annuity']) if(!posOpts.includes(want)) errs.push('missing position '+want);
+  if(posOpts.includes('Annuity')) errs.push('the plain Annuity position should be gone');
   // 3. the Annuities subsection follows the annuity positions (the Smith case has three generic ones)
   const rows=async()=>p.$$eval('#anxBody tr[data-anx]',rs=>rs.map(r=>({id:r.dataset.anx, owner:r.querySelector('[data-af=owner]').textContent, name:r.querySelector('[data-af=name]').textContent, type:r.querySelector('select').value,
     company:r.querySelector('[data-ax=company]').value, companyAuto:r.querySelector('[data-ax=company]').classList.contains('auto'),
@@ -64,7 +65,7 @@ const path = require('path');
   await p.fill('#pasteArea', ['A1\tJeff Smith\tAthene\tNon-Qualified\tMYGA 5yr\t100000','A2\tJeff Smith\tJackson\tNon-Qualified\tVariable annuity\t100000','A3\tJeff Smith\tAllianz\tQualified\tFIA with income rider\t100000','A4\tJeff Smith\tAllianz\tQualified\tFixed indexed annuity\t100000','A5\tJeff Smith\tNY Life\tNon-Qualified\tSPIA\t100000','A6\tJeff Smith\tSchwab\tNon-Qualified\tMutual funds\t100000'].join('\n'));
   await p.click('#pasteAppend'); await p.waitForTimeout(600);
   const m=await p.$$eval('#acctBody tr[data-id] select[data-k="pos"]',ss=>ss.map(s=>s.value)); const added=m.slice(before); console.log('pasted positions:', JSON.stringify(added));
-  if(JSON.stringify(added)!==JSON.stringify(['MYGA Annuity','Variable Annuity','Income Annuity (FIA)','Growth Annuity (FIA)','Annuity','Market'])) errs.push('pasted positions resolved wrongly');
+  if(JSON.stringify(added)!==JSON.stringify(['MYGA Annuity','Variable Annuity','Income Annuity (FIA)','Growth Annuity (FIA)','Income Annuity (FIA)','Market'])) errs.push('pasted positions resolved wrongly');
   console.log('annuity rows now:', (await rows()).length);
   console.log('ERRORS:', errs.length?errs:'none'); await b.close();
 })();

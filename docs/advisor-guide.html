@@ -813,13 +813,16 @@
           design is wrong.</li>
         <li><span class="ui">Current position</span> tells the tool what it is looking at. Mark bank
           savings and money market as <b>Cash</b> — that is what the liquidity buffer keys on, and a
-          household with no Cash row gets no buffer. The annuity positions &mdash; <b>MYGA Annuity</b>,
-          <b>Variable Annuity</b>, <b>Income Annuity (FIA)</b>, <b>Growth Annuity (FIA)</b>, and the
-          plain <b>Annuity</b> older cases carry &mdash; and <b>LTC / Life</b> get their own handling
-          for assignments and 1035s, and every annuity position lists its contract in the
-          <span class="ui">Annuities</span> panel below. An uploaded or pasted position such as
-          <i>MYGA</i>, <i>variable annuity</i>, <i>FIA with income rider</i> or <i>fixed indexed
-          annuity</i> resolves to the matching type.</li>
+          household with no Cash row gets no buffer. The five annuity positions &mdash; <b>MYGA
+          Annuity</b>, <b>Variable Annuity</b>, <b>Income Annuity (FIA)</b>, <b>Growth Annuity
+          (FIA)</b> and <b>RILA Annuity</b> (a plain <i>Annuity</i> from an older case loads as a
+          MYGA) &mdash; and <b>LTC / Life</b> get their own handling for assignments and 1035s, every
+          annuity position lists its contract in the <span class="ui">Annuities</span> panel below,
+          and each type follows its own rules in the projections (see the panel). An uploaded or
+          pasted position such as <i>MYGA</i>, <i>variable annuity</i>, <i>FIA with income rider</i>,
+          <i>fixed indexed annuity</i>, <i>RILA</i> or <i>SPIA</i> resolves to the matching type.
+          An account set to <b>Income Annuity (FIA)</b> switches itself to <b>Stay as is</b>: it is
+          already paying, so it stays with its carrier and counts in the Foundation.</li>
       </ul>
 
       <p>The <span class="ui">Transfer?</span> column at the end holds an account back. Set it to
@@ -839,14 +842,31 @@
           annuity: the owner and account from the list, then <span class="ui">Company</span> (follows
           the custodian until typed), <span class="ui">Product</span>, <span class="ui">Type</span>
           (the account's current position &mdash; change it here or in the list, the other follows),
-          <span class="ui">Rate</span> for a MYGA, <span class="ui">Maturity date</span>,
-          <span class="ui">Monthly income</span> for an income annuity, <span class="ui">Fees</span>
-          as a percent a year, and <span class="ui">Cap rate</span> and <span class="ui">Participation
-          rate</span> for the two FIAs; cells that do not apply to the type are greyed out. The
-          details save with the case and print in the worksheet under <em>Annuity contracts</em>. They
-          are a record: the Growth column in the account list still drives the projections, and a
-          contract already paying out is entered under Other guaranteed income in section&nbsp;04,
-          linked to the account.</dd>
+          <span class="ui">Rate</span> and <span class="ui">Interest</span> (deferred and
+          accumulating, or taken as income) for a MYGA, <span class="ui">Maturity date</span>,
+          <span class="ui">Monthly income</span> and <span class="ui">Payout</span> (single life or
+          joint) for an income annuity, <span class="ui">Fees</span> as a percent a year,
+          <span class="ui">Cap rate</span> for the FIAs and a RILA, <span class="ui">Participation
+          rate</span> for the FIAs and <span class="ui">Floor</span> (the most a bad year can lose) for
+          a RILA; cells that do not apply to the type are greyed out. The details save with the case
+          and print in the worksheet under <em>Annuity contracts</em>.
+          <p style="margin-top:8px">The projections follow these cells. An <b>income annuity</b> in
+            force stays with its carrier and counts in the Foundation (it sits on its own Foundation
+            line in section&nbsp;14 and under the Foundation in section&nbsp;15); it pays its monthly
+            income from now &mdash; the amount typed here, else a section&nbsp;04 line linked to the
+            account, else the Foundation yield on its value &mdash; for the owner's life when single
+            (to the owner's end-of-plan age) or to the end of plan when joint, its value falls by what
+            it pays and the income continues after the value is gone; the Foundation is sized net of
+            that income; it takes no loss in the bad-years stress test. A <b>MYGA</b> grows at its
+            rate when one is typed (the plan rate otherwise); with the interest taken as income it
+            pays the rate on its value each year as annuity income, to its maturity date if one is
+            set, and does not grow; it keeps earning its rate in the bad years. A <b>variable
+            annuity</b> is market money: it grows at the plan rate less its fees and takes the full
+            stress loss. A <b>growth FIA</b> grows at the plan rate up to its cap, and sits at zero
+            in a bad year. A <b>RILA</b> grows at the plan rate up to its cap, and in a bad year loses
+            no more than its floor. The Walls and Roof blend these account by account, as they already
+            do for a rate typed in the Growth column, so the level rates and the stress returns in
+            sections&nbsp;17 and 18 reflect what each level holds.</p></dd>
         <dt>Other assets</dt>
         <dd>A second panel under the accounts for real assets outside the Fortress &mdash; primary
           residence, vacation home, rental property, land, a business interest, vehicles or other

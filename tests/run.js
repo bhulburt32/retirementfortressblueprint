@@ -15,6 +15,7 @@ const SUITE = [
   't-prorate',   // first-year proration
   't-anngroup',  // annuity contracts combined by To account
   't-anx',       // section 06: account list opens with the section, annuity position types, the Annuities subsection
+  't-annrules',  // the annuity product rules in the projections and the stress test
   't-ltcmerge',  // one LTC contract per insured
   't-ltcscn',    // care-event projections
   't-jobs',      // additional employment incomes
