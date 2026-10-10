@@ -1,5 +1,6 @@
 /* Annuity income and the Walls yield in the tax projection: a federally tax-free Walls yield (section 14),
-   annuity income taxable unless it is paid from a Roth account, and the stress-test results on the scenario cards. */
+   annuity income taxable unless it is paid from a Roth account, the stress-test and care-event results on the
+   scenario cards, the cash flow statement (section 17) and the header graphic. */
 const { chromium } = (function(){ try { return require('playwright'); } catch(e){ return require('playwright-core'); } })();
 const path = require('path');
 (async()=>{
@@ -24,6 +25,26 @@ const path = require('path');
     const sec18=await tile('#'+key+'Tiles','at end of plan'), card=cardNum(C[0],label); console.log(label+':', card, '| section 18:', sec18);
     if(Math.abs(card-sec18)>1) errs.push(label+' on the card should match section 18 ('+card+' vs '+sec18+')');
   }
+  // 1b. the care-event rows, matching the section 17 care-event projections
+  for(const [key,label] of [['client','Jeff needs care'],['spouse','Jane needs care'],['both','Both need care']]){
+    const s17=await tile('#assetLtc'+key+'Tiles','at end of plan'), card=cardNum(C[0],label); console.log(label+':', card, '| section 17:', s17);
+    if(Math.abs(card-s17)>1) errs.push(label+' on the card should match section 17 ('+card+' vs '+s17+')');
+  }
+  // 1c. the cash flow statement: one row a year, the net cash flow never negative while funded, the ending balance the section 17 total; the header graphic loads
+  const cf=await p.$$eval('#cfTable tbody tr',rs=>rs.map(r=>[...r.querySelectorAll('td')].map(t=>t.textContent.trim())));
+  const cfHead=await p.$eval('#cfTable thead',e=>[...e.querySelectorAll('th')].map(t=>t.textContent));
+  const col=n=>cfHead.indexOf(n); const num=t=>+t.replace(/[^0-9.-]/g,'')*(/^[−-]/.test(t)?-1:1);
+  const years=await p.$$eval('#assetTable tbody tr',rs=>rs.length);
+  console.log('cash flow rows:', cf.length, '| columns:', cfHead.join(' | '));
+  if(cf.length!==years) errs.push('the cash flow statement should carry every projection year ('+cf.length+' vs '+years+')');
+  for(const n of ['Total income','Needs','Wants','Federal tax','Cash flow before withdrawals','Withdrawals','Net cash flow','Ending account balance','Ending net worth']) if(col(n)<0) errs.push('cash flow column missing: '+n);
+  const bad=cf.filter(r=>num(r[col('Net cash flow')])<-1); if(bad.length) errs.push('net cash flow negative in '+bad.length+' funded years, e.g. '+bad[0].join(' | '));
+  const lastBal=num(cf[cf.length-1][col('Ending account balance')]), assetEnd=await tile('#assetTiles','at end of plan'); console.log('last ending balance:', lastBal, '| section 17 end:', assetEnd);
+  if(Math.abs(lastBal-assetEnd)>1) errs.push('the ending balance should be the section 17 total');
+  const r0=cf[0]; const check=num(r0[col('Total income')])-Math.abs(num(r0[col('Needs')]))-Math.abs(num(r0[col('Wants')]))-Math.abs(num(r0[col('Federal tax')]))-Math.abs(num(r0[col(cfHead.find(h=>/ tax$/.test(h) && !/Federal/.test(h)))]));
+  console.log('first row arithmetic:', check.toFixed(0), 'vs before withdrawals', num(r0[col('Cash flow before withdrawals')]));
+  if(Math.abs(check-num(r0[col('Cash flow before withdrawals')]))>2) errs.push('cash flow before withdrawals should be income less expenses and tax');
+  console.log('hero image:', await p.$eval('#heroImg',e=>e.naturalWidth+'x'+e.naturalHeight)); if(!(await p.$eval('#heroImg',e=>e.naturalWidth>0))) errs.push('the header graphic did not load');
   // 2. the Walls yield federally tax-free: no change while the Walls hold only IRA money, a lower federal tax once a non-qualified account is in the Walls
   await p.$eval('#adjYWtf',e=>{ e.checked=true; e.dispatchEvent(new Event('change',{bubbles:true})); }); await p.waitForTimeout(700);
   const tfIra=await figs(); console.log('tax-free, IRA-funded Walls:', JSON.stringify(tfIra), '| msg mentions tax-free:', /federally tax-free/.test(await txt('#adjIncMsg')));
