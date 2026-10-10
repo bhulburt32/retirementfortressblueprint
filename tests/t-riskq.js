@@ -21,12 +21,12 @@ const path = require('path');
   console.log('panel at load:', JSON.stringify(await panel()));
   const q1=await p.$eval('#rqForm .rq-q',q=>q.textContent.replace(/\s+/g,' ').slice(0,220)); console.log('q1 labels:', q1);
   // answer the third option everywhere (q5: Avoid losses; q12: More than $50,000)
-  const answer=async k=>{ for(const id of ['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12']){ const opts=await p.$$(`#rqForm input[name="rq_${id}"]`); const o=opts[Math.min(k,opts.length-1)]; await o.check(); } await p.waitForTimeout(500); };
+  const answer=async k=>{ for(const id of ['q1','q2','q3','q5','q6','q7','q8','q9','q10','q11','q12']){ const opts=await p.$$(`#rqForm input[name="rq_${id}"]`); const o=opts[Math.min(k,opts.length-1)]; await o.check(); } await p.waitForTimeout(500); };
   await answer(2);
   const P1=await panel(); console.log('panel all third options:', JSON.stringify(P1));
   console.log('tolerance after:', await v('riskTol'), 'auto', await isAuto('riskTol'), '| readout:', (await txt('#riskReadout')).slice(0,260));
-  if(P1.score!=='47') errs.push('expected score 47 for all-third answers, got '+P1.score);
-  if(await v('riskTol')!=='47' || !(await isAuto('riskTol'))) errs.push('a completed questionnaire must write its score over the typed 48');
+  if(P1.score!=='46') errs.push('expected score 46 for all-third answers (eleven questions), got '+P1.score);
+  if(await v('riskTol')!=='46' || !(await isAuto('riskTol'))) errs.push('a completed questionnaire must write its score over the typed 48');
   if(!/Avoid losses/.test(P1.flag)) errs.push('objective mismatch flag expected');
   // a typed tolerance wins; clearing it brings the questionnaire back
   await p.fill('#riskTol','60'); await p.$eval('#riskTol',e=>e.dispatchEvent(new Event('input',{bubbles:true}))); await p.$eval('#riskTol',e=>e.blur()); await p.waitForTimeout(400);
@@ -38,7 +38,7 @@ const path = require('path');
   await p.fill('#riskTol','60'); await p.$eval('#riskTol',e=>e.dispatchEvent(new Event('input',{bubbles:true}))); await p.$eval('#riskTol',e=>e.blur()); await p.waitForTimeout(300);
   await p.fill('#riskTol',''); await p.$eval('#riskTol',e=>e.dispatchEvent(new Event('input',{bubbles:true}))); await p.$eval('#riskTol',e=>e.blur()); await p.waitForTimeout(400);
   console.log('cleared:', await v('riskTol'), 'auto', await isAuto('riskTol'));
-  if(await v('riskTol')!=='47') errs.push('clearing the cell should refill from the questionnaire');
+  if(await v('riskTol')!=='46') errs.push('clearing the cell should refill from the questionnaire');
   // the portfolio amount drives the dollar labels
   await p.fill('#rqAmt','1,000,000'); await p.$eval('#rqAmt',e=>e.dispatchEvent(new Event('input',{bubbles:true}))); await p.waitForTimeout(400);
   const q3=await p.$$eval('#rqForm input[name="rq_q3"]',o=>o.map(x=>x.closest('label').textContent.replace(/\s+/g,' ').trim()));
@@ -52,7 +52,7 @@ const path = require('path');
   // the client report
   [pop]=await Promise.all([ctx.waitForEvent('page',{timeout:30000}), p.click('#rqReport')]); await pop.waitForLoadState('load'); await pop.waitForTimeout(500);
   const rep=await pop.evaluate(()=>({title:document.title, big:document.querySelector('.big').textContent, band:document.querySelector('.pill').textContent, nitro:/Nitrogen/.test(document.body.textContent), aewm:/AE Wealth Management/.test(document.body.textContent), answers:document.querySelectorAll('.answers dd').length}));
-  console.log('client report:', JSON.stringify(rep)); if(rep.big!=='47' || rep.nitro || !rep.aewm || rep.answers!==7) errs.push('client report content wrong'); await pop.close();
+  console.log('client report:', JSON.stringify(rep)); if(rep.big!=='46' || rep.nitro || !rep.aewm || rep.answers!==7) errs.push('client report content wrong'); await pop.close();
   console.log('msg:', await txt('#rqMsg'));
   // worksheet PDF still builds
   const [d]=await Promise.all([p.waitForEvent('download',{timeout:60000}), p.click('#makePdf')]); console.log('worksheet:', d.suggestedFilename());
@@ -63,7 +63,7 @@ const path = require('path');
   if((await p.$$eval('#rqForm input:checked',o=>o.length))!==2) errs.push('clear should leave the two plan answers');
   await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(900);
   console.log('after reload:', await v('riskTol'), 'auto', await isAuto('riskTol'), '| answered', await p.$$eval('#rqForm input:checked',o=>o.length), '| amount', await v('rqAmt'));
-  if(await v('riskTol')!=='47' || (await p.$$eval('#rqForm input:checked',o=>o.length))!==12) errs.push('reload lost the questionnaire');
+  if(await v('riskTol')!=='46' || (await p.$$eval('#rqForm input:checked',o=>o.length))!==11) errs.push('reload lost the questionnaire');
   // theme: the page palette is the questionnaire's
   const tok=await p.evaluate(()=>{ const cs=getComputedStyle(document.documentElement); return ['--navy','--bg','--btn','--accent','--st-alert'].map(k=>k+'='+cs.getPropertyValue(k).trim()).join(' '); }); console.log('tokens:', tok);
   const navyTxt=await p.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--navy-text').trim()); console.log('navy text in dark:', navyTxt); if(navyTxt.toUpperCase()!=='#FFFFFF') errs.push('navy text should be white in dark');

@@ -99,6 +99,9 @@
   .masthead .prepared{color:rgba(255,255,255,.88)} .masthead .prepared span{color:rgba(255,255,255,.65)}
   .masthead .theme-btn{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.45);color:#fff}
   .masthead .theme-btn:hover{background:rgba(255,255,255,.26);border-color:#fff;color:#fff}
+  .masthead a.video-btn{text-decoration:none;display:inline-flex;align-items:center;gap:8px;background:#D9A93C;border-color:#D9A93C;color:#001F5B}
+  .masthead a.video-btn:hover{background:#e6b955;border-color:#e6b955;color:#001F5B}
+  .masthead a.video-btn .play{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#001F5B;color:#fff;font-size:10px;padding-left:2px}
   @media print{ .masthead{background-image:none !important;box-shadow:none} }
   .eyebrow{
     font-family:"IBM Plex Mono",ui-monospace,monospace;
@@ -742,6 +745,9 @@
   .goal .gsrc{font-size:11.5px;color:var(--muted);margin:2px 0 0 8px;font-family:"IBM Plex Mono",monospace;letter-spacing:.04em;text-transform:uppercase}
   .goals .empty-state{padding:22px 16px}
   #notesText{font-family:"Public Sans",sans-serif;font-size:14px}
+  .notes-entry{display:grid;grid-template-columns:170px minmax(0,1fr) 32px;gap:10px;align-items:start;margin-bottom:10px}
+  .notes-entry textarea{font-family:"Public Sans",sans-serif;font-size:14px;min-height:110px}
+  .notes-entry .nmeta{display:flex;flex-direction:column;gap:6px} .notes-entry .nmeta small{color:var(--muted);font-size:12.5px}
   /* client information: dependents */
   .dep-grid{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px 28px}
   .dep-title{
@@ -970,6 +976,7 @@
       <p class="prepared" id="preparedFor" hidden></p>
     </div>
     <div class="head-actions">
+      <a class="theme-btn video-btn" id="roadVideo" href="https://claude.ai/artifact/4betJJT5zWc21C6KhEAQN5" target="_blank" rel="noopener" title="The Fortress story as a short video — opens on claude.ai in a new tab"><span class="play">&#9654;</span> The Road to Retirement Fortress</a>
       <button class="theme-btn" id="newCase" type="button">Start new case</button>
       <button class="theme-btn" id="themeBtn" type="button">Switch theme</button>
     </div>
@@ -1214,7 +1221,7 @@
         ages, names and COLA already on the page; you add only each person's <span class="ui">life
         expectancy</span> (blank: 85 for a man, 88 for a woman), an optional <span class="ui">discount
         rate</span> (blank ranks nominal totals; equal to the COLA ranks in today's dollars) and,
-        optionally, dates of birth for month-level precision &mdash; otherwise ages are whole years from
+        the section&nbsp;02 dates of birth (read-only here while section&nbsp;02 has them; otherwise optional dates here) for month-level precision &mdash; otherwise ages are whole years from
         section&nbsp;02. With <span class="ui">Rank with the trust-fund stress test</span> ticked the
         strategies are ranked on the 22%-from-2032 reduction used in section&nbsp;18, with the no-cut
         total alongside. Tiles name the top strategy, its lifetime benefit, the surviving spouse's
@@ -1248,8 +1255,9 @@
         from the plan formula &mdash; the systems in Alto's Pension Reference Guide: PSERS and SERS,
         VRS, SRPS, TSERS, SCRS, TPAF, MTRS, MPSERS, TRS (Illinois and Texas), the three Ohio systems,
         PERSI, FERS and CSRS, and Wespath. Pick whose pension it is and the <span class="ui">State /
-        pension system</span>, enter the date of birth, the employment start and the expected
-        retirement date (the age at retirement and the years of service are calculated; type over
+        pension system</span>, enter the date of birth and the expected retirement date &mdash; both
+        come from sections&nbsp;02 and 04 while blank, so the age at retirement is the plan's &mdash;
+        and the employment start (the age at retirement and the years of service are calculated; type over
         the years if the record says otherwise), the beneficiary's age, then the <span class="ui">Membership
         class / tier</span> (the hire date suggests one), the average final compensation over the
         years the formula uses, any split-period service the class asks for, and the
@@ -1354,8 +1362,8 @@
         <label class="f"><span id="ssoLifeCLbl">Client&rsquo;s life expectancy<small>Age; blank: 85 for a man, 88 for a woman</small></span><input type="text" inputmode="decimal" id="ssoLifeC" placeholder="85" autocomplete="off"></label>
         <label class="f" id="ssoLifeSWrap"><span id="ssoLifeSLbl">Spouse&rsquo;s life expectancy<small>Age; blank: the default by sex</small></span><input type="text" inputmode="decimal" id="ssoLifeS" placeholder="88" autocomplete="off"></label>
         <label class="f"><span>Discount rate<small>Blank: rank on nominal totals; equal to the COLA ranks in today&rsquo;s dollars</small></span><input type="text" inputmode="decimal" id="ssoRate" placeholder="0.0%" autocomplete="off"></label>
-        <label class="f"><span id="ssoDobCLbl">Client&rsquo;s date of birth<small>Optional &mdash; month-level precision; blank uses the age in section 02</small></span><input type="date" id="ssoDobC"></label>
-        <label class="f" id="ssoDobSWrap"><span id="ssoDobSLbl">Spouse&rsquo;s date of birth<small>Optional</small></span><input type="date" id="ssoDobS"></label>
+        <label class="f"><span id="ssoDobCLbl">Client&rsquo;s date of birth<small>From section 02 when entered there; otherwise optional here, blank uses the age in section 02</small></span><input type="date" id="ssoDobC"></label>
+        <label class="f" id="ssoDobSWrap"><span id="ssoDobSLbl">Spouse&rsquo;s date of birth<small>From section 02 when entered there</small></span><input type="date" id="ssoDobS"></label>
       </div>
       <div class="btn-row" style="margin-top:14px">
         <label class="chk"><input type="checkbox" id="ssoCut" checked> <span id="ssoCutLbl">Rank with the trust-fund stress test</span></label>
@@ -1409,7 +1417,7 @@
           <div class="pbc-grid3">
             <label class="f"><span>Date of birth</span><input type="date" id="pbcDob"></label>
             <label class="f"><span>Employment start date</span><input type="date" id="pbcStart"></label>
-            <label class="f"><span>Expected retirement date</span><input type="date" id="pbcRet"></label>
+            <label class="f"><span>Expected retirement date<small id="pbcRetHint">From section 04 while blank; type to override</small></span><input type="date" id="pbcRet"></label>
             <label class="f"><span>Age at retirement<small>Calculated from the dates</small></span><input type="text" id="pbcRetAge" class="linked" readonly placeholder="0.0"></label>
             <label class="f"><span>Years of service<small id="pbcYosHint">Calculated from the dates; type to override</small></span><input type="text" inputmode="decimal" id="pbcYos" placeholder="0.0" autocomplete="off"></label>
             <label class="f"><span>Spouse / beneficiary age at retirement</span><input type="text" inputmode="numeric" id="pbcSpAge" placeholder="e.g. 62" autocomplete="off"></label>
@@ -2261,18 +2269,22 @@
     <!-- guide-notes:11 -->
     <details class="guide-notes"><summary>User Guide Notes<small>how to use this section</small></summary>
       <div class="guide-body">
-      <p>Drop in the meeting notes &mdash; a <span class="ui">.txt</span>, <span class="ui">.md</span> or
-        <span class="ui">.docx</span> file, or pasted text &mdash; and press
-        <span class="ui">Draft goals from the notes</span>. The tool writes three to five client goals in
-        the client's own terms, each a short title and a sentence or two, ordered by what matters most
-        to them. Opened inside Claude, the drafting is done by Claude from the whole of the notes and
-        asks your permission the first time (it uses your own Claude account); anywhere else, or if you
-        decline, it reads the notes' own <em>Goals</em> heading and falls back to the sentences that read
-        like goals.</p>
+      <p>The meeting notes are a dated log, one entry per meeting. Drop in a
+        <span class="ui">.txt</span>, <span class="ui">.md</span> or <span class="ui">.docx</span> file
+        and it becomes a new entry dated today, or press <span class="ui">Add meeting notes</span> and
+        paste; after each later meeting add another entry (the date is editable, the &times; removes
+        one). <span class="ui">Draft or update goals from the notes</span> writes three to five client
+        goals in the client's own terms, each a short title and a sentence or two, ordered by what
+        matters most to them, from every entry in the log; when goals already exist it updates them
+        &mdash; keeping those that still hold, revising what the later notes changed, adding what is
+        new and dropping what the notes no longer support. Opened inside Claude, the drafting is done
+        by Claude from the whole of the notes and asks your permission the first time (it uses your own
+        Claude account); anywhere else, or if you decline, it reads the notes' own <em>Goals</em>
+        heading and falls back to the sentences that read like goals.</p>
 
       <p>Every goal is editable in place &mdash; retitle it, rewrite it, remove it, or
         <span class="ui">Add a goal</span> of your own. A card notes whether it was drafted, read from
-        the notes, or written by you. Goals and the notes save with the case.</p>
+        the notes, or written by you. Goals and every meeting's notes save with the case.</p>
 
       <div class="note warn">
         <h3>A draft, not a record</h3>
@@ -2296,9 +2308,10 @@
             </div>
           </div>
           <input type="file" id="notesFile" accept=".txt,.md,.docx,text/plain,text/markdown,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
-          <textarea id="notesText" rows="7" spellcheck="false" placeholder="Paste the meeting notes here…" style="margin-top:12px"></textarea>
+          <div id="notesLog" class="notes-log" style="margin-top:12px"></div>
           <div class="btn-row" style="margin-top:12px">
-            <button type="button" class="primary" id="goalsDraft">Draft goals from the notes</button>
+            <button type="button" id="notesAdd">Add meeting notes</button>
+            <button type="button" class="primary" id="goalsDraft">Draft or update goals from the notes</button>
             <button type="button" id="goalsStop" hidden>Stop</button>
             <span class="hint" id="goalsMsg"></span>
           </div>
@@ -2326,11 +2339,11 @@
 
       <dl class="fields">
         <dt>Risk profile questionnaire</dt>
-        <dd>Twelve questions, answered with the client, that produce a 1&ndash;99 risk score on the
+        <dd>Eleven questions, answered with the client, that produce a 1&ndash;99 risk score on the
           same scale and logic as the Risk Number: real dollar amounts, one-year outcome ranges and
           how the client weighs gains against losses. <span class="ui">Portfolio being
           assessed</span> sets the dollar figures in the questions; left blank it follows the total
-          of the accounts in section&nbsp;06. The first five questions measure <em>willingness</em>
+          of the accounts in section&nbsp;06. The first four questions measure <em>willingness</em>
           (65% of the score), the next five <em>capacity</em> (35%), and two on experience count with
           willingness; each answer carries a score, the two sides are weighted averages, and a
           willingness more than 15 points above capacity is limited to capacity plus 15. The panel on
@@ -2348,7 +2361,7 @@
           brings the score back. The
           gap readout, the executive summary's risk page (the category, willingness and capacity
           under the tolerance tile) and the worksheet (the score and every answer) all follow it.
-          <span class="ui">Risk profile report</span> opens a client-facing letter in a new tab
+          <span class="ui">Risk profile report</span>, in section&nbsp;21 with the other reports, opens a client-facing letter in a new tab
           &mdash; the score and category, what a typical year could look like on the portfolio
           assessed, willingness against capacity, the answers in plain words, where the score fits in
           the Fortress and next steps, with no vendor named; <span class="ui">Copy summary</span>
@@ -2401,7 +2414,7 @@
         <label class="f"><span>Risk tolerance<small>1&ndash;100, what the client is comfortable with</small></span><input type="text" inputmode="numeric" id="riskTol" value=""></label>
       </div>
       <div class="moat-readout" id="riskReadout"></div>
-      <div class="inc-title gap">Risk profile questionnaire<small>Twelve questions that produce a 1&ndash;99 risk score on the Risk Number scale &middot; a completed questionnaire fills the risk tolerance above; questions 6 and 7 follow the plan until answered</small></div>
+      <div class="inc-title gap">Risk profile questionnaire<small>Eleven questions that produce a 1&ndash;99 risk score on the Risk Number scale &middot; a completed questionnaire fills the risk tolerance above; questions 6 and 7 follow the plan until answered</small></div>
       <div class="rq" id="rq">
         <div class="rq-top">
           <label class="f"><span>Portfolio being assessed<small>The dollar amounts in the questions scale to this; blank follows the accounts in section 06</small></span><input type="text" inputmode="numeric" id="rqAmt" value=""></label>
@@ -2412,7 +2425,6 @@
           <aside class="rq-panel" id="rqPanel" aria-live="polite"></aside>
         </div>
         <div class="btn-row" style="margin-top:14px">
-          <button type="button" id="rqReport" class="primary">Risk profile report</button>
           <button type="button" id="rqCopy">Copy summary</button>
           <button type="button" id="rqClear">Clear answers</button>
           <span class="hint" id="rqMsg">For advisor use. An Alto-designed approximation of the Risk Number scale, not produced by or affiliated with Nitrogen; the client report names no vendor.</span>
@@ -3251,7 +3263,7 @@
         </div>
         <div class="exp client">
           <span class="tag">Client-facing</span>
-          <b>Social Security analysis</b>
+          <b>Social Security optimizer report</b>
           <p>The claiming optimizer's findings as a letter-size client report, <em>Social Security
             Planning Analysis</em>: a cover with the client names, date and advisor; an introduction
             and key terms (PIA, full retirement age, COLA, life expectancy, spousal and survivor
@@ -3273,6 +3285,20 @@
             &mdash; the need, the average length of care and the 2025 median costs. It needs no case loaded. Use it for the first
             meeting or as a leave-behind; to update the deck, replace the file in the tool.</p>
         </div>
+        <div class="exp client">
+          <span class="tag">Client-facing</span>
+          <b>Risk profile report</b>
+          <p>The section&nbsp;12 questionnaire as a letter: the score and category, what a typical year
+            could look like on the portfolio assessed, willingness against capacity, the answers in
+            plain words, where the score fits in the Fortress and next steps, with no vendor named.</p>
+        </div>
+        <div class="exp client">
+          <span class="tag">Client-facing</span>
+          <b>Pension benefits report</b>
+          <p>The last estimate from the section&nbsp;04 Pension Benefits Calculator as a letter page:
+            the benefit by option, eligibility, the inputs, the formula, the COLA note and the
+            reference tool's disclaimer. Calculate a benefit there first.</p>
+        </div>
         <div class="exp internal">
           <span class="tag">Internal only</span>
           <b>Internal worksheet</b>
@@ -3281,10 +3307,6 @@
             waterfall's own proposal.</p>
         </div>
       </div>
-
-      <p><b>The Road to Retirement Fortress</b> is a short video of the Fortress story for the client
-        meeting or as a follow-up link: <span class="ui">Watch the video</span> opens it in a new tab
-        on claude.ai, where a signed-in Alto account is needed.</p>
 
       <div class="note stop">
         <h3>Before the executive summary report leaves the office</h3>
@@ -3304,14 +3326,11 @@
       <div class="btn-row">
         <button type="button" id="makePdf">Internal worksheet</button>
         <button type="button" class="primary" id="makeDeck">Executive summary report</button>
-        <button type="button" class="primary" id="makeSS">Social Security analysis</button>
+        <button type="button" class="primary" id="makeSS">Social Security optimizer report</button>
+        <button type="button" class="primary" id="rqReport">Risk profile report</button>
+        <button type="button" class="primary" id="makePension">Pension benefits report</button>
         <button type="button" class="primary" id="makeEdu">Educational slides</button>
         <span class="hint" id="pdfMsg">Builds from the figures currently on this page.</span>
-      </div>
-      <div class="video-card">
-        <div class="video-icon">&#9654;</div>
-        <div class="video-text"><b>The Road to Retirement Fortress</b><span>The Fortress story as a short video, for the client meeting or as a follow-up link. It opens in a new tab on claude.ai and needs a signed-in Alto account.</span></div>
-        <a class="btn-link" id="roadVideo" href="https://claude.ai/artifact/4betJJT5zWc21C6KhEAQN5" target="_blank" rel="noopener">Watch the video</a>
       </div>
       <p class="hint" style="margin:12px 0 0;padding-top:11px;border-top:1px solid var(--line)">
         The <b>internal worksheet</b> is marked <i>not for client distribution</i>: the full audit trail.<br>
@@ -3324,7 +3343,11 @@
         ending positions, then how the picture improves, what it costs and the moving parts. <b>Have compliance approve its disclosure pages before it leaves the office.</b> The charts are the ones on this page, carried over as drawn; every figure comes
         from the same run as the PDFs. It opens in a new browser tab; the
         browser’s Print → Save as PDF gives a 16:9 PDF, one page per topic, when a file is needed.<br>
-        The <b>Social Security analysis</b> is the claiming optimizer from section 04 as a letter-size client
+        The <b>risk profile report</b> is the section 12 questionnaire as a client-facing letter — the score and category,
+        what a typical year could look like, willingness against capacity, the answers in plain words and next steps, no vendor named.
+        The <b>pension benefits report</b> is the section 04 Pension Benefits Calculator’s last estimate as a letter-size page, with its
+        inputs, formula, COLA note and disclaimer — calculate a benefit there first.
+        The <b>Social Security optimizer report</b> is the claiming optimizer from section 04 as a letter-size client
         report — cover, key terms, the inputs, the five best strategies with their claiming events, the comparison
         charts and break-even ages, a year-by-year schedule for each, how to file and the disclosures — opened in a
         new tab and printed from the browser.<br>
@@ -4004,6 +4027,7 @@
     return Math.max(0.75, Math.min(0.99, b + adj));
   }
   var pbcSyncWho = null;   // the calculator's Whose list follows the section 02 names (set below, called by renderPensionTable)
+  var pbcReport = null;    // the calculator's last estimate as a report page (set below, used by the Reports section)
   (function(){
     if(!$('pbcState')) return;
     var yosManual = false, cur = null, last = null;
@@ -4017,6 +4041,13 @@
       sel.value = (v === 'spouse' && spouse) ? 'spouse' : 'client';
       var dob = $(sel.value === 'spouse' ? 'spouseDob' : 'clientDob').value;   // the section 02 date of birth, until one is typed here
       if(dob && !$('pbcDob').value){ $('pbcDob').value = dob; derived(); }
+      pullRet(sel.value);
+    }
+    /* the section 04 retirement month, until a date is typed here: the age at retirement follows from it */
+    function pullRet(who){
+      var rm = $(who === 'spouse' ? 'retireS' : 'retireC').value;
+      if(rm && !$('pbcRet').value){ $('pbcRet').value = rm + '-01'; $('pbcRet').classList.add('auto'); derived(); }
+      $('pbcRetHint').textContent = $('pbcRet').classList.contains('auto') ? 'From section 04 \u00b7 type to override' : 'From section 04 while blank; type to override';
     }
     function derived(){
       var dob = $('pbcDob').value, st = $('pbcStart').value, ret = $('pbcRet').value;
@@ -4081,7 +4112,8 @@
       render_(last); $('pbcMsg').textContent = '';
       $('pbcUse').hidden = !(adjusted > 0.5 && last.ret);
     }
-    function render_(d){
+    function render_(d){ $('pbcOut').innerHTML = resultsHtml(d); $('pbcResults').hidden = false; }
+    function resultsHtml(d){
       var row = function(l, v){ return '<div class="pbc-row"><span>' + l + '</span><span>' + v + '</span></div>'; };
       var html = '<div class="pbc-head"><div><b>' + esc(d.name) + '</b><small>' + esc(d.cfg.name) + '</small></div><span class="pbc-tag">' + esc(d.cls.id) + '</span></div>';
       html += '<div class="pbc-elig ' + (d.elig.status === 'ok' ? 'ok' : 'warn') + '">' + (d.elig.status === 'ok' ? '\u2713' : '\u26a0') + ' ' + esc(d.elig.msg) + '</div>';
@@ -4106,8 +4138,33 @@
       if(d.sf < 1) html += '<p class="hint" style="margin:0 0 10px">Survivor benefit factor applied: ' + (d.sf * 100).toFixed(1) + '% of maximum (estimated). The actual factor is set by the plan administrator.</p>';
       if(d.notes) html += row('Advisor notes', esc(d.notes));
       html += '<div class="pbc-foot" style="margin-top:12px"><span>Alto Financial Group \u2014 Pension Reference Tool</span><span>Calculated ' + new Date().toLocaleDateString() + '</span></div>';
-      $('pbcOut').innerHTML = html; $('pbcResults').hidden = false;
+      return html;
     }
+    /* the report (section 21): the last estimate on a letter page, the calculator's own wording and disclaimer */
+    pbcReport = function(){
+      if(!last) throw new Error('Calculate a benefit in the section 04 Pension Benefits Calculator first.');
+      var i = readInputs(), E = esc, advisor = (i.advisor || '').trim(), dateTxt = longDate(i.prepDate || todayISO());
+      var disc = $('pbcResults').querySelector('.pbc-disclaimer'), discHtml = disc ? disc.innerHTML : '';
+      return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Pension Benefit Estimate \u2014 ' + E(last.name) + '</title>'
+        + '<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">'
+        + '<style>:root{--navy:#1F3162;--gold:#C5A044;--red:#D82629;--ink:#18213B;--muted:#5A6276;--line:#DADDE6;--soft:#F4F3EF;--ok:#2E7D4F;--okbg:#E8F5E9;--warn:#8a6d00;--warnbg:#FFF8E1}'
+        + '*{box-sizing:border-box}body{margin:0;font-family:Montserrat,"Helvetica Neue",Arial,sans-serif;color:var(--ink);font-size:12.5px;line-height:1.55;background:#eef0f3}'
+        + '.sheet{background:#fff;max-width:8.5in;margin:24px auto;padding:.7in .75in;box-shadow:0 2px 12px rgba(0,0,0,.08)}'
+        + '.top{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid var(--navy);padding-bottom:12px;margin-bottom:18px}.top img{height:48px}.top .t{font-family:"Playfair Display",Georgia,serif;color:var(--navy);font-size:22px;font-weight:600}.top small{display:block;color:var(--muted);font-size:11.5px}'
+        + '.pbc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:14px}.pbc-head b{font-family:"Playfair Display",Georgia,serif;font-size:20px;color:var(--navy)}.pbc-head small{display:block;color:var(--muted);margin-top:3px}'
+        + '.pbc-tag{font-size:11px;font-weight:600;padding:4px 11px;background:var(--navy);color:#fff;border-radius:20px}'
+        + '.pbc-elig{display:inline-block;padding:7px 12px;border-radius:7px;font-weight:600;margin-bottom:12px}.pbc-elig.ok{background:var(--okbg);color:var(--ok)}.pbc-elig.warn{background:var(--warnbg);color:var(--warn)}'
+        + '.pbc-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 14px;padding:0}.pbc-metric{background:var(--soft);border-radius:8px;padding:12px 10px;text-align:center}.pbc-metric dt{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}.pbc-metric dd{margin:0;font-size:19px;font-weight:700;color:var(--navy)}.pbc-metric small{display:block;font-size:10.5px;color:var(--muted);margin-top:3px}'
+        + '.pbc-detail{display:grid;grid-template-columns:1fr 1fr;gap:0 24px;margin-bottom:12px}.pbc-row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--line)}.pbc-row span:first-child{color:var(--muted)}.pbc-row span:last-child{font-weight:600}'
+        + '.pbc-formula{background:var(--soft);border-radius:7px;padding:10px 13px;font-family:ui-monospace,Menlo,monospace;margin:0 0 12px}.pbc-note{background:var(--soft);border-left:3px solid var(--navy);padding:9px 12px;border-radius:0 6px 6px 0;margin:0 0 12px}.pbc-note.warn{border-left-color:var(--red)}.pbc-note.caution{border-left-color:var(--gold)}'
+        + '.hint{color:var(--muted);font-size:11.5px}.pbc-foot{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;padding-top:10px;border-top:1px solid var(--line)}'
+        + '.disc{font-size:10.5px;color:var(--muted);margin-top:16px;padding-top:12px;border-top:1px solid var(--line);line-height:1.5}'
+        + '@media print{body{background:#fff}.sheet{box-shadow:none;margin:0;max-width:none;padding:.5in .6in}}</style></head><body><div class="sheet">'
+        + '<div class="top"><div><div class="t">Pension Benefit Estimate</div><small>' + E(last.name) + ' \u00b7 ' + E(last.cfg.name) + '</small></div><div style="text-align:right"><img src="data:image/png;base64,' + LOGO_PNG_B64 + '" alt="Alto Financial Group"><small>' + (advisor ? E(advisor) + ' \u00b7 ' : '') + E(dateTxt) + '</small></div></div>'
+        + resultsHtml(last)
+        + '<div class="disc">' + discHtml + '</div>'
+        + '</div></body></html>';
+    };
     /* the estimate becomes a line in Pension income: the monthly benefit from the retirement month, the survivor share of the option, no COLA unless the advisor sets one */
     function useInPlan(){
       if(!last || !(last.adjusted > 0.5)) return;
@@ -4120,7 +4177,8 @@
     ['pbcDob','pbcStart','pbcRet'].forEach(function(id){ $(id).addEventListener('change', derived); $(id).addEventListener('input', derived); });
     $('pbcYos').addEventListener('input', function(){ yosManual = this.value.trim() !== ''; $('pbcYosHint').textContent = yosManual ? 'Entered by hand; clear to calculate from the dates' : 'Calculated from the dates; type to override'; if(!yosManual) derived(); });
     $('pbcWho').addEventListener('focus', syncWho); $('pbcWho').addEventListener('mousedown', syncWho);
-    $('pbcWho').addEventListener('change', function(){ var dob = $(this.value === 'spouse' ? 'spouseDob' : 'clientDob').value; if(dob){ $('pbcDob').value = dob; derived(); } });
+    $('pbcWho').addEventListener('change', function(){ var dob = $(this.value === 'spouse' ? 'spouseDob' : 'clientDob').value; if(dob){ $('pbcDob').value = dob; derived(); } if($('pbcRet').classList.contains('auto')) $('pbcRet').value = ''; pullRet(this.value); });
+    $('pbcRet').addEventListener('input', function(){ $('pbcRet').classList.remove('auto'); $('pbcRetHint').textContent = 'From section 04 while blank; type to override'; });
     $('pbcCalc').addEventListener('click', calculate);
     $('pbcUse').addEventListener('click', useInPlan);
     pbcSyncWho = syncWho; syncWho();
@@ -8277,6 +8335,7 @@
       })(),
       goals:goals.length ? goals.map(function(g){ return {title:g.title, detail:g.detail, src:g.src}; }) : null,
       notes:notesText ? notesText.slice(0, 60000) : null,
+      meetingNotes:meetingNotes.length ? meetingNotes.map(function(n){ return {date:n.date, text:n.text.slice(0, 60000)}; }) : null,
       ltc:(function(){
         var dur = function(who){ var P = ltcSuffix(who); return ltcAuto.dur[who] ? null : {home:num($('ltcDHome' + P).value), al:num($('ltcDAL' + P).value), nh:num($('ltcDNH' + P).value)}; };
         return {infl:pctIn($('ltcInfl').value), room:$('ltcRoom').value, mem:pctIn($('ltcMem').value), hours:num($('ltcHours').value),
@@ -8421,8 +8480,9 @@
       renderNonGuarTable();
     })();
     goals = Array.isArray(d.goals) ? d.goals.map(function(g){ return mkGoal({title:g.title, detail:g.detail, src:g.src || 'advisor'}); }) : [];
-    notesText = typeof d.notes === 'string' ? d.notes : '';
-    $('notesText').value = notesText;
+    meetingNotes = Array.isArray(d.meetingNotes) ? d.meetingNotes.map(mkNote)
+                 : (typeof d.notes === 'string' && d.notes.trim() ? [mkNote({date:'', text:d.notes})] : []);   // an older case: its one block of notes
+    renderNotesLog();
     $('goalsMsg').textContent = '';
     renderGoals();
     $('resState').value = (d.client && d.client.state) || '';
@@ -9842,7 +9902,11 @@
     if(document.activeElement !== $('ssoLifeC')) $('ssoLifeC').value = ssoCfg.lifeC || '';
     if(document.activeElement !== $('ssoLifeS')) $('ssoLifeS').value = ssoCfg.lifeS || '';
     if(document.activeElement !== $('ssoRate')) $('ssoRate').value = ssoCfg.rate || '';
-    $('ssoDobC').value = ssoCfg.dobC || ''; $('ssoDobS').value = ssoCfg.dobS || ''; $('ssoCut').checked = ssoCfg.cutOn !== false;
+    [['ssoDobC', ssoCfg.dobC, i.clientDob], ['ssoDobS', ssoCfg.dobS, i.spouseDob]].forEach(function(k){   // section 02's birthdate, read-only here while it has one
+      var own = k[1] || '', from02 = !own && !!k[2], el = $(k[0]);
+      el.value = own || k[2] || ''; el.readOnly = from02; el.classList.toggle('auto', from02);
+    });
+    $('ssoCut').checked = ssoCfg.cutOn !== false;
     $('ssoLifeC').placeholder = String(SSO_LIFE[i.clientSex] || 85); $('ssoLifeS').placeholder = String(SSO_LIFE[i.spouseSex] || 88);
     $('ssoCutLbl').textContent = 'Rank with the trust-fund stress test (' + Math.round(SENS_SS.pct * 100) + '% cut from ' + SENS_SS.year + ', as in section 18)';
     var S = ssoRun(i); ssoLast = S;
@@ -11188,7 +11252,7 @@
   var risk = {score:'', tol:'', selected:{}, custom:[]};
 
   /* ============================================================
-     Risk profile questionnaire (section 12). Twelve questions that produce
+     Risk profile questionnaire (section 12). Eleven questions that produce
      a 1-99 score on the Risk Number scale: willingness (65%) and capacity
      (35%), each a weighted mean of option scores, the result limited to
      capacity + 15 when willingness runs well ahead. A completed questionnaire
@@ -11205,8 +11269,6 @@
        o:[{l:'Move everything to cash so it can’t fall further',s:5},{l:'Sell part of it to limit further losses',s:25},{l:'Stay put and wait for a recovery',s:55},{l:'Rebalance back to my target mix',s:75},{l:'Add money while prices are lower',s:95}]},
       {id:'q3', dim:'w', w:2, t:'What is the largest one-year decline you could see on your statement and still sleep well?',
        o:[{p:5,s:10},{p:10,s:30},{p:17,s:50},{p:25,s:70},{p:35,s:90,plus:true}]},
-      {id:'q4', dim:'w', w:2, t:'A coin-flip opportunity could cost you 5% of your portfolio. How much would the winning side need to pay before you’d take it?', h:'This measures how heavily you weigh losses against gains.', lossPct:5,
-       o:[{m:3,s:10,plus:true,l:'I wouldn’t take it unless the gain is 3× the loss or more'},{m:2.5,s:30},{m:2,s:50},{m:1.5,s:70},{m:1.2,s:90}]},
       {id:'q5', dim:'w', w:4, t:'Of your major objectives, which is most important to you?',
        o:[{l:'Grow my assets',sub:'I’m focused on long-term growth and can ride out market swings',s:85,k:'Grow'},{l:'Protect my assets with growth',sub:'I want growth, but keeping what I have comes first',s:50,k:'Protect with growth'},{l:'Avoid losses',sub:'Preserving my principal matters more than earning more',s:15,k:'Avoid losses'}]}
     ]},
@@ -11929,7 +11991,26 @@
      ============================================================ */
   var goals = [];           // [{id, title, detail, src}]  src: 'claude' | 'notes' | 'advisor'
   var goalUid = 0;
-  var notesText = '';
+  var notesText = '';       // every meeting's notes, combined (for the case file and older readers)
+  /* the meeting notes log: one entry per meeting, dated, newest last; goals are drafted from all of them */
+  var meetingNotes = [], noteUid = 0;
+  function mkNote(o){ o = o || {}; return {id:++noteUid, date:String(o.date || ''), text:String(o.text || '')}; }
+  function notesCombined(){
+    return meetingNotes.filter(function(n){ return n.text.trim(); })
+      .map(function(n){ return (n.date ? 'Meeting notes \u2014 ' + longDate(n.date) + '\n' : '') + n.text.trim(); }).join('\n\n');
+  }
+  function renderNotesLog(){
+    var box = $('notesLog'); if(!box) return;
+    box.innerHTML = meetingNotes.length
+      ? meetingNotes.map(function(n, k){
+          return '<div class="notes-entry" data-note="' + n.id + '">'
+            + '<div class="nmeta"><input type="date" data-nk="date" value="' + esc(n.date) + '"><small>' + (k === meetingNotes.length - 1 ? 'Latest meeting' : 'Meeting ' + (k + 1)) + '</small></div>'
+            + '<textarea data-nk="text" rows="6" spellcheck="false" placeholder="' + (k ? 'Notes from this meeting\u2026' : 'Paste the meeting notes here\u2026') + '">' + esc(n.text) + '</textarea>'
+            + '<button type="button" class="row-x" data-ndel aria-label="Remove these notes">&times;</button></div>';
+        }).join('')
+      : '<div class="empty-state">No meeting notes yet \u2014 drop a file above, or press <b>Add meeting notes</b> and paste. Add another entry after each later meeting and draft the goals again to update them.</div>';
+    notesText = notesCombined();
+  }
   function mkGoal(o){ return {id:++goalUid, title:String(o.title || '').trim(), detail:String(o.detail || '').trim(), src:o.src || 'advisor'}; }
 
   function renderGoals(){
@@ -11995,18 +12076,31 @@
   function goalsPrompt(notes){
     var slice = String(notes || '').slice(0, 60000);
     var who = ($('clientFirst').value.trim() || 'the client') + (hasSpouse(null) ? ' and ' + ($('spouseFirst').value.trim() || 'their spouse') : '');
+    var current = goals.filter(function(g){ return g.title || g.detail; });
+    var update = current.length
+      ? 'The advisor\u2019s current goals, from earlier meetings, are:\n' + current.map(function(g){ return '- ' + g.title + (g.detail ? ': ' + g.detail : ''); }).join('\n')
+        + '\nThe notes below cover every meeting so far, dated, latest last. Update the goals: keep each that still holds, revise any the later notes change, add what is new, drop any the notes no longer support.\n\n'
+      : '';
     return 'You are helping a financial advisor at Alto Financial Group turn meeting notes into client goals for a retirement plan built on the Retirement Fortress framework (Foundation = guaranteed income for needs, Walls = balanced investments for wants, Roof = growth and legacy, Moat = long-term care and tax protection).\n\n'
       + 'From the notes below, write 3 to 5 goals for ' + who + '. Each goal is specific to these notes, written in plain language the client would recognise as their own, suitable to print on a client-facing summary. Lead with what the client wants, not what the advisor will do; include timing or amounts when the notes give them; do not invent facts; order by importance to the client. Skip administrative next steps and document requests.\n\n'
       + 'Reply with only a JSON array of objects {"title": string, "detail": string}: title is 2 to 5 words, detail is one or two sentences (at most 45 words).\n\n'
-      + 'MEETING NOTES:\n' + slice;
+      + update + 'MEETING NOTES:\n' + slice;
+  }
+  /* without Claude: each meeting's notes read on their own, the latest first, so a later meeting's goals lead */
+  function goalsFromLog(){
+    var out = [], seen = {};
+    meetingNotes.slice().reverse().forEach(function(n){
+      goalsFromNotes(n.text).forEach(function(g){ var key = (g.title + '|' + g.detail).toLowerCase(); if(seen[key] || out.length >= 5) return; seen[key] = 1; out.push(g); });
+    });
+    return out;
   }
   function draftGoals(){
-    var notes = $('notesText').value.trim();
-    if(!notes){ $('goalsMsg').textContent = 'Paste or upload the meeting notes first.'; return; }
+    var notes = notesCombined().trim(), updating = goals.some(function(g){ return g.title || g.detail; });
+    if(!notes){ $('goalsMsg').textContent = 'Add or upload the meeting notes first.'; return; }
     notesText = notes;
     var btn = $('goalsDraft'), msg = $('goalsMsg');
     if(!sampleFn){
-      var found = goalsFromNotes(notes);
+      var found = goalsFromLog();
       if(!found.length){ msg.textContent = 'Nothing in the notes read as a goal — add them by hand below.'; return; }
       goals = found.map(mkGoal);
       renderGoals();
@@ -12024,7 +12118,7 @@
           .map(function(g){ return mkGoal({title:g.title, detail:g.detail, src:'claude'}); });
         if(!list.length) throw {code:'empty_completion', message:'no goals'};
         goals = list; renderGoals();
-        msg.textContent = 'Drafted from the notes. Edit, remove or add before it goes on anything.';
+        msg.textContent = (updating ? 'Goals updated from every meeting\u2019s notes.' : 'Drafted from the notes.') + ' Edit, remove or add before it goes on anything.';
         $('caseJson').value = caseData();
       })
       .catch(function(e){
@@ -12032,7 +12126,7 @@
         if(code === 'cancelled'){ msg.textContent = 'Stopped.'; return; }
         if(code === 'not_granted' || code === 'sampling_disabled' || code === 'not_declared' || code === 'capability_disabled' || code === 'capability_removed'){
           sampleFn = null;                 // fall back for the rest of this view
-          var found = goalsFromNotes(notes);
+          var found = goalsFromLog();
           if(found.length){ goals = found.map(mkGoal); renderGoals(); $('caseJson').value = caseData(); }
           msg.textContent = (found.length ? 'Read from the notes instead' : 'Claude is not available here')
             + (code === 'not_granted' ? ' \u2014 Claude was not allowed for this page.' : '.');
@@ -12052,9 +12146,9 @@
     if(!file) return;
     var name = (file.name || '').toLowerCase();
     var done = function(txt){
-      $('notesText').value = String(txt || '').trim();
-      notesText = $('notesText').value;
-      $('goalsMsg').textContent = 'Loaded ' + (file.name || 'the file') + ' \u2014 now press Draft goals from the notes.';
+      meetingNotes.push(mkNote({date:todayISO(), text:String(txt || '').trim()}));
+      renderNotesLog(); $('caseJson').value = caseData();
+      $('goalsMsg').textContent = 'Loaded ' + (file.name || 'the file') + ' as a new meeting entry \u2014 now press Draft or update goals from the notes.';
     };
     if(/\.docx$/.test(name)){
       file.arrayBuffer().then(function(buf){
@@ -13275,7 +13369,20 @@
     d.addEventListener('dragleave', function(e){ if(e.target === d) d.classList.remove('over'); });
     d.addEventListener('drop', function(e){ e.preventDefault(); d.classList.remove('over'); if(e.dataTransfer.files[0]) readNotesFile(e.dataTransfer.files[0]); });
   })();
-  $('notesText').addEventListener('input', function(){ notesText = $('notesText').value; });
+  $('notesAdd').addEventListener('click', function(){
+    meetingNotes.push(mkNote({date:todayISO()})); renderNotesLog();
+    var tas = $('notesLog').querySelectorAll('textarea'); if(tas.length) tas[tas.length - 1].focus();
+  });
+  $('notesLog').addEventListener('input', function(e){
+    var k = e.target.getAttribute('data-nk'), tr = e.target.closest('[data-note]'); if(!k || !tr) return;
+    var n = meetingNotes.filter(function(x){ return x.id === +tr.getAttribute('data-note'); })[0]; if(!n) return;
+    n[k] = e.target.value; notesText = notesCombined();
+  });
+  $('notesLog').addEventListener('click', function(e){
+    if(!e.target.hasAttribute('data-ndel')) return;
+    var id = +e.target.closest('[data-note]').getAttribute('data-note');
+    meetingNotes = meetingNotes.filter(function(x){ return x.id !== id; }); renderNotesLog(); $('caseJson').value = caseData();
+  });
   $('goalsDraft').addEventListener('click', draftGoals);
   $('goalsStop').addEventListener('click', function(){ if(goalsCtl) goalsCtl.abort(); });
   $('goalAdd').addEventListener('click', function(){
@@ -13706,7 +13813,7 @@
     syncAges();
     $('prepDate').value = todayISO();
     $('resState').value = '';
-    goals = []; notesText = ''; $('notesText').value = ''; $('goalsMsg').textContent = ''; renderGoals();
+    goals = []; notesText = ''; meetingNotes = []; renderNotesLog(); $('goalsMsg').textContent = ''; renderGoals();
     dependents = {adult:[], minor:[]}; renderDependents();
     debts = []; renderDebtTable();
     lifePolicies = []; ltcPolicies = []; renderLifePolicies(); renderLtcPolicies();
@@ -14033,7 +14140,7 @@
      ============================================================ */
   var downloads = null, dlReady = false;
   var inClaude = !!(window.claude && typeof window.claude.use === 'function');
-  var EXPORT_BTNS = ['makePdf','makeDeck','makeSS','makeEdu','dlTemplate'];
+  var EXPORT_BTNS = ['makePdf','makeDeck','makeSS','rqReport','makePension','makeEdu','dlTemplate'];
 
   if(inClaude){
     window.claude.use('downloads').then(function(ns){
@@ -15512,13 +15619,22 @@
     return html;
   }
   $('rqReport').addEventListener('click', function(){
-    var msg = $('rqMsg'), fname = pdfName('risk-profile').replace(/\.pdf$/, '.html');
+    var msg = $('pdfMsg'), fname = pdfName('risk-profile').replace(/\.pdf$/, '.html');
     var html;
     try { html = buildRiskReport(); }
     catch(err){ msg.textContent = err.message; return; }
     var blob = new Blob([html], {type:'text/html'});
     if(openInTab(blob)){ msg.textContent = 'Risk profile report opened in a new tab — use the browser’s Print → Save as PDF there if a PDF is needed.'; return; }
     savePdf($('rqReport'), function(){ return blob; }, fname, 'risk profile report', 'text/html', 'This view does not allow new tabs, so the risk profile report was saved as an HTML file — open it in your browser and print from there.');
+  });
+  $('makePension').addEventListener('click', function(){
+    var msg = $('pdfMsg'), fname = pdfName('pension-benefit-estimate').replace(/\.pdf$/, '.html');
+    var html;
+    try { html = pbcReport(); }
+    catch(err){ msg.textContent = err.message; return; }
+    var blob = new Blob([html], {type:'text/html'});
+    if(openInTab(blob)){ msg.textContent = 'Pension benefits report opened in a new tab \u2014 use the browser\u2019s Print \u2192 Save as PDF there if a PDF is needed.'; return; }
+    savePdf($('makePension'), function(){ return blob; }, fname, 'pension benefits report', 'text/html', 'This view does not allow new tabs, so the pension benefits report was saved as an HTML file \u2014 open it in your browser and print from there.');
   });
   $('makeSS').addEventListener('click', function(){
     var msg = $('pdfMsg'), fname = pdfName('social-security-planning-analysis').replace(/\.pdf$/, '.html');

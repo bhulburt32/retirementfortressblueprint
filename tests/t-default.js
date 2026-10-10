@@ -16,7 +16,7 @@ const path = require('path');
   console.log('ann income rows:', JSON.stringify(await p.$$eval('#annIncBody tr[data-ann]',rs=>rs.map(r=>({key:r.dataset.ann,name:r.querySelector('td').textContent.replace(/\s+/g,' ').trim().slice(0,90),amt:r.querySelector('[data-af=amt]').textContent,mo:r.querySelector('[data-ak=monthly]').value,auto:r.querySelector('[data-ak=monthly]').classList.contains('auto')})))));
   console.log('risk score/tol:', await v('riskScore'), await v('riskTol'), '| nitro out:', (await txt('#nitroOut')).slice(0,120));
   console.log('scn tabs:', await txt('#scnTabs'));
-  console.log('notes has Smith:', (await v('notesText')).includes('Smith'), 'Mara?', (await v('notesText')).includes('Mara'));
+  const notesAll=await p.$$eval('#notesLog textarea',ts=>ts.map(t=>t.value).join('\n')); console.log('notes entries:', await p.$$eval('#notesLog textarea',ts=>ts.length), '| has Smith:', notesAll.includes('Smith'), 'Mara?', notesAll.includes('Mara'));
   console.log('goals:', (await txt('#goalsList')).slice(0,100));
   // report still builds
   const [pop]=await Promise.all([p.waitForEvent('popup'),p.click('#makeDeck')]); await pop.waitForLoadState(); await pop.waitForTimeout(1500);

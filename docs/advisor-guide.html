@@ -403,7 +403,7 @@
       <p>You give it a household's income picture and a list of their existing accounts. It sizes the
         four Fortress levels from those numbers, then maps every account to a destination — which
         registration it consolidates into, which carrier it ends up with, and what stays put. Out the
-        other end come four documents: three for the client, one for the file.</p>
+        other end come six documents: five for the client, one for the file.</p>
       <p>It does <em>not</em> replace your judgment. The allocation it proposes is a starting point
         you are expected to override, and section&nbsp;14 exists for exactly that.</p>
 
@@ -434,6 +434,10 @@
         client's details do not. To open with a different case, paste its block from section&nbsp;22
         into <span class="ui">Load pasted case</span>; to change the default itself, the saved block is
         swapped into the page.</p>
+
+      <p>The header carries <span class="ui">The Road to Retirement Fortress</span>, a short video of
+        the Fortress story for the client meeting or as a follow-up link; it opens in a new tab on
+        claude.ai, where a signed-in Alto account is needed.</p>
 
       <p>Every section of the application opens with <span class="ui">User Guide Notes</span> under
         its header &mdash; the same instructions as this guide's section, collapsed until you open
@@ -663,7 +667,7 @@
         ages, names and COLA already on the page; you add only each person's <span class="ui">life
         expectancy</span> (blank: 85 for a man, 88 for a woman), an optional <span class="ui">discount
         rate</span> (blank ranks nominal totals; equal to the COLA ranks in today's dollars) and,
-        optionally, dates of birth for month-level precision &mdash; otherwise ages are whole years from
+        the section&nbsp;02 dates of birth (read-only here while section&nbsp;02 has them; otherwise optional dates here) for month-level precision &mdash; otherwise ages are whole years from
         section&nbsp;02. With <span class="ui">Rank with the trust-fund stress test</span> ticked the
         strategies are ranked on the 22%-from-2032 reduction used in section&nbsp;18, with the no-cut
         total alongside. Tiles name the top strategy, its lifetime benefit, the surviving spouse's
@@ -697,8 +701,9 @@
         from the plan formula &mdash; the systems in Alto's Pension Reference Guide: PSERS and SERS,
         VRS, SRPS, TSERS, SCRS, TPAF, MTRS, MPSERS, TRS (Illinois and Texas), the three Ohio systems,
         PERSI, FERS and CSRS, and Wespath. Pick whose pension it is and the <span class="ui">State /
-        pension system</span>, enter the date of birth, the employment start and the expected
-        retirement date (the age at retirement and the years of service are calculated; type over
+        pension system</span>, enter the date of birth and the expected retirement date &mdash; both
+        come from sections&nbsp;02 and 04 while blank, so the age at retirement is the plan's &mdash;
+        and the employment start (the age at retirement and the years of service are calculated; type over
         the years if the record says otherwise), the beneficiary's age, then the <span class="ui">Membership
         class / tier</span> (the hire date suggests one), the average final compensation over the
         years the formula uses, any split-period service the class asks for, and the
@@ -1126,18 +1131,22 @@
     <div class="num">11<small>Draft</small></div>
     <div class="body">
       <h2>Goals</h2>
-      <p>Drop in the meeting notes &mdash; a <span class="ui">.txt</span>, <span class="ui">.md</span> or
-        <span class="ui">.docx</span> file, or pasted text &mdash; and press
-        <span class="ui">Draft goals from the notes</span>. The tool writes three to five client goals in
-        the client's own terms, each a short title and a sentence or two, ordered by what matters most
-        to them. Opened inside Claude, the drafting is done by Claude from the whole of the notes and
-        asks your permission the first time (it uses your own Claude account); anywhere else, or if you
-        decline, it reads the notes' own <em>Goals</em> heading and falls back to the sentences that read
-        like goals.</p>
+      <p>The meeting notes are a dated log, one entry per meeting. Drop in a
+        <span class="ui">.txt</span>, <span class="ui">.md</span> or <span class="ui">.docx</span> file
+        and it becomes a new entry dated today, or press <span class="ui">Add meeting notes</span> and
+        paste; after each later meeting add another entry (the date is editable, the &times; removes
+        one). <span class="ui">Draft or update goals from the notes</span> writes three to five client
+        goals in the client's own terms, each a short title and a sentence or two, ordered by what
+        matters most to them, from every entry in the log; when goals already exist it updates them
+        &mdash; keeping those that still hold, revising what the later notes changed, adding what is
+        new and dropping what the notes no longer support. Opened inside Claude, the drafting is done
+        by Claude from the whole of the notes and asks your permission the first time (it uses your own
+        Claude account); anywhere else, or if you decline, it reads the notes' own <em>Goals</em>
+        heading and falls back to the sentences that read like goals.</p>
 
       <p>Every goal is editable in place &mdash; retitle it, rewrite it, remove it, or
         <span class="ui">Add a goal</span> of your own. A card notes whether it was drafted, read from
-        the notes, or written by you. Goals and the notes save with the case.</p>
+        the notes, or written by you. Goals and every meeting's notes save with the case.</p>
 
       <div class="note warn">
         <h3>A draft, not a record</h3>
@@ -1159,11 +1168,11 @@
 
       <dl class="fields">
         <dt>Risk profile questionnaire</dt>
-        <dd>Twelve questions, answered with the client, that produce a 1&ndash;99 risk score on the
+        <dd>Eleven questions, answered with the client, that produce a 1&ndash;99 risk score on the
           same scale and logic as the Risk Number: real dollar amounts, one-year outcome ranges and
           how the client weighs gains against losses. <span class="ui">Portfolio being
           assessed</span> sets the dollar figures in the questions; left blank it follows the total
-          of the accounts in section&nbsp;06. The first five questions measure <em>willingness</em>
+          of the accounts in section&nbsp;06. The first four questions measure <em>willingness</em>
           (65% of the score), the next five <em>capacity</em> (35%), and two on experience count with
           willingness; each answer carries a score, the two sides are weighted averages, and a
           willingness more than 15 points above capacity is limited to capacity plus 15. The panel on
@@ -1181,7 +1190,7 @@
           brings the score back. The
           gap readout, the executive summary's risk page (the category, willingness and capacity
           under the tolerance tile) and the worksheet (the score and every answer) all follow it.
-          <span class="ui">Risk profile report</span> opens a client-facing letter in a new tab
+          <span class="ui">Risk profile report</span>, in section&nbsp;21 with the other reports, opens a client-facing letter in a new tab
           &mdash; the score and category, what a typical year could look like on the portfolio
           assessed, willingness against capacity, the answers in plain words, where the score fits in
           the Fortress and next steps, with no vendor named; <span class="ui">Copy summary</span>
@@ -1681,7 +1690,7 @@
   <section>
     <div class="num">21<small>Output</small></div>
     <div class="body">
-      <h2>The four downloads</h2>
+      <h2>The reports</h2>
       <p>Three of these go to a client (a fourth, the risk profile report, opens from
         section&nbsp;12). The other two are marked
         <em>not for client distribution</em> on every page. <span class="ui">Scenario for the
@@ -1725,7 +1734,7 @@
         </div>
         <div class="exp client">
           <span class="tag">Client-facing</span>
-          <b>Social Security analysis</b>
+          <b>Social Security optimizer report</b>
           <p>The claiming optimizer's findings as a letter-size client report, <em>Social Security
             Planning Analysis</em>: a cover with the client names, date and advisor; an introduction
             and key terms (PIA, full retirement age, COLA, life expectancy, spousal and survivor
@@ -1747,6 +1756,20 @@
             &mdash; the need, the average length of care and the 2025 median costs. It needs no case loaded. Use it for the first
             meeting or as a leave-behind; to update the deck, replace the file in the tool.</p>
         </div>
+        <div class="exp client">
+          <span class="tag">Client-facing</span>
+          <b>Risk profile report</b>
+          <p>The section&nbsp;12 questionnaire as a letter: the score and category, what a typical year
+            could look like on the portfolio assessed, willingness against capacity, the answers in
+            plain words, where the score fits in the Fortress and next steps, with no vendor named.</p>
+        </div>
+        <div class="exp client">
+          <span class="tag">Client-facing</span>
+          <b>Pension benefits report</b>
+          <p>The last estimate from the section&nbsp;04 Pension Benefits Calculator as a letter page:
+            the benefit by option, eligibility, the inputs, the formula, the COLA note and the
+            reference tool's disclaimer. Calculate a benefit there first.</p>
+        </div>
         <div class="exp internal">
           <span class="tag">Internal only</span>
           <b>Internal worksheet</b>
@@ -1755,10 +1778,6 @@
             waterfall's own proposal.</p>
         </div>
       </div>
-
-      <p><b>The Road to Retirement Fortress</b> is a short video of the Fortress story for the client
-        meeting or as a follow-up link: <span class="ui">Watch the video</span> opens it in a new tab
-        on claude.ai, where a signed-in Alto account is needed.</p>
 
       <div class="note stop">
         <h3>Before the executive summary report leaves the office</h3>

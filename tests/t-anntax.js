@@ -72,8 +72,8 @@ const path = require('path');
   const added=penRows[penRows.length-1]; if(penRows.length!==penRows0+1 || !added || Math.abs(+added.amt.replace(/,/g,'')-monthly)>1 || added.start!=='2027-06' || added.surv!=='50') errs.push('Add to pension income should add the line with the monthly benefit, the retirement month and the survivor share');
   const lastPen=await p.$$eval('#penBody tr[data-pen]',rs=>rs[rs.length-1].dataset.pen); await p.click(`#penBody tr[data-pen="${lastPen}"] [data-pdel]`); await p.waitForTimeout(400);
   if((await p.$$eval('#penBody tr[data-pen]',rs=>rs.length))!==penRows0) errs.push('removing the added pension should restore the list');
-  console.log('video link:', await p.$eval('#roadVideo',a=>a.href+' '+a.target), '|', await p.$eval('.video-card b',e=>e.textContent));
-  if(!(await p.$eval('#roadVideo',a=>/claude\.ai\/artifact\/4betJJT5zWc21C6KhEAQN5/.test(a.href) && a.target==='_blank'))) errs.push('the Reports section should link to The Road to Retirement Fortress video');
+  console.log('video link:', await p.$eval('#roadVideo',a=>a.href+' '+a.target), '|', await p.$eval('.masthead #roadVideo',e=>e.textContent.trim()));
+  if(!(await p.$eval('.masthead #roadVideo',a=>/claude\.ai\/artifact\/4betJJT5zWc21C6KhEAQN5/.test(a.href) && a.target==='_blank'))) errs.push('the header should link to The Road to Retirement Fortress video');
   console.log('header background image:', (await p.$eval('.masthead',e=>getComputedStyle(e).backgroundImage)).slice(0,60)); if(!/url\("data:image\/jpeg/.test(await p.$eval('.masthead',e=>getComputedStyle(e).backgroundImage))) errs.push('the header should carry the Fortress graphic as its background');
   // 2. AUM - Tax Free: a Walls line in that product pays a federally tax-free yield; no change while the Walls hold only IRA money
   const at=await acct('After Tax'); const line=await p.$$eval('#adjBody tr[data-adj]',(rs,id)=>{ const r=rs.find(x=>x.querySelector('select[data-ak=acctId]').value===String(id)); return r? r.dataset.adj : null; }, at);
@@ -168,6 +168,30 @@ const path = require('path');
   for(const id of ['clientDob','spouseDob']){ await p.fill('#'+id,''); await p.$eval('#'+id,e=>e.dispatchEvent(new Event('change',{bubbles:true}))); }
   await p.fill('#clientAge',ages0[0]); await p.$eval('#clientAge',e=>e.dispatchEvent(new Event('input',{bubbles:true}))); await p.fill('#spouseAge',ages0[1]); await p.$eval('#spouseAge',e=>e.dispatchEvent(new Event('input',{bubbles:true}))); await p.waitForTimeout(700);
   console.log('restored ages:', await p.$eval('#clientAge',e=>e.value), await p.$eval('#spouseAge',e=>e.value), '| end of plan:', await tile('#assetTiles','at end of plan'));
+  // 1g. the optimizer and the pension calculator take the section 02 birthdate and the section 04 retirement date; the notes log; the reports
+  await p.fill('#clientDob','1963-04-02'); await p.$eval('#clientDob',e=>e.dispatchEvent(new Event('change',{bubbles:true}))); await p.waitForTimeout(600);
+  console.log('optimizer DOB:', await p.$eval('#ssoDobC',e=>e.value+(e.readOnly?' (from section 02)':'')), '| calculator DOB:', await p.$eval('#pbcDob',e=>e.value));
+  if(await p.$eval('#ssoDobC',e=>e.value)!=='1963-04-02' || !(await p.$eval('#ssoDobC',e=>e.readOnly))) errs.push('the optimizer should take the section 02 birthdate');
+  await p.fill('#pbcRet',''); await p.$eval('#pbcRet',e=>e.dispatchEvent(new Event('input',{bubbles:true}))); await p.selectOption('#pbcWho','client'); await p.waitForTimeout(300);
+  console.log('calculator retirement date:', await p.$eval('#pbcRet',e=>e.value+(e.classList.contains('auto')?' (from section 04)':'')), '| section 04:', await p.$eval('#retireC',e=>e.value), '| age at retirement:', await p.$eval('#pbcRetAge',e=>e.value));
+  if(await p.$eval('#pbcRet',e=>e.value)!==(await p.$eval('#retireC',e=>e.value))+'-01') errs.push('the calculator should take the section 04 retirement date');
+  await p.fill('#clientDob',''); await p.$eval('#clientDob',e=>e.dispatchEvent(new Event('change',{bubbles:true}))); await p.fill('#clientAge',ages0[0]); await p.$eval('#clientAge',e=>e.dispatchEvent(new Event('input',{bubbles:true}))); await p.waitForTimeout(500);
+  const n0=await p.$$eval('#notesLog textarea',t=>t.length); await p.click('#notesAdd'); await p.waitForTimeout(200);
+  await p.fill('#notesLog .notes-entry:last-child textarea','Second meeting, October 2026.\nGoals:\nPay off the mortgage: clear the mortgage before Jeff retires.\nTravel: a trip to Italy every other year.'); await p.$eval('#notesLog .notes-entry:last-child textarea',e=>e.dispatchEvent(new Event('input',{bubbles:true})));
+  await p.click('#goalsDraft'); await p.waitForTimeout(800);
+  const goalsNow=await p.$$eval('#goalsList .goal input.gtitle',es=>es.map(e=>e.value)); console.log('notes entries:', n0, '->', await p.$$eval('#notesLog textarea',t=>t.length), '| goals after update:', JSON.stringify(goalsNow).slice(0,200), '|', await txt('#goalsMsg'));
+  if((await p.$$eval('#notesLog textarea',t=>t.length))!==n0+1) errs.push('Add meeting notes should add a dated entry');
+  if(!goalsNow.some(g=>/mortgage|Italy|travel/i.test(g))) errs.push('drafting again should take the later meeting\'s notes into the goals');
+  const saved=JSON.parse(await p.$eval('#caseJson',e=>e.value)); if(!saved.meetingNotes || saved.meetingNotes.length!==n0+1) errs.push('the notes log should save with the case');
+  console.log('questionnaire questions:', await p.$$eval('#rqForm .rq-q',q=>q.length), '| q4 present:', !!(await p.$('#rqForm input[name="rq_q4"]')), '| report buttons in section 21:', await p.$$eval('#reportSec button',bs=>bs.map(b=>b.id).join(',')));
+  if(await p.$('#rqForm input[name="rq_q4"]')) errs.push('question 4 should be gone');
+  if(!(await p.$('#reportSec #rqReport')) || !(await p.$('#reportSec #makePension')) || !(await p.$('#reportSec #makeSS'))) errs.push('the risk profile, pension and Social Security reports should sit in the Reports section');
+  await p.selectOption('#pbcState','PA-PSERS'); await p.waitForTimeout(200); await p.fill('#pbcDob','1965-03-15'); await p.fill('#pbcStart','1990-08-20'); await p.fill('#pbcRet','2027-06-30'); for(const id of ['pbcDob','pbcStart','pbcRet']) await p.$eval('#'+id,e=>e.dispatchEvent(new Event('change',{bubbles:true})));
+  await p.selectOption('#pbcClass','TD'); await p.fill('#pbcAfc','80000'); await p.click('#pbcCalc'); await p.waitForTimeout(300);
+  const [pr]=await Promise.all([ctx.waitForEvent('page',{timeout:30000}), p.click('#makePension')]); await pr.waitForLoadState('load'); await pr.waitForTimeout(500);
+  const prep=await pr.evaluate(()=>({title:document.title, monthly:(document.querySelector('.pbc-metric dd')||{}).textContent, disc:/IMPORTANT DISCLAIMER/.test(document.body.textContent), logo:!!document.querySelector('.top img')}));
+  const pageMonthly=await p.$eval('#pbcOut .pbc-metric dd',e=>e.textContent);
+  console.log('pension report:', JSON.stringify(prep), '| on the page:', pageMonthly); if(!/Pension Benefit Estimate/.test(prep.title) || prep.monthly!==pageMonthly || !prep.disc || !prep.logo) errs.push('pension report content wrong'); await pr.close();
   // 4. the worksheet and the deck still build
   const [dl]=await Promise.all([p.waitForEvent('download',{timeout:60000}), p.click('#makePdf')]); console.log('worksheet:', dl.suggestedFilename());
   const [pop]=await Promise.all([ctx.waitForEvent('page',{timeout:30000}), p.click('#makeDeck')]); await pop.waitForLoadState('load'); await pop.waitForTimeout(800);
