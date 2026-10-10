@@ -11,7 +11,7 @@ const path = require('path');
   const txt=async sel=>(await p.$eval(sel,e=>e.textContent)).replace(/\s+/g,' ').trim();
   const tile=async(box,label)=>p.$eval(box,(e,l)=>{ const d=[...e.querySelectorAll('div')].find(x=>x.querySelector('dt') && x.querySelector('dt').textContent.trim().toLowerCase().startsWith(l)); return d? +d.querySelector('dd').textContent.replace(/[^0-9.-]/g,'') : NaN; }, label);
   const figs=async()=>({end:await tile('#assetTiles','at end of plan'), today:await tile('#assetTiles','assets today'), seqEnd:await tile('#sensseqTiles','at end of plan'), seqLow:await tile('#sensseqTiles','lowest point')});
-  const acct=async name=>p.$$eval('#acctBody tr[data-id]',(rs,n)=>{ const r=rs.find(x=>x.querySelector('input[data-k=name]').value===n); return r? r.dataset.id : null; }, name);
+  const acct=async name=>p.$$eval('#acctBody tr[data-id]',(rs,n)=>{ const r=rs.find(x=>x.querySelector('input[data-k=name]').value.trim()===n); return r? r.dataset.id : null; }, name);
   const setPos=async(id,pos)=>{ await p.selectOption(`#acctBody tr[data-id="${id}"] select[data-k="pos"]`,pos); await p.waitForTimeout(500); };
   const cell=async(id,k,v)=>{ const sel=`#anxBody tr[data-anx="${id}"] [data-ax="${k}"]`; const tag=await p.$eval(sel,e=>e.tagName); if(tag==='SELECT'){ await p.selectOption(sel,v); } else { await p.fill(sel,v); await p.$eval(sel,e=>{e.dispatchEvent(new Event('input',{bubbles:true})); e.blur();}); } await p.waitForTimeout(500); };
   const base=await figs(); console.log('baseline:', JSON.stringify(base));
@@ -52,6 +52,21 @@ const path = require('path');
   await cell(sen,'fees',''); await setPos(sen,'Growth Annuity (FIA)'); const fia=await figs(); console.log('Growth FIA, no cap:', JSON.stringify(fia));
   if(Math.abs(fia.end-base.end)>1) errs.push('a growth FIA without a cap should match the plan rate ('+fia.end+' vs '+base.end+')');
   if(!(fia.seqEnd>va.seqEnd)) errs.push('a growth FIA should not take the stress loss a variable annuity takes ('+fia.seqEnd+' vs '+va.seqEnd+')');
+  // 4b. a MYGA matures: the interest stops and the money earns its level's rate from then on
+  await cell(ih,'rate','10'); await cell(ih,'interest','taken'); const takenOpen=await figs();
+  await cell(ih,'maturity','2029-01'); const takenMat=await figs(); console.log('MYGA taken, matures 2029:', JSON.stringify(takenMat), '| open-ended:', JSON.stringify(takenOpen));
+  if(!(takenMat.end>takenOpen.end)) errs.push('after maturity the MYGA should grow at the level rate instead of paying 0% growth ('+takenMat.end+' vs '+takenOpen.end+')');
+  await cell(ih,'interest','deferred'); const defMat=await figs(); console.log('MYGA 10% deferred, matures 2029:', JSON.stringify(defMat));
+  if(!(defMat.end<myga10.end && defMat.end>base.end)) errs.push('a 10% MYGA that matures in 2029 should land between the baseline and an open-ended 10% ('+defMat.end+')');
+  await cell(ih,'rate',''); await cell(ih,'maturity','');
+  // 4c. Stay as is keeps its Fortress level, stays at its institution
+  const at=await acct('After Tax'); await p.selectOption(`#acctBody tr[data-id="${at}"] select[data-k="move"]`,'no'); await p.waitForTimeout(600);
+  const held=await figs(); const hold=await p.$eval('#holdings',e=>e.textContent.replace(/\s+/g,' '));
+  const levelOf=await p.$$eval('#adjBody tr[data-adj]',(rs,id)=>rs.filter(r=>r.querySelector('select[data-ak=acctId]').value===String(id)).map(r=>r.querySelector('select[data-ak=bucket]').value+' | '+(r.nextElementSibling? r.nextElementSibling.textContent.replace(/\s+/g,' ').trim().slice(0,80):'')), at);
+  console.log('After Tax held:', JSON.stringify(held), '| line:', JSON.stringify(levelOf), '| in holdings:', /After Tax/.test(hold), '| outside layer:', /Held outside the plan/.test(await p.$eval('#assetLegend',e=>e.textContent)));
+  if(!levelOf.length || /inplace/.test(levelOf[0]) || !/no transfer/.test(levelOf[0])) errs.push('a held account should keep its level with a no-transfer note');
+  if(/Held outside the plan/.test(await p.$eval('#assetLegend',e=>e.textContent))) errs.push('a held account should not sit outside the plan');
+  await p.selectOption(`#acctBody tr[data-id="${at}"] select[data-k="move"]`,'yes'); await p.waitForTimeout(500);
   // 5. save/load keeps the new cells, the worksheet and the deck still build
   await cell(sen,'cap','6'); const json=await p.$eval('#caseJson',e=>e.value), d=JSON.parse(json); const sv=d.accounts.find(a=>a.name==='Sentinel'); console.log('saved Sentinel:', JSON.stringify(sv));
   if(!sv.ann || sv.ann.cap!==0.06) errs.push('cap not saved');

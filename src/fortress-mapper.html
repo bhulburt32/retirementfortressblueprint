@@ -1186,7 +1186,7 @@
   <!-- 6. ACCOUNTS -->
   <section id="acctSec">
     <div class="sec-head"><span class="sec-num">06</span><h2>Assets</h2></div>
-    <p class="sec-note">Tax type drives the waterfall. Owner and current position drive the transfer flags. Set <b>Transfer?</b> to <b>Stay as is</b> for any account the client will not move — it is then held out of the plan entirely. The <b>Growth</b> column is each account's assumed annual growth; leave it blank and the account takes the plan rate for the level its money lands in (Walls, Roof or, if it stays as is, the Walls rate), and a rate typed there is weighted into the projections for that level.</p>
+    <p class="sec-note">Tax type drives the waterfall. Owner and current position drive the transfer flags. Set <b>Transfer?</b> to <b>Stay as is</b> for any account the client will not move — it still takes its place in the Fortress levels, but stays where it is with no transfer. The <b>Growth</b> column is each account's assumed annual growth; leave it blank and the account takes the plan rate for the level its money lands in (Walls, Roof or, if it stays as is, the Walls rate), and a rate typed there is weighted into the projections for that level.</p>
     <div class="panel">
       <div class="panel-pad">
         <div class="tbl-scroll" data-tgl="Account list<small>One row per account</small>">
@@ -2041,9 +2041,10 @@
      lands in: a MYGA earns its rate (nothing while the interest is taken as income), a variable
      annuity the rate less its fees, a growth FIA or a RILA the rate up to its cap; a typed Growth
      cell still comes first for every other position. */
-  function acctGrowth(a, dflt){
+  function mygaMatured(a, t){ var x = a.ann || {}; if(a.pos !== 'MYGA Annuity' || !x.maturity || t == null) return false; var m = planYears(x.maturity); return m != null && t >= m; }
+  function acctGrowth(a, dflt, t){
     var x = a.ann || {}, g = (a.growth != null) ? a.growth : dflt;
-    if(a.pos === 'MYGA Annuity') return x.interest === 'taken' ? 0 : (x.rate != null ? x.rate : g);
+    if(a.pos === 'MYGA Annuity'){ if(mygaMatured(a, t)) return g; return x.interest === 'taken' ? 0 : (x.rate != null ? x.rate : g); }   // after maturity: market money at the level's rate
     if(a.pos === 'Variable Annuity') return g - (x.fees || 0);
     if(a.pos === 'Growth Annuity (FIA)' || a.pos === 'RILA Annuity') return x.cap != null ? Math.min(g, x.cap) : g;
     return g;
@@ -2051,9 +2052,9 @@
   /* What an account returns in one of the stress test's bad years, given the level's loss: market
      money and a variable annuity take the loss; a MYGA earns its rate regardless; a growth FIA
      credits nothing and loses nothing; a RILA loses no more than its floor. */
-  function acctStressReturn(a, loss, dflt){
+  function acctStressReturn(a, loss, dflt, t){
     var x = a.ann || {};
-    if(a.pos === 'MYGA Annuity') return acctGrowth(a, dflt);
+    if(a.pos === 'MYGA Annuity') return mygaMatured(a, t) ? loss : acctGrowth(a, dflt, t);
     if(a.pos === 'Growth Annuity (FIA)' || a.pos === 'Income Annuity (FIA)' || a.pos === 'Cash') return 0;
     if(a.pos === 'RILA Annuity') return x.floor != null ? Math.max(loss, -Math.abs(x.floor)) : loss;
     return loss;
@@ -2771,7 +2772,7 @@
     var out = {}, used = {};
     adjMoves.forEach(function(m){
       var a = live[m.acctId];
-      if(!a || a.move === 'no' || !(m.amt > 0.5)) return;
+      if(!a || isIncomeAnn(a) || !(m.amt > 0.5)) return;   // an income annuity is always Foundation, whatever its lines say
       var room = a.val - (used[a.id] || 0);
       if(!(room > 0.5)) return;
       var amt = Math.min(m.amt, room);
@@ -2790,7 +2791,7 @@
      income already in place, averaged. Nominal dollars throughout, as a level
      annuity payment would be. */
   function foundationSizing(i, yF, yW){
-    var incMoves = accounts.filter(function(a){ return isIncomeAnn(a) && a.move === 'no' && a.val > 0.5; }).map(function(a){ return {acct:a, bucket:'foundation', amt:a.val, stay:true}; });
+    var incMoves = accounts.filter(function(a){ return isIncomeAnn(a) && a.val > 0.5; }).map(function(a){ return {acct:a, bucket:'foundation', amt:a.val, stay:true}; });
     var incSum = incMoves.reduce(function(t, m){ return t + m.amt; }, 0);
     var stub = {inputs:i, yF:yF, yW:yW, total:0, adjusted:false, statusQuo:true,
                 funded:{reserve:0, foundation:incSum, walls:0, moat:0, roof:0, inplace:0},
@@ -2925,18 +2926,14 @@
       return amt - left;   // what was actually placed
     }
 
-    /* Accounts marked "stay as is" never enter the waterfall at all - except an income annuity,
-       which stays with its carrier and counts in the Foundation: it is already the income the
-       Foundation exists to provide. */
+    /* An income annuity in force is always Foundation: it stays with its carrier and is already the
+       income the Foundation exists to provide. Every other account marked "stay as is" still takes
+       its place in the levels below - it just stays where it is, with no transfer (stay:true on
+       its moves); only a Moat contract, which needs a 1035, is never bought from one. */
     accounts.forEach(function(a){
-      if(a.move === 'no' && remain[a.id] > 0.5){
-        if(isIncomeAnn(a)){
-          funded.foundation += remain[a.id];
-          moves.push({acct:a, bucket:'foundation', amt:remain[a.id], stay:true});
-        } else {
-          funded.inplace += remain[a.id];
-          moves.push({acct:a, bucket:'inplace', amt:remain[a.id]});
-        }
+      if(isIncomeAnn(a) && remain[a.id] > 0.5){
+        funded.foundation += remain[a.id];
+        moves.push({acct:a, bucket:'foundation', amt:remain[a.id], stay:true});
         remain[a.id] = 0;
       }
     });
@@ -2980,7 +2977,7 @@
        stays exactly where it is, with no transfer at all. */
     var lifeAccts = accounts.filter(function(a){ return a.pos === 'LTC / Life' && a.val > 0; });
     if(i.lifeCV === 'yes' && !manual){
-      lifeAccts.slice().sort(function(a, b){ return remain[b.id] - remain[a.id]; })
+      lifeAccts.filter(function(a){ return a.move !== 'no'; }).sort(function(a, b){ return remain[b.id] - remain[a.id]; })
         .forEach(function(a){
           /* A 1035 exchange has to keep the same owner and the same insured,
              so a policy's cash value can only fund that person's own LTC
@@ -3035,7 +3032,7 @@
         if(!(room > 0.5)) return;
         // largest balances first, so fewer accounts get split
         var pool = accounts.filter(function(a){
-          return a.tax === step.tax && remain[a.id] > 0.5;
+          return a.tax === step.tax && remain[a.id] > 0.5 && !(step.bucket === 'moat' && a.move === 'no');   // a held account cannot buy an LTC contract
         }).sort(function(a,b){ return remain[b.id] - remain[a.id]; });
 
         pool.forEach(function(a){
@@ -3070,6 +3067,8 @@
       });
     }
 
+    /* a held account's moves stay put: counted in their level, no transfer */
+    moves.forEach(function(m){ if(m.acct.move === 'no' && m.bucket !== 'moat') m.stay = true; });
     var roofT = funded.roof;   // Roof is the residual by definition
 
     var splits = {};
@@ -3120,9 +3119,13 @@
   }
 
   function regFor(a, bucket, i, m){
-    if(bucket === 'foundation' && a.move === 'no' && isIncomeAnn(a)){   // an income annuity in force: stays with its carrier, counted in the Foundation
+    if(bucket === 'foundation' && isIncomeAnn(a)){   // an income annuity in force: stays with its carrier, counted in the Foundation
       return {key:'stay:' + a.id, stay:true, kind:'income', tax:a.tax, owner:effOwner(a.owner, i),
               name:a.name || 'Income annuity', cust:(a.ann && a.ann.company) || a.cust || 'existing carrier'};
+    }
+    if(a.move === 'no' && bucket !== 'moat' && bucket !== 'inplace'){   // held: counted in its level where it sits, no transfer
+      return {key:'stay:' + a.id, stay:true, kind:'held', tax:a.tax, owner:effOwner(a.owner, i),
+              name:a.name || 'Untitled account', cust:a.cust || 'existing institution'};
     }
     if(bucket === 'inplace'){
       var isLife = (a.move !== 'no' && a.pos === 'LTC / Life');
@@ -3234,7 +3237,7 @@
   /* Where a given bucket's money physically sits at the end. */
   function bucketCustodian(bucket, reg, i){
     if(reg && reg.custom)       return reg.cust || i.newCust;
-    if(reg && reg.kind === 'income') return reg.cust;
+    if(reg && reg.stay && bucket !== 'reserve') return reg.cust;   // an account that stays put keeps its institution whatever its level
     if(bucket === 'inplace')    return (reg && reg.cust) || 'existing institution';
     if(bucket === 'foundation') return i.annuityCarrier || 'TBD';
     if(bucket === 'moat')       return i.ltcCarrier     || 'TBD';
@@ -3569,7 +3572,7 @@
     var incomeSum = incomeC.reduce(function(a, c){ return a + c.amt; }, 0);
     if(r.statusQuo || !(r.funded.foundation - incomeSum > 0.5)) return incomeC;
     var i = r.inputs, A = incomeAdj(r), out = [], seen = {}, groups = {}, order = [];
-    var lines = (typeof lineLedger === 'function') ? lineLedger(r).lines.filter(function(L){ return L.a && L.eff > 0.5 && L.m.bucket === 'foundation' && !(L.a.move === 'no' && isIncomeAnn(L.a)); }) : [];
+    var lines = (typeof lineLedger === 'function') ? lineLedger(r).lines.filter(function(L){ return L.a && L.eff > 0.5 && L.m.bucket === 'foundation' && !isIncomeAnn(L.a); }) : [];
     var sum = lines.reduce(function(a, L){ return a + L.eff; }, 0), scale = sum > 0.5 ? (r.funded.foundation - incomeSum) / sum : 1;
     /* Lines that land in the same To account are one annuity contract: their amounts add up and
        the contract takes one set of income settings. A line that stays put is its own contract. */
@@ -3683,18 +3686,18 @@
     try { lineLedger(r).lines.forEach(function(L){ if(L.a && L.m.bucket === 'roof' && map[L.a.id] == null) map[L.a.id] = roofGKeyOf(L); }); } catch(e){}
     return map;
   }
-  function effGrowth(r){
+  function effGrowth(r, t){           // t: the plan year the rates are for (a matured MYGA is market money from then); the start of plan when omitted
     var i = r.inputs, A = incomeAdj(r), gW = A.gPost, gWpre = A.gPre, gR = i.growthR || 0;
     var acc = {w:[0, 0], r:[0, 0], i:[0, 0]}, any = false, roofMap = null;
     (r.moves || []).forEach(function(m){
       var key = m.bucket === 'walls' ? 'w' : m.bucket === 'roof' ? 'r' : m.bucket === 'inplace' ? 'i' : null;
       if(!key || !(m.amt > 0.5) || m.acct.pos === 'LTC / Life') return;
       var dflt = r.statusQuo ? sqDefaultGrowth(m.acct, i.growthW || 0, gR) : (key === 'r' ? gR : key === 'i' ? (i.growthW || 0) : gW);
-      var g = acctGrowth(m.acct, dflt);
+      var g = acctGrowth(m.acct, dflt, t);
       if(Math.abs(g - dflt) > 1e-9) any = true;
-      if(key === 'r' && !r.statusQuo){ roofMap = roofMap || roofKeyMap(r); var ov = roofGOverrideKey(roofMap[m.acct.id] || ('acct:' + accounts.indexOf(m.acct)), m.acct); if(ov != null){ g = ov; any = true; } }
+      if(key === 'r' && !r.statusQuo){ roofMap = roofMap || r._roofMap || (r._roofMap = roofKeyMap(r)); var ov = roofGOverrideKey(roofMap[m.acct.id] || ('acct:' + accounts.indexOf(m.acct)), m.acct); if(ov != null){ g = ov; any = true; } }
       acc[key][0] += m.amt * g; acc[key][1] += m.amt;
-      if(key === 'w'){ var gp = acctGrowth(m.acct, gWpre); acc.wPre = acc.wPre || [0, 0]; acc.wPre[0] += m.amt * gp; acc.wPre[1] += m.amt; }
+      if(key === 'w'){ var gp = acctGrowth(m.acct, gWpre, t); acc.wPre = acc.wPre || [0, 0]; acc.wPre[0] += m.amt * gp; acc.wPre[1] += m.amt; }
     });
     return {w: acc.w[1] > 0.5 ? acc.w[0] / acc.w[1] : gW, wPre: acc.wPre && acc.wPre[1] > 0.5 ? acc.wPre[0] / acc.wPre[1] : gWpre,
             r: acc.r[1] > 0.5 ? acc.r[0] / acc.r[1] : gR, i: acc.i[1] > 0.5 ? acc.i[0] / acc.i[1] : (i.growthW || 0), any: any};
@@ -3702,12 +3705,12 @@
   /* The return the Walls and the Roof earn in one of the stress test's bad years: the level's
      loss blended by what it holds - market money and variable annuities take it, a MYGA earns its
      rate, a growth FIA sits at zero, a RILA loses no more than its floor. */
-  function stressRates(r, SQ){
+  function stressRates(r, SQ, t){
     var i = r.inputs, A = incomeAdj(r), gR = i.growthR || 0, acc = {w:[0, 0], r:[0, 0]};
     (r.moves || []).forEach(function(m){
       var key = m.bucket === 'walls' ? 'w' : m.bucket === 'roof' ? 'r' : null;
       if(!key || !(m.amt > 0.5) || m.acct.pos === 'LTC / Life') return;
-      var ret = acctStressReturn(m.acct, key === 'w' ? SQ.walls : SQ.roof, key === 'w' ? A.gPost : gR);
+      var ret = acctStressReturn(m.acct, key === 'w' ? SQ.walls : SQ.roof, key === 'w' ? A.gPost : gR, t);
       acc[key][0] += m.amt * ret; acc[key][1] += m.amt;
     });
     return {w: acc.w[1] > 0.5 ? acc.w[0] / acc.w[1] : SQ.walls, r: acc.r[1] > 0.5 ? acc.r[0] / acc.r[1] : SQ.roof};
@@ -3792,8 +3795,8 @@
       var preYrs = Math.min(t, wStart), postYrs = Math.max(0, t - wStart);
       var wallsBal = r.funded.walls * Math.pow(1 + A.gPre, preYrs) * Math.pow(1 + A.gPost, postYrs);
       if(r.stress && r.stress.seq){            // sensitivity: the bad years replace that year's Walls growth (blended by what the Walls hold)
-        var SQ = r.stress.seq, SRw = stressRates(r, SQ).w;
-        for(var sy = SQ.from; sy < Math.min(t, SQ.from + SQ.years); sy++){ var gs = (sy + 1 <= wStart) ? A.gPre : A.gPost; wallsBal *= (1 + SRw) / (1 + gs); }
+        var SQ = r.stress.seq;
+        for(var sy = SQ.from; sy < Math.min(t, SQ.from + SQ.years); sy++){ var gs = (sy + 1 <= wStart) ? A.gPre : A.gPost; wallsBal *= (1 + stressRates(r, SQ, sy).w) / (1 + gs); }
       }
       /* The Foundation annuities pay from their start dates and
          its value falls by what it pays out. With guaranteed lifetime income
@@ -4332,9 +4335,8 @@
               + (g.info.kind === 'income'
                   ? '<div class="flag ok">An income annuity in force — stays with ' + esc(g.info.cust) + ', counted in the Foundation, its income in the projections.</div>'
                 : g.info.kind === 'held'
-                  ? '<div class="flag ok">Marked <b>Stay as is</b> — no transfer, and it funds no Fortress level.</div>'
-                    + '<div class="flag">Switch it to <b>Transfer</b> in section 06 to bring '
-                    + money(g.total) + ' into the waterfall.</div>'
+                  ? '<div class="flag ok">Marked <b>Stay as is</b> — no transfer; counted in its Fortress level where it sits.</div>'
+                    + '<div class="flag">Switch it to <b>Transfer</b> in section 06 to consolidate ' + money(g.total) + ' at ' + esc(r.inputs.newCust || 'the new custodian') + '.</div>'
                 : g.info.kind === 'life'
                   ? '<div class="flag ok">No transfer — the policy stays with ' + esc(g.info.cust)
                     + ' exactly as it is.</div>'
@@ -4636,13 +4638,14 @@
   /* What a single adjusted row is worth flagging for. */
   function adjRowNote(m, a){
     if(!a) return {lvl:'alert', txt:'That account is no longer in section 06 — remove this line.'};
+    if(isIncomeAnn(a)) return m.bucket === 'foundation'
+      ? {lvl:'ok', txt:'An income annuity in force — stays with its carrier, counted in the Foundation; its income continues and the value falls as it pays.'}
+      : {lvl:'', txt:'An income annuity in force — it is always Foundation (section 15), so this line is ignored.'};
     if(a.move === 'no'){
-      if(isIncomeAnn(a)) return m.bucket === 'foundation'
-        ? {lvl:'ok', txt:'An income annuity in force — stays with its carrier, counted in the Foundation; its income continues and the value falls as it pays.'}
-        : {lvl:'', txt:'An income annuity in force — it stays with its carrier and counts in the Foundation (section 15), so this line is ignored.'};
       return m.bucket === 'inplace'
-        ? {lvl:'', txt:'Marked <b>Stay as is</b> in section 06 — held out of the plan, funds no Fortress level.'}
-        : {lvl:'alert', txt:'Marked <b>Stay as is</b> in section 06, so this transfer is ignored.'};
+        ? {lvl:'', txt:'Marked <b>Stay as is</b> in section 06 and held out of the plan — funds no Fortress level.'}
+        : m.bucket === 'moat' ? {lvl:'alert', txt:'Marked <b>Stay as is</b> in section 06 — an LTC contract needs a 1035, so this line is ignored.'}
+        : {lvl:'', txt:'Marked <b>Stay as is</b> in section 06 — counted in the ' + (BUCKET_NAME[m.bucket] || m.bucket) + ' where it sits, no transfer.'};
     }
     if(m.bucket === 'inplace') return {lvl:'', txt:'Held out of the plan — funds no Fortress level.'};
     if(a.pos === 'LTC / Life' && m.bucket !== 'moat'){
@@ -4914,7 +4917,7 @@
       var amt = Math.max(0, m.amt || 0), eff = amt;
       if(a){
         var before = a.val - (used[a.id] || 0);
-        eff = (a.move === 'no' && m.bucket !== 'inplace' && !(m.bucket === 'foundation' && isIncomeAnn(a))) ? 0 : Math.min(amt, Math.max(0, before));
+        eff = (isIncomeAnn(a) && m.bucket !== 'foundation') ? 0 : Math.min(amt, Math.max(0, before));   // an income annuity's money is Foundation, whatever a line says
         used[a.id] = (used[a.id] || 0) + eff;
       }
       var d = a ? adjDest(m, a, r) : {to:'\u2014', cust:'\u2014', prod:'\u2014', sub:''};
@@ -4967,7 +4970,7 @@
       var remEl = tr.querySelector('[data-rem]');
       if(remEl){
         remEl.textContent = (after == null) ? '\u2014' : money(after);
-        var cut = !!a && amt > eff + 0.5 && !(a.move === 'no' && m.bucket !== 'inplace' && !(m.bucket === 'foundation' && isIncomeAnn(a)));
+        var cut = !!a && amt > eff + 0.5 && !(isIncomeAnn(a) && m.bucket !== 'foundation');
         remEl.className = 'num rem' + (after != null && after < 0.5 ? ' zero' : '') + (cut ? ' over' : '');
         remEl.title = cut
           ? 'Only ' + money(eff) + ' of this line can be funded — the account is used up.' : '';
@@ -7312,11 +7315,12 @@
     var ltcPoolLeft = function(){ var f = function(arr){ return arr.reduce(function(a, k){ return a + (k.total != null ? k.total : k.cap * k.left); }, 0); }; return f(ltcPool.client) + f(ltcPool.spouse); };
     rows.forEach(function(row, t){
       if(t > 0){
-        var gWy = (t <= P.wStart) ? G.wPre : gW, gRy = gR;     // Walls grow at the pre-income rate until they start paying
+        var Gt = effGrowth(r, t - 1), gIy = Gt.i;                 // the rates for the year just earned (a matured MYGA is market money from its maturity)
+        var gWy = (t <= P.wStart) ? Gt.wPre : Gt.w, gRy = Gt.r;   // Walls grow at the pre-income rate until they start paying
         var SQ = r.stress && r.stress.seq;                        // sensitivity: bad market years (the return earned during year t-1), blended by what each level holds
-        if(SQ && (t - 1) >= SQ.from && (t - 1) < SQ.from + SQ.years){ var SR = stressRates(r, SQ); gWy = SR.w; gRy = SR.r; }
-        ['taxable','roth'].forEach(function(k){ bal[k].w *= 1 + gWy; bal[k].r *= 1 + gRy; bal[k].i *= 1 + gI; });
-        ['client','spouse'].forEach(function(o){ bal.deferred[o].w *= 1 + gWy; bal.deferred[o].r *= 1 + gRy; bal.deferred[o].i *= 1 + gI; });
+        if(SQ && (t - 1) >= SQ.from && (t - 1) < SQ.from + SQ.years){ var SR = stressRates(r, SQ, t - 1); gWy = SR.w; gRy = SR.r; }
+        ['taxable','roth'].forEach(function(k){ bal[k].w *= 1 + gWy; bal[k].r *= 1 + gRy; bal[k].i *= 1 + gIy; });
+        ['client','spouse'].forEach(function(o){ bal.deferred[o].w *= 1 + gWy; bal.deferred[o].r *= 1 + gRy; bal.deferred[o].i *= 1 + gIy; });
       }
       var g = Math.pow(1 + infl, t), calYear = row.year;
       var ppl = P.ppl, ages = {};
@@ -10381,10 +10385,10 @@
       var co = tr.querySelector('[data-ax="company"]');
       if(document.activeElement !== co){ var own = a.ann.company.trim() !== ''; co.value = own ? a.ann.company : (a.cust || ''); co.classList.toggle('auto', !own); }
     });
-    var n = rows.length, inc = rows.filter(function(a){ return isIncomeAnn(a) && a.move === 'no'; }).length;
+    var n = rows.length, inc = rows.filter(isIncomeAnn).length;
     $('anxMsg').textContent = !n ? ''
       : n + ' annuity contract' + (n === 1 ? '' : 's') + (inc ? ' \u00b7 ' + inc + ' income annuit' + (inc === 1 ? 'y' : 'ies') + ' in force, counted in the Foundation and left with the carrier' : '') + '. Company follows the custodian until typed. '
-        + 'The projections follow these cells: an income annuity pays its monthly income (for the owner\u2019s life, or to the end of plan when joint) and its value falls as it pays; a MYGA grows at its rate, or pays the rate as income with no growth when the interest is taken; a variable annuity grows at the plan rate less its fees; a growth FIA and a RILA grow at the plan rate up to the cap. In the bad-years stress test a MYGA, a growth FIA and an income annuity lose nothing and a RILA loses no more than its floor.';
+        + 'The projections follow these cells: an income annuity is always Foundation, paying its monthly income (for the owner\u2019s life, or to the end of plan when joint) while its value falls as it pays; a MYGA grows at its rate, or pays the rate as income with no growth when the interest is taken, until its maturity date, after which it is market money at its level\u2019s rate; a variable annuity grows at the plan rate less its fees; a growth FIA and a RILA grow at the plan rate up to the cap. In the bad-years stress test a MYGA, a growth FIA and an income annuity lose nothing and a RILA loses no more than its floor.';
   }
   function anxFor(el){
     var tr = el.closest('tr[data-anx]'); if(!tr) return null;
