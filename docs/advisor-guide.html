@@ -1201,7 +1201,8 @@
         colour of the one showing, with its name on every header. <b>Three scenarios side by
         side</b> beneath the tabs sets their headline figures in three columns &mdash; the four
         levels funded, annuity income, LTC benefit, Roth conversions, withdrawal order, lifetime tax
-        and assets at the end of plan &mdash; each with a <span class="ui">View</span> button and a
+        and assets at the end of plan, then the assets at the end of plan under each of the three
+        section&nbsp;18 stress tests (or the year they run out) &mdash; each with a <span class="ui">View</span> button and a
         <span class="ui">Use for reports</span> pick. Rename a scenario in the
         <span class="ui">Name</span> box; <span class="ui">Copy this scenario into&hellip;</span>
         duplicates the one showing into another slot as a starting point. An untouched scenario
@@ -1327,15 +1328,20 @@
         <dt>Walls income assumptions</dt>
         <dd>Four fields for the Walls as adjusted: the <span class="ui">Walls yield</span>, when
           <span class="ui">Walls income starts</span>, and the Walls growth rate <span class="ui">before
-          income starts</span> and <span class="ui">after</span>. Every field is blank by default
+          income starts</span> and <span class="ui">after</span>, with a <span class="ui">Federally
+          tax-free</span> box beside the yield for Walls held in municipal bonds. Every field is blank by default
           and then follows the plan &mdash; the Walls growth <em>before</em> income starts is a plan
           assumption of 5%, the growth <em>after</em> is section&nbsp;03's Walls growth rate, and the
           start is the first retirement date; the plan figure is shown under each label. Type a value and the projections in sections&nbsp;15, 16 and 17,
           the worksheet and the executive summary report follow it; the sizing in section&nbsp;13
           keeps the plan assumptions, so a lower yield here shows up as a Needs or Wants shortfall
           in the projections rather than a bigger target. A line beneath states the result in words,
-          <span class="ui">Follow the plan assumptions</span> clears the annuity table and these
-          four fields, and everything saves with the case. Every date in the projections &mdash;
+          <span class="ui">Follow the plan assumptions</span> clears the annuity table, these
+          four fields and the tax-free box, and everything saves with the case. With the box ticked,
+          the non-qualified share of the Walls yield leaves federal taxable income; it still counts
+          toward the taxation of Social Security (as tax-exempt interest does), the state model still
+          taxes it, and the share paid from IRA money in the Walls is a taxable distribution either way,
+          so the box changes nothing while the Walls hold only qualified money. Every date in the projections &mdash;
           these, the retirement dates and each benefit's start and end &mdash; lands in the calendar
           year it names: a July 2030 start pays half a year in the 2030 row and the full amount
           from 2031.</dd>
@@ -1467,8 +1473,12 @@
           Security thresholds are not indexed, so up to 85% of benefits becomes taxable over time.
           Wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs are ordinary income;
           the Foundation annuity is taxed by its funding (qualified money fully, a non-qualified annuity
-          half); the non-qualified share of the Walls yield and half of each taxable-account
-          withdrawal are long-term gains. RMDs follow the Uniform Lifetime Table from 73 or 75 by birth
+          half, Roth money not at all), and annuity income already in force the same way by the account
+          that pays it &mdash; a section&nbsp;04 line with no account, or a qualified contract, fully; a
+          non-qualified contract half; a Roth contract not at all; a MYGA's interest fully unless the
+          contract is Roth. The non-qualified share of the Walls yield and half of each taxable-account
+          withdrawal are long-term gains, unless the Walls yield is marked federally tax-free in
+          section&nbsp;14. RMDs follow the Uniform Lifetime Table from 73 or 75 by birth
           year; an RMD larger than the plan's own tax-deferred draw is taxed, spent first and otherwise
           reinvested in the after-tax Roof account. Both spouses are assumed living to the end of plan; no itemising, credits or IRMAA.</p>
         <p><b>State tax</b> follows the state in section&nbsp;02 through a planning model of each
@@ -1543,8 +1553,9 @@
           the extra spending over the plan.</dd>
       </dl>
       <p>The stresses use the scenario's own transfers, annuity income, Roof growth and Roth
-        strategy, so each scenario has its own set. The report carries them after the projected
-        assets, a full page for each.</p>
+        strategy, so each scenario has its own set; the scenario cards at the top of section&nbsp;14
+        show each scenario's end-of-plan assets under all three, side by side. The report carries them
+        after the projected assets, a full page for each.</p>
 
       <h3 style="margin-top:18px">If a long term care event occurs</h3>
       <p>Under the three stress tests, the same three care-event projections as section&nbsp;06 &mdash; male, female,

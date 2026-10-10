@@ -169,6 +169,7 @@
   .scn-card dl{margin:0;padding:6px 14px}
   .scn-card dl div{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13.5px}
   .scn-card dl div:last-child{border-bottom:0}
+  .scn-card dl div.scn-sub{display:block;padding:10px 0 2px;border-bottom:0;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;color:var(--muted)}
   .scn-card dt{color:var(--muted)} .scn-card dd{margin:0;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
   .scn-card dd small{color:var(--muted);font-family:"Public Sans",sans-serif}
   .scn-card-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;background:var(--scn-bg);font-size:13.5px;flex-wrap:wrap}
@@ -197,6 +198,7 @@
     color:var(--muted);font-weight:600;
   }
   label.f small{display:block;text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted);font-size:12.5px}
+  label.f > span.chk-line{display:inline-flex;align-items:center;gap:7px;text-transform:none;letter-spacing:0;font-weight:400;font-size:14px;color:var(--ink-2);cursor:pointer;min-height:38px}
   input,select,textarea{
     font-family:"IBM Plex Mono",ui-monospace,monospace;
     font-size:16px;
@@ -1677,6 +1679,7 @@
         <div class="inc-title gap">Walls income assumptions<small>Yield, start date and growth for the Walls as adjusted &middot; blank follows section 03 and the first retirement date</small></div>
         <div class="assump first" style="margin-top:14px">
           <label class="f"><span>Walls yield<small>Plan assumption <span id="adjYWDef"></span></small></span><input type="text" inputmode="decimal" id="adjYW" placeholder="plan" autocomplete="off"></label>
+          <label class="f"><span>Walls yield tax<small>Federally taxable by default &middot; tick if the Walls hold municipal bonds</small></span><span class="chk-line"><input type="checkbox" id="adjYWtf"> Federally tax-free</span></label>
           <label class="f"><span>Walls income starts<small>Default: first retirement, <span id="adjWStartDef"></span></small></span><input type="month" id="adjWStart"></label>
           <label class="f"><span>Walls growth before income starts<small>Plan assumption <span id="adjGPreDef"></span></small></span><input type="text" inputmode="decimal" id="adjGPre" placeholder="plan" autocomplete="off"></label>
           <label class="f"><span>Walls growth after income starts<small>Plan assumption <span id="adjGPostDef"></span></small></span><input type="text" inputmode="decimal" id="adjGPost" placeholder="plan" autocomplete="off"></label>
@@ -3548,7 +3551,7 @@
      starts paying, and the Walls growth rate before and after income begins.
      Each is blank by default and then follows section 03 and the first
      retirement date. They drive the projections, not the sizing in section 13. */
-  var INC_ADJ = {yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:''};
+  var INC_ADJ = {yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:'', yWtf:''};
   var WALLS_PRE_GROWTH = 0.05;   // the plan's Walls growth before their income starts; section 03's Walls rate applies once it does
   /* Per-annuity income settings for the Foundation lines in section 14, keyed
      by the account's row order, the level and the line's ordinal. Every field
@@ -3667,6 +3670,7 @@
     return {
       yF: INC_ADJ.yF !== '' ? pctIn(INC_ADJ.yF) : r.yF,
       yW: INC_ADJ.yW !== '' ? pctIn(INC_ADJ.yW) : r.yW,
+      yWtf: INC_ADJ.yWtf === 'yes',          // the Walls yield is federally tax-free (municipal bonds)
       fStart: yrs(INC_ADJ.fStart), wStart: yrs(INC_ADJ.wStart),
       gPre: INC_ADJ.gPre !== '' ? pctIn(INC_ADJ.gPre) : WALLS_PRE_GROWTH,
       gPost: INC_ADJ.gPost !== '' ? pctIn(INC_ADJ.gPost) : gW,
@@ -3740,6 +3744,9 @@
     if(newC.length) fStart = Math.min.apply(null, newC.map(function(c){ return c.start != null ? c.start : firstRet; }));
     var incomeAcctIds = {}; contracts.forEach(function(c){ if(c.income) incomeAcctIds[c.key.replace('income:', '')] = 1; });
     var mygaTaken = accounts.filter(function(a){ return a.pos === 'MYGA Annuity' && a.ann && a.ann.interest === 'taken' && a.ann.rate > 0 && a.val > 0.5; });
+    /* how much of an annuity payment is taxable: a line with no account, or qualified money, fully; a non-qualified
+       contract by its exclusion ratio (MYGA interest fully: interest comes out first); a Roth contract not at all */
+    var annTaxShare = function(acct, interest){ if(!acct) return 1; var tier = wdTierOf(acct); if(tier === 'roth') return 0; if(interest || acct.tax === 'Qualified') return 1; return NQ_ANNUITY_TAXABLE; };
     var PS = planStart(), frac0 = PS.frac;
     for(var t = 0; t <= N; t++){
       /* Row t covers plan years t..t+1, except the first, which runs from the month the plan is
@@ -3749,11 +3756,11 @@
       var act = function(sy, ey){ var a = Math.max(t + s0, sy == null ? -1e9 : sy), bnd = Math.min(t + 1, ey == null ? 1e9 : ey); return Math.max(0, bnd - a); };
       /* income of the first calendar year earned before the plan started: already received and
          spent, so not in the cash flow, but in that year's tax base (the brackets are annual) */
-      var pre = s0 > 0 ? {emp:0, ss:0, pen:0, ann:0, ng:0} : null;
+      var pre = s0 > 0 ? {emp:0, ss:0, pen:0, ann:0, annTax:0, ng:0} : null;
       var actPre = function(sy, ey){ var a = Math.max(t, sy == null ? -1e9 : sy), bnd = Math.min(t + s0, ey == null ? 1e9 : ey); return Math.max(0, bnd - a); };
       var g = Math.pow(1 + infl, t), ex = expenseAt(i, t, drives, s0);
       var row = {t:t, year:year0 + t, ages:ppl.map(function(w){ return ageOf(w) + t; }),
-                 needs:ex.need * g, wants:ex.want * g, emp:0, ss:0, pen:0, ann:0, sleeve:0, wallsYield:0, ng:0, pre:pre};
+                 needs:ex.need * g, wants:ex.want * g, emp:0, ss:0, pen:0, ann:0, annTax:0, sleeve:0, wallsYield:0, ng:0, pre:pre};
       ppl.forEach(function(w){
         var x = e[w];
         if(x.salary > 0.5){
@@ -3781,7 +3788,8 @@
         if(!(x.amt > 0.5) || incomeAcctIds[String(x.acctId)]) return;        // a line linked to an income annuity in force is paid by the contract itself
         var sy = planYears(x.start); if(sy == null) sy = 0;
         var ey = x.life ? null : planYears(x.end), annY = x.amt * 12 * Math.pow(1 + (x.cola || 0), t);
-        row.ann += annY * act(sy, ey); if(pre) pre.ann += annY * actPre(sy, ey);
+        var annOn = annY * act(sy, ey), annSh = annTaxShare(x.acctId != null && String(x.acctId) !== '' ? accounts.filter(function(a){ return String(a.id) === String(x.acctId); })[0] : null, false);
+        row.ann += annOn; row.annTax += annOn * annSh; if(pre){ var annP = annY * actPre(sy, ey); pre.ann += annP; pre.annTax += annP * annSh; }
       });
       (b.nonGuar || []).forEach(function(x){
         if(!(x.amt > 0.5)) return;
@@ -3792,7 +3800,8 @@
       /* a MYGA whose interest is taken as income: the rate on its value each year, to its maturity if one is set; the value itself does not grow */
       mygaTaken.forEach(function(a){
         var ey = a.ann.maturity ? planYears(a.ann.maturity) : null, intY = a.val * a.ann.rate;
-        row.ann += intY * act(null, ey); if(pre) pre.ann += intY * actPre(null, ey);
+        var intOn = intY * act(null, ey), intSh = annTaxShare(a, true);
+        row.ann += intOn; row.annTax += intOn * intSh; if(pre){ var intP = intY * actPre(null, ey); pre.ann += intP; pre.annTax += intP * intSh; }
       });
       var on = act(fStart, null), onW = act(wStart, null);
       /* Walls balance for the yield: grows at the pre-income rate until the
@@ -4057,7 +4066,8 @@
     $('adjIncMsg').textContent = ((A.any || AS.any || Object.keys(ROOF_G).some(function(k){ return String(ROOF_G[k]).trim() !== ''; })) ? 'Adjusted: ' : 'Following the plan assumptions: ')
       + 'the Foundation annuit' + (AS.count === 1 ? 'y pays' : 'ies pay') + ' about ' + money(AS.total) + ' a year at the start'
       + '; the Walls pay ' + pc1(A.yW) + ' of their balance from ' + (A.wStart != null ? longDate(INC_ADJ.wStart + '-01').replace(/ \d+,/, '') : 'the first retirement')
-      + ' \u2014 about ' + money(wRow ? wRow.wallsYield / Math.max(0.01, clamp01(Math.ceil(P.wStart) + 1 - P.wStart)) : r.funded.walls * A.yW) + ' in the first full year \u2014 growing ' + pc1(A.gPre) + ' before income starts and ' + pc1(A.gPost) + ' after.';
+      + ' \u2014 about ' + money(wRow ? wRow.wallsYield / Math.max(0.01, clamp01(Math.ceil(P.wStart) + 1 - P.wStart)) : r.funded.walls * A.yW) + ' in the first full year \u2014 growing ' + pc1(A.gPre) + ' before income starts and ' + pc1(A.gPost) + ' after.'
+      + (A.yWtf ? ' The yield is federally tax-free; it still counts toward the taxation of Social Security and in the state model, and the share paid from IRA money is a taxable distribution.' : '');
   }
   function renderAdjAlloc(base, r){
     $('adjAllocMsg').innerHTML = r.adjusted
@@ -5590,7 +5600,7 @@
     });
     xrows.push({cells:['Total', '', money(TX.lifetimeGross), '', '', '', '', '', '', money(TX.lifetime), money(TX.lifetimeState), pc(TX.avgTotalEffective)], bold:true, rule:true});
     table(xcols, xrows, {rowH:12});
-    para('2026 federal law (OBBBA): standard deduction ' + money(TAX_2026[TX.status].std) + (TX.status === 'mfj' ? ' plus $1,650 per spouse 65+' : ' plus $2,050 at 65') + ', the $6,000 senior deduction for 2025-2028, brackets and thresholds indexed at ' + pc(i.inflation || 0) + '; up to 85% of Social Security taxable by the provisional-income formula. Ordinary income: wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs; the Foundation annuity ' + Math.round(TX.foundTaxShare * 100) + '% taxable; the non-qualified share of the Walls yield and half of each taxable-account withdrawal taxed as long-term gains. Withdrawals follow the order above and are grossed up for the tax they cause; RMDs use the Uniform Lifetime Table on tax-deferred market balances. Both spouses assumed living to the end of plan; no itemising, credits or IRMAA. State tax follows a planning model of the state\'s 2025 rates, brackets, deductions or exemptions and retirement-income exclusions, Social Security exempt unless the state taxes it, local taxes excluded. A planning estimate, not tax advice.');
+    para('2026 federal law (OBBBA): standard deduction ' + money(TAX_2026[TX.status].std) + (TX.status === 'mfj' ? ' plus $1,650 per spouse 65+' : ' plus $2,050 at 65') + ', the $6,000 senior deduction for 2025-2028, brackets and thresholds indexed at ' + pc(i.inflation || 0) + '; up to 85% of Social Security taxable by the provisional-income formula. Ordinary income: wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs; the Foundation annuity ' + Math.round(TX.foundTaxShare * 100) + '% taxable, annuity income in force by the account that pays it (Roth tax-free); ' + (TX.wallsTaxFree ? 'the Walls yield federally tax-free (in provisional income and the state model); ' : 'the non-qualified share of the Walls yield and ') + 'half of each taxable-account withdrawal taxed as long-term gains. Withdrawals follow the order above and are grossed up for the tax they cause; RMDs use the Uniform Lifetime Table on tax-deferred market balances. Both spouses assumed living to the end of plan; no itemising, credits or IRMAA. State tax follows a planning model of the state\'s 2025 rates, brackets, deductions or exemptions and retirement-income exclusions, Social Security exempt unless the state taxes it, local taxes excluded. A planning estimate, not tax advice.');
 
     /* ---------- estate plan ---------- */
     var EF = estateFacts();
@@ -6696,7 +6706,7 @@
     resetIncomeAdj();
     if(d.incomeAdj){
       Object.keys(INC_ADJ).forEach(function(k){ if(d.incomeAdj[k] != null) INC_ADJ[k] = String(d.incomeAdj[k]); });
-      $('adjYW').value = INC_ADJ.yW; $('adjGPre').value = INC_ADJ.gPre; $('adjGPost').value = INC_ADJ.gPost;
+      $('adjYW').value = INC_ADJ.yW; $('adjGPre').value = INC_ADJ.gPre; $('adjGPost').value = INC_ADJ.gPost; $('adjYWtf').checked = INC_ADJ.yWtf === 'yes';
       $('adjWStart').value = INC_ADJ.wStart;
     }
     ROOF_G = {}; roofGSig = '';
@@ -6728,7 +6738,7 @@
     } else {
       scenarios[0] = null;   // an older case file: what was loaded above is Scenario A
     }
-    $('adjYW').value = INC_ADJ.yW || ''; $('adjGPre').value = INC_ADJ.gPre || ''; $('adjGPost').value = INC_ADJ.gPost || ''; $('adjWStart').value = INC_ADJ.wStart || '';
+    $('adjYW').value = INC_ADJ.yW || ''; $('adjGPre').value = INC_ADJ.gPre || ''; $('adjGPost').value = INC_ADJ.gPost || ''; $('adjYWtf').checked = INC_ADJ.yWtf === 'yes'; $('adjWStart').value = INC_ADJ.wStart || '';
   }
 
 
@@ -7228,10 +7238,10 @@
 
   /* Federal tax on one year. ord = ordinary income before Social Security,
      cg = long-term gains / qualified dividends, ss = gross Social Security. */
-  function fedTax(ord, cg, ss, ages65, status, g, calYear){
+  function fedTax(ord, cg, ss, ages65, status, g, calYear, exempt){
     var T = TAX_2026[status];
     var agiExSS = ord + cg;
-    var prov = agiExSS + 0.5 * ss, ssTax = 0;
+    var prov = agiExSS + (exempt || 0) + 0.5 * ss, ssTax = 0;   // tax-exempt interest counts toward the taxation of Social Security
     if(ss > 0){
       if(prov > T.ssTop) ssTax = Math.min(0.85 * ss, 0.85 * (prov - T.ssTop) + Math.min(0.5 * ss, 0.5 * (T.ssTop - T.ssBase)));
       else if(prov > T.ssBase) ssTax = Math.min(0.5 * ss, 0.5 * (prov - T.ssBase));
@@ -7288,18 +7298,20 @@
     /* balances by tier, from the plan's own moves */
     var bal = {taxable:{w:0, r:0, f:0, i:0}, roth:{w:0, r:0, f:0, i:0}, deferred:{client:{w:0, r:0, f:0, i:0}, spouse:{w:0, r:0, f:0, i:0}}};
     var lifeHeld = 0;                       // life / LTC policies left in place: held outside the plan, level
-    var foundQ = 0, foundNQ = 0, wallsQ = {client:0, spouse:0}, wallsTot = 0, wallsNQ = 0, wallsRoth = 0;
+    var foundQ = 0, foundNQ = 0, foundRoth = 0, wallsQ = {client:0, spouse:0}, wallsTot = 0, wallsNQ = 0, wallsRoth = 0;
     (r.moves || []).forEach(function(m){
       var a = m.acct, tier = wdTierOf(a);
       if(!tier && isLifePos(a.pos) && m.bucket === 'inplace') lifeHeld += m.amt;
       if(!tier || m.bucket === 'moat') return;
-      if(m.bucket === 'foundation'){ if(tier === 'deferred'){ if(a.tax === 'Qualified') foundQ += m.amt; else foundNQ += m.amt; } else foundNQ += m.amt; return; }
+      if(m.bucket === 'foundation'){ if(tier === 'roth') foundRoth += m.amt; else if(tier === 'deferred' && a.tax === 'Qualified') foundQ += m.amt; else foundNQ += m.amt; return; }
       var key = m.bucket === 'walls' ? 'w' : (m.bucket === 'roof' ? 'r' : (m.bucket === 'inplace' ? 'i' : 'f'));
       if(m.bucket === 'walls'){ wallsTot += m.amt; if(tier === 'taxable') wallsNQ += m.amt; if(tier === 'roth') wallsRoth += m.amt; }
       if(tier === 'deferred'){ var o = personOwner(a.owner, i); bal.deferred[o][key] += m.amt; if(m.bucket === 'walls') wallsQ[o] += m.amt; }
       else bal[tier][key] += m.amt;
     });
-    var foundTaxShare = (foundQ + foundNQ) > 0 ? (foundQ + foundNQ * NQ_ANNUITY_TAXABLE) / (foundQ + foundNQ) : 1;
+    /* annuity income is taxable unless it comes from a Roth account: qualified money fully, a non-qualified annuity by its exclusion ratio, Roth money not at all */
+    var foundAll = foundQ + foundNQ + foundRoth, foundTaxShare = foundAll > 0 ? (foundQ + foundNQ * NQ_ANNUITY_TAXABLE) / foundAll : 1;
+    var wallsTF = !!incomeAdj(r).yWtf;      // section 14: the Walls yield is federally tax-free (municipal bonds)
     var wQshare = {client: wallsTot > 0 ? wallsQ.client / wallsTot : 0, spouse: wallsTot > 0 ? wallsQ.spouse / wallsTot : 0};
     var wNQshare = wallsTot > 0 ? wallsNQ / wallsTot : 0;
     var sum3 = function(b){ return b.w + b.r + b.f + b.i; };
@@ -7349,7 +7361,11 @@
       var sleeveOrd = row.sleeve * foundTaxShare;
       var wallsNow = bal.taxable.w + bal.roth.w + bal.deferred.client.w + bal.deferred.spouse.w;
       var wQ = {client: wallsNow > 0.5 ? bal.deferred.client.w / wallsNow : 0, spouse: wallsNow > 0.5 ? bal.deferred.spouse.w / wallsNow : 0};
-      var wallsOrd = row.wallsYield * (wQ.client + wQ.spouse), wallsCG = row.wallsYield * (wallsNow > 0.5 ? bal.taxable.w / wallsNow : 0);
+      var wallsOrd = row.wallsYield * (wQ.client + wQ.spouse), wallsNQy = row.wallsYield * (wallsNow > 0.5 ? bal.taxable.w / wallsNow : 0);
+      /* the non-qualified share of the yield: long-term gains, or, federally tax-free, out of federal income but still in Social Security's
+         provisional income and in the state model; the share paid from IRA money (wallsOrd) is a taxable distribution either way */
+      var wallsCG = wallsTF ? 0 : wallsNQy, wallsExempt = wallsTF ? wallsNQy : 0;
+      var annOrd = row.annTax != null ? row.annTax : row.ann;   // the taxable part of annuity income already in force
       var qualDraw = {client: row.wallsYield * wQ.client, spouse: row.wallsYield * wQ.spouse};
       /* required minimum distributions on the tax-deferred market balances — and, from 70½, qualified
          charitable distributions: given straight from the IRA, counted toward the RMD, left out of income */
@@ -7370,20 +7386,20 @@
         }
       });
       qcdTotal += qcd; giftTotal += gift;
-      var ordBase = row.emp + row.pen + row.ann + row.ng + sleeveOrd + wallsOrd + rmdExcess;
+      var ordBase = row.emp + row.pen + annOrd + row.ng + sleeveOrd + wallsOrd + rmdExcess;
       var income = row.emp + row.ss + row.pen + row.ann + row.ng + row.sleeve + row.wallsYield + rmdExcess;
       /* The first calendar year: income earned before the plan started sits in the year's tax
          base (brackets and Social Security taxation are annual). The year's tax on income is
          shared with the plan window in proportion to its income — the rest was withheld before
          the plan — while a Roth conversion is taxed at the margin, on top of the whole year. */
       var PRE = (t === 0 && row.pre) ? row.pre : null, pplAges = ppl.map(function(w){ return {age:ages[w]}; });
-      var preOrd = PRE ? PRE.emp + PRE.pen + PRE.ann + PRE.ng : 0, preSS = PRE ? PRE.ss : 0;
+      var preOrd = PRE ? PRE.emp + PRE.pen + (PRE.annTax != null ? PRE.annTax : PRE.ann) + PRE.ng : 0, preSS = PRE ? PRE.ss : 0;
       var cpObj = function(o){ var k, c = {}; for(k in o) c[k] = o[k]; return c; };
       var fedT = function(ord, cg, ss, conv){
         conv = conv || 0;
-        var x = fedTax(ord + preOrd, cg, ss + preSS, ages65, status, g, calYear);
+        var x = fedTax(ord + preOrd, cg, ss + preSS, ages65, status, g, calYear, wallsExempt);
         if(!PRE) return x;
-        var noConv = conv > 0.5 ? fedTax(ord - conv + preOrd, cg, ss + preSS, ages65, status, g, calYear) : x;
+        var noConv = conv > 0.5 ? fedTax(ord - conv + preOrd, cg, ss + preSS, ages65, status, g, calYear, wallsExempt) : x;
         var planInc = Math.max(0, ord - conv) + cg + ss, share = (planInc + preOrd + preSS) > 0.5 ? planInc / (planInc + preOrd + preSS) : 1;
         x = cpObj(x); x.tax = Math.max(0, noConv.tax * share + (x.tax - noConv.tax));
         return x;
@@ -7462,8 +7478,8 @@
           bb.taxable.r += rmdSpare;
           tx0 = fedT(ordBase + wd0.deferred + cv.amt, wallsCG + wd0.taxable * TAXABLE_GAIN_SHARE, row.ss, cv.amt);
           /* the draw covers state income tax as well as federal, so the year's cash flow closes */
-          var st0 = stT({wages:row.emp + row.ng, gains:wallsCG + wd0.taxable * TAXABLE_GAIN_SHARE, pension:row.pen,
-                     retirement:row.pen + row.ann + sleeveOrd + wallsOrd + rmdExcess + wd0.deferred + cv.amt, ssFederal:tx0.ssTaxable,
+          var st0 = stT({wages:row.emp + row.ng, gains:wallsNQy + wd0.taxable * TAXABLE_GAIN_SHARE, pension:row.pen,
+                     retirement:row.pen + annOrd + sleeveOrd + wallsOrd + rmdExcess + wd0.deferred + cv.amt, ssFederal:tx0.ssTaxable,
                      gross:income + wd0.taxable + wd0.deferred + wd0.roth}, cv.amt);
           var tot0 = tx0.tax + st0.tax;
           if(Math.abs(tot0 - tax0) < 0.05){ tax0 = tot0; break; }
@@ -7506,12 +7522,12 @@
       var moatLeft = (ltcPool && ltcPool0 > 0.5) ? Math.max(0, Math.min(1, ltcPoolLeft() / ltcPool0)) : 1;
       var layers = {buffer:layer('f'), sleeve:(row.sleeveBal != null ? row.sleeveBal : r.funded.foundation), walls:layer('w'), roof:layer('r'), moat:r.funded.moat * Math.pow(1 + moatG, t) * moatLeft, outside:layer('i') + lifeHeld};
       layers.total = layers.buffer + layers.sleeve + layers.walls + layers.roof + layers.moat + layers.outside;
-      var stParts = {wages:row.emp + row.ng, gains:wallsCG + wd.taxable * TAXABLE_GAIN_SHARE, pension:row.pen,
-                     retirement:row.pen + row.ann + sleeveOrd + wallsOrd + rmdExcess + wd.deferred + (cvInfo ? cvInfo.amt : 0), ssFederal:tx.ssTaxable, gross:gross};
+      var stParts = {wages:row.emp + row.ng, gains:wallsNQy + wd.taxable * TAXABLE_GAIN_SHARE, pension:row.pen,
+                     retirement:row.pen + annOrd + sleeveOrd + wallsOrd + rmdExcess + wd.deferred + (cvInfo ? cvInfo.amt : 0), ssFederal:tx.ssTaxable, gross:gross};
       var st = stT(stParts, cvInfo ? cvInfo.amt : 0);
       if(cvInfo && cvInfo.amt > 0.5){
-        var stB = stT({wages:stParts.wages, gains:wallsCG + base.wd.taxable * TAXABLE_GAIN_SHARE, pension:row.pen,
-          retirement:row.pen + row.ann + sleeveOrd + wallsOrd + rmdExcess + base.wd.deferred, ssFederal:base.tx.ssTaxable, gross:income + base.wd.taxable + base.wd.deferred + base.wd.roth});
+        var stB = stT({wages:stParts.wages, gains:wallsNQy + base.wd.taxable * TAXABLE_GAIN_SHARE, pension:row.pen,
+          retirement:row.pen + annOrd + sleeveOrd + wallsOrd + rmdExcess + base.wd.deferred, ssFederal:base.tx.ssTaxable, gross:income + base.wd.taxable + base.wd.deferred + base.wd.roth});
         cvInfo.stateTax = st.tax - stB.tax; cvInfo.tax = cvInfo.fedTax + cvInfo.stateTax; convTax += cvInfo.tax;
       }
       lifetime += tx.tax; lifetimeGross += gross; lifetimeState += st.tax;
@@ -7530,7 +7546,7 @@
             avgTotalEffective: lifetimeGross > 0.5 ? (lifetime + lifetimeState) / lifetimeGross : 0,
             avgEffective: lifetimeGross > 0.5 ? lifetime / lifetimeGross : 0, firstRmd:firstRmd, peak:peak, rmdStartYear:rmdStartYear,
             convTotal:convTotal, convTax:convTax, convert:conv, qcd:QC, qcdTotal:qcdTotal, giftTotal:giftTotal,
-            firstRet:P.firstRet, lastRet:P.lastRet, foundTaxShare:foundTaxShare, start:bal, ltc:LTC ? ltcTot : null};
+            firstRet:P.firstRet, lastRet:P.lastRet, foundTaxShare:foundTaxShare, wallsTaxFree:wallsTF, start:bal, ltc:LTC ? ltcTot : null};
   }
 
 
@@ -8408,7 +8424,7 @@
         }).join('')
       + '</tbody><tfoot><tr><td colspan="2">Total</td><td class="num">' + money(X0.lifetimeGross) + '</td><td colspan="7"></td><td class="num"><b>' + money(X0.lifetime) + '</b></td><td class="num">' + pct(X0.avgEffective) + '</td><td class="num">' + money(X0.lifetimeState) + '</td><td class="num"><b>' + money(X0.lifetime + X0.lifetimeState) + '</b></td><td class="num">' + pct(X0.avgTotalEffective) + '</td>' + (anyUnf ? '<td></td>' : '') + '</tr></tfoot>';
 
-    $('taxAssume').innerHTML = '<b>Assumptions.</b> 2026 federal law: standard deduction ' + money(TAX_2026[X0.status].std) + (X0.status === 'mfj' ? ' plus $1,650 for each spouse 65 or older' : ' plus $2,050 at 65') + ', brackets ' + T.brackets.map(function(b){ return Math.round(b[0] * 100) + '%'; }).join(' / ') + ', and the $6,000 senior deduction for 2025–2028 (phasing out above ' + money(T.seniorPhase) + ' of AGI); brackets, the standard deduction and the capital-gains thresholds are indexed at the ' + pct(i.inflation || 0) + ' inflation assumption, the Social Security thresholds are not. Up to 85% of Social Security is taxable by the provisional-income formula. Wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs are ordinary income; the Foundation annuity is ' + Math.round(X0.foundTaxShare * 100) + '% taxable (qualified money fully, a non-qualified annuity half); the Walls yield follows the Walls funding mix, with the non-qualified share taxed as long-term gains; half of each taxable-account withdrawal is assumed to be gain. RMDs use the Uniform Lifetime Table from age ' + rmdAge(X0.year0 - i.clientAge) + ' on the tax-deferred market balances (the Foundation annuity’s payments satisfy its own). Both spouses are assumed living to the end of plan; no itemising, credits or Medicare IRMAA. <b>State tax</b> uses a planning model of each state\u2019s 2025 rates, brackets, standard deduction or exemptions and retirement-income exclusions, indexed the same way, with Social Security exempt except where the state taxes it; local income taxes are left out. A planning estimate, not tax advice.';
+    $('taxAssume').innerHTML = '<b>Assumptions.</b> 2026 federal law: standard deduction ' + money(TAX_2026[X0.status].std) + (X0.status === 'mfj' ? ' plus $1,650 for each spouse 65 or older' : ' plus $2,050 at 65') + ', brackets ' + T.brackets.map(function(b){ return Math.round(b[0] * 100) + '%'; }).join(' / ') + ', and the $6,000 senior deduction for 2025–2028 (phasing out above ' + money(T.seniorPhase) + ' of AGI); brackets, the standard deduction and the capital-gains thresholds are indexed at the ' + pct(i.inflation || 0) + ' inflation assumption, the Social Security thresholds are not. Up to 85% of Social Security is taxable by the provisional-income formula. Wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs are ordinary income; the Foundation annuity is ' + Math.round(X0.foundTaxShare * 100) + '% taxable (qualified money fully, a non-qualified annuity half, Roth money not at all), and annuity income already in force the same way by the account that pays it; the Walls yield follows the Walls funding mix, with the non-qualified share ' + (X0.wallsTaxFree ? 'federally tax-free (it still counts toward the taxation of Social Security and in the state model)' : 'taxed as long-term gains') + '; half of each taxable-account withdrawal is assumed to be gain. RMDs use the Uniform Lifetime Table from age ' + rmdAge(X0.year0 - i.clientAge) + ' on the tax-deferred market balances (the Foundation annuity’s payments satisfy its own). Both spouses are assumed living to the end of plan; no itemising, credits or Medicare IRMAA. <b>State tax</b> uses a planning model of each state\u2019s 2025 rates, brackets, standard deduction or exemptions and retirement-income exclusions, indexed the same way, with Social Security exempt except where the state taxes it; local income taxes are left out. A planning estimate, not tax advice.';
     return X0;
   }
 
@@ -10641,7 +10657,7 @@
   var scnNames = ['Scenario A', 'Scenario B', 'Scenario C'];
   var scenarios = [null, null, null], activeScn = 0, reportScn = 0;
   function scnDefault(){
-    return {adjMoves:null, INC_ADJ:{yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:''}, ANN_INC:{}, LTC_BEN:{}, ROOF_G:{},
+    return {adjMoves:null, INC_ADJ:{yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:'', yWtf:''}, ANN_INC:{}, LTC_BEN:{}, ROOF_G:{},
             wdOrder:WD_DEFAULT.slice(), rothCfg:{apply:true, target:'auto', start:'auto', order:'roof', irmaa:true}, qcdCfg:qcdDefault()};
   }
   function scnClone(v){ return v == null ? v : JSON.parse(JSON.stringify(v)); }
@@ -10663,7 +10679,7 @@
   function scnRestore(S){
     scnRestoreGlobals(S);
     annSig = ''; ltcBenSig = ''; roofGSig = ''; autoSig = null; autoDirty = true;
-    $('adjYW').value = INC_ADJ.yW || ''; $('adjGPre').value = INC_ADJ.gPre || ''; $('adjGPost').value = INC_ADJ.gPost || '';
+    $('adjYW').value = INC_ADJ.yW || ''; $('adjGPre').value = INC_ADJ.gPre || ''; $('adjGPost').value = INC_ADJ.gPost || ''; $('adjYWtf').checked = INC_ADJ.yWtf === 'yes';
     $('adjWStart').value = INC_ADJ.wStart || '';
   }
   function scnFor(k){ return k === activeScn ? scnSnapshot() : (scenarios[k] || scnDefault()); }
@@ -10738,12 +10754,16 @@
       var last = TX.rows[TX.rows.length - 1], dep = TX.rows.filter(function(x){ return x.unfunded > 0.5; })[0];
       var AS = annuitySummary(r), MC = moatContracts(r);
       var S = scnFor(k);
+      /* the three section 18 stress tests on this scenario: assets at the end of plan, or the year they run out */
+      var P = projectIncome(r); TX.income = TX.income || P;
+      var stress = sensDefs(r, P).map(function(d){ var RUN = sensRun(r, d, TX); return {key:d.key, title:d.title, end:RUN.last.layers.total, endYear:RUN.last.year, dep:RUN.dep}; });
       var n = (S.adjMoves ? S.adjMoves.length : 0);
       return {r:r, funded:r.funded, annuity:AS.total, gR:effGrowth(r).r, moatBenefit:MC.reduce(function(a, c){ return a + (c.benefit || 0); }, 0),
               converted:TX.convTotal || 0, rothOn:!!cfg.apply, tax:TX.lifetime + TX.lifetimeState, end:last.layers.total, endYear:last.year, dep:dep,
-              adjusted:!!S.adjMoves, lines:n, wd:(S.wdOrder || WD_DEFAULT).map(function(t){ return ({taxable:'Taxable', deferred:'Tax-deferred', roth:'Roth'})[t] || t; }).join(' \u2192 ')};
+              stress:stress, adjusted:!!S.adjMoves, lines:n, wd:(S.wdOrder || WD_DEFAULT).map(function(t){ return ({taxable:'Taxable', deferred:'Tax-deferred', roth:'Roth'})[t] || t; }).join(' \u2192 ')};
     });
   }
+  function scnStressCell(x){ return !x ? '\u2014' : x.dep ? '<span style="color:var(--st-alert)">run out ' + x.dep.year + '</span>' : money(x.end) + ' <small>' + x.endYear + '</small>'; }
   function renderScenarioBar(){
     scnChrome();
     var grid = $('scnGrid'); if(!grid) return;
@@ -10760,14 +10780,18 @@
       ['Roth conversions', function(m){ return m.rothOn ? (m.converted > 0.5 ? money(m.converted) : 'none fit') : 'off'; }],
       ['Withdrawal order', function(m){ return m.wd; }],
       ['Lifetime income tax', function(m){ return money(m.tax); }],
-      ['Assets at end of plan', function(m){ return m.dep ? '<span style="color:var(--st-alert)">run out ' + m.dep.year + '</span>' : money(m.end) + ' <small>' + m.endYear + '</small>'; }]
+      ['Assets at end of plan', function(m){ return m.dep ? '<span style="color:var(--st-alert)">run out ' + m.dep.year + '</span>' : money(m.end) + ' <small>' + m.endYear + '</small>'; }],
+      {head:'Stress tests, assets at end of plan'},
+      ['Sequence of returns', function(m){ return scnStressCell(m.stress[0]); }],
+      ['Social Security cut', function(m){ return scnStressCell(m.stress[1]); }],
+      ['Higher inflation', function(m){ return scnStressCell(m.stress[2]); }]
     ];
     if(grid.children.length !== 3 || grid.getAttribute('data-rows') !== String(rows.length)){
       grid.setAttribute('data-rows', String(rows.length));
       grid.innerHTML = SCN_META.map(function(meta, k){
         return '<div class="scn-card" style="--scn:' + meta.color + ';--scn-bg:' + meta.bg + '">'
           + '<div class="scn-card-head"><b></b><span></span></div>'
-          + '<dl>' + rows.map(function(row){ return '<div><dt>' + row[0] + '</dt><dd></dd></div>'; }).join('') + '</dl>'
+          + '<dl>' + rows.map(function(row){ return row.head ? '<div class="scn-sub">' + row.head + '</div>' : '<div><dt>' + row[0] + '</dt><dd></dd></div>'; }).join('') + '</dl>'
           + '<div class="scn-card-foot"><span class="scn-viewing">Viewing</span><button type="button" data-scn-view="' + k + '"></button>'
           + '<label><input type="radio" name="scnReport" value="' + k + '"> Use for reports</label></div></div>';
       }).join('');
@@ -10777,7 +10801,7 @@
       card.classList.toggle('on', on);
       card.querySelector('.scn-card-head b').textContent = scnNames[k];
       card.querySelector('.scn-card-head span').textContent = m.adjusted ? m.lines + ' adjusted line' + (m.lines === 1 ? '' : 's') : 'the model\u2019s own proposal';
-      var dds = card.querySelectorAll('dd'); rows.forEach(function(row, j){ dds[j].innerHTML = row[1](m); });
+      var dds = card.querySelectorAll('dd'), j = 0; rows.forEach(function(row){ if(row.head) return; dds[j++].innerHTML = row[1](m); });
       card.querySelector('.scn-viewing').hidden = !on;
       var vb = card.querySelector('[data-scn-view]'); vb.hidden = on; vb.textContent = 'View ' + scnNames[k];
       card.querySelector('input[name="scnReport"]').checked = k === reportScn;
@@ -11445,10 +11469,11 @@
     $(pair[0]).addEventListener('change', function(){ INC_ADJ[pair[1]] = this.value; render(); });
     $(pair[0]).addEventListener('input', function(){ INC_ADJ[pair[1]] = this.value; render(); });
   });
+  $('adjYWtf').addEventListener('change', function(){ INC_ADJ.yWtf = this.checked ? 'yes' : ''; render(); });
   function resetIncomeAdj(){
-    INC_ADJ = {yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:''};
+    INC_ADJ = {yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:'', yWtf:''};
     ANN_INC = {}; annSig = ''; LTC_BEN = {}; ltcBenSig = ''; ROOF_G = {}; roofGSig = '';
-    ['adjYW','adjGPre','adjGPost','adjWStart'].forEach(function(id){ $(id).value = ''; });
+    ['adjYW','adjGPre','adjGPost','adjWStart'].forEach(function(id){ $(id).value = ''; }); $('adjYWtf').checked = false;
   }
   $('adjIncReset').addEventListener('click', function(){ resetIncomeAdj(); render(); });
 
