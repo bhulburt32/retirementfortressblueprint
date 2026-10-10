@@ -936,10 +936,22 @@
 
   footer{
     border-top:1px solid var(--line-strong);padding-top:20px;margin-top:8px;
-    font-size:13px;line-height:1.55;color:var(--muted);max-width:88ch;
+    font-size:13px;line-height:1.55;color:var(--muted);
   }
   footer p{margin:0 0 8px}
   footer strong{color:var(--ink-2)}
+  /* the Important Disclosures block: gold, closed until opened */
+  details.rfb-disc-box{border:2px solid #D9A93C;border-radius:var(--radius);background:rgba(217,169,60,.12)}
+  details.rfb-disc-box > summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;padding:12px 16px;font-family:Bitter,Georgia,serif;font-weight:700;font-size:16px;color:var(--ink)}
+  details.rfb-disc-box > summary::-webkit-details-marker{display:none}
+  details.rfb-disc-box > summary::before{content:"+";font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:700;width:20px;height:20px;border-radius:4px;background:#D9A93C;color:#001F5B;display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex:none}
+  details.rfb-disc-box[open] > summary::before{content:"\2212"}
+  details.rfb-disc-box > summary small{font-family:"Public Sans",sans-serif;font-weight:400;font-size:12.5px;color:var(--muted)}
+  details.rfb-disc-box .rfb-disc{padding:4px 18px 16px;font-size:13.5px;line-height:1.55;color:var(--ink-2);max-width:none}
+  details.rfb-disc-box .rfb-disc h2{font-family:Bitter,Georgia,serif;font-size:15px;letter-spacing:.03em;margin:8px 0 10px;color:var(--ink)}
+  details.rfb-disc-box .rfb-disc h3{font-size:14px;font-weight:700;margin:12px 0 4px;color:var(--ink)}
+  details.rfb-disc-box .rfb-disc p{margin:0 0 8px;max-width:88ch}
+  details.rfb-disc-box .rfb-disc .rfb-disc-copy{margin-top:14px;color:var(--muted)}
 
   #tip{
     position:fixed;pointer-events:none;z-index:50;opacity:0;transition:opacity .12s;
@@ -3335,6 +3347,13 @@
         </div>
       </div>
 
+      <p>Every report &mdash; the executive summary, the Social Security optimizer report, the risk profile
+        report, the pension benefits report and the internal worksheet &mdash; ends with the
+        <b>Important Disclosures &ndash; Retirement Fortress Blueprint&trade;</b> page, the same text as
+        the gold <span class="ui">Important Disclosures</span> block at the foot of the application
+        (open it with the +). The educational slides are a fixed PDF and carry Alto's own slide
+        disclosures instead.</p>
+
       <div class="note stop">
         <h3>Before the executive summary report leaves the office</h3>
         <p>Its disclosure pages are a draft. Have compliance approve that language — and the AEWM
@@ -3432,11 +3451,11 @@
 
 
 
-  <footer>
-    <p><strong>For internal illustration and planning discussion only.</strong> This worksheet applies a fixed set of assumptions — a flat annual yield on Foundation and Walls allocations, a 24-month Needs floor on Walls, and a stated long-term-care premium-to-benefit ratio. Those assumptions are hypothetical, are not guaranteed, and do not reflect the fees, spreads, caps, participation rates, surrender charges, or rider costs of any specific product.</p>
-    <p>Bucket sizing and transfer sequencing shown here are not a recommendation, a suitability determination, or tax or legal advice. Tax treatment of any transfer, rollover, or 1035 exchange depends on facts this worksheet does not capture; confirm with the client's tax advisor before executing. Long-term-care benefit amounts depend on underwriting, issue age, and the contract actually issued.</p>
-    <p><strong>Confidential — not for client distribution.</strong> This worksheet and both PDF exports are internal Alto Financial Group planning documents.</p>
-    <p><em>Replace this paragraph with your firm's approved disclosure language before showing this page to a client.</em></p>
+  <footer class="rfb-foot">
+    <details class="rfb-disc-box" id="rfbDisc">
+      <summary>Important Disclosures &ndash; Retirement Fortress Blueprint&trade;<small>the firm’s disclosure language &middot; also the last page of every report</small></summary>
+      <div class="rfb-disc" id="rfbDiscBody"></div>
+    </details>
   </footer>
 </div>
 
@@ -4191,6 +4210,7 @@
         + '<div class="top"><div><div class="t">Pension Benefit Estimate</div><small>' + E(last.name) + ' \u00b7 ' + E(last.cfg.name) + '</small></div><div style="text-align:right"><img src="data:image/png;base64,' + LOGO_PNG_B64 + '" alt="Alto Financial Group"><small>' + (advisor ? E(advisor) + ' \u00b7 ' : '') + E(dateTxt) + '</small></div></div>'
         + resultsHtml(last)
         + '<div class="disc">' + discHtml + '</div>'
+        + '<style>' + RFB_DISC_CSS + '</style>' + rfbDiscHtml({page:true})
         + '</div></body></html>';
     };
     /* the estimate becomes a line in Pension income: the monthly benefit from the retirement month, the survivor share of the option, no COLA unless the advisor sets one */
@@ -7151,7 +7171,9 @@
         .replace(/·/g, '-').replace(/§/g, 'Sec.').replace(/…/g, '...')
         .replace(/ /g, ' ')
         // WinAnsi carries these two, and the framework's name needs the (c)
-        .replace(/[^\x20-\x7E©®]/g, '');
+        .replace(/\u2122/g, '\x99')
+        // WinAnsi carries these three, and the framework's name needs the (c)
+        .replace(/[^\x20-\x7E©®\x99]/g, '');
     }
     function esc(s){ return s.replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)'); }
 
@@ -7856,20 +7878,16 @@
       });
     }
 
-    /* ---------- disclosure ---------- */
-    need(96);
-    y -= 10; rule(); y -= 14;
-    doc.text('Disclosure', M, y, {font:'F2', size:8, rgb:MUT});
-    y -= 11;
-    para('For internal illustration and planning discussion only. This worksheet applies fixed assumptions - stated annual '
-      + 'yields on the Foundation and Walls allocations, a 24-month Needs floor on Walls, and a stated long-term-care '
-      + 'premium-to-benefit ratio. Those assumptions are hypothetical, are not guaranteed, and do not reflect the fees, '
-      + 'spreads, caps, participation rates, surrender charges, or rider costs of any specific product.', {size:7.5});
-    para('Bucket sizing and transfer sequencing shown here are not a recommendation, a suitability determination, or tax '
-      + 'or legal advice. Tax treatment of any transfer, rollover, or 1035 exchange depends on facts this worksheet does '
-      + 'not capture; confirm with the client’s tax advisor before executing. Long-term-care benefit amounts depend on '
-      + 'underwriting, issue age, and the contract actually issued. Replace this paragraph with your firm’s approved '
-      + 'disclosure language before showing this report to a client.', {size:7.5});
+    /* ---------- the firm's Important Disclosures, the last page ---------- */
+    newPage();
+    doc.text(RFB_DISC_TITLE, M, y, {font:'F2', size:11, rgb:INK});
+    y -= 8; rule(); y -= 14;
+    RFB_DISC.forEach(function(b){
+      need(30);
+      doc.text(b[0], M, y, {font:'F2', size:8.5, rgb:INK}); y -= 12;
+      para(b[1], {size:8});
+    });
+    y -= 4; para(RFB_DISC_COPY, {size:8});
 
     /* ---------- footers ---------- */
     var total = doc.pages.length;
@@ -10242,6 +10260,7 @@
       + '<div class="foot"><p>Investment advisory products and services made available through AE Wealth Management, LLC (AEWM), a Registered Investment Adviser. AEWM only transacts business in states where it is properly registered or is excluded or exempted from registration requirements. Alto Financial Group and AEWM are not affiliated with or endorsed by the U.S. government or any governmental agency, including the Social Security Administration.</p>'
       + '<p>This report is for informational and educational purposes only and does not constitute tax, legal or individualized investment advice. Neither Alto Financial Group, AEWM nor their representatives assume liability for any loss arising from reliance on the information in this report.</p>'
       + '<p>© ' + today.getFullYear() + ' Alto Financial Group. All rights reserved.</p></div></section>'
+      + '<section class="page"><style>' + RFB_DISC_CSS + '</style>' + rfbDiscHtml({page:false}) + '</section>'
       + '</div></body></html>';
     return html;
   }
@@ -14320,6 +14339,28 @@
   var DECK_C = {navy:'001F5B', red:'E70000', gold:'D9A93C', ink:'4E4A48', ink2:'2B2A29', bg:'F5F2ED', panel:'E4DFDA', line:'C9C3BE', white:'FFFFFF', muted:'8A857F',
                 F:'1F6FB2', W:'C0632B', M:'1F8A70', R:'8B5CA6', FS:'8FB8DD', needs:'8E1B1B', wants:'D9706A', navyMid:'1C3060', salary:'8FC4B3',
                 dk:'0A2C70', dkLine:'163A82', dkText:'E7EAF2', dkMuted:'B9C1D6'};
+  /* ---- Important Disclosures – Retirement Fortress Blueprint™: the firm's wording, verbatim. The gold block at the foot
+     of the application and the last page of every report and presentation carry it; the text is edited only with compliance. */
+  var RFB_DISC_TITLE = 'IMPORTANT DISCLOSURES – RETIREMENT FORTRESS BLUEPRINT™';
+  var RFB_DISC = [
+    ['For Illustrative and Discussion Purposes Only', 'The Retirement Fortress Blueprint™ and the projections, calculators, and reports it produces are for illustrative and discussion purposes only. They are not an investment recommendation, an offer to buy or sell any security or insurance product, or a solicitation of any kind. They are not tax, legal, or accounting advice. Do not make any final financial decision based only on this analysis.'],
+    ['Forward-Looking Statements', 'This analysis contains forward-looking statements, including projections of future income, expenses, asset values, account balances, tax liabilities, and the likelihood of meeting retirement goals. Words such as “project,” “estimate,” “expect,” “anticipate,” “assume,” “may,” “could,” and “would” identify these statements. Forward-looking statements are based on assumptions and current expectations, and they are subject to risks and uncertainties that could cause actual results to differ materially from those shown. These include changes in market conditions, interest rates, inflation, tax laws, Social Security and pension rules, health, longevity, and personal circumstances. Alto Financial Group, LLC, AFG II, LLC, and AFGWM, LLC have no obligation to update any forward-looking statement after the date this analysis is prepared.'],
+    ['Past Performance and No Guarantees', 'Past performance and historical results do not predict or guarantee future results. All investing involves risk, including the possible loss of principal. No investment strategy can guarantee a profit or protect against loss in a declining market. Any interest rates or rates of return shown are hypothetical. They do not represent any specific investment and do not reflect fees, expenses, or taxes unless stated otherwise. The projections or other information this report generates about the likelihood of various investment outcomes are hypothetical, do not reflect actual investment results, and do not guarantee future results.'],
+    ['Reliance on Client-Provided Information', 'The information provided by these projections and calculators is for illustrative purposes only. The estimates are based on information the client supplied, such as estimated Social Security benefits, pension benefits, cost-of-living increases, inflation rates, and federal and state income tax rates. The accuracy of this analysis depends on the accuracy and completeness of that information. If any of it is inaccurate, incomplete, or changes, the projections may be materially inaccurate. The client should review all inputs and notify their advisor of any errors or changes in circumstances.'],
+    ['Tax Assumptions', 'Certain calculations use current federal income tax tables and current tax law. Tax laws and regulations change frequently, and their application depends on each individual’s circumstances. Future changes may significantly affect the outcomes shown. Before acting on any tax-related part of this analysis, consult a qualified CPA or tax professional.'],
+    ['Limitations of Assumptions', 'Social Security and pension estimates, inflation and cost-of-living assumptions, tax rates, and rate-of-return assumptions are all subject to change, and changes will affect the long-range outcome shown. The assumptions do not cover every situation and may not account for every factor relevant to an individual’s financial plan. Alto Financial Group, LLC, AFG II, LLC, and AFGWM, LLC make no guarantees about the outcome of any recommendation made based on this information.'],
+    ['Advisory and Insurance Services', 'Advisory services are offered through AE Wealth Management, LLC. Insurance products are offered through AFG II, LLC and/or Alto Financial Group, LLC. Guarantees of insurance products depend on the claims-paying ability of the issuing insurance company.']
+  ];
+  var RFB_DISC_COPY = '© 2026 AFG II, LLC. All rights reserved.';
+  function rfbDiscHtml(opts){   // opts.page: a page-break before it (the reports); opts.title: show the title
+    opts = opts || {};
+    return '<div class="rfb-disc"' + (opts.page ? ' style="page-break-before:always;break-before:page;padding-top:.2in"' : '') + '>'
+      + (opts.title === false ? '' : '<h2 class="rfb-disc-title">' + esc(RFB_DISC_TITLE) + '</h2>')
+      + RFB_DISC.map(function(b){ return '<h3>' + esc(b[0]) + '</h3><p>' + esc(b[1]) + '</p>'; }).join('')
+      + '<p class="rfb-disc-copy">' + esc(RFB_DISC_COPY) + '</p></div>';
+  }
+  var RFB_DISC_CSS = '.rfb-disc{font-size:11px;line-height:1.5;color:#3b4252}.rfb-disc .rfb-disc-title{font-size:13px;letter-spacing:.04em;margin:0 0 10px;color:#1F3162}.rfb-disc h3{font-size:11.5px;margin:10px 0 3px;color:#1F3162}.rfb-disc p{margin:0 0 6px;max-width:none}.rfb-disc .rfb-disc-copy{margin-top:12px;color:#5A6276}';
+  if($('rfbDiscBody')) $('rfbDiscBody').innerHTML = rfbDiscHtml({title:true});   // the gold block at the foot of the page
   var DECK_DISC = 'Illustrative only \u2014 hypothetical projections from information you supplied, not a guarantee of results. See Important Disclosures, pages 2\u20133.';
   var DECK_MIN = 16;                            // no text on a page smaller than this, in points
 
@@ -15616,6 +15657,19 @@
       s.text(17.5, 10.6, 1.6, 0.4, [{runs:[{t:String(page), sz:16, color:DECK_C.dkMuted}], align:'r'}]);
     })();
 
+    /* 31. the firm's Important Disclosures, the last pages */
+    (function(){
+      var chunks = [RFB_DISC.slice(0, 3), RFB_DISC.slice(3)];
+      chunks.forEach(function(chunk, k){
+        var s = doc.slide(); page++;
+        frame(s, '', 'Important Disclosures \u2013 Retirement Fortress Blueprint\u2122' + (k ? ' (continued)' : ''), false, {noDisc:true});
+        var paras = [];
+        chunk.forEach(function(b){ paras.push({runs:[{t:b[0], b:true, color:DECK_C.navy}], after:2}); paras.push({runs:[{t:b[1]}], after:8}); });
+        if(k === chunks.length - 1) paras.push({runs:[{t:RFB_DISC_COPY, color:DECK_C.muted}]});
+        s.text(0.9, 2.0, 18.2, 8.5, paras, {sz:16, color:DECK_C.ink});
+      });
+    })();
+
     return doc.build();
   }
 
@@ -15695,6 +15749,7 @@
       + '<p>Investment advisory products and services made available through AE Wealth Management, LLC (AEWM), a Registered Investment Adviser. AEWM only transacts business in states where it is properly registered or is excluded or exempted from registration requirements.</p>'
       + '<p>This report is for informational and educational purposes only and does not constitute tax, legal or individualized investment advice. Neither Alto Financial Group, AEWM nor their representatives assume liability for any loss arising from reliance on the information in this report.</p>'
       + '<p>© ' + today.getFullYear() + ' Alto Financial Group. All rights reserved.</p></div>'
+      + '<style>' + RFB_DISC_CSS + '</style>' + rfbDiscHtml({page:true})
       + '</div></body></html>';
     return html;
   }
