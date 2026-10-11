@@ -24,6 +24,7 @@ const SUITE = [
   't-riskq',     // risk profile questionnaire, the tolerance cell that follows it, the client report
   't-tglbtn',    // Adjust Target Allocations button
   't-takehome',  // the client take-home summary: three Letter pages that fit, the nothing-is-locked-in language, the disclosures page
+  't-budget-upload', // the Monthly Budget Worksheet PDF into the detailed budget and Employment income
   't-assetmap',  // the asset map (page and deck), the -8%/-16% sequence stress, the 3.26% inflation default, the protected-pieces continuation slide
 ];
 const only = process.argv.slice(2);

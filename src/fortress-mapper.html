@@ -1555,6 +1555,25 @@
         a budget &mdash; the apply button waits for a line you entered yourself &mdash; but they are
         in the totals from the first line you add.</p>
 
+      <p>Or let the client fill in Alto's <b>Monthly Budget Worksheet</b> and
+        <span class="ui">Upload the completed Monthly Budget Worksheet</span> &mdash; drop the PDF on
+        the box under the toggle or choose it. The worksheet is a fillable form, and the page reads
+        the form fields themselves, so a copy completed in Acrobat, Preview or a browser reads the
+        same. Page 1 lands line for line in the detailed expenses: every worksheet line replaces
+        what the budget held (a blank line clears it), the Need / Want switch keeps its preset,
+        dates in the usual forms (06/2031, Oct 2027, 2027-05) become start and end dates and
+        anything else is kept in the note, and a note on an <em>Other</em> line becomes that line's
+        name. The Life Insurance and Long Term Care Insurance lines keep following the policies
+        unless the worksheet gives an amount. Page 2 goes to Employment income in section&nbsp;04,
+        a column each: the payroll deductions (everything withheld except the retirement
+        contributions) become the annual <span class="ui">Payroll deductions</span>, and the
+        employee contributions and the employer match and profit sharing become the two
+        percentages of the salary already entered there &mdash; enter the salary first, or the
+        message tells you the dollar amounts it could not convert. Employer HSA contributions,
+        pension accruals and IRA contributions outside payroll are reported in the message and not
+        carried. The worksheet opens and the totals update; press Apply (or keep the sync ticked)
+        for Annual Needs and Wants to follow it.</p>
+
       <p>Under the table the budget rolls up into annual <b>Needs</b> and <b>Wants</b> next to what
         the two fields above currently hold. <span class="ui">Apply to Annual Needs &amp; Wants</span>
         copies them up once; tick <span class="ui">Keep Annual Needs &amp; Wants in sync</span> and
@@ -1612,6 +1631,18 @@
       <div class="btn-row" style="margin-top:14px">
         <button type="button" id="budToggle" aria-expanded="false" aria-controls="budDetail">Enter detailed expenses</button>
         <span class="hint" id="budHint"></span>
+      </div>
+      <div class="drop" id="budDrop">
+        <div class="drop-main">
+          <div>
+            <p class="drop-title">Upload the completed Monthly Budget Worksheet</p>
+            <p class="hint">Drop the filled-in Alto worksheet <code>.pdf</code> here, or choose it. Page 1 fills the detailed expenses line by line;
+              page 2's payroll deductions and employer contributions go to Employment income in section 04.</p>
+          </div>
+          <div class="btn-row"><button type="button" class="primary" id="budPick">Choose PDF</button></div>
+        </div>
+        <input type="file" id="budFile" accept=".pdf,application/pdf" hidden>
+        <p class="hint" id="budUpMsg" hidden></p>
       </div>
       <div id="budDetail" hidden>
         <p class="hint" style="margin:18px 0 10px;padding-top:14px;border-top:1px solid var(--line)">Alto's monthly budget worksheet, line by line. Mark each expense a <b>Need</b> or a <b>Want</b> — the two annual totals can be pushed straight into the figures above. Start and end dates are for your notes: an expense that ends before retirement, or one that begins later.</p>
@@ -13769,6 +13800,151 @@
     $('budMsg').textContent = 'Annual Needs and Wants above now come from this budget.';
     render();
   });
+
+  /* ============================================================
+     The Monthly Budget Worksheet PDF. Alto's fillable form: page 1 is the
+     budget line for line (hh_01_amt, hh_01_start, hh_01_end, hh_01_notes …
+     for the six categories), page 2 the payroll deductions (pd_01..11),
+     employer contributions (er_01..04) and IRA contributions (ir_01..02),
+     a client (_c) and a spouse (_s) column each. The values are read from
+     the form fields themselves, so a worksheet filled in Acrobat, Preview
+     or a browser reads the same; the last definition of a field wins, which
+     is what an incremental save leaves behind.
+     ============================================================ */
+  function pdfFormFields(bytes){
+    return pdfObjects(bytes).then(function(R){
+      var objs = R.objs, raw = pdfLatin(bytes), fields = {}, order = [];
+      /* a PDF string at position i of txt: (literal) with escapes, or <hex>; UTF-16BE with a BOM decoded */
+      var readStr = function(txt, i){
+        var c = txt[i];
+        if(c === '('){
+          var d = 0, out = '', k = i;
+          for(; k < txt.length; k++){
+            var ch = txt[k];
+            if(ch === '\\'){ k++; var e = txt[k];
+              if(e === 'n') out += '\n'; else if(e === 'r') out += '\r'; else if(e === 't') out += '\t'; else if(e === 'b' || e === 'f') out += '';
+              else if(/[0-7]/.test(e)){ var oct = e; while(oct.length < 3 && /[0-7]/.test(txt[k + 1])) oct += txt[++k]; out += String.fromCharCode(parseInt(oct, 8)); }
+              else if(e === '\r' || e === '\n'){ if(e === '\r' && txt[k + 1] === '\n') k++; }
+              else out += e;
+              continue; }
+            if(ch === '('){ d++; if(d > 1) out += ch; continue; }
+            if(ch === ')'){ d--; if(d === 0) break; out += ch; continue; }
+            out += ch;
+          }
+          return out;
+        }
+        if(c === '<'){ var j = txt.indexOf('>', i), hex = txt.slice(i + 1, j).replace(/\s+/g, ''), b = []; for(var h = 0; h + 1 < hex.length; h += 2) b.push(parseInt(hex.slice(h, h + 2), 16)); return b.length >= 2 && b[0] === 0xFE && b[1] === 0xFF ? utf16(b.slice(2)) : b.map(function(x){ return String.fromCharCode(x); }).join(''); }
+        return null;
+      };
+      var utf16 = function(b){ var o = ''; for(var i = 0; i + 1 < b.length; i += 2) o += String.fromCharCode(b[i] * 256 + b[i + 1]); return o; };
+      var fix = function(t){ return t.length >= 2 && t.charCodeAt(0) === 0xFE && t.charCodeAt(1) === 0xFF ? utf16(t.slice(2).split('').map(function(ch){ return ch.charCodeAt(0); })) : t; };
+      /* a dictionary's string value for a key that is a direct string, or an indirect reference to one */
+      var strVal = function(dict, key){
+        var re = new RegExp('/' + key + '(?=[\\s(<\\[/])', 'g'), m, best = null;
+        while((m = re.exec(dict))){ var j = m.index + key.length + 1; while(j < dict.length && /\s/.test(dict[j])) j++;
+          if(dict[j] === '(' || (dict[j] === '<' && dict[j + 1] !== '<')) best = fix(readStr(dict, j));
+          else { var r = /^(\d+)\s+\d+\s+R/.exec(dict.slice(j)); if(r && objs[+r[1]]){ var t = String(objs[+r[1]].dict).trim(); if(t[0] === '(' || t[0] === '<') best = fix(readStr(t, 0)); } } }
+        return best;
+      };
+      var take = function(dict){
+        if(!/\/T(?=[\s(<\[])/.test(dict)) return;
+        var name = strVal(dict, 'T'); if(!name) return;
+        var v = strVal(dict, 'V'); if(v == null && !/\/V(?=[\s(<\[\/])/.test(dict)) v = undefined;   // no value key at all: leave an earlier definition alone
+        if(v === undefined && fields.hasOwnProperty(name)) return;
+        fields[name] = v == null ? '' : v; if(order.indexOf(name) < 0) order.push(name);
+      };
+      /* plain objects in file order, then object streams (a later save's objects sit later in the file either way) */
+      var re = /(\d+)\s+(\d+)\s+obj\b/g, m, plain = [];
+      while((m = re.exec(raw))){ var start = m.index + m[0].length, end = raw.indexOf('endobj', start); if(end < 0) end = raw.length; var body = raw.slice(start, end), si = body.indexOf('stream'); plain.push({pos:m.index, num:+m[1], dict:si >= 0 ? body.slice(0, si) : body}); re.lastIndex = end; }
+      var stms = plain.filter(function(o){ return /\/Type\s*\/ObjStm/.test(o.dict); });
+      return Promise.all(stms.map(function(o){ return R.decode(objs[o.num]).then(function(b){ if(!b) return null; var txt = pdfLatin(b), n = +pdfDictVal(o.dict, 'N'), first = +pdfDictVal(o.dict, 'First'), hdr = txt.slice(0, first).trim().split(/\s+/), items = []; for(var i = 0; i < n; i++){ var off = +hdr[2 * i + 1], nxt = i + 1 < n ? +hdr[2 * i + 3] : txt.length - first; items.push(txt.slice(first + off, first + nxt)); } return {pos:o.pos, items:items}; }); })).then(function(packs){
+        var all = plain.map(function(o){ return {pos:o.pos, dicts:[o.dict]}; }).concat(packs.filter(Boolean).map(function(p){ return {pos:p.pos, dicts:p.items}; }));
+        all.sort(function(a, b){ return a.pos - b.pos; });
+        all.forEach(function(seg){ seg.dicts.forEach(take); });
+        return {fields:fields, order:order};
+      });
+    });
+  }
+  /* a worksheet date — 06/2031, 6/2031, Oct 2027, October 2027, 2027-05, 10/01/2027, 2031 — as yyyy-mm, or '' */
+  function ymFromText(t){
+    t = String(t || '').trim(); if(!t) return '';
+    var m, MON = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+    var pad = function(n){ n = +n; return n >= 1 && n <= 12 ? (n < 10 ? '0' : '') + n : null; };
+    if((m = /^(\d{4})-(\d{1,2})(?:-\d{1,2})?$/.exec(t))){ var a = pad(m[2]); return a ? m[1] + '-' + a : ''; }
+    if((m = /^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/.exec(t))){ var b = pad(m[1]); return b ? m[3] + '-' + b : ''; }
+    if((m = /^(\d{1,2})[\/.-](\d{4})$/.exec(t))){ var c = pad(m[1]); return c ? m[2] + '-' + c : ''; }
+    if((m = /^([A-Za-z]{3,9})\.?,?\s+(\d{4})$/.exec(t))){ var k = MON.indexOf(m[1].slice(0, 3).toLowerCase()); return k >= 0 ? m[2] + '-' + (k < 9 ? '0' : '') + (k + 1) : ''; }
+    if((m = /^(\d{4})$/.exec(t))) return m[1] + '-01';
+    return '';
+  }
+  /* the worksheet's lines onto the budget's, and page 2 onto Employment income */
+  var WS_MAP = {hh:{cat:'hh', idx:[0,1,2,3,4,5,6,7,8,9,10,11]}, dl:{cat:'dl', idx:[0,1,2,3]}, hc:{cat:'hc', idx:[0,1,6,7,8,9]}, tr:{cat:'tr', idx:[0,1,2,3]}, db:{cat:'db', idx:[0,1,2,3]}, en:{cat:'eo', idx:[0,1,2,3,4,5,6,7,8,9]}};
+  function importWorksheet(F, fname){
+    var f = function(k){ return F.hasOwnProperty(k) ? String(F[k]).trim() : ''; }, amt = function(k){ var t = f(k); return t ? num(t) : 0; };
+    var cats = {}; BUDGET_CATS.forEach(function(c){ cats[c.key] = c; });
+    var lines = 0, monthly = 0, unparsed = [];
+    Object.keys(WS_MAP).forEach(function(ws){
+      var M = WS_MAP[ws], c = cats[M.cat];
+      M.idx.forEach(function(k, n){
+        var key = ws + '_' + (n + 1 < 10 ? '0' : '') + (n + 1), it = c.items[k], L = budLine(c, k);
+        var a = amt(key + '_amt'), st = f(key + '_start'), en = f(key + '_end'), note = f(key + '_notes');
+        var isPol = !!(it[3] && it[3].pol);
+        if(!(a > 0.5) && !st && !en && !note){ if(!isPol){ L.amt = 0; L.start = ''; L.end = ''; L.note = ''; L.auto = false; L.autoStart = false; } return; }
+        L.amt = a; L.auto = false; L.autoStart = false;
+        var ys = ymFromText(st), ye = ymFromText(en); L.start = ys; L.end = ye;
+        if(st && !ys) unparsed.push(it[0] + ' start "' + st + '"'); if(en && !ye) unparsed.push(it[0] + ' end "' + en + '"');
+        if(it[2] && note){ L.label = note; L.note = ''; } else L.note = note + ((st && !ys) ? ' (start ' + st + ')' : '') + ((en && !ye) ? ' (end ' + en + ')' : '');
+        if(a > 0.5){ lines++; monthly += a; }
+      });
+    });
+    /* page 2: payroll deductions (everything but the retirement contributions), the employee
+       retirement contributions and the employer match and profit sharing, monthly to annual */
+    var emp = [], skipped = [];
+    [['c', 'C', 'client'], ['s', 'S', 'spouse']].forEach(function(P){
+      var col = P[0], p = P[1], who = P[2];
+      var ret = amt('pd_01_' + col) + amt('pd_02_' + col), ded = 0; for(var n = 3; n <= 11; n++) ded += amt('pd_' + (n < 10 ? '0' : '') + n + '_' + col);
+      var er = amt('er_01_' + col) + amt('er_02_' + col), erOther = amt('er_03_' + col) + amt('er_04_' + col), ira = amt('ir_01_' + col) + amt('ir_02_' + col);
+      if(!(ret > 0.5 || ded > 0.5 || er > 0.5 || erOther > 0.5 || ira > 0.5)) return;
+      if(who === 'spouse' && !hasSpouse(null)){ skipped.push('the spouse column (no spouse on file)'); return; }
+      var name = ownerLabel(who), parts = [], salary = num($('salary' + p).value);
+      $('deduct' + p).value = fmtN.format(Math.round(ded * 12)); parts.push('payroll deductions ' + money(Math.round(ded * 12)) + ' a year');
+      if(ret > 0.5 || er > 0.5){
+        if(salary > 0.5){
+          $('contrib' + p).value = (ret * 12 / salary * 100).toFixed(1) + '%'; $('employer' + p).value = (er * 12 / salary * 100).toFixed(1) + '%';
+          parts.push('employee contribution ' + (ret * 12 / salary * 100).toFixed(1) + '% and employer ' + (er * 12 / salary * 100).toFixed(1) + '% of the ' + money(salary) + ' salary');
+        } else parts.push('retirement contributions of ' + money(Math.round(ret * 12)) + ' and employer ' + money(Math.round(er * 12)) + ' a year could not be turned into a percentage — enter the salary first, then upload again');
+      }
+      if(erOther > 0.5) skipped.push(name + '\u2019s employer HSA and pension accrual (' + money(Math.round(erOther * 12)) + ' a year)');
+      if(ira > 0.5) skipped.push(name + '\u2019s IRA contributions outside payroll (' + money(Math.round(ira * 12)) + ' a year)');
+      emp.push(name + ': ' + parts.join('; '));
+    });
+    setBudgetOpen(true); renderBudgetTable(); renderBudgetTotals(); renderBudgetHint();
+    var msg = 'Read ' + lines + ' expense line' + (lines === 1 ? '' : 's') + ', ' + money(Math.round(monthly)) + ' a month, from ' + fname + (f('client_name') ? ' (' + f('client_name') + (f('date_prepared') ? ', ' + f('date_prepared') : '') + ')' : '') + '.'
+      + (emp.length ? ' Employment income (section 04) — ' + emp.join(' \u00b7 ') + '.' : '')
+      + (skipped.length ? ' Not carried: ' + skipped.join('; ') + '.' : '')
+      + (unparsed.length ? ' Dates kept as notes: ' + unparsed.join(', ') + '.' : '')
+      + (budgetLink ? '' : ' Press Apply to Annual Needs & Wants when the lines look right.');
+    return msg;
+  }
+  (function(){
+    var d = $('budDrop'), input = $('budFile'), msgEl = $('budUpMsg');
+    var say = function(t, cls){ msgEl.hidden = false; msgEl.textContent = t; msgEl.className = 'hint' + (cls ? ' ' + cls : ''); };
+    var handle = function(file){
+      if(!file) return;
+      if(!/\.pdf$/i.test(file.name) && file.type !== 'application/pdf'){ say('That is not a PDF — upload the completed Monthly Budget Worksheet.', 'alert'); return; }
+      say('Reading ' + file.name + '\u2026');
+      file.arrayBuffer().then(function(buf){ return pdfFormFields(new Uint8Array(buf)); }).then(function(R){
+        var names = Object.keys(R.fields);
+        if(!names.some(function(n){ return /^(hh|dl|hc|tr|db|en)_\d\d_amt$/.test(n); })){ say('No worksheet fields found in ' + file.name + ' — this does not look like Alto\u2019s Monthly Budget Worksheet.', 'alert'); return; }
+        say(importWorksheet(R.fields, file.name)); render();
+      }).catch(function(err){ say('The worksheet could not be read: ' + (err && err.message ? err.message : err), 'alert'); });
+    };
+    $('budPick').addEventListener('click', function(){ input.value = ''; input.click(); });
+    input.addEventListener('change', function(){ handle(input.files && input.files[0]); });
+    ['dragenter','dragover'].forEach(function(ev){ d.addEventListener(ev, function(e){ e.preventDefault(); d.classList.add('over'); }); });
+    d.addEventListener('dragleave', function(e){ if(e.target === d) d.classList.remove('over'); });
+    d.addEventListener('drop', function(e){ e.preventDefault(); d.classList.remove('over'); var dt = e.dataTransfer; if(dt && dt.files && dt.files.length) handle(dt.files[0]); });
+  })();
   $('budLink').addEventListener('change', function(){
     budgetLink = $('budLink').checked;
     if(budgetLink){ applyBudget(); $('budMsg').textContent = 'Annual Needs and Wants follow this budget until you untick the box.'; }
