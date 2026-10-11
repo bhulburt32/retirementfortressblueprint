@@ -26,6 +26,8 @@ const path = require('path');
   check(!/\bsection\s*\d/i.test(text), 'the report should not name a section of the application');
   check(!/take-home/i.test(text), 'the report should be titled Initial Observations and Findings');
   check(!/run out (in )?20\d\d/i.test(text), 'an exhausted plan should be given as ages, not a year');
+  const brand = await pop.evaluate(()=>({logo:!!document.querySelector('.band img.logo[src^="data:image/png"]'), tg:[...document.querySelectorAll('.tg')].map(e=>{ const c=getComputedStyle(e); return e.textContent+'|'+c.fontWeight+'|'+c.textDecorationLine; })})); console.log('brand:', JSON.stringify(brand));
+  check(brand.logo, 'the logo at the top'); check(brand.tg.length>=2 && brand.tg.every(x=>/^Together\.\|700\|underline/.test(x)), 'Together in bold and underlined in the motto and the tagline');
   const disc = await pop.$$eval('.rfb-disc', d=>d.length); console.log('disclosure blocks:', disc); check(disc>=1, 'disclosures page');
   const tiles = await pop.$$eval('.tile', ts=>ts.map(t=>t.querySelector('.lab').textContent+': '+t.querySelector('.val').textContent));
   console.log('tiles:', tiles.join(' | '));

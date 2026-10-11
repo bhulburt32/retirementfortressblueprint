@@ -15993,8 +15993,8 @@
       + '*{box-sizing:border-box}body{margin:0;font-family:Montserrat,"Helvetica Neue",Arial,sans-serif;color:var(--ink);font-size:12px;line-height:1.5;background:#eef0f3}'
       + '.sheet{background:#fff;width:8.5in;min-height:11in;margin:24px auto;padding:.6in .7in;box-shadow:0 2px 12px rgba(0,0,0,.08);page-break-after:always;position:relative}'
       + 'h1,h2,h3{font-family:"Playfair Display",Georgia,serif;color:var(--navy);font-weight:600;margin:0}h1{font-size:26px;line-height:1.15}h2{font-size:17px;margin:0 0 6px;padding-bottom:4px;border-bottom:2px solid var(--gold)}h3{font-size:13px;margin:0 0 3px}p{margin:0 0 7px}'
-      + '.band{background:var(--navy);color:#fff;padding:20px 28px;margin:-.6in -.7in 20px;border-bottom:5px solid var(--gold);display:flex;justify-content:space-between;align-items:flex-end;gap:16px}'
-      + '.band .sub{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#E6D3A0;white-space:nowrap}.band .firm{font-family:"Playfair Display",Georgia,serif;font-size:19px}.band .meta{font-size:11px;text-align:right;color:#DCE2F0;white-space:nowrap}'
+      + '.band{background:var(--navy);color:#fff;padding:16px 28px 14px;margin:-.6in -.7in 18px;border-bottom:5px solid var(--gold);display:flex;justify-content:space-between;align-items:flex-end;gap:16px}'
+      + '.band .sub{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#E6D3A0;white-space:nowrap;margin-top:4px}.band .logo{display:block;height:44px;width:auto;background:#fff;padding:4px 9px;border-radius:4px;margin-bottom:6px}.band .motto{font-family:"Playfair Display",Georgia,serif;font-size:14px;color:#fff;white-space:nowrap}.tg{color:var(--red);font-weight:700;text-decoration:underline}.band .tg{color:#FF4A4A}.band .meta{font-size:11px;text-align:right;color:#DCE2F0;white-space:nowrap}'
       + '.ph{display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:5px;margin-bottom:16px}'
       + 'section{margin:0 0 13px;page-break-inside:avoid}.lead{font-size:12.5px;max-width:72ch}.tiles.lv .val{font-size:16px}.tiles.lv .tile{border-radius:0 0 6px 6px}'
       + '.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:8px 0 4px}.tile{background:var(--sel);border-radius:6px;padding:8px 11px}.tile .lab{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}.tile .val{font-family:"Playfair Display",Georgia,serif;font-size:19px;color:var(--navy);margin:2px 0 1px;line-height:1.15}.tile .sub{font-size:10.5px;color:var(--muted);line-height:1.35}.tile.warn .val{color:var(--red)}.tile.good .val{color:var(--good)}'
@@ -16013,9 +16013,9 @@
     var foot = '<div class="foot">Illustrative only — hypothetical projections from the information you supplied, not a guarantee of results. This is only a starting point: nothing is final until we complete the recommendation meeting together. See the Important Disclosures on the last page.</div>';
     /* page 1 — where you are today */
     html += '<div class="sheet">'
-      + '<div class="band"><div><div class="sub">Initial Observations and Findings</div><div class="firm">Alto Financial Group</div></div><div class="meta">Prepared for <strong>' + E(names) + '</strong><br>' + E(dateTxt) + (advisor ? '<br>' + E(advisor) : '') + '</div></div>'
+      + '<div class="band"><div><img class="logo" src="data:image/png;base64,' + LOGO_PNG_B64 + '" alt="Alto Financial Group"><div class="motto">Your Goals. Our Guidance. <span class="tg">Together.</span></div><div class="sub">Initial Observations and Findings</div></div><div class="meta">Prepared for <strong>' + E(names) + '</strong><br>' + E(dateTxt) + (advisor ? '<br>' + E(advisor) : '') + '</div></div>'
       + '<h1>Where you are, what we found, and where the plan could take you</h1>'
-      + '<p class="lead" style="margin-top:8px">Thank you for the time you spent with us. These observations are for ' + you + ' to keep: where things stand today, the problems we see in the current course, and where the Retirement Fortress we have begun shaping together could take you. '
+      + '<p class="lead" style="margin-top:8px">These observations are for ' + you + ' to keep: where things stand today, the problems we see in the current course, and where the Retirement Fortress we have begun shaping together could take you. '
       + '<strong>This is only a starting point</strong> to guide how we’ll work together to achieve your retirement goals and address each of the problems we’ve identified together; the plan is fine-tuned with you at the recommendation meeting until you are fully happy with it.</p>'
       + '<section><h2>Where you are today</h2><div class="tiles">'
       + tile('Investable accounts', money(totalVal), accounts.length + ' account' + (accounts.length === 1 ? '' : 's') + ' on file')
@@ -16087,7 +16087,7 @@
       + '<li><b>Implementation:</b> Only after you’ve given your approval will we begin carrying out the agreed-upon strategies, in the order your plan lays out.</li>'
       + '<li><b>Ongoing Partnership:</b> Once your plan is in place, our commitment to you is just beginning. We’ll meet quarterly to review your progress and make sure your plan stays on track as life changes.</li>'
       + '</ol></div></div>'
-      + '<p class="tag">Your Goals. Our Guidance. <u>Together.</u></p></div>'
+      + '<p class="tag">Your Goals. Our Guidance. <span class="tg">Together.</span></p></div>'
       + foot + '</div>'
       + rfbDiscHtml({page:true})
       + '</body></html>';
