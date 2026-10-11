@@ -3366,11 +3366,11 @@
             section&nbsp;11 (or the tool's suggestions when none are), the three stress tests against
             the plan, long-term care cost and coverage, and life insurance in force against the need.
             Page three is where the plan takes them: each Fortress level and its drafted amount,
-            current course against the plan, and a gold <b>This is only a starting point</b> box
-            &mdash; a guide to how you will work together on the goals and each problem identified, with
-            nothing signed until the recommendation meeting, where the plan is fine-tuned together
-            until the client is fully happy with it &mdash; then the questions to think about before the
-            meeting. The report never names a section of the application, and an exhausted plan is
+            current course against the plan, and a gold <b>This is just the beginning&hellip;</b> box: a
+            starting point, not a final plan, the only decision today being whether they believe
+            Alto can help; no investment placed until the Recommendation Meeting; and the four
+            steps &mdash; Simplify Meeting, Recommendation Meeting, Implementation, Ongoing
+            Partnership &mdash; under <i>Your Goals. Our Guidance. Together.</i> The report never names a section of the application, and an exhausted plan is
             given as the clients' ages, not a year. Every page carries the illustrative footer, and the
             disclosures page closes it.</p>
         </div>
@@ -16001,7 +16001,7 @@
       + '.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}'
       + 'table{border-collapse:collapse;width:100%;font-size:11.5px}th{text-align:left;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:4px 6px;border-bottom:1px solid var(--line)}td{padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top}td.n,th.n{text-align:right;white-space:nowrap}td.hi{font-weight:700;color:var(--navy)}td.lv{font-weight:600;white-space:nowrap}td .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:-1px}'
       + 'ol.risks{margin:4px 0 0;padding-left:20px}ol.risks li{margin:0 0 5px}ol.risks b{color:var(--navy)}ol.risks span{display:block;color:var(--muted);font-size:11px}'
-      + '.box{border:2px solid var(--gold);background:var(--goldsoft);border-radius:8px;padding:9px 14px;margin:2px 0 11px}.box h3{color:#8A6410;font-size:14px;margin-bottom:4px}.box p{max-width:none}'
+      + '.box{border:2px solid var(--gold);background:var(--goldsoft);border-radius:8px;padding:8px 14px;margin:2px 0 8px}.box h3{color:#8A6410;font-size:14px;margin-bottom:4px}.box p{max-width:none}.box .two{gap:14px}.box h3.next{font-size:12px;color:var(--navy);margin:0 0 3px}.box ol.next{margin:0;padding-left:18px;font-size:11px;line-height:1.45}.box ol.next li{margin:0 0 4px}.box ol.next b{color:var(--navy)}.box p.tag{margin:3px 0 0;text-align:center;font-family:"Playfair Display",Georgia,serif;font-size:14px;color:var(--navy);font-weight:600}'
       + '.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.steps div{border-top:3px solid var(--navy);background:var(--sel);padding:8px 10px;border-radius:0 0 6px 6px;font-size:10.5px;line-height:1.4}.steps b{display:block;font-family:"Playfair Display",Georgia,serif;font-size:12px;color:var(--navy);margin-bottom:2px}.steps div.on{border-top-color:var(--gold);background:var(--goldsoft)}.steps small{display:block;color:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:9px;margin-bottom:3px}'
       + 'ul.q{margin:4px 0 0;padding-left:18px}ul.q li{margin:0 0 3px}'
       + '.foot{position:absolute;left:.7in;right:.7in;bottom:.45in;font-size:9.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:5px}'
@@ -16078,14 +16078,16 @@
       + '<tr><td>Held in Roth accounts at the end of plan</td><td class="n">' + money(sqLast.balances.roth) + '</td><td class="n hi">' + money(faLast.balances.roth) + '</td></tr>'
       + '</tbody></table>'
       + '<p style="margin-top:6px">In short: ' + money(protectedAmt) + ' moves into protection no market can take away, ' + money(r.funded.walls + r.funded.roof) + ' stays invested, and your essentials are paid first.</p></section>'
-      + '<div class="box"><h3>This is only a starting point</h3>'
-      + '<p>This is only a starting point to guide how we’ll work together to achieve your retirement goals and address each of the problems we’ve identified together. No account moves, no contract is applied for and no investment is placed until we sit down for the <strong>recommendation meeting</strong>, walk through every level of the Fortress and adjust it to fit you — the income targets, the amount set aside for protection, the timing of Social Security, the investments themselves — and keep working on it with you until you are fully happy with the plan. Only then does anything get signed.</p>'
-      + '<p style="margin:0"><strong>What happens next:</strong> the recommendation meeting, where the plan is settled with you; then, only after your sign-off, the applications and transfers; then move-in day and four planning meetings a year.</p></div>'
-      + '<section><h2>Worth thinking about before we meet</h2><ul class="q">'
-      + '<li>Is the spending picture right — Needs of about ' + money(Math.round(i.needs / 12)) + ' and Wants of about ' + money(Math.round(i.wants / 12)) + ' a month?</li>'
-      + '<li>How much of your savings should be out of the market’s reach, and which problem on page 2 matters most to you?</li>'
-      + '<li>What matters most about what you leave behind, and to whom?</li>'
-      + '</ul></section>'
+      + '<div class="box"><h3>This is just the beginning…</h3><div class="two">'
+      + '<div><p>What you’re holding today is a starting point, not a final plan. The only decision we’re asking you to make today is whether you believe we can help you build the retirement ' + (spouse ? 'you both deserve' : 'you deserve') + '.</p>'
+      + '<p>There’s still meaningful work ahead of us, and we’ll do it together. No investment is placed until we sit down for your Recommendation Meeting, walk through every level of the Fortress, and tailor it to fit you. Together, we’ll fine-tune the details: your income targets, the amount set aside for protection, the timing of Social Security, and the investments themselves. We’ll keep refining until you’re fully comfortable with the plan. Only then do we begin putting it into action.</p></div>'
+      + '<div><h3 class="next">What happens next</h3><ol class="next">'
+      + '<li><b>Simplify Meeting:</b> We’ll start simplifying your financial picture by consolidating your investment accounts at the institution you choose, either Fidelity or Charles Schwab.</li>'
+      + '<li><b>Recommendation Meeting:</b> We’ll finalize the plan with you, making sure every piece reflects your goals.</li>'
+      + '<li><b>Implementation:</b> Only after you’ve given your approval will we begin carrying out the agreed-upon strategies, in the order your plan lays out.</li>'
+      + '<li><b>Ongoing Partnership:</b> Once your plan is in place, our commitment to you is just beginning. We’ll meet quarterly to review your progress and make sure your plan stays on track as life changes.</li>'
+      + '</ol></div></div>'
+      + '<p class="tag">Your Goals. Our Guidance. <u>Together.</u></p></div>'
       + foot + '</div>'
       + rfbDiscHtml({page:true})
       + '</body></html>';

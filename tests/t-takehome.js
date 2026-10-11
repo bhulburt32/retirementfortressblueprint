@@ -22,7 +22,7 @@ const path = require('path');
   console.log('content heights:', content.join(' / '), '(budget 905px, what a printed Letter page holds above the footer)');
   content.forEach((h,k)=>check(h<=905, 'page '+(k+1)+' content runs into the footer ('+h+'px)'));
   const text = await pop.evaluate(()=>document.body.innerText);
-  for(const phrase of ['This is only a starting point','recommendation meeting','fully happy with','Where you are today','The problems we found','Current course versus the plan','IMPORTANT DISCLOSURES','first ten years of retirement','first fifteen years']) check(new RegExp(phrase,'i').test(text), 'missing: '+phrase);
+  for(const phrase of ['This is only a starting point','This is just the beginning','Recommendation Meeting','fully comfortable with the plan','Ongoing Partnership','Your Goals. Our Guidance.','Where you are today','The problems we found','Current course versus the plan','IMPORTANT DISCLOSURES','first ten years of retirement','first fifteen years']) check(new RegExp(phrase,'i').test(text), 'missing: '+phrase);
   check(!/\bsection\s*\d/i.test(text), 'the report should not name a section of the application');
   check(!/take-home/i.test(text), 'the report should be titled Initial Observations and Findings');
   check(!/run out (in )?20\d\d/i.test(text), 'an exhausted plan should be given as ages, not a year');
