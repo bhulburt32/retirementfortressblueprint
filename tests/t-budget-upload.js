@@ -4,11 +4,16 @@ const { chromium } = (function(){ try { return require('playwright'); } catch(e)
 const path = require('path');
 (async()=>{
   const b=await chromium.launch(process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH} : {});
-  const ctx=await b.newContext(); const p=await ctx.newPage({viewport:{width:1400,height:900}});
+  const ctx=await b.newContext({acceptDownloads:true}); const p=await ctx.newPage({viewport:{width:1400,height:900}});
   const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
   const fail=[]; const check=(ok,msg)=>{ if(!ok) fail.push(msg); };
   await p.goto('file://'+path.resolve(__dirname,'../dist/preview.html'),{waitUntil:'load'}); await p.waitForTimeout(1000);
   await p.click('#expandAll'); await p.waitForTimeout(400);
+  const dl = await p.evaluate(()=>{ const b=document.getElementById('dlWorksheet'); return b ? {inHeader:!!b.closest('.masthead'), label:b.textContent.trim()} : null; }); console.log('header button:', JSON.stringify(dl));
+  check(dl && dl.inHeader && /Budget worksheet/.test(dl.label), 'the Budget worksheet button in the header');
+  const [download] = await Promise.all([p.waitForEvent('download',{timeout:15000}), p.click('#dlWorksheet')]);
+  const saved = await download.path(); const bytes = require('fs').readFileSync(saved); console.log('downloaded:', download.suggestedFilename(), bytes.length, 'bytes, AcroForm:', bytes.includes('/AcroForm'));
+  check(/Alto Monthly Budget Worksheet\.pdf/.test(download.suggestedFilename()) && bytes.length > 300000 && bytes.includes('/AcroForm'), 'the blank fillable worksheet downloads');
   await p.fill('#salaryC','120,000'); await p.fill('#salaryS','68,000'); await p.waitForTimeout(400);
   await p.setInputFiles('#budFile', path.resolve(__dirname,'../samples/budget-worksheet-sample.pdf'));
   await p.waitForFunction(()=>/Read \d+ expense line/.test(document.getElementById('budUpMsg').textContent) || /could not|not look/.test(document.getElementById('budUpMsg').textContent), null, {timeout:20000});
