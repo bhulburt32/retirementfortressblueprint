@@ -9,6 +9,7 @@ const path = require('path');
   const txt=async sel=>(await p.$eval(sel,e=>e.textContent)).replace(/\s+/g,' ').trim();
   const v=async id=>p.$eval('#'+id,e=>e.value);
   console.log('names:', await v('clientFirst'), await v('clientLast'), await v('spouseFirst'), await v('spouseLast'), '| advisor', await v('advisor'), '| date', await v('prepDate'));
+  console.log('header motto:', await p.$eval('.masthead #motto', e=>e.textContent.trim()), '| Together styled:', await p.$eval('.masthead #motto .tg', e=>{ const c=getComputedStyle(e); return c.fontWeight+'/'+c.textDecorationLine; }));
   console.log('needs/wants:', await v('needs'), await v('wants'), '| infl', await v('inflation'), '| banner present?', !!(await p.$('#sampleBanner')));
   console.log('accounts rows:', await p.$$eval('#acctBody tr', rs=>rs.length));
   console.log('debts rows:', await p.$$eval('#debtBody tr[data-debt]', rs=>rs.length), '| pensions:', await p.$$eval('#penBody tr[data-pen]', rs=>rs.length), '| annuities:', await p.$$eval('#annBody tr[data-ann]', rs=>rs.length));
