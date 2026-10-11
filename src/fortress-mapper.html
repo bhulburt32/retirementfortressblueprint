@@ -15293,7 +15293,7 @@
     var stateName = TX.stateName || 'State';
     var frame = function(s, eyebrow, title, dark, o){ dkFrame(doc, s, eyebrow, title, dark, page, o, logo); };
     var dash = '—';
-    var blended = totalVal > 0.5 ? accounts.reduce(function(a, x){ return a + x.val * (x.growth != null ? x.growth : (x.pos === 'Market' ? i.growthR : isAnnuityPos(x.pos) ? i.growthW : 0)); }, 0) / totalVal : i.growthR;
+    var blended = (SQ.growth && SQ.growth.i != null) ? SQ.growth.i : i.growthR;   // the status quo's own weighted rate: fees, MYGA rates and caps included
     var bt = budgetTotals(), detailed = bt.entered > 0.5;
     var lineVal = function(c, k){ var L = budLine(c, k), v = Math.max(0, L.amt || 0), m = medInfo(c.items[k]); if(m && !medActive(m)) v = 0; return v; };
 
@@ -16227,7 +16227,7 @@
       return '<svg class="gap" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Total income before the plan against total expenses, by year">' + out + '</svg>';
     })();
     /* projected assets before the plan: every account where it is, at its own rate */
-    var blended = totalVal > 0.5 ? accounts.reduce(function(a, x){ return a + x.val * (x.growth != null ? x.growth : (x.pos === 'Market' ? i.growthR : isAnnuityPos(x.pos) ? i.growthW : 0)); }, 0) / totalVal : i.growthR;
+    var blended = (SQ.growth && SQ.growth.i != null) ? SQ.growth.i : i.growthR;   // the engine's weighted rate across the accounts as they sit: fees, MYGA rates and caps included
     var sqSvg = (function(){
       var rows = sqRows, Ns = rows.length - 1, W = 1000, H = 215, L = 64, Rm = 16, Tp = 20, B = 44, pw = W - L - Rm, ph = H - Tp - B;
       var Xc = function(t){ return L + pw * t / Math.max(1, Ns); };
