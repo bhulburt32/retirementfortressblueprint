@@ -3369,7 +3369,7 @@
             <i>The Retirement Fortress Starting Point Which We'll Refine Together from Here</i> (each
             level and its drafted amount), the three stress tests against the plan, and current
             course against the plan. Page four is
-            the strategic tax planning in the plan &mdash; the withdrawal order, the Roth conversions
+            the strategic tax planning in the plan &mdash; the Roth conversions
             (amount, years, bracket, the tax paid and the lifetime tax saved, Roth at the end of plan),
             gifts from the IRA when applied, and a current-course-versus-plan table of lifetime tax,
             effective rate, top bracket, Roth balance and the first required distribution &mdash; then
@@ -16034,7 +16034,6 @@
     var convSaved = TXp ? (TXb.lifetime + TXb.lifetimeState) - (TXp.lifetime + TXp.lifetimeState) : 0, lB = TXb.rows[TXb.rows.length - 1];
     var QF = (typeof qcdFacts === 'function') ? qcdFacts(r, TX, TXp ? cfg : null) : null, qcdOn = !!(QF && QF.applied && QF.total > 0.5);
     var stateName = TX.stateName || 'state', retIdx = Math.min(N, Math.ceil(TX.lastRet || 0)), faRet = faRows[retIdx];
-    var ordNames = wdOrder.map(function(k){ return WD_TIERS[k] ? WD_TIERS[k].name.toLowerCase() : k; });
     var pct1 = function(v){ return ((v || 0) * 100).toFixed(1) + '%'; };
     var tile = function(lab, val, sub, cls){ return '<div class="tile' + (cls ? ' ' + cls : '') + '"><div class="lab">' + E(lab) + '</div><div class="val">' + E(val) + '</div>' + (sub ? '<div class="sub">' + E(sub) + '</div>' : '') + '</div>'; };
     var pageHead = function(n, title){ return '<div class="ph"><span>' + E(names) + ' · Initial observations and findings</span><span>' + E(title) + ' · page ' + n + '</span></div>'; };
@@ -16141,7 +16140,6 @@
     html += '<div class="sheet">' + pageHead(4, 'Your tax plan, and what happens next')
       + '<section><h2>Strategic tax planning in the plan</h2>'
       + '<p>Taxes are the one retirement expense you can plan around: the plan sets the order your accounts are drawn in, pays tax on purpose in the years it is cheapest, and keeps required distributions from pushing you into higher brackets later.</p>'
-      + '<p><strong>The withdrawal order.</strong> When the plan needs money beyond your income it draws from ' + E(ordNames[0]) + ' first, then ' + E(ordNames[1]) + ', and ' + E(ordNames[2]) + ' last' + (wdOrder[wdOrder.length - 1] === 'roth' ? ' — tax-free money is spent last and left to compound or pass on' : '') + '.</p>'
       + (TXp && cRows.length
           ? '<p><strong>Roth conversions.</strong> Convert <strong>' + money(TXp.convTotal) + '</strong> of tax-deferred money to Roth over ' + cRows.length + ' years (' + cRows[0].year + '–' + cRows[cRows.length - 1].year + '), each year sized to the room left in the ' + Math.round((cfg.targetRate || 0) * 100) + '% federal bracket' + (cfg.irmaa ? ' and capped so Medicare premiums are not pushed into a higher tier' : '') + '. The tax on the conversions is about ' + money(TXp.convTax) + (TXp.convTotal > 0.5 ? ' (' + (TXp.convTax / TXp.convTotal * 100).toFixed(1) + '% of the amount converted)' : '') + '; it ' + (convSaved >= 0 ? 'saves about ' + money(convSaved) : 'adds about ' + money(-convSaved)) + ' of lifetime tax against the same plan without conversions, and leaves ' + money(faLast.balances.roth) + ' in Roth accounts at the end of plan instead of ' + money(lB.balances.roth) + ' — tax-free to you and to your heirs, with no lifetime required distributions.</p>'
           : '<p><strong>Roth conversions.</strong> ' + (TXp ? 'Nothing converts under the current limits — the target bracket and the Medicare threshold leave no room before required distributions begin.' : 'No conversions in this version of the plan; whether to pay some tax early to reduce it later is one of the things we settle together.') + '</p>')
