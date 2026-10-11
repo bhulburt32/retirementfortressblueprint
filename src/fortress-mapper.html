@@ -284,7 +284,6 @@
   #roofGTable td small.sub{display:block;color:var(--muted);font-size:12px;margin-top:2px}
   #roofGTable input.num{min-width:104px;max-width:130px}
   #roofGTable input.auto{color:var(--muted)}
-  #acctTable input.auto{color:var(--muted)}
   #annIncTable td,#ltcBenTable td{vertical-align:middle}
   #annIncTable td small.sub,#ltcBenTable td small.sub{display:block;color:var(--muted);font-size:12px;margin-top:2px}
   #annIncTable input.num,#ltcBenTable input.num{min-width:104px;max-width:130px}
@@ -1713,10 +1712,9 @@
         <li><span class="ui">Tax type</span> drives the whole waterfall. Qualified, Roth and
           Non-Qualified money go to different levels in a different order — get this wrong and the
           design is wrong.</li>
-        <li><span class="ui">Current position</span> tells the tool what it is looking at. Mark a
-          checking balance as <b>Cash</b> and bank savings, CDs and money market as
-          <b>Savings / CD / Money Market</b> — both are what the liquidity buffer keys on, and a
-          household with neither gets no buffer. The five annuity positions &mdash; <b>MYGA
+        <li><span class="ui">Current position</span> tells the tool what it is looking at. Mark bank
+          savings and money market as <b>Cash</b> — that is what the liquidity buffer keys on, and a
+          household with no Cash row gets no buffer. The five annuity positions &mdash; <b>MYGA
           Annuity</b>, <b>Variable Annuity</b>, <b>Income Annuity (FIA)</b>, <b>Growth Annuity
           (FIA)</b> and <b>RILA Annuity</b> (a plain <i>Annuity</i> from an older case loads as a
           MYGA) &mdash; and the two policy positions, <b>Cash Value Life Insurance</b> and
@@ -1739,18 +1737,12 @@
         never does is buy a Moat contract, which needs a 1035. (<b>Stay put, no transfer</b> on a
         section&nbsp;14 line is different: that holds the money out of every level.)</p>
 
-      <p>The <span class="ui">Growth</span> column is each account's assumed annual growth. It opens
-        showing the default in grey &mdash; the rate the account earns before the plan: market
-        accounts 5%, fixed indexed annuities 3% (a MYGA shows its own stated rate, a variable
-        annuity the market rate less its fees, a RILA the market rate up to its cap), savings, CDs
-        and money market 2%, checking 0%, life policies 0% &mdash; and the projected assets before the
-        Fortress in section&nbsp;15 grow each account at it. Leave it grey and, once the plan is
-        built, the account takes the plan rate from section&nbsp;03 for the level its money lands in
-        &mdash; the Walls rate for the Walls and for anything that stays as is, the Roof rate for the
-        Roof. Type a rate (it turns dark) and it applies before the plan and in it, blended into that
-        level's growth in proportion to the account's share, so the projections in sections&nbsp;16,
-        15 and 17 follow it; the assumptions line under each one shows the blended rates. Clear the
-        cell to go back to the default.</p>
+      <p>The <span class="ui">Growth</span> column is each account's assumed annual growth. Leave it
+        blank (<em>default</em>) and the account takes the plan rate from section&nbsp;03 for the
+        level its money lands in &mdash; the Walls rate for the Walls and for anything that stays as
+        is, the Roof rate for the Roof. Type a rate and it is blended into that level's growth in
+        proportion to the account's share, so the projections in sections&nbsp;16, 15 and 17 follow
+        it; the assumptions line under each one shows the blended rates.</p>
 
       <dl class="fields">
         <dt>Annuities</dt>
@@ -1797,12 +1789,8 @@
 
         <dt>Projected assets before the Fortress</dt>
         <dd>The status quo, for comparison with section&nbsp;17: every account left where it is and
-          grown at its own rate from section&nbsp;06 or, by default, market accounts at 5%, fixed
-          indexed annuities at 3% (a MYGA at its stated rate, a variable annuity at the market rate
-          less its fees, a RILA at the market rate up to its cap), savings, CDs and money market at
-          2%, checking at 0% and life policies flat (<span class="ui">Cash</span> in section&nbsp;06
-          is a checking balance; <span class="ui">Savings / CD / Money Market</span> the rest, and
-          both count as bank money for the liquidity buffer), current income &mdash; salary to each retirement date, Social
+          grown at its own rate (or, by default, cash flat, annuities at the Walls rate and market
+          accounts at the Roof rate), current income &mdash; salary to each retirement date, Social
           Security, pensions, annuity and non-guaranteed income &mdash; against the Needs and Wants
           budget growing with inflation, and any gap drawn in the section&nbsp;16 withdrawal order
           with the tax on the draw. Five tiles, a stacked bar by tax type for every year with the
@@ -1839,7 +1827,7 @@
             <thead>
               <tr>
                 <th>Account</th><th>Owner</th><th>Custodian / carrier</th><th>Tax type</th>
-                <th>Current position</th><th class="num">Value</th><th>Growth<small>Before the plan · grey = default</small></th><th>Transfer?</th><th></th>
+                <th>Current position</th><th class="num">Value</th><th>Growth<small>Assumed, annual</small></th><th>Transfer?</th><th></th>
               </tr>
             </thead>
             <tbody id="acctBody"></tbody>
@@ -3650,18 +3638,14 @@
     [ {tax:'Qualified', bucket:'roof'} ]
   ];
 
-  var POSITIONS = ['Cash','Savings / CD / Money Market','Market','MYGA Annuity','Variable Annuity','Income Annuity (FIA)','Growth Annuity (FIA)','RILA Annuity','Cash Value Life Insurance','LTC / Life','Unassigned'];
+  var POSITIONS = ['Cash','Market','MYGA Annuity','Variable Annuity','Income Annuity (FIA)','Growth Annuity (FIA)','RILA Annuity','Cash Value Life Insurance','LTC / Life','Unassigned'];
   /* a life policy's cash value and an LTC / life hybrid are handled alike: never a withdrawal tier, a 1035 into the Moat or left in place */
   function isLifePos(p){ return p === 'LTC / Life' || p === 'Cash Value Life Insurance'; }
-  /* bank money: Cash is a checking balance, the other savings, CDs and money market — both stay liquid, count as the buffer and never move by ACATS */
-  function isCashPos(p){ return p === 'Cash' || p === 'Savings / CD / Money Market'; }
-  /* what each kind of account earns in the status quo — before the plan, every account where it sits */
-  var SQ_GROWTH = {market:0.05, fia:0.03, savings:0.02, checking:0};
   /* the five annuity positions; a plain "Annuity" from an older case loads as a MYGA */
   var ANNUITY_POS = {'MYGA Annuity':1, 'Variable Annuity':1, 'Income Annuity (FIA)':1, 'Growth Annuity (FIA)':1, 'RILA Annuity':1};
   function isAnnuityPos(p){ return !!ANNUITY_POS[p]; }
   function isIncomeAnn(a){ return !!a && a.pos === 'Income Annuity (FIA)'; }
-  function posShort(p){ return ({'MYGA Annuity':'MYGA', 'Variable Annuity':'Variable annuity', 'Income Annuity (FIA)':'Income FIA', 'Growth Annuity (FIA)':'Growth FIA', 'RILA Annuity':'RILA', 'Cash Value Life Insurance':'Cash value life', 'Savings / CD / Money Market':'Savings / CD / MM'})[p] || p; }
+  function posShort(p){ return ({'MYGA Annuity':'MYGA', 'Variable Annuity':'Variable annuity', 'Income Annuity (FIA)':'Income FIA', 'Growth Annuity (FIA)':'Growth FIA', 'RILA Annuity':'RILA', 'Cash Value Life Insurance':'Cash value life'})[p] || p; }
   /* the contract details kept on an annuity account (section 06, Annuities):
      rate and interest (taken or deferred) for a MYGA; monthly income and payout (single or joint)
      for an income annuity; cap for the FIAs and a RILA, participation for the FIAs, floor (the
@@ -3691,7 +3675,7 @@
   function acctStressReturn(a, loss, dflt, t){
     var x = a.ann || {};
     if(a.pos === 'MYGA Annuity') return mygaMatured(a, t) ? loss : acctGrowth(a, dflt, t);
-    if(a.pos === 'Growth Annuity (FIA)' || a.pos === 'Income Annuity (FIA)' || isCashPos(a.pos)) return 0;
+    if(a.pos === 'Growth Annuity (FIA)' || a.pos === 'Income Annuity (FIA)' || a.pos === 'Cash') return 0;
     if(a.pos === 'RILA Annuity') return x.floor != null ? Math.max(loss, -Math.abs(x.floor)) : loss;
     return loss;
   }
@@ -5022,7 +5006,7 @@
       var pool = accounts.filter(function(a){
         return a.tax !== 'Roth' && remain[a.id] > 0.5;
       }).sort(function(a,b){
-        var ca = (isCashPos(a.pos)) ? 0 : 1, cb = (isCashPos(b.pos)) ? 0 : 1;
+        var ca = (a.pos === 'Cash') ? 0 : 1, cb = (b.pos === 'Cash') ? 0 : 1;
         if(ca !== cb) return ca - cb;
         var ta = (a.tax === 'Non-Qualified') ? 0 : 1, tb = (b.tax === 'Non-Qualified') ? 0 : 1;
         if(ta !== tb) return ta - tb;
@@ -5157,7 +5141,7 @@
               srcOwner:a.owner, tax:a.tax, owner:who,
               name:ownerLabel(who) + ' LTC Contract', cust:i.ltcCarrier || 'TBD'};
     }
-    if(bucket === 'reserve' && isCashPos(a.pos) && a.tax === 'Non-Qualified'){
+    if(bucket === 'reserve' && a.pos === 'Cash' && a.tax === 'Non-Qualified'){
       return {key:'stay:' + a.id, stay:true, kind:'buffer', tax:a.tax, owner:effOwner(a.owner, i),
               name:a.name || 'Savings', cust:a.cust || 'existing bank'};
     }
@@ -5282,12 +5266,12 @@
       out.push({lvl:'ok', txt:'Already at ' + nc + ' — internal re-registration, no ACATS and no delivering-firm paperwork.'});
     } else if(isAnnuityPos(a.pos)){
       out.push({lvl:'caution', txt:'An in-force annuity does not move by ACATS. Either assign the contract to ' + nc + ' where the carrier and platform both support it, or leave it with the carrier and change the advisor of record. Check the surrender schedule and free-withdrawal amount first.'});
-    } else if(isCashPos(a.pos)){
+    } else if(a.pos === 'Cash'){
       out.push({lvl:'', txt:'Bank cash does not move by ACATS — open the account at ' + nc + ' first, then fund it by wire or ACH from ' + (a.cust || 'the bank') + '.'});
     } else {
       out.push({lvl:'', txt:'ACATS from ' + (a.cust || 'the current custodian') + ' to ' + nc + '. Match the registration exactly or the transfer rejects.'});
     }
-    if(isCashPos(a.pos)){
+    if(a.pos === 'Cash'){
       var beyond = r.moves.reduce(function(s,m){
         return s + ((m.acct.id === a.id && m.bucket !== 'reserve') ? m.amt : 0);
       }, 0);
@@ -5299,7 +5283,7 @@
       out.push({lvl:'ok', txt:'Stays qualified. Trustee-to-trustee transfer — no tax event and no 60-day exposure.'});
     } else if(a.pos === 'Market'){
       out.push({lvl:'caution', txt:'Taxable account — transfer in kind so nothing is sold in transit. Gains are realized only when positions are liquidated in Step 2.'});
-    } else if(isCashPos(a.pos)){
+    } else if(a.pos === 'Cash'){
       out.push({lvl:'ok', txt:'Cash transfer, nothing to realize. Confirm none of this is earmarked outside the plan.'});
     }
     return out;
@@ -5330,7 +5314,7 @@
     if(!named){
       out.push({lvl:'caution', txt:'No carrier yet — the carrier comes from the largest annuity or life/LTC policy in section 06; add that account with its carrier, or pick a carrier on the line in section 14, before this step produces paperwork.'});
     }
-    if(isCashPos(a.pos)){
+    if(a.pos === 'Cash'){
       out.push({lvl:'caution', txt:'This balance is currently savings. Beyond the '+r.inputs.bufMonths+'-month liquidity buffer, the Fortress holds no cash — these dollars are deployed into the contract and stop being liquid.'});
     }
     if(r.splits[a.id] > 1){
@@ -5346,11 +5330,6 @@
     }).join('');
   }
 
-  /* the Growth cell: the rate typed, or the default for the position — the before-the-plan rate net of a
-     MYGA's own rate, a variable annuity's fees or a RILA's cap — shown grey until a rate is typed */
-  var GROWTH_TIP = 'Before the plan: market 5%, fixed indexed annuities 3%, savings / CD / money market 2%, checking 0% — shown grey. Type a rate to use it instead, before the plan and in it; blank follows the default before the plan and the level\u2019s rate in it.';
-  function growthDefault(a){ return acctGrowth(a, sqDefaultGrowth(a), 0); }
-  function growthCell(a){ return ((a.growth != null ? a.growth : growthDefault(a)) * 100).toFixed(1) + '%'; }
   function renderAccounts(){
     var body = $('acctBody');
     if(!accounts.length){
@@ -5364,7 +5343,7 @@
           + '<td><select data-k="tax">'+opts(TAXTYPES,a.tax)+'</select></td>'
           + '<td><select data-k="pos">'+opts(POSITIONS,a.pos)+'</select></td>'
           + '<td class="num"><input class="num" data-k="val" value="'+fmtN.format(a.val)+'"></td>'
-          + '<td><input class="pcola' + (a.growth != null ? '' : ' auto') + '" inputmode="decimal" data-k="growth" value="' + growthCell(a) + '" placeholder="default" title="' + GROWTH_TIP + '"></td>'
+          + '<td><input class="pcola" inputmode="decimal" data-k="growth" value="'+(a.growth != null ? (a.growth * 100).toFixed(1) + '%' : '')+'" placeholder="default" title="Blank uses the plan rate for the level this money lands in"></td>'
           + '<td><select data-k="move" class="move'+(a.move === 'no' ? ' held' : '')+'">'
           +   '<option value="yes"'+(a.move !== 'no' ? ' selected' : '')+'>Transfer</option>'
           +   '<option value="no"'+(a.move === 'no' ? ' selected' : '')+'>Stay as is</option></select></td>'
@@ -6189,7 +6168,7 @@
   function accountExcess(a, r){
     return r.moves.reduce(function(s, m){
       if(m.acct.id !== a.id) return s;
-      var isBuffer = (m.bucket === 'reserve' && isCashPos(a.pos) && a.tax === 'Non-Qualified');
+      var isBuffer = (m.bucket === 'reserve' && a.pos === 'Cash' && a.tax === 'Non-Qualified');
       return s + (isBuffer ? 0 : m.amt);
     }, 0);
   }
@@ -6240,7 +6219,7 @@
       if(isAnnuityPos(a.pos)){
         out.push({lvl:'caution', txt:'"' + (a.name || 'Untitled') + '" is an in-force annuity and will not move by ACATS. Assign the contract where the carrier and platform allow it, or 1035 it into the destination contract. Check the surrender schedule first.'});
       }
-      if(isCashPos(a.pos) && a.tax === 'Non-Qualified'){
+      if(a.pos === 'Cash' && a.tax === 'Non-Qualified'){
         out.push({lvl:'', txt:'The ' + (a.name || 'savings') + ' balance above the buffer funds this account by wire or ACH from '
           + (a.cust || 'the bank') + ' — bank cash does not move by ACATS.'});
       }
@@ -6567,7 +6546,7 @@
      Walls and Roof. The liquidity buffer (savings), the Foundation income
      sleeve (annuity) and the Moat (LTC annuity or life policy) are out. */
   var MANAGED_BUCKETS = ['walls','roof'];
-  var UNMANAGED_POS   = {'Cash':1, 'Savings / CD / Money Market':1, 'MYGA Annuity':1, 'Variable Annuity':1, 'Income Annuity (FIA)':1, 'Growth Annuity (FIA)':1, 'RILA Annuity':1, 'Cash Value Life Insurance':1, 'LTC / Life':1};
+  var UNMANAGED_POS   = {'Cash':1, 'MYGA Annuity':1, 'Variable Annuity':1, 'Income Annuity (FIA)':1, 'Growth Annuity (FIA)':1, 'RILA Annuity':1, 'Cash Value Life Insurance':1, 'LTC / Life':1};
 
   function aumPlan(r){
     var managed = MANAGED_BUCKETS.reduce(function(s, k){ return s + r.funded[k]; }, 0);
@@ -6753,7 +6732,7 @@
     if(a.tax === 'Qualified' && m.bucket === 'moat'){
       return {lvl:'alert', txt:'Qualified dollars into LTC coverage distribute as taxable income — re-check the product.'};
     }
-    if(isCashPos(a.pos) && (m.bucket === 'walls' || m.bucket === 'moat' || m.bucket === 'roof')){
+    if(a.pos === 'Cash' && (m.bucket === 'walls' || m.bucket === 'moat' || m.bucket === 'roof')){
       return {lvl:'caution', txt:'Savings leaving cash for the ' + BUCKET_NAME[m.bucket] + ' — these dollars stop being liquid.'};
     }
     if(a.tax === 'Non-Qualified' && m.bucket === 'foundation'){
@@ -8677,8 +8656,7 @@
     if(/fia\b|indexed/.test(v)) return /income|gli|rider/.test(v) ? 'Income Annuity (FIA)' : 'Growth Annuity (FIA)';
     if(/spia|immediate|income annuit/.test(v)) return 'Income Annuity (FIA)';
     if(/annuit/.test(v)) return 'MYGA Annuity';
-    if(/savings|money market|\bcds?\b|certificate/.test(v)) return 'Savings / CD / Money Market';
-    if(/cash|checking/.test(v)) return 'Cash';
+    if(/cash|savings|checking|money market|cd\b/.test(v)) return 'Cash';
     if(/ltc|long.term|hybrid/.test(v)) return 'LTC / Life';
     if(/life|cash value|whole|universal|\biul\b/.test(v)) return 'Cash Value Life Insurance';
     if(/market|equit|fund|etf|stock|bond|brokerage|invest/.test(v)) return 'Market';
@@ -10740,12 +10718,11 @@
      money at the Roof rate — with current income against the expense budget
      and any gap drawn in the section 16 order with tax. The same engine as
      section 17 runs it, with every account marked as staying put. */
-  function sqDefaultGrowth(a){
-    if(a.pos === 'Cash') return SQ_GROWTH.checking;
-    if(a.pos === 'Savings / CD / Money Market') return SQ_GROWTH.savings;
-    if(a.pos === 'Growth Annuity (FIA)' || a.pos === 'Income Annuity (FIA)' || a.pos === 'MYGA Annuity') return SQ_GROWTH.fia;   // a MYGA's own rate takes over in acctGrowth
+  function sqDefaultGrowth(a, gW, gR){
+    if(a.pos === 'Cash') return 0;
+    if(isAnnuityPos(a.pos)) return gW;
     if(isLifePos(a.pos)) return 0;
-    return SQ_GROWTH.market;   // market positions; a variable or RILA annuity starts here and its fees or cap apply
+    return gR;
   }
   function statusQuoRun(r, extra){
     var sqMoves = accounts.filter(function(a){ return a.val > 0.5; }).map(function(a){ return isIncomeAnn(a) ? {acct:a, bucket:'foundation', amt:a.val, stay:true} : {acct:a, bucket:'inplace', amt:a.val}; });
@@ -14290,7 +14267,6 @@
     var a = accounts.find(function(x){ return x.id === +tr.getAttribute('data-id'); });
     if(!a) return;
     a[k] = (k === 'val') ? num(e.target.value) : (k === 'growth') ? (e.target.value.trim() === '' ? null : pctIn(e.target.value)) : e.target.value;
-    if(k === 'growth') e.target.classList.toggle('auto', a.growth == null);
     var t = accounts.reduce(function(s,x){ return s+x.val; },0);
     $('acctTotal').textContent = accounts.length + ' account' + (accounts.length===1?'':'s') + ' · ' + money(t) + ' total';
     render();
@@ -14304,18 +14280,9 @@
     if(e.target.getAttribute('data-k') === 'move'){
       e.target.classList.toggle('held', e.target.value === 'no');
     }
-    if(e.target.getAttribute('data-k') === 'pos'){   // the default rate follows the position
-      var trp = e.target.closest('tr'), ap = accounts.find(function(x){ return x.id === +trp.getAttribute('data-id'); }), gi = trp.querySelector('input[data-k="growth"]');
-      if(ap && gi && ap.growth == null) gi.value = growthCell(ap);
-    }
     render();
   });
   $('acctBody').addEventListener('blur', function(e){
-    if(e.target.getAttribute('data-k') === 'growth'){   // left blank: back to the default, in grey
-      var trg = e.target.closest('tr'), ag = accounts.find(function(x){ return x.id === +trg.getAttribute('data-id'); });
-      if(ag && ag.growth == null){ e.target.value = growthCell(ag); e.target.classList.add('auto'); }
-      else if(ag) e.target.value = (ag.growth * 100).toFixed(1) + '%';
-    }
     if(e.target.getAttribute('data-k') === 'val'){
       e.target.value = fmtN.format(Math.round(num(e.target.value)));
     }
@@ -15513,7 +15480,7 @@
     (function(){
       var s = doc.slide(); page++;
       frame(s, '', 'Your Assets and Net Worth');
-      var arows = accounts.slice(0, 8).map(function(a){ return [a.name || 'Untitled', ownerLabel(a.owner), a.cust || dash, isCashPos(a.pos) ? 'Cash' : a.tax, posShort(a.pos), a.growth != null ? pc1(a.growth) : 'plan rate', money(a.val)]; });
+      var arows = accounts.slice(0, 8).map(function(a){ return [a.name || 'Untitled', ownerLabel(a.owner), a.cust || dash, a.pos === 'Cash' ? 'Cash' : a.tax, posShort(a.pos), a.growth != null ? pc1(a.growth) : 'plan rate', money(a.val)]; });
       if(accounts.length > 8) arows.push([accounts.length - 8 + ' more account' + (accounts.length - 8 === 1 ? '' : 's'), '', '', '', '', '', money(accounts.slice(8).reduce(function(a, x){ return a + x.val; }, 0))]);
       arows.push({cls:'tot', cells:['Total investable accounts', '', '', '', '', '', money(totalVal)]});
       dkLabel(s, 0.9, 1.95, 9, 'Investable accounts');
@@ -15526,7 +15493,7 @@
       dkHtmlTable(s, 0.9, oy + 0.4, 12.2, Math.max(0.9, 9.9 - oy - 0.4), [{t:'Asset'}, {t:'Type'}, {t:'Growth', align:'r'}, {t:'Value', align:'r'}], orows);
       dkTile(s, 13.6, 2.05, 5.5, 1.9, 'Net worth', money(totalVal + OA.val - DT.bal), 'Accounts ' + fmtKM(totalVal) + ' + other assets ' + fmtKM(OA.val) + ' − debts ' + fmtKM(DT.bal));
       dkLabel(s, 13.6, 4.2, 5.5, 'Accounts by tax type');
-      var byTax = {}; accounts.forEach(function(a){ var k = isCashPos(a.pos) ? 'Cash' : a.tax; byTax[k] = (byTax[k] || 0) + a.val; });
+      var byTax = {}; accounts.forEach(function(a){ var k = a.pos === 'Cash' ? 'Cash' : a.tax; byTax[k] = (byTax[k] || 0) + a.val; });
       var TAXC = {'Qualified':DECK_C.F, 'Non-Qualified':DECK_C.W, 'Roth':DECK_C.M, 'Cash':DECK_C.FS};
       dkPie(s, 13.6, 4.6, 5.5, 3.1, ['Qualified', 'Non-Qualified', 'Roth', 'Cash'].filter(function(k){ return byTax[k] > 0.5; }).map(function(k){ return {name:k, v:byTax[k], color:TAXC[k] || DECK_C.muted}; }));
       dkTile(s, 13.6, 8.0, 5.5, 1.9, 'In market positions', marketPct + '%', money(marketVal) + ' exposed to market swings today', {valueColor:marketPct >= 60 ? DECK_C.red : DECK_C.navy});
@@ -16335,7 +16302,7 @@
     /* page 2 — the risks */
     html += '<div class="sheet">' + pageHead(2, 'The current course and the problems')
       + '<section><h2>If nothing changes</h2>'
-      + '<p>Leaving every account where it is, growing at its own rate — a blended <strong>' + pct1(blended) + '</strong> a year across your accounts, with market positions assumed to earn ' + pct1(SQ_GROWTH.market) + ', fixed indexed annuities ' + pct1(SQ_GROWTH.fia) + ' and savings ' + pct1(SQ_GROWTH.savings) + ' — and drawing the shortfall each year in tax order: <strong>' + E(endOf(sqDep, sqLast)) + '</strong>'
+      + '<p>Leaving every account where it is, growing at its own rate — a blended <strong>' + pct1(blended) + '</strong> a year across your accounts, with market positions assumed to earn ' + pct1(i.growthR) + ' — and drawing the shortfall each year in tax order: <strong>' + E(endOf(sqDep, sqLast)) + '</strong>'
       + (sqDep ? ' (' + sqDep.year + '). ' : ' (' + sqLast.year + '). ') + 'Along the way you would pay about <strong>' + money(SQ.lifetime + SQ.lifetimeState) + '</strong> in federal and state income tax'
       + (marketPct >= 50 ? ', with ' + marketPct + '% of your savings riding on the markets through every downturn' : '') + '.'
       + ' None of this is a prediction: it is the course you are on if nothing is decided, and the reference point for the pages that follow.</p>'

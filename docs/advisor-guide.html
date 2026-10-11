@@ -876,10 +876,9 @@
         <li><span class="ui">Tax type</span> drives the whole waterfall. Qualified, Roth and
           Non-Qualified money go to different levels in a different order — get this wrong and the
           design is wrong.</li>
-        <li><span class="ui">Current position</span> tells the tool what it is looking at. Mark a
-          checking balance as <b>Cash</b> and bank savings, CDs and money market as
-          <b>Savings / CD / Money Market</b> — both are what the liquidity buffer keys on, and a
-          household with neither gets no buffer. The five annuity positions &mdash; <b>MYGA
+        <li><span class="ui">Current position</span> tells the tool what it is looking at. Mark bank
+          savings and money market as <b>Cash</b> — that is what the liquidity buffer keys on, and a
+          household with no Cash row gets no buffer. The five annuity positions &mdash; <b>MYGA
           Annuity</b>, <b>Variable Annuity</b>, <b>Income Annuity (FIA)</b>, <b>Growth Annuity
           (FIA)</b> and <b>RILA Annuity</b> (a plain <i>Annuity</i> from an older case loads as a
           MYGA) &mdash; and the two policy positions, <b>Cash Value Life Insurance</b> and
@@ -902,18 +901,12 @@
         never does is buy a Moat contract, which needs a 1035. (<b>Stay put, no transfer</b> on a
         section&nbsp;14 line is different: that holds the money out of every level.)</p>
 
-      <p>The <span class="ui">Growth</span> column is each account's assumed annual growth. It opens
-        showing the default in grey &mdash; the rate the account earns before the plan: market
-        accounts 5%, fixed indexed annuities 3% (a MYGA shows its own stated rate, a variable
-        annuity the market rate less its fees, a RILA the market rate up to its cap), savings, CDs
-        and money market 2%, checking 0%, life policies 0% &mdash; and the projected assets before the
-        Fortress in section&nbsp;15 grow each account at it. Leave it grey and, once the plan is
-        built, the account takes the plan rate from section&nbsp;03 for the level its money lands in
-        &mdash; the Walls rate for the Walls and for anything that stays as is, the Roof rate for the
-        Roof. Type a rate (it turns dark) and it applies before the plan and in it, blended into that
-        level's growth in proportion to the account's share, so the projections in sections&nbsp;16,
-        15 and 17 follow it; the assumptions line under each one shows the blended rates. Clear the
-        cell to go back to the default.</p>
+      <p>The <span class="ui">Growth</span> column is each account's assumed annual growth. Leave it
+        blank (<em>default</em>) and the account takes the plan rate from section&nbsp;03 for the
+        level its money lands in &mdash; the Walls rate for the Walls and for anything that stays as
+        is, the Roof rate for the Roof. Type a rate and it is blended into that level's growth in
+        proportion to the account's share, so the projections in sections&nbsp;16, 15 and 17 follow
+        it; the assumptions line under each one shows the blended rates.</p>
 
       <dl class="fields">
         <dt>Annuities</dt>
@@ -960,12 +953,8 @@
 
         <dt>Projected assets before the Fortress</dt>
         <dd>The status quo, for comparison with section&nbsp;17: every account left where it is and
-          grown at its own rate from section&nbsp;06 or, by default, market accounts at 5%, fixed
-          indexed annuities at 3% (a MYGA at its stated rate, a variable annuity at the market rate
-          less its fees, a RILA at the market rate up to its cap), savings, CDs and money market at
-          2%, checking at 0% and life policies flat (<span class="ui">Cash</span> in section&nbsp;06
-          is a checking balance; <span class="ui">Savings / CD / Money Market</span> the rest, and
-          both count as bank money for the liquidity buffer), current income &mdash; salary to each retirement date, Social
+          grown at its own rate (or, by default, cash flat, annuities at the Walls rate and market
+          accounts at the Roof rate), current income &mdash; salary to each retirement date, Social
           Security, pensions, annuity and non-guaranteed income &mdash; against the Needs and Wants
           budget growing with inflation, and any gap drawn in the section&nbsp;16 withdrawal order
           with the tax on the draw. Five tiles, a stacked bar by tax type for every year with the
