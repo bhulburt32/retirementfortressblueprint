@@ -1014,13 +1014,19 @@
       <p>The first thing on the page: your name and the date. Both print on the client PDF and the
         worksheet, and the date sets the plan's first year for the projections. The
         <span class="ui">Advisor</span> name carries from case to case; the
-        <span class="ui">Date prepared</span> resets to today whenever you start a new case.</p>
+        <span class="ui">Date prepared</span> resets to today whenever you start a new case.
+        <span class="ui">Advisor cell</span> and <span class="ui">Advisor email</span> print with
+        your name on the initial observations and findings &mdash; in the header and under the
+        closing tagline with Alto's number and website; leave the cell blank to keep it off the
+        report.</p>
       </div>
     </details>
     <!-- /guide-notes:01 -->
     <div class="panel panel-pad">
       <div class="assump first">
         <label class="f"><span>Advisor<small>Prepared by</small></span><input type="text" id="advisor" placeholder="Advisor name" autocomplete="off"></label>
+        <label class="f"><span>Advisor cell<small>On the client reports; blank to leave it off</small></span><input type="text" id="advisorCell" inputmode="tel" placeholder="(000) 000-0000" autocomplete="off"></label>
+        <label class="f"><span>Advisor email<small>On the client reports</small></span><input type="text" id="advisorEmail" inputmode="email" placeholder="name@altofg.com" autocomplete="off"></label>
         <label class="f"><span>Date prepared<small>Appears on both PDFs</small></span><input type="date" id="prepDate"></label>
       </div>
     </div>
@@ -3377,7 +3383,8 @@
             starting point, not a final plan, the only decision today being whether they believe
             Alto can help; no investment placed until the Recommendation Meeting; and the four
             steps &mdash; Simplify Meeting, Recommendation Meeting, Implementation, Ongoing
-            Partnership &mdash; under <i>Your Goals. Our Guidance. Together.</i> The report never names a section of the application, and an exhausted plan is
+            Partnership &mdash; under <i>Your Goals. Our Guidance. Together.</i> and a contact line: the advisor's
+            name, cell (when given) and email, Alto's 1-800 number and website The report never names a section of the application, and an exhausted plan is
             given as the clients' ages, not a year. Every page carries the illustrative footer, and the
             disclosures page closes it.</p>
         </div>
@@ -3708,6 +3715,8 @@
       spouseFirst: $('spouseFirst').value.trim(),
       spouseLast:  $('spouseLast').value.trim(),
       advisor:     $('advisor').value.trim(),
+      advisorCell: $('advisorCell').value.trim(),
+      advisorEmail:$('advisorEmail').value.trim(),
       prepDate:    $('prepDate').value,
       needs:   num($('needs').value),
       wants:   num($('wants').value),
@@ -8691,7 +8700,7 @@
     var d = JSON.parse(txt);
     if(d.household){
       var h = d.household;
-      ['clientFirst','clientLast','spouseFirst','spouseLast','advisor'].forEach(function(k){
+      ['clientFirst','clientLast','spouseFirst','spouseLast','advisor','advisorCell','advisorEmail'].forEach(function(k){
         if(h[k] != null) $(k).value = h[k];
       });
       if(h.prepDate) $('prepDate').value = h.prepDate;
@@ -14028,7 +14037,7 @@
   }
   $('adjIncReset').addEventListener('click', function(){ resetIncomeAdj(); render(); });
 
-  ['advisor'].forEach(function(id){
+  ['advisor','advisorCell','advisorEmail'].forEach(function(id){
     $(id).addEventListener('input', render);
   });
   ['growthW','growthR'].forEach(function(id){
@@ -15944,6 +15953,9 @@
     var names = spouse ? cName + ' and ' + sName + (i.clientLast ? ' ' + i.clientLast : '') : cName + (i.clientLast ? ' ' + i.clientLast : '');
     var ppl = spouse ? ['client', 'spouse'] : ['client'], pName = function(w){ return w === 'client' ? cName : sName; };
     var advisor = (i.advisor || '').trim(), dateTxt = prepLong(i), you = spouse ? 'you both' : 'you';
+    var advCell = (i.advisorCell || '').trim(), advEmail = (i.advisorEmail || '').trim();
+    var ALTO_PHONE = '1-800-491-7005', ALTO_SITE = 'www.altofinancialgrp.com';
+    var contact = [advisor, advCell, advEmail].filter(Boolean).concat(['Alto Financial Group', ALTO_PHONE, ALTO_SITE]).join(' · ');
     var sqRows = SQ.rows, faRows = TX.rows, N = TX.N;
     var sqLast = sqRows[sqRows.length - 1], faLast = faRows[faRows.length - 1];
     var sqDep = sqRows.filter(function(x){ return x.unfunded > 0.5; })[0], faDep = faRows.filter(function(x){ return x.unfunded > 0.5; })[0];
@@ -16052,7 +16064,7 @@
       + '.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}svg.gap{display:block;width:100%;height:auto;font-family:Montserrat,Arial,sans-serif}.legend{display:flex;gap:16px;font-size:10.5px;color:var(--muted);margin:2px 0 4px}.legend i{display:inline-block;width:12px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}.legend i.ln{height:0;border-top:2.5px solid var(--ink);vertical-align:3px}.cap{margin-top:6px}'
       + 'table{border-collapse:collapse;width:100%;font-size:11.5px}th{text-align:left;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:4px 6px;border-bottom:1px solid var(--line)}td{padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top}td.n,th.n{text-align:right;white-space:nowrap}td.hi{font-weight:700;color:var(--navy)}td.lv{font-weight:600;white-space:nowrap}td .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:-1px}'
       + 'ol.risks{margin:4px 0 0;padding-left:20px}ol.risks li{margin:0 0 5px}ol.risks b{color:var(--navy)}ol.risks span{display:block;color:var(--muted);font-size:11px}'
-      + '.box{border:2px solid var(--gold);background:var(--goldsoft);border-radius:8px;padding:8px 14px;margin:2px 0 8px}.box h3{color:#8A6410;font-size:14px;margin-bottom:4px}.box p{max-width:none}.box .two{gap:14px}.box h3.next{font-size:12px;color:var(--navy);margin:0 0 3px}.box ol.next{margin:0;padding-left:18px;font-size:11px;line-height:1.45}.box ol.next li{margin:0 0 4px}.box ol.next b{color:var(--navy)}.box p.tag{margin:3px 0 0;text-align:center;font-family:"Playfair Display",Georgia,serif;font-size:14px;color:var(--navy);font-weight:600}'
+      + '.box{border:2px solid var(--gold);background:var(--goldsoft);border-radius:8px;padding:8px 14px;margin:2px 0 8px}.box h3{color:#8A6410;font-size:14px;margin-bottom:4px}.box p{max-width:none}.box .two{gap:14px}.box h3.next{font-size:12px;color:var(--navy);margin:0 0 3px}.box ol.next{margin:0;padding-left:18px;font-size:11px;line-height:1.45}.box ol.next li{margin:0 0 4px}.box ol.next b{color:var(--navy)}.box p.contact{margin:4px 0 0;text-align:center;font-size:10.5px;color:var(--muted)}.box p.tag{margin:3px 0 0;text-align:center;font-family:"Playfair Display",Georgia,serif;font-size:14px;color:var(--navy);font-weight:600}'
       + '.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.steps div{border-top:3px solid var(--navy);background:var(--sel);padding:8px 10px;border-radius:0 0 6px 6px;font-size:10.5px;line-height:1.4}.steps b{display:block;font-family:"Playfair Display",Georgia,serif;font-size:12px;color:var(--navy);margin-bottom:2px}.steps div.on{border-top-color:var(--gold);background:var(--goldsoft)}.steps small{display:block;color:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:9px;margin-bottom:3px}'
       + 'ul.q{margin:4px 0 0;padding-left:18px}ul.q li{margin:0 0 3px}'
       + '.foot{position:absolute;left:.7in;right:.7in;bottom:.45in;font-size:9.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:5px}'
@@ -16064,7 +16076,7 @@
     var foot = '<div class="foot">Illustrative only — hypothetical projections from the information you supplied, not a guarantee of results. This is only a starting point: nothing is final until we complete the recommendation meeting together. See the Important Disclosures on the last page.</div>';
     /* page 1 — where you are today */
     html += '<div class="sheet">'
-      + '<div class="band"><div><img class="logo" src="data:image/png;base64,' + LOGO_PNG_B64 + '" alt="Alto Financial Group"><div class="motto">Your Goals. Our Guidance. <span class="tg">Together.</span></div><div class="sub">Initial Observations and Findings</div></div><div class="meta">Prepared for <strong>' + E(names) + '</strong><br>' + E(dateTxt) + (advisor ? '<br>' + E(advisor) : '') + '</div></div>'
+      + '<div class="band"><div><img class="logo" src="data:image/png;base64,' + LOGO_PNG_B64 + '" alt="Alto Financial Group"><div class="motto">Your Goals. Our Guidance. <span class="tg">Together.</span></div><div class="sub">Initial Observations and Findings</div></div><div class="meta">Prepared for <strong>' + E(names) + '</strong><br>' + E(dateTxt) + (advisor ? '<br>' + E(advisor) : '') + (advCell ? '<br>' + E(advCell) : '') + (advEmail ? '<br>' + E(advEmail) : '') + '<br>' + ALTO_PHONE + ' · ' + ALTO_SITE + '</div></div>'
       + '<h1>Where you are, what we found, and where the plan could take you</h1>'
       + '<p class="lead" style="margin-top:8px">These observations are for ' + you + ' to keep: where things stand today, the problems we see in the current course, and where the Retirement Fortress we have begun shaping together could take you. '
       + '<strong>This is only a starting point</strong> to guide how we’ll work together to achieve your retirement goals and address each of the problems we’ve identified together; the plan is fine-tuned with you at the recommendation meeting until you are fully happy with it.</p>'
@@ -16157,7 +16169,8 @@
       + '<li><b>Implementation:</b> Only after you’ve given your approval will we begin carrying out the agreed-upon strategies, in the order your plan lays out.</li>'
       + '<li><b>Ongoing Partnership:</b> Once your plan is in place, our commitment to you is just beginning. We’ll meet quarterly to review your progress and make sure your plan stays on track as life changes.</li>'
       + '</ol></div></div>'
-      + '<p class="tag">Your Goals. Our Guidance. <span class="tg">Together.</span></p></div>'
+      + '<p class="tag">Your Goals. Our Guidance. <span class="tg">Together.</span></p>'
+      + '<p class="contact">' + E(contact) + '</p></div>'
       + foot + '</div>'
       + rfbDiscHtml({page:true})
       + '</body></html>';
