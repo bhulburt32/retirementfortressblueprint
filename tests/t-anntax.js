@@ -92,6 +92,13 @@ const path = require('path');
   if(Math.abs(tfNq.state-txNq.state)>1) errs.push('the state model should be unchanged by the federal exemption ('+tfNq.state+' vs '+txNq.state+')');
   if(!/AUM - Tax Free/.test(await txt('#taxAssume'))) errs.push('the section 16 assumptions should name the tax-free share');
   // saved and reloaded with the case
+  // the advisor's cell and email on every report
+  await p.fill('#advisorCell','412-555-0100'); await p.$eval('#advisorCell',e=>e.blur()); await p.fill('#advisorEmail','dasti@altofg.com'); await p.waitForTimeout(600);
+  for(const [btn,label,sel] of [['makeDeck','executive summary','.sl'],['makeSS','Social Security report','body'],['rqReport','risk profile report','body'],['makePension','pension report','body'],['makeTakeHome','observations report','body']]){
+    const [rp]=await Promise.all([ctx.waitForEvent('page',{timeout:30000}), p.click('#'+btn)]); await rp.waitForLoadState('load'); await rp.waitForTimeout(500);
+    const tx=await rp.evaluate(()=>document.body.innerText); const ok=/\(412\) 555-0100/.test(tx) && /dasti@altofg\.com/.test(tx); console.log(label+': cell and email present:', ok); if(!ok) errs.push('the '+label+' should carry the advisor cell and email'); await rp.close();
+  }
+  await p.fill('#advisorCell',''); await p.fill('#advisorEmail',''); await p.waitForTimeout(400);
   const json=await p.$eval('#caseJson',e=>e.value); console.log('product saved with the case:', /AUM - Tax Free/.test(json));
   if(!/AUM - Tax Free/.test(json)) errs.push('the product should save with the case');
   await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(900); await p.click('#expandAll'); await p.waitForTimeout(300);

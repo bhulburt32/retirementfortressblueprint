@@ -1016,9 +1016,10 @@
         <span class="ui">Advisor</span> name carries from case to case; the
         <span class="ui">Date prepared</span> resets to today whenever you start a new case.
         <span class="ui">Advisor cell</span> and <span class="ui">Advisor email</span> print with
-        your name on the initial observations and findings &mdash; in the header and under the
-        closing tagline with Alto's number and website; leave the cell blank to keep it off the
-        report.</p>
+        your name on every report &mdash; the executive summary cover, the initial observations and
+        findings (header and closing contact line, with Alto's number and website), the Social
+        Security, risk profile and pension reports and the worksheet. The cell is shown as
+        (nnn) nnn-nnnn; leave either blank and it is left off.</p>
       </div>
     </details>
     <!-- /guide-notes:01 -->
@@ -3715,7 +3716,7 @@
       spouseFirst: $('spouseFirst').value.trim(),
       spouseLast:  $('spouseLast').value.trim(),
       advisor:     $('advisor').value.trim(),
-      advisorCell: $('advisorCell').value.trim(),
+      advisorCell: fmtPhone($('advisorCell').value),
       advisorEmail:$('advisorEmail').value.trim(),
       prepDate:    $('prepDate').value,
       needs:   num($('needs').value),
@@ -4267,7 +4268,7 @@
         + '.hint{color:var(--muted);font-size:11.5px}.pbc-foot{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;padding-top:10px;border-top:1px solid var(--line)}'
         + '.disc{font-size:10.5px;color:var(--muted);margin-top:16px;padding-top:12px;border-top:1px solid var(--line);line-height:1.5}'
         + '@media print{body{background:#fff}.sheet{box-shadow:none;margin:0;max-width:none;padding:.5in .6in}}</style></head><body><div class="sheet">'
-        + '<div class="top"><div><div class="t">Pension Benefit Estimate</div><small>' + E(last.name) + ' \u00b7 ' + E(last.cfg.name) + '</small></div><div style="text-align:right"><img src="data:image/png;base64,' + LOGO_PNG_B64 + '" alt="Alto Financial Group"><small>' + (advisor ? E(advisor) + ' \u00b7 ' : '') + E(dateTxt) + '</small></div></div>'
+        + '<div class="top"><div><div class="t">Pension Benefit Estimate</div><small>' + E(last.name) + ' \u00b7 ' + E(last.cfg.name) + '</small></div><div style="text-align:right"><img src="data:image/png;base64,' + LOGO_PNG_B64 + '" alt="Alto Financial Group"><small>' + (advisor ? E(advisorContact(i)) + ' \u00b7 ' : '') + E(dateTxt) + '</small></div></div>'
         + resultsHtml(last)
         + '<div class="disc">' + discHtml + '</div>'
         + '<style>' + RFB_DISC_CSS + '</style>' + rfbDiscHtml({page:true})
@@ -7595,7 +7596,7 @@
       : [c1, s1].filter(Boolean).join(' & ');
     if(who){ y -= 6; doc.text('Prepared for ' + who, M, y, {size:10.5, rgb:INK}); y -= 8; }
     y -= 6;
-    doc.text(prepLong(i) + (i.advisor ? '   ·   Prepared by ' + i.advisor : '')
+    doc.text(prepLong(i) + (i.advisor ? '   ·   Prepared by ' + advisorContact(i, ', ') : '')
       + '   ·   ' + (r.adjusted ? 'Transfers adjusted by the advisor' : 'Internal planning worksheet'),
       M, y, {size:8.5, rgb:MUT});
     y -= 14;
@@ -8208,7 +8209,7 @@
       ? i.clientFirst + ' & ' + i.spouseFirst + ' ' + i.clientLast
       : [c1, s1].filter(Boolean).join(' & ');
     if(who){ y -= 4; doc.text(who, M, y, {size:10.5, rgb:INK}); y -= 10; }
-    doc.text(prepLong(i) + (i.advisor ? '   ·   Prepared by ' + i.advisor : '')
+    doc.text(prepLong(i) + (i.advisor ? '   ·   Prepared by ' + advisorContact(i, ', ') : '')
       + '   ·   Ending positions' + (r.adjusted ? ', with the advisor\u2019s adjusted transfers' : ' after both transfer steps'),
       M, y, {size:8.5, rgb:MUT});
     y -= 14;
@@ -10402,7 +10403,7 @@
     var detail = R.map(function(r, k){ return '<section class="page"><h2>' + r.rank + '. ' + E(title(r)) + '</h2><ul class="ev">' + ssoEvents(S, r).map(function(e){ return '<li>' + E(e.text) + '</li>'; }).join('') + '</ul><p class="lt"><b>Lifetime benefit: ' + M(r.cum) + '</b></p>' + tableHTML(r) + '<p class="cap">Amounts include the ' + pc(S.cola) + ' COLA assumption' + (cut ? ' and the ' + Math.round(cut.pct * 100) + '% reduction beginning January ' + cut.year : '') + '. The Monthly column shows the first and last monthly amount of the year when they differ. Figures are estimates in future dollars.</p></section>'; }).join('');
     var info = '<table class="kv">'
       + '<tr><th>Prepared for</th><td>' + E(client) + '</td></tr>'
-      + (advisor ? '<tr><th>Prepared by</th><td>' + E(advisor) + ', Alto Financial Group</td></tr>' : '')
+      + (advisor ? '<tr><th>Prepared by</th><td>' + E(advisorContact(i, ', ')) + ', Alto Financial Group</td></tr>' : '')
       + '<tr><th>Marital status</th><td>' + (couple ? 'Married' : 'Single') + '</td></tr>'
       + '<tr><th>Current age' + (couple ? 's' : '') + '</th><td>' + people.map(function(p){ return E(p.name) + ' ' + ssoAgeStr(p.ageNow) + (p.dob ? ' (born ' + p.dob.toLocaleDateString('en-US') + ')' : ''); }).join(', ') + '</td></tr>'
       + '<tr><th>Full retirement age</th><td>' + people.map(function(p){ return E(p.name) + ' ' + ssoAgeStr(p.fra); }).join(', ') + '</td></tr>'
@@ -10439,7 +10440,7 @@
       + '<div class="sheet">'
       + '<section class="cover"><div class="band"><small>Alto Financial Group</small><h1>Social Security<br>Planning Analysis</h1></div>'
       + '<div class="who">Prepared for</div><div class="name">' + E(client) + '</div><div class="who">' + E(dateTxt) + '</div>'
-      + '<div class="firm"><b>Prepared by ' + (advisor ? E(advisor) + ', ' : '') + 'Alto Financial Group</b><br>4099 William Penn Hwy, Fourth Floor<br>Monroeville, PA 15146<br>(800) 491-7005<br>altofinancialgrp.com</div>'
+      + '<div class="firm"><b>Prepared by ' + (advisor ? E(advisor) + ', ' : '') + 'Alto Financial Group</b>' + (fmtPhone(i.advisorCell) ? '<br>' + E(fmtPhone(i.advisorCell)) : '') + ((i.advisorEmail || '').trim() ? '<br>' + E(i.advisorEmail.trim()) : '') + '<br>4099 William Penn Hwy, Fourth Floor<br>Monroeville, PA 15146<br>(800) 491-7005<br>altofinancialgrp.com</div>'
       + '<div class="logo"><img src="' + logo + '" alt="Alto Financial Group"></div></section>'
       + '<section class="page"><h2>Introduction</h2>'
       + '<p>This analysis projects the Social Security income you can expect under different claiming strategies. It starts from the primary insurance amount (PIA) shown on your Social Security statement and layers on assumptions about how long you will live and how benefits will be adjusted for inflation. The goal is not to predict a single number but to show how the timing of your filing decision changes the income you receive over your lifetime, so the decision can be made deliberately and in step with the rest of your Retirement Fortress plan.</p>'
@@ -14040,6 +14041,18 @@
   ['advisor','advisorCell','advisorEmail'].forEach(function(id){
     $(id).addEventListener('input', render);
   });
+  $('advisorCell').addEventListener('blur', function(){ $('advisorCell').value = fmtPhone($('advisorCell').value); });
+  /* a US number as (nnn) nnn-nnnn; anything that is not ten digits (eleven with a leading 1) is left as typed */
+  function fmtPhone(v){
+    v = String(v == null ? '' : v).trim(); if(!v) return '';
+    var d = v.replace(/\D/g, ''); if(d.length === 11 && d.charAt(0) === '1') d = d.slice(1);
+    return d.length === 10 ? '(' + d.slice(0, 3) + ') ' + d.slice(3, 6) + '-' + d.slice(6) : v;
+  }
+  /* the advisor as the client reports print them: name, cell when given, email when given */
+  function advisorContact(i, sep){
+    var parts = [(i.advisor || '').trim(), fmtPhone(i.advisorCell), (i.advisorEmail || '').trim()].filter(Boolean);
+    return parts.join(sep || ' \u00b7 ');
+  }
   ['growthW','growthR'].forEach(function(id){
     $(id).addEventListener('input', render);
     $(id).addEventListener('blur', function(){ var el = $(id); el.value = el.value.trim() === '' ? '' : (pctIn(el.value) * 100).toFixed(1) + '%'; });
@@ -15081,7 +15094,7 @@
     var lifeGap = life.people.reduce(function(a, p){ return a + p.gap; }, 0);
     var firstRetRow = P.rows[Math.min(P.N, Math.ceil(P.lastRet))] || P.rows[P.rows.length - 1];
     var fCover = firstRetRow.needs > 0.5 ? Math.round(firstRetRow.foundation / firstRetRow.needs * 100) : 0, wCover = firstRetRow.wants > 0.5 ? Math.round(firstRetRow.walls / firstRetRow.wants * 100) : 0;
-    var preparedBy = i.advisor ? i.advisor + ' \u00b7 Alto Financial Group' : 'Alto Financial Group';
+    var preparedBy = i.advisor ? advisorContact(i) + ' \u00b7 Alto Financial Group' : 'Alto Financial Group';
     var doc = new HtmlDoc('Retirement Fortress Executive Summary — ' + names), page = 0;
     var cover = doc.media_('jpg', COVER_B64), logo = doc.media_('png', LOGO_PNG_B64), fortImg = doc.media_('jpg', FORT_B64);
     var endYear = faLast.year, endAges = ages(faLast);
@@ -15169,7 +15182,7 @@
       dkTile(s, hx, 2.05, tw, 1.7, 'State of residency', stateName, 'State income tax model', {big:20});
       dkTile(s, hx + tw + 0.3, 2.05, tw, 1.7, 'Filing status', TX.status === 'mfj' ? 'Married filing jointly' : 'Single', 'Federal brackets', {big:20});
       dkTile(s, hx, 3.95, tw, 1.7, 'Plan horizon', 'To age ' + (i.endAge || 100), 'Runs to ' + endYear, {big:20});
-      dkTile(s, hx + tw + 0.3, 3.95, tw, 1.7, 'Prepared', prepLong(i), 'By ' + preparedBy, {big:20});
+      dkTile(s, hx + tw + 0.3, 3.95, tw, 1.7, 'Prepared', prepLong(i), 'By ' + (i.advisor ? i.advisor + ' \u00b7 Alto Financial Group' : 'Alto Financial Group'), {big:20});
       dkBody(s, 0.9, 6.0, 18.2, 1.3, (spouse ? cName + ' is ' + i.clientAge + ' and ' + sName + ' is ' + i.spouseAge : cName + ' is ' + i.clientAge) + '. ' + accounts.length + ' account' + (accounts.length === 1 ? '' : 's') + ' hold ' + money(totalVal) + (OA.val > 0.5 ? ', other assets add ' + money(OA.val) : '') + (DT.bal > 0.5 ? ', and ' + money(DT.bal) + ' of debt stands against them' : '') + '. The plan runs year by year to ' + endYear + ', when the younger of you turns ' + (i.endAge || 100) + ', with expenses growing ' + pc1(i.inflation) + ' a year.', {sz:17});
       dkTile(s, 0.9, 7.6, 4.3, 1.85, 'Net worth today', money(totalVal + OA.val - DT.bal), 'Accounts + other assets − debts');
       dkTile(s, 5.4, 7.6, 4.3, 1.85, 'Household income', money(netSal + ng), 'Take-home pay' + (ng > 0.5 ? ' plus other income' : ''));
@@ -15953,7 +15966,7 @@
     var names = spouse ? cName + ' and ' + sName + (i.clientLast ? ' ' + i.clientLast : '') : cName + (i.clientLast ? ' ' + i.clientLast : '');
     var ppl = spouse ? ['client', 'spouse'] : ['client'], pName = function(w){ return w === 'client' ? cName : sName; };
     var advisor = (i.advisor || '').trim(), dateTxt = prepLong(i), you = spouse ? 'you both' : 'you';
-    var advCell = (i.advisorCell || '').trim(), advEmail = (i.advisorEmail || '').trim();
+    var advCell = fmtPhone(i.advisorCell), advEmail = (i.advisorEmail || '').trim();
     var ALTO_PHONE = '1-800-491-7005', ALTO_SITE = 'www.altofinancialgrp.com';
     var contact = [advisor, advCell, advEmail].filter(Boolean).concat(['Alto Financial Group', ALTO_PHONE, ALTO_SITE]).join(' · ');
     var sqRows = SQ.rows, faRows = TX.rows, N = TX.N;
@@ -16222,7 +16235,7 @@
       + '</style></head><body>'
       + '<div class="toolbar"><span>Risk Profile — ' + E(client) + '</span><button onclick="window.print()">Print / Save as PDF</button></div>'
       + '<div class="sheet">'
-      + '<div class="band"><div><div class="sub">Retirement Fortress · Risk Profile</div><div class="firm">Alto Financial Group</div></div><div class="meta">Prepared for <strong>' + E(client) + '</strong><br>' + E(dateTxt) + (advisor ? '<br>' + E(advisor) : '') + '</div></div>'
+      + '<div class="band"><div><div class="sub">Retirement Fortress · Risk Profile</div><div class="firm">Alto Financial Group</div></div><div class="meta">Prepared for <strong>' + E(client) + '</strong><br>' + E(dateTxt) + (advisor ? '<br>' + E(advisor) : '') + (fmtPhone(i.advisorCell) ? '<br>' + E(fmtPhone(i.advisorCell)) : '') + ((i.advisorEmail || '').trim() ? '<br>' + E(i.advisorEmail.trim()) : '') + '</div></div>'
       + '<section class="hero"><div><div class="eyebrow">Your risk score</div><div class="big">' + S.rn + '</div><span class="pill">' + E(S.band) + '</span></div>'
       + '<div><h2>What your score means</h2><p>' + E(RQ_BAND_TXT[S.band]) + '</p><div class="gauge"><div class="pin" style="left:' + ((S.rn - 1) / 98 * 100).toFixed(1) + '%"></div></div><div class="ticks"><span>1 · Conservative</span><span>50</span><span>99 · Aggressive</span></div></div></section>'
       + '<section><h2>Your risk category</h2><p>Your score places you in the <strong>' + E(S.band) + '</strong> category, one of five we use to match clients with portfolios.</p>'
