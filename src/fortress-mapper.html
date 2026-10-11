@@ -3357,16 +3357,23 @@
         <div class="exp client">
           <span class="tag">Client-facing</span>
           <b>Initial observations &amp; findings</b>
-          <p>Three Letter pages the client keeps after the discovery meeting, built from the same run
+          <p>Four Letter pages the client keeps after the discovery meeting, built from the same run
             and scenario as the executive summary. Page one is where they are today &mdash; accounts,
             net worth, spending, guaranteed income and the share of Needs it covers (the monthly
-            average over the first ten years of retirement), market exposure, the income gap (the
-            first full year, the largest gap within the first fifteen years, the total) and the
-            current course if nothing changes. Page two is the problems: the items selected in
-            section&nbsp;11 (or the tool's suggestions when none are), the three stress tests against
-            the plan, long-term care cost and coverage, and life insurance in force against the need.
-            Page three is where the plan takes them: each Fortress level and its drafted amount,
-            current course against the plan, and a gold <b>This is just the beginning&hellip;</b> box: a
+            average over the first ten years of retirement), market exposure &mdash; and the income gap
+            before the plan as the section&nbsp;03 chart, with the first full year, the largest gap
+            within the first fifteen years and the total in a caption. Page two is the current course
+            if nothing changes &mdash; with the blended growth rate assumed across the accounts and the
+            projected accounts before the plan as a chart, the run-out marked &mdash; then the problems:
+            the items selected in section&nbsp;11 (or the tool's suggestions when none are), long-term
+            care cost and coverage, and life insurance in force against the need. Page three is the
+            three stress tests against the plan, each Fortress level and its drafted amount, and
+            current course against the plan. Page four is
+            the strategic tax planning in the plan &mdash; the withdrawal order, the Roth conversions
+            (amount, years, bracket, the tax paid and the lifetime tax saved, Roth at the end of plan),
+            gifts from the IRA when applied, and a current-course-versus-plan table of lifetime tax,
+            effective rate, top bracket, Roth balance and the first required distribution &mdash; then
+            a gold <b>This is just the beginning&hellip;</b> box: a
             starting point, not a final plan, the only decision today being whether they believe
             Alto can help; no investment placed until the Recommendation Meeting; and the four
             steps &mdash; Simplify Meeting, Recommendation Meeting, Implementation, Ongoing
@@ -15984,6 +15991,51 @@
       ['Roof', 'Growth for Wishes and legacy', r.funded.roof, '#8B5CA6'],
       ['Moat', 'Long-term care protection', r.funded.moat, '#1F8A70']
     ].filter(function(L){ return L[2] > 0.5; });
+    /* the income gap before the plan, drawn as the application draws it, at report size */
+    var gapSvg = (function(){
+      var W = 1000, H = 215, L = 64, Rm = 16, Tp = 20, B = 44, pw = W - L - Rm, ph = H - Tp - B;
+      var slot = pw / (Nq + 1), bw = Math.max(3, slot * 0.72), Xc = function(t){ return L + slot * (t + 0.5); };
+      var ymax = Math.max.apply(null, inc.concat(exp)) * 1.12 || 100000;
+      var step = Math.pow(10, Math.floor(Math.log(ymax) / Math.LN10)); if(ymax / step < 3) step /= 2; if(ymax / step > 7) step *= 2;
+      var Yf = function(v){ return Tp + ph - ph * Math.min(v, ymax) / ymax; };
+      var out = '';
+      if(Pq.lastRet > 0){ var xr = Xc(Pq.lastRet) - slot / 2; out += '<rect x="' + xr + '" y="' + Tp + '" width="' + (L + pw - xr) + '" height="' + ph + '" fill="#EEF1F8"/><text x="' + (xr + 5) + '" y="' + (Tp + 12) + '" font-size="10" fill="#5A6276" letter-spacing="1">RETIRED</text>'; }
+      for(var v = 0; v <= ymax; v += step) out += '<line x1="' + L + '" x2="' + (L + pw) + '" y1="' + Yf(v) + '" y2="' + Yf(v) + '" stroke="#DADDE6"/><text x="' + (L - 7) + '" y="' + (Yf(v) + 4) + '" text-anchor="end" font-size="11" fill="#5A6276">' + fmtKM(v) + '</text>';
+      for(var t = 0; t <= Nq; t += 5) out += '<text x="' + Xc(t) + '" y="' + (Tp + ph + 16) + '" text-anchor="middle" font-size="11" fill="#5A6276">' + qrows[t].year + '</text><text x="' + Xc(t) + '" y="' + (Tp + ph + 30) + '" text-anchor="middle" font-size="10" fill="#5A6276">age ' + qrows[t].ages.join(' / ') + '</text>';
+      qrows.forEach(function(x, n){
+        var x0 = Xc(n) - bw / 2;
+        if(inc[n] > 0.5) out += '<rect x="' + x0.toFixed(1) + '" y="' + Yf(inc[n]).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + Math.max(0.5, Yf(0) - Yf(inc[n])).toFixed(1) + '" fill="#1F6FB2" rx="1"/>';
+        if(gaps[n] > 0.5) out += '<rect x="' + x0.toFixed(1) + '" y="' + Yf(exp[n]).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + Math.max(0.5, Yf(inc[n]) - Yf(exp[n]) - 1).toFixed(1) + '" fill="#8E1B1B" rx="1"/>';
+        if((n % 5 === 0 || n === Nq) && gaps[n] > 0.5) out += '<text x="' + Xc(n).toFixed(1) + '" y="' + (Yf(exp[n]) - 5).toFixed(1) + '" text-anchor="middle" font-size="11" font-weight="700" fill="#8E1B1B">' + fmtKM(gaps[n]) + '</text>';
+      });
+      out += '<polyline fill="none" stroke="#18213B" stroke-width="2.5" stroke-linejoin="round" points="' + qrows.map(function(x, n){ return Xc(n).toFixed(1) + ',' + Yf(exp[n]).toFixed(1); }).join(' ') + '"/>';
+      return '<svg class="gap" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Total income before the plan against total expenses, by year">' + out + '</svg>';
+    })();
+    /* projected assets before the plan: every account where it is, at its own rate */
+    var blended = totalVal > 0.5 ? accounts.reduce(function(a, x){ return a + x.val * (x.growth != null ? x.growth : (x.pos === 'Market' ? i.growthR : isAnnuityPos(x.pos) ? i.growthW : 0)); }, 0) / totalVal : i.growthR;
+    var sqSvg = (function(){
+      var rows = sqRows, Ns = rows.length - 1, W = 1000, H = 215, L = 64, Rm = 16, Tp = 20, B = 44, pw = W - L - Rm, ph = H - Tp - B;
+      var Xc = function(t){ return L + pw * t / Math.max(1, Ns); };
+      var tot = rows.map(function(x){ return x.layers.total; }), ymax = Math.max.apply(null, tot) * 1.12 || 100000;
+      var step = Math.pow(10, Math.floor(Math.log(ymax) / Math.LN10)); if(ymax / step < 3) step /= 2; if(ymax / step > 7) step *= 2;
+      var Yf = function(v){ return Tp + ph - ph * Math.min(Math.max(0, v), ymax) / ymax; };
+      var out = '';
+      for(var v = 0; v <= ymax; v += step) out += '<line x1="' + L + '" x2="' + (L + pw) + '" y1="' + Yf(v) + '" y2="' + Yf(v) + '" stroke="#DADDE6"/><text x="' + (L - 7) + '" y="' + (Yf(v) + 4) + '" text-anchor="end" font-size="11" fill="#5A6276">' + fmtKM(v) + '</text>';
+      for(var t = 0; t <= Ns; t += 5) out += '<text x="' + Xc(t) + '" y="' + (Tp + ph + 16) + '" text-anchor="middle" font-size="11" fill="#5A6276">' + rows[t].year + '</text><text x="' + Xc(t) + '" y="' + (Tp + ph + 30) + '" text-anchor="middle" font-size="10" fill="#5A6276">age ' + rows[t].ages.join(' / ') + '</text>';
+      var pts = rows.map(function(x, n){ return Xc(n).toFixed(1) + ',' + Yf(tot[n]).toFixed(1); });
+      out += '<polygon fill="#1F6FB2" fill-opacity="0.18" points="' + Xc(0).toFixed(1) + ',' + Yf(0).toFixed(1) + ' ' + pts.join(' ') + ' ' + Xc(Ns).toFixed(1) + ',' + Yf(0).toFixed(1) + '"/>'
+        + '<polyline fill="none" stroke="#1F6FB2" stroke-width="2.5" stroke-linejoin="round" points="' + pts.join(' ') + '"/>';
+      if(sqDep){ var dn = rows.indexOf(sqDep), dx = Xc(dn); out += '<line x1="' + dx.toFixed(1) + '" x2="' + dx.toFixed(1) + '" y1="' + (Tp + 16) + '" y2="' + Yf(0).toFixed(1) + '" stroke="#8E1B1B" stroke-dasharray="3 3"/><circle cx="' + dx.toFixed(1) + '" cy="' + Yf(0).toFixed(1) + '" r="5" fill="#8E1B1B"/><text x="' + (dx + (dn > Ns * 0.6 ? -7 : 7)).toFixed(1) + '" y="' + (Tp + 12) + '" text-anchor="' + (dn > Ns * 0.6 ? 'end' : 'start') + '" font-size="11" font-weight="700" fill="#8E1B1B">accounts run out at ' + agesShort(sqDep) + '</text>'; }
+      else out += '<text x="' + Xc(Ns).toFixed(1) + '" y="' + (Yf(tot[Ns]) - 8).toFixed(1) + '" text-anchor="end" font-size="11" font-weight="700" fill="#1F6FB2">' + fmtKM(tot[Ns]) + ' at the end of plan</text>';
+      return '<svg class="gap" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Projected accounts before the plan, by year">' + out + '</svg>';
+    })();
+    /* the tax plan: the withdrawal order, the Roth conversions, the gifts from the IRA */
+    var cRows = TXp ? TXp.rows.filter(function(x){ return x.conv && x.conv.amt > 0.5; }) : [];
+    var convSaved = TXp ? (TXb.lifetime + TXb.lifetimeState) - (TXp.lifetime + TXp.lifetimeState) : 0, lB = TXb.rows[TXb.rows.length - 1];
+    var QF = (typeof qcdFacts === 'function') ? qcdFacts(r, TX, TXp ? cfg : null) : null, qcdOn = !!(QF && QF.applied && QF.total > 0.5);
+    var stateName = TX.stateName || 'state', retIdx = Math.min(N, Math.ceil(TX.lastRet || 0)), faRet = faRows[retIdx];
+    var ordNames = wdOrder.map(function(k){ return WD_TIERS[k] ? WD_TIERS[k].name.toLowerCase() : k; });
+    var pct1 = function(v){ return ((v || 0) * 100).toFixed(1) + '%'; };
     var tile = function(lab, val, sub, cls){ return '<div class="tile' + (cls ? ' ' + cls : '') + '"><div class="lab">' + E(lab) + '</div><div class="val">' + E(val) + '</div>' + (sub ? '<div class="sub">' + E(sub) + '</div>' : '') + '</div>'; };
     var pageHead = function(n, title){ return '<div class="ph"><span>' + E(names) + ' · Initial observations and findings</span><span>' + E(title) + ' · page ' + n + '</span></div>'; };
     var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Initial Observations and Findings — ' + E(names) + '</title>'
@@ -15998,7 +16050,7 @@
       + '.ph{display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:5px;margin-bottom:16px}'
       + 'section{margin:0 0 13px;page-break-inside:avoid}.lead{font-size:12.5px;max-width:72ch}.tiles.lv .val{font-size:16px}.tiles.lv .tile{border-radius:0 0 6px 6px}'
       + '.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:8px 0 4px}.tile{background:var(--sel);border-radius:6px;padding:8px 11px}.tile .lab{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}.tile .val{font-family:"Playfair Display",Georgia,serif;font-size:19px;color:var(--navy);margin:2px 0 1px;line-height:1.15}.tile .sub{font-size:10.5px;color:var(--muted);line-height:1.35}.tile.warn .val{color:var(--red)}.tile.good .val{color:var(--good)}'
-      + '.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}'
+      + '.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}svg.gap{display:block;width:100%;height:auto;font-family:Montserrat,Arial,sans-serif}.legend{display:flex;gap:16px;font-size:10.5px;color:var(--muted);margin:2px 0 4px}.legend i{display:inline-block;width:12px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}.legend i.ln{height:0;border-top:2.5px solid var(--ink);vertical-align:3px}.cap{margin-top:6px}'
       + 'table{border-collapse:collapse;width:100%;font-size:11.5px}th{text-align:left;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:4px 6px;border-bottom:1px solid var(--line)}td{padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top}td.n,th.n{text-align:right;white-space:nowrap}td.hi{font-weight:700;color:var(--navy)}td.lv{font-weight:600;white-space:nowrap}td .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:-1px}'
       + 'ol.risks{margin:4px 0 0;padding-left:20px}ol.risks li{margin:0 0 5px}ol.risks b{color:var(--navy)}ol.risks span{display:block;color:var(--muted);font-size:11px}'
       + '.box{border:2px solid var(--gold);background:var(--goldsoft);border-radius:8px;padding:8px 14px;margin:2px 0 8px}.box h3{color:#8A6410;font-size:14px;margin-bottom:4px}.box p{max-width:none}.box .two{gap:14px}.box h3.next{font-size:12px;color:var(--navy);margin:0 0 3px}.box ol.next{margin:0;padding-left:18px;font-size:11px;line-height:1.45}.box ol.next li{margin:0 0 4px}.box ol.next b{color:var(--navy)}.box p.tag{margin:3px 0 0;text-align:center;font-family:"Playfair Display",Georgia,serif;font-size:14px;color:var(--navy);font-weight:600}'
@@ -16026,44 +16078,46 @@
       + tile('In market positions', marketPct + '%', money(RF.marketVal || 0) + ' exposed to market swings today', marketPct >= 60 ? 'warn' : '')
       + '</div><p style="margin-top:6px"><strong>Retirement:</strong> ' + E(retire) + '. The plan runs to age ' + (i.endAge || 100) + ' (' + faLast.year + ').</p></section>'
       + '<section><h2>Your income gap</h2>'
-      + '<p>' + (first == null ? 'With your income as it stands — salaries to each retirement date, Social Security, pensions and other income — your expenses are covered every year of the plan before anything changes. That is a strong position; the questions become taxes, protection and what you leave behind.'
-                 : 'Your income as it stands — salaries to each retirement date, Social Security, pensions and other income — stops covering your expenses in <strong>' + qrows[first].year + '</strong> (ages ' + ages(qrows[first]) + '). From there the difference has to come out of your accounts, and that is what the plan is built to fund.') + '</p>'
-      + '<div class="tiles">'
-      + tile('Gap in ' + qrows[ri].year + (ri <= 1 ? ', the first full year' : ', at full retirement'), money(gaps[ri]) + ' a year', 'Income ' + fmtKM(inc[ri]) + ' against expenses ' + fmtKM(exp[ri]), gaps[ri] > 0.5 ? 'warn' : 'good')
-      + tile('Largest gap in the first fifteen years', money(gaps[big]) + ' a year', gaps[big] > 0.5 ? 'In ' + qrows[big].year + ', ' + agesShort(qrows[big]) : 'No shortfall in the first fifteen years of retirement', gaps[big] > 0.5 ? 'warn' : 'good')
-      + tile('Total gap over the plan', money(tot), 'What your accounts must fund, before tax')
-      + '</div></section>'
-      + '<section><h2>If nothing changes</h2>'
-      + '<p>Leaving every account where it is, growing at its own rate, and drawing the shortfall each year in tax order: <strong>' + E(endOf(sqDep, sqLast)) + '</strong>'
-      + (sqDep ? ' (' + sqDep.year + '). ' : ' (' + sqLast.year + '). ') + 'Along the way you would pay about <strong>' + money(SQ.lifetime + SQ.lifetimeState) + '</strong> in federal and state income tax'
-      + (marketPct >= 50 ? ', with ' + marketPct + '% of your savings riding on the markets through every downturn' : '') + '.'
-      + ' None of this is a prediction: it is the course you are on if nothing is decided, and the reference point for the next two pages.</p></section>'
+      + '<p>' + (first == null ? 'Your income as it stands — salaries to each retirement date, Social Security, pensions and other income — covers your expenses every year before anything changes. The questions become taxes, protection and what you leave behind.'
+                 : 'Your income as it stands — salaries to each retirement date, Social Security, pensions and other income — stops covering your expenses in <strong>' + qrows[first].year + '</strong> (ages ' + ages(qrows[first]) + '). From there the difference comes out of your accounts.') + '</p>'
+      + '<div class="legend"><span><i style="background:#1F6FB2"></i>Total income before the plan</span><span><i style="background:#8E1B1B"></i>Income gap</span><span><i class="ln"></i>Total expenses</span></div>'
+      + gapSvg
+      + '<p class="cap">' + (gaps[ri] > 0.5 ? 'The gap is <strong>' + money(gaps[ri]) + '</strong> in ' + qrows[ri].year + (ri <= 1 ? ', the first full year of retirement' : ', at full retirement') + ' (income ' + fmtKM(inc[ri]) + ' against expenses ' + fmtKM(exp[ri]) + ')' : 'There is no gap in ' + qrows[ri].year)
+      + (gaps[big] > 0.5 ? '; the largest in the first fifteen years is <strong>' + money(gaps[big]) + '</strong> in ' + qrows[big].year + ', ' + agesShort(qrows[big]) : '; none in the first fifteen years of retirement')
+      + '. Over the whole plan your accounts must fund <strong>' + money(tot) + '</strong>, before tax.</p></section>'
       + foot + '</div>';
     /* page 2 — the risks */
-    html += '<div class="sheet">' + pageHead(2, 'The problems we found')
+    html += '<div class="sheet">' + pageHead(2, 'The current course and the problems')
+      + '<section><h2>If nothing changes</h2>'
+      + '<p>Leaving every account where it is, growing at its own rate — a blended <strong>' + pct1(blended) + '</strong> a year across your accounts, with market positions assumed to earn ' + pct1(i.growthR) + ' — and drawing the shortfall each year in tax order: <strong>' + E(endOf(sqDep, sqLast)) + '</strong>'
+      + (sqDep ? ' (' + sqDep.year + '). ' : ' (' + sqLast.year + '). ') + 'Along the way you would pay about <strong>' + money(SQ.lifetime + SQ.lifetimeState) + '</strong> in federal and state income tax'
+      + (marketPct >= 50 ? ', with ' + marketPct + '% of your savings riding on the markets through every downturn' : '') + '.'
+      + ' None of this is a prediction: it is the course you are on if nothing is decided, and the reference point for the pages that follow.</p>'
+      + '<div class="legend"><span><i style="background:#1F6FB2"></i>Your accounts before the plan</span>' + (sqDep ? '<span><i style="background:#8E1B1B;border-radius:50%;width:10px"></i>Accounts run out</span>' : '') + '</div>'
+      + sqSvg + '</section>'
       + '<section><h2>The problems we found</h2><p>The things that could knock a retirement off course, in the order we would address them. Each has an answer in the plan; none is a reason to rush.</p>'
       + (items.length ? '<ol class="risks">' + items.map(function(it){ return '<li><b>' + E(it.text) + '</b><span>' + E(it.sub) + '</span></li>'; }).join('') + '</ol>' : '<p><em>No specific problems have been flagged yet; we will go through them together at the next meeting.</em></p>')
       + '</section>'
-      + '<section><h2>How the plan holds up under stress</h2><p>The plan itself, tested against three things outside anyone’s control. Its base case: ' + E(faDep ? 'accounts run out ' + atAges(faDep) : money(faLast.layers.total) + ' at the end of plan') + '.</p>'
-      + '<table><thead><tr><th>Stress</th><th>What we assumed</th><th class="n">Where you end up</th></tr></thead><tbody>'
-      + sens.map(function(x){ var R = x.R; return '<tr><td class="lv">' + E(x.d.title) + '</td><td>' + E(x.d.sub) + '</td><td class="n' + (R.dep ? ' hi' : '') + '">' + E(R.dep ? 'Run out at ' + agesShort(R.dep) : money(R.last.layers.total) + (R.diff < 0 ? ' (' + fmtKM(-R.diff) + ' less)' : '')) + '</td></tr>'; }).join('')
-      + '</tbody></table></section>'
+      + foot + '</div>';
+    /* page 3 — where the plan takes you */
+    html += '<div class="sheet">' + pageHead(3, 'Where this plan would take you')
       + '<section><div class="two"><div><h2>Long-term care</h2>'
-      + '<p>The single largest unplanned expense most retirements face. Using the costs in your state' + (ltc.state ? ' (' + E(ltc.state) + ')' : '') + ':</p>'
+      + '<p>The largest unplanned expense most retirements face, at the costs in your state' + (ltc.state ? ' (' + E(ltc.state) + ')' : '') + ':</p>'
       + '<table><thead><tr><th>Who</th><th class="n">Projected cost of care</th><th class="n">Covered today</th></tr></thead><tbody>'
       + ltc.people.map(function(p){ return '<tr><td class="lv">' + E(p.name) + '</td><td class="n">' + money(p.total) + '</td><td class="n">' + money(p.covTotal) + '</td></tr>'; }).join('')
       + '<tr><td class="lv">Together</td><td class="n hi">' + money(ltc.total) + '</td><td class="n hi">' + money(ltcCov) + '</td></tr></tbody></table>'
-      + '<p style="margin-top:6px">' + (ltc.gap > 0.5 ? 'The uncovered ' + money(ltc.gap) + ' would come out of your accounts and your estate. The plan’s Moat is sized to carry ' + (ltcPlan > 0.5 ? 'about ' + money(ltcPlan) + ' of it' : 'this risk') + '.' : 'Your existing coverage carries the projected cost; we will confirm the policy terms together.') + '</p></div>'
+      + '<p style="margin-top:6px">' + (ltc.gap > 0.5 ? 'The uncovered ' + money(ltc.gap) + ' would come out of your accounts and estate; the plan’s Moat carries ' + (ltcPlan > 0.5 ? 'about ' + money(ltcPlan) + ' of it' : 'this problem') + '.' : 'Your existing coverage carries the projected cost; we will confirm the policy terms together.') + '</p></div>'
       + '<div><h2>Life insurance</h2>'
       + '<p>What a survivor would need to keep the household whole, against what is in force:</p>'
       + '<table><thead><tr><th>Who</th><th class="n">In force</th><th class="n">Additional need</th></tr></thead><tbody>'
       + life.people.map(function(p){ return '<tr><td class="lv">' + E(p.name) + '</td><td class="n">' + money(p.existing) + '</td><td class="n' + (p.gap > 0.5 ? ' hi' : '') + '">' + (p.gap > 0.5 ? money(p.gap) : '—') + '</td></tr>'; }).join('')
       + '</tbody></table>'
       + '<p style="margin-top:6px">' + (lifeGap > 0.5 ? 'About ' + money(lifeGap) + ' more coverage would close the gap; the plan prices it before anything is applied for.' : 'The coverage in force (' + money(lifeNow) + ') meets the need as we have estimated it.') + '</p></div></div></section>'
-      + foot + '</div>';
-    /* page 3 — where the plan takes you */
-    html += '<div class="sheet">' + pageHead(3, 'Where this plan would take you')
-      + '<section><h2>Your Retirement Fortress, as drafted</h2><p>Each level has one job; every amount is a draft, open to change at the recommendation meeting.</p>'
+      + '<section><h2>How the plan holds up under stress</h2><p>The plan itself against three things outside anyone’s control; its base case is ' + E(faDep ? 'accounts running out ' + atAges(faDep) : money(faLast.layers.total) + ' at the end of plan') + '.</p>'
+      + '<table><thead><tr><th>Stress</th><th>What we assumed</th><th class="n">Where you end up</th></tr></thead><tbody>'
+      + sens.map(function(x){ var R = x.R, d = x.d, short = d.key === 'seq' ? 'Walls ' + (SENS_SEQ.walls * 100).toFixed(0) + '% and Roof ' + (SENS_SEQ.roof * 100).toFixed(0) + '% a year for three years (' + d.range + ')' : d.key === 'ss' ? 'Benefits ' + Math.round(SENS_SS.pct * 100) + '% lower from ' + SENS_SS.year : 'Inflation ' + Math.round((SENS_INFL - 1) * 100) + '% above the plan assumption, ' + ((i.inflation || 0) * SENS_INFL * 100).toFixed(2) + '% a year'; return '<tr><td class="lv">' + E(d.title) + '</td><td>' + E(short) + '</td><td class="n' + (R.dep ? ' hi' : '') + '">' + E(R.dep ? 'Run out at ' + agesShort(R.dep) : money(R.last.layers.total) + (R.diff < 0 ? ' (' + fmtKM(-R.diff) + ' less)' : '')) + '</td></tr>'; }).join('')
+      + '</tbody></table></section>'
+      + '<section><h2>Your Retirement Fortress, as drafted</h2>'
       + '<div class="tiles lv" style="grid-template-columns:repeat(' + levels.length + ',minmax(0,1fr))">'
       + levels.map(function(L){ return '<div class="tile" style="border-top:3px solid ' + L[3] + '"><div class="lab">' + E(L[0]) + '</div><div class="val">' + money(L[2]) + '</div><div class="sub">' + E(L[1]) + '</div></div>'; }).join('')
       + '</div></section>'
@@ -16073,11 +16127,30 @@
       + '<tr><td>Savings exposed to market swings</td><td class="n">' + marketPct + '%</td><td class="n hi">' + exposurePlan + '%</td></tr>'
       + '<tr><td>Needs covered by income not tied to the market, first ten years</td><td class="n">' + cover10 + '%</td><td class="n hi">' + planCover + '%</td></tr>'
       + '<tr><td>Long-term care benefit in force</td><td class="n">' + money(ltcCov) + '</td><td class="n hi">' + money(ltcPlan) + '</td></tr>'
-      + '<tr><td>Life insurance in force</td><td class="n">' + money(lifeNow) + '</td><td class="n hi">' + money(lifeNow + lifeGap) + '</td></tr>'
       + '<tr><td>Lifetime federal and state income tax</td><td class="n">' + money(SQ.lifetime + SQ.lifetimeState) + '</td><td class="n hi">' + money(TX.lifetime + TX.lifetimeState) + (dTax > 0.5 ? ' (' + fmtKM(dTax) + ' less)' : '') + '</td></tr>'
-      + '<tr><td>Held in Roth accounts at the end of plan</td><td class="n">' + money(sqLast.balances.roth) + '</td><td class="n hi">' + money(faLast.balances.roth) + '</td></tr>'
       + '</tbody></table>'
-      + '<p style="margin-top:6px">In short: ' + money(protectedAmt) + ' moves into protection no market can take away, ' + money(r.funded.walls + r.funded.roof) + ' stays invested, and your essentials are paid first.</p></section>'
+      + '</section>'
+      + foot + '</div>';
+    /* page 4 — the tax plan, and the beginning */
+    var taxRows = [
+      ['Lifetime federal and ' + stateName + ' income tax', money(SQ.lifetime + SQ.lifetimeState), money(TX.lifetime + TX.lifetimeState) + (dTax > 0.5 ? ' (' + fmtKM(dTax) + ' less)' : '')],
+      ['Average effective rate on all income', pct1(SQ.avgTotalEffective || 0), pct1(TX.avgTotalEffective || 0)],
+      ['Top federal bracket at full retirement', Math.round((sqRows[retIdx] ? sqRows[retIdx].marginal : 0) * 100) + '%', Math.round((faRet ? faRet.marginal : 0) * 100) + '%'],
+      ['Held in Roth accounts at the end of plan', money(sqLast.balances.roth), money(faLast.balances.roth)],
+      ['Required minimum distributions begin', SQ.firstRmd ? SQ.firstRmd.year + ', ' + pName(SQ.firstRmd.who) + ' at ' + SQ.firstRmd.age : 'None in the plan', TX.firstRmd ? TX.firstRmd.year + ', ' + pName(TX.firstRmd.who) + ' at ' + TX.firstRmd.age : 'None in the plan']
+    ];
+    html += '<div class="sheet">' + pageHead(4, 'Your tax plan, and what happens next')
+      + '<section><h2>Strategic tax planning in the plan</h2>'
+      + '<p>Taxes are the one retirement expense you can plan around: the plan sets the order your accounts are drawn in, pays tax on purpose in the years it is cheapest, and keeps required distributions from pushing you into higher brackets later.</p>'
+      + '<p><strong>The withdrawal order.</strong> When the plan needs money beyond your income it draws from ' + E(ordNames[0]) + ' first, then ' + E(ordNames[1]) + ', and ' + E(ordNames[2]) + ' last' + (wdOrder[wdOrder.length - 1] === 'roth' ? ' — tax-free money is spent last and left to compound or pass on' : '') + '.</p>'
+      + (TXp && cRows.length
+          ? '<p><strong>Roth conversions.</strong> Convert <strong>' + money(TXp.convTotal) + '</strong> of tax-deferred money to Roth over ' + cRows.length + ' years (' + cRows[0].year + '–' + cRows[cRows.length - 1].year + '), each year sized to the room left in the ' + Math.round((cfg.targetRate || 0) * 100) + '% federal bracket' + (cfg.irmaa ? ' and capped so Medicare premiums are not pushed into a higher tier' : '') + '. The tax on the conversions is about ' + money(TXp.convTax) + (TXp.convTotal > 0.5 ? ' (' + (TXp.convTax / TXp.convTotal * 100).toFixed(1) + '% of the amount converted)' : '') + '; it ' + (convSaved >= 0 ? 'saves about ' + money(convSaved) : 'adds about ' + money(-convSaved)) + ' of lifetime tax against the same plan without conversions, and leaves ' + money(faLast.balances.roth) + ' in Roth accounts at the end of plan instead of ' + money(lB.balances.roth) + ' — tax-free to you and to your heirs, with no lifetime required distributions.</p>'
+          : '<p><strong>Roth conversions.</strong> ' + (TXp ? 'Nothing converts under the current limits — the target bracket and the Medicare threshold leave no room before required distributions begin.' : 'No conversions in this version of the plan; whether to pay some tax early to reduce it later is one of the things we settle together.') + '</p>')
+      + (qcdOn ? '<p><strong>Giving from the IRA.</strong> From age 70½ your charitable gifts are paid straight from the IRA as qualified charitable distributions: ' + money(QF.total) + ' over ' + QF.years + ' years from ' + QF.first.year + ', counting toward required distributions and never entering your income, ' + (QF.saved >= 0 ? 'saving about ' + money(QF.saved) : 'costing about ' + money(-QF.saved)) + ' of lifetime tax against giving the same amounts in cash.</p>' : '')
+      + '<table><thead><tr><th></th><th class="n">Current course</th><th class="n">With the plan</th></tr></thead><tbody>'
+      + taxRows.map(function(rw){ return '<tr><td>' + E(rw[0]) + '</td><td class="n">' + E(rw[1]) + '</td><td class="n hi">' + E(rw[2]) + '</td></tr>'; }).join('')
+      + '</tbody></table>'
+      + '<p style="margin-top:6px">Today’s federal and ' + E(stateName) + ' tax law, brackets indexed; the conversions are re-sized each year to that year’s income.</p></section>'
       + '<div class="box"><h3>This is just the beginning…</h3><div class="two">'
       + '<div><p>What you’re holding today is a starting point, not a final plan. The only decision we’re asking you to make today is whether you believe we can help you build the retirement ' + (spouse ? 'you both deserve' : 'you deserve') + '.</p>'
       + '<p>There’s still meaningful work ahead of us, and we’ll do it together. No investment is placed until we sit down for your Recommendation Meeting, walk through every level of the Fortress, and tailor it to fit you. Together, we’ll fine-tune the details: your income targets, the amount set aside for protection, the timing of Social Security, and the investments themselves. We’ll keep refining until you’re fully comfortable with the plan. Only then do we begin putting it into action.</p></div>'
