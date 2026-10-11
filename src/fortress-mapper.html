@@ -3365,9 +3365,10 @@
             if nothing changes &mdash; with the blended growth rate assumed across the accounts and the
             projected accounts before the plan as a chart, the run-out marked &mdash; then the problems:
             the items selected in section&nbsp;11 (or the tool's suggestions when none are), long-term
-            care cost and coverage, and life insurance in force against the need. Page three is the
-            three stress tests against the plan, each Fortress level and its drafted amount, and
-            current course against the plan. Page four is
+            care cost and coverage, and life insurance in force against the need. Page three is
+            <i>The Retirement Fortress Starting Point Which We'll Refine Together from Here</i> (each
+            level and its drafted amount), the three stress tests against the plan, and current
+            course against the plan. Page four is
             the strategic tax planning in the plan &mdash; the withdrawal order, the Roth conversions
             (amount, years, bracket, the tax paid and the lifetime tax saved, Roth at the end of plan),
             gifts from the IRA when applied, and a current-course-versus-plan table of lifetime tax,
@@ -16111,14 +16112,14 @@
       + life.people.map(function(p){ return '<tr><td class="lv">' + E(p.name) + '</td><td class="n">' + money(p.existing) + '</td><td class="n' + (p.gap > 0.5 ? ' hi' : '') + '">' + (p.gap > 0.5 ? money(p.gap) : '—') + '</td></tr>'; }).join('')
       + '</tbody></table>'
       + '<p style="margin-top:6px">' + (lifeGap > 0.5 ? 'About ' + money(lifeGap) + ' more coverage would close the gap; the plan prices it before anything is applied for.' : 'The coverage in force (' + money(lifeNow) + ') meets the need as we have estimated it.') + '</p></div></div></section>'
+      + '<section><h2>The Retirement Fortress Starting Point Which We’ll Refine Together from Here</h2>'
+      + '<div class="tiles lv" style="grid-template-columns:repeat(' + levels.length + ',minmax(0,1fr))">'
+      + levels.map(function(L){ return '<div class="tile" style="border-top:3px solid ' + L[3] + '"><div class="lab">' + E(L[0]) + '</div><div class="val">' + money(L[2]) + '</div><div class="sub">' + E(L[1]) + '</div></div>'; }).join('')
+      + '</div></section>'
       + '<section><h2>How the plan holds up under stress</h2><p>The plan itself against three things outside anyone’s control; its base case is ' + E(faDep ? 'accounts running out ' + atAges(faDep) : money(faLast.layers.total) + ' at the end of plan') + '.</p>'
       + '<table><thead><tr><th>Stress</th><th>What we assumed</th><th class="n">Where you end up</th></tr></thead><tbody>'
       + sens.map(function(x){ var R = x.R, d = x.d, short = d.key === 'seq' ? 'Walls ' + (SENS_SEQ.walls * 100).toFixed(0) + '% and Roof ' + (SENS_SEQ.roof * 100).toFixed(0) + '% a year for three years (' + d.range + ')' : d.key === 'ss' ? 'Benefits ' + Math.round(SENS_SS.pct * 100) + '% lower from ' + SENS_SS.year : 'Inflation ' + Math.round((SENS_INFL - 1) * 100) + '% above the plan assumption, ' + ((i.inflation || 0) * SENS_INFL * 100).toFixed(2) + '% a year'; return '<tr><td class="lv">' + E(d.title) + '</td><td>' + E(short) + '</td><td class="n' + (R.dep ? ' hi' : '') + '">' + E(R.dep ? 'Run out at ' + agesShort(R.dep) : money(R.last.layers.total) + (R.diff < 0 ? ' (' + fmtKM(-R.diff) + ' less)' : '')) + '</td></tr>'; }).join('')
       + '</tbody></table></section>'
-      + '<section><h2>Your Retirement Fortress, as drafted</h2>'
-      + '<div class="tiles lv" style="grid-template-columns:repeat(' + levels.length + ',minmax(0,1fr))">'
-      + levels.map(function(L){ return '<div class="tile" style="border-top:3px solid ' + L[3] + '"><div class="lab">' + E(L[0]) + '</div><div class="val">' + money(L[2]) + '</div><div class="sub">' + E(L[1]) + '</div></div>'; }).join('')
-      + '</div></section>'
       + '<section><h2>Current course versus the plan</h2>'
       + '<table><thead><tr><th></th><th class="n">Current course</th><th class="n">With the plan</th></tr></thead><tbody>'
       + '<tr><td>Assets at the end of plan (' + faLast.year + ')</td><td class="n">' + E(sqDep ? 'Run out at ' + agesShort(sqDep) : money(sqLast.layers.total)) + '</td><td class="n hi">' + E(faDep ? 'Run out at ' + agesShort(faDep) : money(faLast.layers.total)) + '</td></tr>'
