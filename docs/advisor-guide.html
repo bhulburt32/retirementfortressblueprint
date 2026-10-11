@@ -901,12 +901,19 @@
         never does is buy a Moat contract, which needs a 1035. (<b>Stay put, no transfer</b> on a
         section&nbsp;14 line is different: that holds the money out of every level.)</p>
 
-      <p>The <span class="ui">Growth</span> column is each account's assumed annual growth. Leave it
-        blank (<em>default</em>) and the account takes the plan rate from section&nbsp;03 for the
-        level its money lands in &mdash; the Walls rate for the Walls and for anything that stays as
-        is, the Roof rate for the Roof. Type a rate and it is blended into that level's growth in
-        proportion to the account's share, so the projections in sections&nbsp;16, 15 and 17 follow
-        it; the assumptions line under each one shows the blended rates.</p>
+      <p>The <span class="ui">Growth</span> column is <b>required</b>: the annual rate each account
+        earns where it sits. It is what the projected assets before the Fortress (section&nbsp;15)
+        grow the account at, and what anything marked <em>Stay as is</em> keeps earning in the plan;
+        money the plan moves grows at its level's rate from section&nbsp;03 instead &mdash; the Walls
+        rate for the Walls, the Roof rate for the Roof &mdash; whatever the account earned before. A
+        new account has no rate (the cell is outlined in red and the total line counts the gaps),
+        and until every account with a balance has one the asset projections wait: sections&nbsp;15
+        and 17, the stress tests and the care-event projections show a notice instead, and the
+        executive summary, the initial observations and findings and the internal worksheet decline
+        to build. Nothing is assumed for a missing rate &mdash; it counts as 0% &mdash; so enter the
+        rate even when it is zero. The annuity rules still apply on top: a MYGA earns its own
+        stated rate, a variable annuity the rate less its fees, an indexed or RILA annuity up to its
+        cap.</p>
 
       <dl class="fields">
         <dt>Annuities</dt>
@@ -953,8 +960,9 @@
 
         <dt>Projected assets before the Fortress</dt>
         <dd>The status quo, for comparison with section&nbsp;17: every account left where it is and
-          grown at its own rate (or, by default, cash flat, annuities at the Walls rate and market
-          accounts at the Roof rate), current income &mdash; salary to each retirement date, Social
+          grown at the rate entered for it in section&nbsp;06 (a MYGA at its stated rate, a variable
+          annuity less its fees, an indexed or RILA annuity up to its cap; the projection waits
+          until every account has a rate), current income &mdash; salary to each retirement date, Social
           Security, pensions, annuity and non-guaranteed income &mdash; against the Needs and Wants
           budget growing with inflation, and any gap drawn in the section&nbsp;16 withdrawal order
           with the tax on the draw. Five tiles, a stacked bar by tax type for every year with the
