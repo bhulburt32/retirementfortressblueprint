@@ -1,9 +1,9 @@
 const { chromium } = require('playwright-core');
 (async () => {
-  const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const b = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
   const pg = await b.newPage({ viewport: { width: 1600, height: 1000 } });
   const errs = []; pg.on('pageerror', e => errs.push(e.message));
-  await pg.goto('file://' + __dirname + '/preview-smith.html'); await pg.waitForTimeout(1500);
+  await pg.goto('file://' + process.cwd() + '/preview-smith.html'); await pg.waitForTimeout(1500);
   await pg.click('#expandAll').catch(() => {}); await pg.waitForTimeout(800);
   const r = await pg.evaluate(() => {
     const t = document.getElementById('cfTable'); if (!t) return 'no cfTable';

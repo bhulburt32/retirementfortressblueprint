@@ -1,11 +1,10 @@
-const { chromium } = (function(){ try { return require('playwright'); } catch(e){ return require('playwright-core'); } })();
-const path = require('path');
+const { chromium } = require('playwright-core');
 const fs=require('fs');
 (async()=>{
-  const b=await chromium.launch(process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH} : {});
+  const b=await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
   const ctx=await b.newContext({acceptDownloads:true}); const p=await ctx.newPage({viewport:{width:1500,height:1000}});
   const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
-  await p.goto('file://'+path.resolve(__dirname,'../dist/preview.html'),{waitUntil:'load'}); await p.waitForTimeout(500);
+  await p.goto('file://'+process.cwd()+'/preview-smith.html',{waitUntil:'load'}); await p.waitForTimeout(500);
   await p.click('#expandAll'); await p.waitForTimeout(300);
   const [pop]=await Promise.all([ctx.waitForEvent('page',{timeout:20000}), p.click('#makeDeck')]);
   await pop.waitForLoadState('load'); await pop.waitForTimeout(800);

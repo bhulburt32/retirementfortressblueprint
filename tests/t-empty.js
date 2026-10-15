@@ -1,6 +1,6 @@
 const { chromium } = require('playwright-core');
 (async () => {
-  const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const b = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
   const p = await b.newPage({ viewport: { width: 1400, height: 900 } }); const errs=[]; p.on('pageerror', e => errs.push(String(e)));
   await p.goto('file://' + process.cwd() + '/preview.html',{waitUntil:'load'}); await p.waitForTimeout(800);
   const r = await p.evaluate(() => ({ first: document.getElementById('clientFirst').value, salary: document.getElementById('salaryC').value, needs: document.getElementById('needs').value, accounts: document.querySelectorAll('#acctBody tr').length, debts: document.querySelectorAll('#debtBody tr').length, pensions: document.querySelectorAll('#penBody tr, #pensionBody tr').length, prep: document.getElementById('prepDate').value, banner: (document.getElementById('preparedFor')||{}).textContent, caseLen: document.getElementById('caseJson').value.length }));

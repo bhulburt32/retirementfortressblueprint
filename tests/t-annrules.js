@@ -6,7 +6,7 @@ const path = require('path');
   const b=await chromium.launch(process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH} : {});
   const ctx=await b.newContext({acceptDownloads:true}); const p=await ctx.newPage({viewport:{width:1500,height:950}});
   const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
-  await p.goto('file://'+path.resolve(__dirname,'../dist/preview.html'),{waitUntil:'load'}); await p.waitForTimeout(900);
+  await p.goto('file://'+path.resolve(__dirname,'../dist/preview-smith.html'),{waitUntil:'load'}); await p.waitForTimeout(900);
   await p.click('#expandAll'); await p.waitForTimeout(400);
   await p.click('#scnTabs [data-scn="1"]'); await p.waitForTimeout(600);   // Scenario B: the sample's MYGA and After Tax sit in the Walls there, not in Moat contracts
   const txt=async sel=>(await p.$eval(sel,e=>e.textContent)).replace(/\s+/g,' ').trim();

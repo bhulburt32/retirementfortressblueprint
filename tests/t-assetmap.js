@@ -8,7 +8,7 @@ const path = require('path');
   const ctx=await b.newContext(); const p=await ctx.newPage({viewport:{width:1400,height:900}});
   const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
   const fail=[]; const check=(ok,msg)=>{ if(!ok) fail.push(msg); };
-  await p.goto('file://'+path.resolve(__dirname,'../dist/preview.html'),{waitUntil:'load'}); await p.waitForTimeout(1000);
+  await p.goto('file://'+path.resolve(__dirname,'../dist/preview-smith.html'),{waitUntil:'load'}); await p.waitForTimeout(1000);
   await p.click('#expandAll'); await p.waitForTimeout(400);
 
   const infl = await p.$eval('#inflation',e=>e.value); console.log('inflation:', infl);

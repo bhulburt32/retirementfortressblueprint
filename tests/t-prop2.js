@@ -1,6 +1,6 @@
 const { chromium } = require('playwright-core'); const fs = require('fs');
 (async () => {
-  const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const b = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
   const ctx = await b.newContext(); const pg = await ctx.newPage({ viewport: { width: 1500, height: 1000 } }); const errs=[]; pg.on('pageerror', e => errs.push(String(e)));
   await pg.goto('file://' + process.cwd() + '/preview-smith.html',{waitUntil:'load'}); await pg.waitForTimeout(500); await pg.click('#expandAll'); await pg.waitForTimeout(300);
   await pg.setInputFiles('#pfFile', (process.env.PROPOSAL_PDF || 'samples/portfolio-proposal.pdf')); await pg.waitForTimeout(8000);
