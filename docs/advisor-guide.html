@@ -391,7 +391,7 @@
       Retirement Fortress design in about fifteen minutes.</p>
     <div class="meta">
       <span>Internal use</span>
-      <span>Twenty-one sections, top to bottom</span>
+      <span>Twenty-three sections, top to bottom</span>
       <span>No login, nothing installed</span>
     </div>
   </header>
@@ -403,21 +403,23 @@
       <p>You give it a household's income picture and a list of their existing accounts. It sizes the
         four Fortress levels from those numbers, then maps every account to a destination — which
         registration it consolidates into, which carrier it ends up with, and what stays put. Out the
-        other end come six documents: five for the client, one for the file.</p>
+        other end come five documents: three for the client, two for the file.</p>
       <p>It does <em>not</em> replace your judgment. The allocation it proposes is a starting point
         you are expected to override, and section&nbsp;14 exists for exactly that.</p>
 
       <div class="note stop">
-        <h3>Nothing is saved</h3>
-        <p>The tool keeps no data. Close the tab or hit refresh and the case is gone — there is no
-          autosave and no account. Before you walk away, go to section&nbsp;22, press
-          <span class="ui">Copy case data</span>, and paste the block into your CRM note. That block
-          is the only way back.</p>
+        <h3>Nothing is saved by itself</h3>
+        <p>The tool has no autosave. Close the tab or hit refresh and the case is gone. On the claude.ai
+          demo there is no account either: before you walk away, go to section&nbsp;23, press
+          <span class="ui">Copy case data</span>, and paste the block into your CRM note &mdash; that
+          block is the only way back. On Alto's own site you sign in and press
+          <span class="ui">Save</span> in section&nbsp;23 instead; the case is kept on Alto's server
+          under your name.</p>
       </div>
 
       <div class="note">
         <h3>Everything opens with a +</h3>
-        <p>The page loads with all twenty-one sections closed &mdash; a column of navy headers. Click a
+        <p>The page loads with all twenty-three sections closed &mdash; a column of navy headers. Click a
           header, or its <b>+</b>, to open a section; inside, every subsection bar and every standalone
           table has its own <b>+</b> as well, and the year-by-year tables sit behind a <b>+</b> of their
           own. <span class="ui">Expand all sections</span> and <span class="ui">Collapse all
@@ -427,21 +429,12 @@
           toggles.</p>
       </div>
 
-      <p>The page opens with the default case loaded — the Smith household, a saved case built in
-        so you can see how every section behaves, with a transfer plan, three scenarios and a Nitrogen
-        analysis already in place. Press <span class="ui">Start new case</span> in the top right —
-        twice, it asks you to confirm — to empty every field. Your name and the date carry over; the
-        client's details do not. To open with a different case, paste its block from section&nbsp;22
-        into <span class="ui">Load pasted case</span>; to change the default itself, the saved block is
-        swapped into the page.</p>
-
-      <p>The header carries <span class="ui">The Road to Retirement Fortress</span>, a short video of
-        the Fortress story for the client meeting or as a follow-up link; it opens in a new tab on
-        claude.ai, where a signed-in Alto account is needed.</p>
-
-      <p>Every section of the application opens with <span class="ui">User Guide Notes</span> under
-        its header &mdash; the same instructions as this guide's section, collapsed until you open
-        them with the <b>+</b>. They are copied from this guide, so the two never disagree.</p>
+      <p>The page opens empty — a new case, every field blank, today's date in section&nbsp;01. To pick up
+        a household, paste its block from section&nbsp;23 into <span class="ui">Load pasted case</span>.
+        <span class="ui">Start new case</span> in the top right — twice, it asks you to confirm — empties
+        every field again; your name and the date carry over, the client's details do not. There is no
+        sample household in the page; a training copy can be opened with one by defining
+        <span class="ui">RFB_DEFAULT_CASE</span> ahead of the script, which the repository notes describe.</p>
     </div>
   </section>
 
@@ -449,7 +442,7 @@
     <div class="num">Levels<small>Reference</small></div>
     <div class="body">
       <h2>The four levels, and how the tool sizes them</h2>
-      <p>The framework in one table &mdash; the same description appears in the executive summary report.
+      <p>The framework in one table &mdash; the same description appears in the Retirement Fortress Plan report.
         Send clients to the whitepaper for the full version.</p>
 
       <div class="tbl-scroll">
@@ -499,7 +492,7 @@
         <h3>The Moat here is narrower than the framework's</h3>
         <p>In the whitepaper the Moat defends against long-term care <em>and</em> tax drag. This tool
           sizes only the long-term care piece. Withdrawal sequencing, Roth conversions and asset
-          location are still your job, and the executive summary report says the tax side is handled in how
+          location are still your job, and the Retirement Fortress Plan report says the tax side is handled in how
           and when income is drawn.</p>
       </div>
     </div>
@@ -523,18 +516,13 @@
 
       <dl class="fields">
         <dt>Client and spouse</dt>
-        <dd>First and last name, date of birth, age and sex for each. Enter the <span class="ui">Date of
-          birth</span> and the age is calculated &mdash; whole years at the plan date in section&nbsp;01
-          &mdash; and the age cell follows it; leave the date blank and the age is typed as before.
-          The date also fixes the exact 59&frac12; date for the early-withdrawal penalty in
-          section&nbsp;16 and feeds the Social Security optimizer and the pension calculator in
-          section&nbsp;04 when their own date is blank. Age and sex set the long-term care benefit
+        <dd>First and last name, age and sex for each. Age and sex set the long-term care benefit
           defaults in sections&nbsp;08 and 09. Leave every spouse field blank for a single client and
           nothing in the plan is titled Joint or Spouse.</dd>
 
         <dt><span class="ui">State of residency</span></dt>
-        <dd>Sets the state income tax model in section&nbsp;16 and is recorded for the file. Product
-          approval is by state, so check it against the carrier before anything in section&nbsp;19
+        <dd>Sets the state income tax model in section&nbsp;17 and is recorded for the file. Product
+          approval is by state, so check it against the carrier before anything in section&nbsp;20
           goes to paper.</dd>
 
         <dt>Dependents</dt>
@@ -551,7 +539,7 @@
       <h2>Plan assumptions</h2>
       <p>The rates and choices the whole plan is built on, kept in one place so they are easy to
         review before a client sees anything. They are planning assumptions, not quotes, and the
-        executive summary report's disclosures carry whatever you set here.</p>
+        Retirement Fortress Plan's disclosures carry whatever you set here.</p>
 
       <dl class="fields">
         <dt><span class="ui">Liquidity buffer</span></dt>
@@ -586,7 +574,7 @@
           &mdash; the payment continues for life after the value reaches zero. With <b>No</b> the
           contract pays a monthly share of its value and the payment stops once the value is gone,
           so Foundation income drops in the years that follow and the Roof carries more of Needs.
-          Sections&nbsp;15 and 17 and the executive summary report all follow the setting; the sizing in
+          Sections&nbsp;15 and 17 and the Retirement Fortress Plan report all follow the setting; the sizing in
           section&nbsp;13 does not change.</dd>
 
         <dt>Growth rates</dt>
@@ -597,12 +585,12 @@
           balance column.</dd>
 
         <dt><span class="ui">Inflation</span></dt>
-        <dd>What Needs and Wants grow at in the projection. Defaults to 3.26%. The tax projection in
-          section&nbsp;16 indexes the brackets and deductions at the same rate.</dd>
+        <dd>What Needs and Wants grow at in the projection. Defaults to 3.0%. The tax projection in
+          section&nbsp;17 indexes the brackets and deductions at the same rate.</dd>
 
         <dt><span class="ui">End of plan age</span></dt>
         <dd>The age of the <em>younger</em> client when the plan ends; 100 by default. It sets how far
-          the income projection in section&nbsp;13 and the tax projection in section&nbsp;16 run.</dd>
+          the income projection in section&nbsp;13 and the tax projection in section&nbsp;17 run.</dd>
 
         <dt>Medicare</dt>
         <dd><span class="ui">Medicare Part B</span> and <span class="ui">Medicare Part D</span>, monthly
@@ -645,7 +633,7 @@
         otherwise through the plan) and an annual increase. The note beneath each line reads it back,
         and the hint totals what is paying now. These incomes count as wages on their own dates in the
         income gap, the tax projection, the status quo and the reports (they appear as rows on the
-        Employment income table of the executive summary and in the Household income tile); no payroll
+        Employment income table of the Retirement Fortress Plan and in the Household income tile); no payroll
         deductions or retirement contributions are assumed on them, and they do not move the retirement
         dates. They save with the case.</p>
 
@@ -667,18 +655,14 @@
         ages, names and COLA already on the page; you add only each person's <span class="ui">life
         expectancy</span> (blank: 85 for a man, 88 for a woman), an optional <span class="ui">discount
         rate</span> (blank ranks nominal totals; equal to the COLA ranks in today's dollars) and,
-        the section&nbsp;02 dates of birth (read-only here while section&nbsp;02 has them; otherwise optional dates here) for month-level precision &mdash; otherwise ages are whole years from
+        optionally, dates of birth for month-level precision &mdash; otherwise ages are whole years from
         section&nbsp;02. With <span class="ui">Rank with the trust-fund stress test</span> ticked the
-        strategies are ranked on the 22%-from-2032 reduction used in section&nbsp;18, with the no-cut
+        strategies are ranked on the 22%-from-2032 reduction used in section&nbsp;19, with the no-cut
         total alongside. Tiles name the top strategy, its lifetime benefit, the surviving spouse's
         income under it, and where the plan's own claiming ages rank among everything tested; the
-        table lists the five best, then four strategies that always show with their true rank
-        (shaded): <b>File early</b>, both at 62; <b>File late</b>, both at 70; the client early at 62
-        and the spouse late at 70; the client late at 70 and the spouse early at 62 &mdash; a person
-        already past an age files at the earliest age still open to them &mdash; each with the
-        person's monthly amounts, lifetime totals and the age at which it catches up to filing
-        earliest; a chart runs the cumulative benefits (the plan's own ages as a dashed line when they
-        are not among the strategies shown), and <span class="ui">Break-even
+        table lists the five best with each person's monthly amounts, lifetime totals and the age at
+        which each catches up to filing earliest; a chart runs the cumulative benefits (the plan's
+        own ages as a dashed line when they are outside the five), and <span class="ui">Break-even
         ages</span> opens the full strategy-versus-strategy table. <span class="ui">Use the top
         strategy in the plan</span> sets the benefit starting ages above to strategy #1 (whole years),
         so the income projections, the Foundation sizing and every report follow. The optimizer's
@@ -701,27 +685,8 @@
         this income, so a rental covering part of the discretionary budget shrinks the Walls target
         accordingly (the 24-month Needs floor still applies).</p>
 
-      <p>The <b>Pension Benefits Calculator</b> beneath the pension list estimates a public pension
-        from the plan formula &mdash; the systems in Alto's Pension Reference Guide: PSERS and SERS,
-        VRS, SRPS, TSERS, SCRS, TPAF, MTRS, MPSERS, TRS (Illinois and Texas), the three Ohio systems,
-        PERSI, FERS and CSRS, and Wespath. Pick whose pension it is and the <span class="ui">State /
-        pension system</span>, enter the date of birth and the expected retirement date &mdash; both
-        come from sections&nbsp;02 and 04 while blank, so the age at retirement is the plan's &mdash;
-        and the employment start (the age at retirement and the years of service are calculated; type over
-        the years if the record says otherwise), the beneficiary's age, then the <span class="ui">Membership
-        class / tier</span> (the hire date suggests one), the average final compensation over the
-        years the formula uses, any split-period service the class asks for, and the
-        <span class="ui">Benefit option</span>. <span class="ui">Calculate estimated benefit</span> shows
-        the monthly and annual benefit, the single-life maximum, the income replacement, the
-        eligibility rule met, the formula, the system's COLA note and a warning where the system
-        does not pay into Social Security (WEP and GPO). <span class="ui">Add to pension income</span>
-        then puts a line in the pension list &mdash; the monthly benefit from the retirement month,
-        the option's survivor percentage, COLA 0% until you set one &mdash; and the projections follow.
-        The survivor factors are general estimates and every figure carries the reference tool's
-        disclaimer: verify with the plan administrator before recommending an option.</p>
-
       <p>The section closes with <b>Your income today and in retirement</b>, the same summary the
-        executive summary report carries: four tiles &mdash; household income today, guaranteed
+        Retirement Fortress Plan report carries: four tiles &mdash; household income today, guaranteed
         income in retirement, the share of Needs it covers and the <b>Annual Needs income gap</b>
         the Foundation annuity is sized to close &mdash; a table setting Social Security, pensions
         and annuity income against Annual Needs, and a <b>Sources of income</b> chart stacking
@@ -758,7 +723,7 @@
       </dl>
 
       <p>Type both straight in from a client's own figures, or press
-        <span class="ui">Enter detailed expenses</span> to open Alto's monthly budget worksheet, line
+        the green <span class="ui">Complete Detailed Expenses</span> bar to open Alto's monthly budget worksheet, line
         for line — six categories from Household to Entertainment &amp; other, with three
         <em>Other</em> lines you can name. Enter monthly amounts. Each line carries a
         <span class="ui">Need / Want</span> switch, preset the way most households would answer
@@ -766,10 +731,7 @@
         Start and end dates and notes are for the file &mdash; a mortgage that ends in 2031, a
         tuition line that starts next autumn &mdash; and do not change the arithmetic.</p>
 
-      <p>Under <em>Healthcare &amp; insurance</em> the worksheet carries six lines it fills for you.
-        <b>Life Insurance</b> and <b>Long Term Care Insurance</b> take the monthly premiums of the
-        policies listed in sections&nbsp;08 and 09 (grey) until you type an amount &mdash; do that when
-        the premiums are already in the budget. The other four:
+      <p>Under <em>Healthcare &amp; insurance</em> the worksheet carries four lines it fills for you:
         <b>Medicare Part B</b> and <b>Part D</b> for each person, at the premiums set in
         section&nbsp;03, with a start date of the month each person turns 65 worked out from the ages
         in section&nbsp;02 (blank once they are 65 already). They are shown in grey while they are
@@ -782,9 +744,7 @@
         the two fields above currently hold. <span class="ui">Apply to Annual Needs &amp; Wants</span>
         copies them up once; tick <span class="ui">Keep Annual Needs &amp; Wants in sync</span> and
         every budget edit updates the fields as you type. Leave both alone and the fields keep
-        whatever you entered. <span class="ui">Hide detailed expenses</span> folds the worksheet
-        away again; a line beside the button keeps the monthly total and the two annual figures in
-        view, and a case with budget lines reopens with the worksheet showing.</p>
+        whatever you entered. The green <span class="ui">Complete Detailed Expenses</span> bar folds the worksheet and its upload box away again with its +/−; the bar itself keeps the monthly total and the two annual figures in view, and a case with budget lines reopens with the worksheet showing.</p>
 
       <div class="note">
         <h3>The worksheet is optional</h3>
@@ -823,15 +783,14 @@
         fifth year. The tiles above it give the year the gap first appears, the gap at full
         retirement, the largest gap and the total over the plan: the figure the Fortress is built
         to fund. It runs before any Fortress is built, so advisor adjustments in section&nbsp;14 do
-        not move it; the same chart is the Income Gap page of the executive summary report.</p>
+        not move it; the same chart is the Income Gap page of the Retirement Fortress Plan report.</p>
     </div>
   </section>
   <section>
     <div class="num">06<small>Input</small></div>
     <div class="body">
       <h2>Assets</h2>
-      <p>Opening the section opens the account list with it. Three ways in. Pick whichever suits the
-        case:</p>
+      <p>Three ways in. Pick whichever suits the case:</p>
       <ol class="steps">
         <li><p><b>Upload a spreadsheet.</b> Press <span class="ui">Download template</span> for the
           Alto account template, fill it in, then drop it on the panel or use
@@ -852,28 +811,13 @@
           design is wrong.</li>
         <li><span class="ui">Current position</span> tells the tool what it is looking at. Mark bank
           savings and money market as <b>Cash</b> — that is what the liquidity buffer keys on, and a
-          household with no Cash row gets no buffer. The five annuity positions &mdash; <b>MYGA
-          Annuity</b>, <b>Variable Annuity</b>, <b>Income Annuity (FIA)</b>, <b>Growth Annuity
-          (FIA)</b> and <b>RILA Annuity</b> (a plain <i>Annuity</i> from an older case loads as a
-          MYGA) &mdash; and the two policy positions, <b>Cash Value Life Insurance</b> and
-          <b>LTC / Life</b> (handled alike: never drawn on, a 1035 into the Moat or left in place),
-          get their own handling for assignments and 1035s, every
-          annuity position lists its contract in the <span class="ui">Annuities</span> panel below,
-          and each type follows its own rules in the projections (see the panel). An uploaded or
-          pasted position such as <i>MYGA</i>, <i>variable annuity</i>, <i>FIA with income rider</i>,
-          <i>fixed indexed annuity</i>, <i>RILA</i> or <i>SPIA</i> resolves to the matching type.
-          An account set to <b>Income Annuity (FIA)</b> is always Foundation: it is already paying,
-          so it stays with its carrier, counts in the Foundation and its income counts in the
-          Foundation sizing, whatever its Transfer? column or its section&nbsp;14 lines say.</li>
+          household with no Cash row gets no buffer. <b>Annuity</b> and <b>LTC / Life</b> get their
+          own handling for assignments and 1035s.</li>
       </ul>
 
       <p>The <span class="ui">Transfer?</span> column at the end holds an account back. Set it to
-        <b>Stay as is</b> and that account still takes its place in the Fortress levels &mdash; the
-        waterfall (or your section&nbsp;14 lines) puts it in a level and the projections count it
-        there &mdash; but it stays at its institution, generates no paperwork, and drops out of the
-        billable base; the fee note names the amount so nothing hides. The one thing a held account
-        never does is buy a Moat contract, which needs a 1035. (<b>Stay put, no transfer</b> on a
-        section&nbsp;14 line is different: that holds the money out of every level.)</p>
+        <b>Stay as is</b> and that account funds no level, generates no paperwork, and drops out of
+        the billable base — the fee note names the amount so nothing hides.</p>
 
       <p>The <span class="ui">Growth</span> column is each account's assumed annual growth. Leave it
         blank (<em>default</em>) and the account takes the plan rate from section&nbsp;03 for the
@@ -883,39 +827,6 @@
         it; the assumptions line under each one shows the blended rates.</p>
 
       <dl class="fields">
-        <dt>Annuities</dt>
-        <dd>A panel under the accounts with one row per account whose current position is an
-          annuity: the owner and account from the list, then <span class="ui">Company</span> (follows
-          the custodian until typed), <span class="ui">Product</span>, <span class="ui">Type</span>
-          (the account's current position &mdash; change it here or in the list, the other follows),
-          <span class="ui">Rate</span> and <span class="ui">Interest</span> (deferred and
-          accumulating, or taken as income) for a MYGA, <span class="ui">Maturity date</span>,
-          <span class="ui">Monthly income</span> and <span class="ui">Payout</span> (single life or
-          joint) for an income annuity, <span class="ui">Fees</span> as a percent a year,
-          <span class="ui">Cap rate</span> for the FIAs and a RILA, <span class="ui">Participation
-          rate</span> for the FIAs and <span class="ui">Floor</span> (the most a bad year can lose) for
-          a RILA; cells that do not apply to the type are greyed out. The details save with the case
-          and print in the worksheet under <em>Annuity contracts</em>.
-          <p style="margin-top:8px">The projections follow these cells. An <b>income annuity</b> in
-            force is always Foundation: it stays with its carrier and counts in the Foundation (it
-            sits on its own Foundation line in section&nbsp;14 and under the Foundation in
-            section&nbsp;15); it pays its monthly
-            income from now &mdash; the amount typed here, else a section&nbsp;04 line linked to the
-            account, else the Foundation yield on its value &mdash; for the owner's life when single
-            (to the owner's end-of-plan age) or to the end of plan when joint, its value falls by what
-            it pays and the income continues after the value is gone; the Foundation is sized net of
-            that income; it takes no loss in the bad-years stress test. A <b>MYGA</b> grows at its
-            rate when one is typed (the plan rate otherwise); with the interest taken as income it
-            pays the rate on its value each year as annuity income and does not grow; at its maturity
-            date the interest stops and the money is market money in its level from then on, at the
-            level's rate and exposed to the stress test; before maturity it keeps earning its rate in
-            the bad years. A <b>variable
-            annuity</b> is market money: it grows at the plan rate less its fees and takes the full
-            stress loss. A <b>growth FIA</b> grows at the plan rate up to its cap, and sits at zero
-            in a bad year. A <b>RILA</b> grows at the plan rate up to its cap, and in a bad year loses
-            no more than its floor. The Walls and Roof blend these account by account, as they already
-            do for a rate typed in the Growth column, so the level rates and the stress returns in
-            sections&nbsp;17 and 18 reflect what each level holds.</p></dd>
         <dt>Other assets</dt>
         <dd>A second panel under the accounts for real assets outside the Fortress &mdash; primary
           residence, vacation home, rental property, land, a business interest, vehicles or other
@@ -926,34 +837,28 @@
           Non-guaranteed income in section&nbsp;04, and the mortgage on a home in section&nbsp;07.</dd>
 
         <dt>Projected assets before the Fortress</dt>
-        <dd>The status quo, for comparison with section&nbsp;17: every account left where it is and
+        <dd>The status quo, for comparison with section&nbsp;18: every account left where it is and
           grown at its own rate (or, by default, cash flat, annuities at the Walls rate and market
           accounts at the Roof rate), current income &mdash; salary to each retirement date, Social
           Security, pensions, annuity and non-guaranteed income &mdash; against the Needs and Wants
-          budget growing with inflation, and any gap drawn in the section&nbsp;16 withdrawal order
+          budget growing with inflation, and any gap drawn in the section&nbsp;17 withdrawal order
           with the tax on the draw. Five tiles, a stacked bar by tax type for every year with the
           retired years shaded and the first RMD year marked, a note that sets the end-of-plan figure
           against the Fortress projection, and a year-by-year table behind a <b>+</b>. It runs on the
-          same engine as section&nbsp;17 and prints in the worksheet.</dd>
+          same engine as section&nbsp;18 and prints in the worksheet.</dd>
 
         <dt>If a long term care event occurs</dt>
         <dd>Under the status-quo chart, the same projection run again with a care event added, as a
           set of three charts: the male needs care, the female needs care, both need care (one chart
           for a single client). Costs come from the section&nbsp;12 estimate &mdash; the state medians
           or the costs typed there, the average durations for a man and a woman, the care start age
-          and the cost inflation &mdash; the full projected cost when one person needs care and the
-          full combined cost when both do, net of any benefits already in force. With
+          and the cost inflation &mdash; at <b>70%</b> of the projected cost when one person needs care
+          and <b>49%</b> of the combined cost when both do, net of any benefits already in force. With
           no Fortress in place the whole cost comes out of the accounts in the withdrawal order, with
           the tax on the draw. Each chart carries tiles for the cost of care, what is drawn from the
           accounts and the end-of-plan figure (or the year the accounts run out), and the projection
-          without a care event as a dashed line for comparison. Each person who needs care is assumed
-          to pass away at the end of the care period: from then the survivor receives the larger of
-          the two Social Security benefits, single-life annuity income and any salary of the deceased
-          stop, and pensions and section&nbsp;04 annuity lines pay their survivor percentage (an
-          annuity line's 100% means joint); expenses, the tax filing status and RMDs are unchanged.
-          When no one is left the plan ends: no further income, expenses, tax or withdrawals, and the
-          balances stand as the estate, which the tile labels <em>Estate from</em> the year. The
-          charts need a current age in section&nbsp;02 for each person.</dd>
+          without a care event as a dashed line for comparison. The charts need a current age in
+          section&nbsp;02 for each person.</dd>
       </dl>
     </div>
   </section>
@@ -990,18 +895,8 @@
       <p>Alto's Coverage Needs Analyzer, built in with a column for each person. The section opens
         with the two <span class="ui">Existing life insurance</span> fields &mdash; the death benefit
         already in force, individual and group combined &mdash; and a readout of the additional
-        coverage recommended; <span class="ui">Complete detailed life insurance needs analysis</span>
+        coverage recommended; the green <span class="ui">Complete Detailed Life Insurance Needs Analysis</span> bar
         opens the rest, and a case that used it reopens with it showing.</p>
-
-      <p><b>Existing life insurance policies</b>, at the top of the section, lists each policy in
-        force: owner, company, insured, death benefit, beneficiary, type (Term, Whole Life, IUL), cash
-        value (permanent policies), years remaining (term) and the monthly premium, with
-        <span class="ui">Add a life insurance policy</span> for each. While any are listed, the death
-        benefits by insured fill the <span class="ui">Existing life insurance</span> fields (grey, read
-        from the list) and the needs analysis counts them as coverage in force; the premiums of all
-        policies fill the <b>Life Insurance</b> line of the section&nbsp;05 budget until an amount is
-        typed there &mdash; type one when the premiums are already in the budget. Everything saves
-        with the case.</p>
 
       <dl class="fields">
         <dt>Household obligations</dt>
@@ -1038,7 +933,7 @@
       <div class="note">
         <h3>On the worksheet only</h3>
         <p>The need by person, the breakdown, the underwriting notes and the assumptions print in the
-          internal worksheet under <em>Life insurance needs</em>; the executive summary report carries the summary.
+          internal worksheet under <em>Life insurance needs</em>; the Retirement Fortress Plan report carries the summary.
           The estimate ignores Social Security survivor benefits, a surviving spouse's own income and
           taxes unless you reflect them in the inputs.</p>
       </div>
@@ -1048,28 +943,18 @@
     <div class="num">09<small>Input</small></div>
     <div class="body">
       <h2>Long Term Care</h2>
-      <p><b>Existing long term care policies</b>, at the top of the section, lists each policy in
-        force: owner and insured, company, daily benefit, benefit term in years and the monthly
-        premium, with <span class="ui">Add a long term care policy</span> for each and the total
-        benefit (daily benefit &times; 365 &times; years) worked out per line. While any are listed,
-        the daily benefits fill the <span class="ui">Existing LTC coverage</span> field for that person
-        (daily benefit &times; 30, grey, read from the list) and the estimate caps what the policies pay
-        at their total benefit when the benefit term is shorter than the care; the premiums of all
-        policies fill the <b>Long Term Care Insurance</b> line of the section&nbsp;05 budget until an
-        amount is typed there. Everything saves with the case.</p>
-      <p>After the policies come the two <span class="ui">LTC need to insure</span> fields that size the
-        Moat, with a <span class="ui">Share to self-fund</span> beside them, the Moat premium readout, and Alto's Long-Term Care Needs Estimator folded away behind
-        <span class="ui">Complete detailed long term care needs analysis</span>. Press it and two
+      <p>The section opens with the two <span class="ui">Average LTC cost</span> fields that size the
+        Moat, the Moat premium readout, and Alto's Long-Term Care Needs Estimator folded away behind
+        the green <span class="ui">Complete Detailed Long Term Care Needs Analysis</span> bar. Press it and two
         blocks open beneath; a case that used the analysis reopens with it showing.</p>
 
       <dl class="fields">
-        <dt>LTC need to insure</dt>
+        <dt>Average LTC cost to plan for</dt>
         <dd>The long-term care need per person, which the Moat is sized to cover. By default it is
-          the result of the needs analysis below &mdash; the projected cost of care for that person
-          less any coverage in force &mdash; multiplied by one minus the <span class="ui">Share to
-          self-fund</span> (0% unless you set one), rounded to the nearest $1,000, shown grey while it
-          follows; it moves with every input of the analysis, the ages and sex and the policies listed
-          above, until you type over it, or press
+          the average lifetime cost of care from age 65 (HHS ASPE: $85,400 for a man, $154,300 for a
+          woman) grown at 4.5% a year from the person's current age in section&nbsp;02 to age 80
+          &mdash; about $188,600 for a 62-year-old man, $372,100 for a 60-year-old woman &mdash; and it
+          follows the age and sex as you change them, until you type over it, or press
           <span class="ui">Use the uncovered need as the LTC benefit</span> to take the estimate
           (rounded to the nearest $1,000); that works whether or not the analysis is open, and a
           line beneath the buttons shows the current estimate. Tick <span class="ui">Keep the LTC
@@ -1103,7 +988,7 @@
       <div class="note">
         <h3>The detail is on the worksheet</h3>
         <p>The estimate, its cost basis and the HHS duration note print in the internal worksheet
-          under <em>Long-term care estimate</em>. The executive summary report shows the projection
+          under <em>Long-term care estimate</em>. The Retirement Fortress Plan report shows the projection
           table, the benefit and the Moat premium.</p>
       </div>
     </div>
@@ -1136,22 +1021,18 @@
     <div class="num">11<small>Draft</small></div>
     <div class="body">
       <h2>Goals</h2>
-      <p>The meeting notes are a dated log, one entry per meeting. Drop in a
-        <span class="ui">.txt</span>, <span class="ui">.md</span> or <span class="ui">.docx</span> file
-        and it becomes a new entry dated today, or press <span class="ui">Add meeting notes</span> and
-        paste; after each later meeting add another entry (the date is editable, the &times; removes
-        one). <span class="ui">Draft or update goals from the notes</span> writes three to five client
-        goals in the client's own terms, each a short title and a sentence or two, ordered by what
-        matters most to them, from every entry in the log; when goals already exist it updates them
-        &mdash; keeping those that still hold, revising what the later notes changed, adding what is
-        new and dropping what the notes no longer support. Opened inside Claude, the drafting is done
-        by Claude from the whole of the notes and asks your permission the first time (it uses your own
-        Claude account); anywhere else, or if you decline, it reads the notes' own <em>Goals</em>
-        heading and falls back to the sentences that read like goals.</p>
+      <p>Drop in the meeting notes &mdash; a <span class="ui">.txt</span>, <span class="ui">.md</span> or
+        <span class="ui">.docx</span> file, or pasted text &mdash; and press
+        <span class="ui">Draft goals from the notes</span>. The tool writes three to five client goals in
+        the client's own terms, each a short title and a sentence or two, ordered by what matters most
+        to them. Opened inside Claude, the drafting is done by Claude from the whole of the notes and
+        asks your permission the first time (it uses your own Claude account); anywhere else, or if you
+        decline, it reads the notes' own <em>Goals</em> heading and falls back to the sentences that read
+        like goals.</p>
 
       <p>Every goal is editable in place &mdash; retitle it, rewrite it, remove it, or
         <span class="ui">Add a goal</span> of your own. A card notes whether it was drafted, read from
-        the notes, or written by you. Goals and every meeting's notes save with the case.</p>
+        the notes, or written by you. Goals and the notes save with the case.</p>
 
       <div class="note warn">
         <h3>A draft, not a record</h3>
@@ -1166,44 +1047,16 @@
     <div class="body">
       <h2>Risk</h2>
       <p>Two scores on a 1&ndash;100 scale &mdash; the client's <span class="ui">current risk
-        score</span> from the portfolio analysis, and their <span class="ui">risk
-        tolerance</span>, from the questionnaire below or typed &mdash; with the gap read out beneath.
-        Then the risks the advisor identifies in the current situation, ticked from a fixed list,
-        plus any added by hand.</p>
+        score</span> from the questionnaire or portfolio analysis, and their <span class="ui">risk
+        tolerance</span> &mdash; with the gap read out beneath. Then the risks the advisor identifies
+        in the current situation, ticked from a fixed list, plus any added by hand. Two green
+        sub-section bars sit between the scores and the risk list: <span class="ui">Complete the Risk
+        Profile Questionnaire</span> (eleven questions that produce a 1&ndash;99 score on the Risk
+        Number scale and fill the risk tolerance) and <span class="ui">Upload the Nitrogen Wealth
+        Report</span>; each folds with its +/&minus;.</p>
 
       <dl class="fields">
-        <dt>Risk profile questionnaire</dt>
-        <dd>Eleven questions, answered with the client, that produce a 1&ndash;99 risk score on the
-          same scale and logic as the Risk Number: real dollar amounts, one-year outcome ranges and
-          how the client weighs gains against losses. <span class="ui">Portfolio being
-          assessed</span> sets the dollar figures in the questions; left blank it follows the total
-          of the accounts in section&nbsp;06. The first four questions measure <em>willingness</em>
-          (65% of the score), the next five <em>capacity</em> (35%), and two on experience count with
-          willingness; each answer carries a score, the two sides are weighted averages, and a
-          willingness more than 15 points above capacity is limited to capacity plus 15. The panel on
-          the right shows the score as it builds, its category (Conservative to Aggressive in five
-          bands), the primary objective, willingness and capacity, and an illustrative one-year
-          range in percent and dollars, with a note when the objective and the scenario answers
-          disagree, when one side runs well ahead of the other, or when questions remain. Questions 6
-          and 7 are answered from the plan until the advisor picks another answer (shown dashed, with
-          the reason beneath): when withdrawals begin from the first retirement date in section&nbsp;04,
-          and the share of Needs covered by guaranteed income from the annual Needs gap the Foundation
-          is sized on. A completed questionnaire writes its score into <span class="ui">Risk
-          tolerance</span> above in grey, like any value that follows the plan, each time an answer
-          changes &mdash; even over a typed value; a tolerance typed afterwards (or the client's own Risk
-          Number from an uploaded report) holds until the answers change again, and clearing the cell
-          brings the score back. The
-          gap readout, the executive summary's risk page (the category, willingness and capacity
-          under the tolerance tile) and the worksheet (the score and every answer) all follow it.
-          <span class="ui">Risk profile report</span>, in section&nbsp;21 with the other reports, opens a client-facing letter in a new tab
-          &mdash; the score and category, what a typical year could look like on the portfolio
-          assessed, willingness against capacity, the answers in plain words, where the score fits in
-          the Fortress and next steps, with no vendor named; <span class="ui">Copy summary</span>
-          puts a text summary with every answer on the clipboard for the CRM; <span class="ui">Clear
-          answers</span> starts over, with questions 6 and 7 back on the plan's answers. Answers and the portfolio amount save with the case. The
-          questionnaire is an Alto approximation for framing the conversation; confirm the official
-          Risk Number before building or changing a portfolio.</dd>
-        <dt>Nitrogen Wealth report</dt>
+        <dt>Upload the Nitrogen Wealth Report</dt>
         <dd>Press <span class="ui">Upload Nitrogen report</span> and choose the PDF of the client's
           current-portfolio analysis (a text file works too). The page reads the PDF's text itself
           &mdash; nothing is sent anywhere &mdash; and summarises the portfolio in aggregate: the
@@ -1270,9 +1123,7 @@
         colour of the one showing, with its name on every header. <b>Three scenarios side by
         side</b> beneath the tabs sets their headline figures in three columns &mdash; the four
         levels funded, annuity income, LTC benefit, Roth conversions, withdrawal order, lifetime tax
-        and assets at the end of plan, then the assets at the end of plan under each of the three
-        section&nbsp;18 stress tests and under each section&nbsp;17 care-event projection (one spouse
-        needs care, the other, both), or the year they run out &mdash; each with a <span class="ui">View</span> button and a
+        and assets at the end of plan &mdash; each with a <span class="ui">View</span> button and a
         <span class="ui">Use for reports</span> pick. Rename a scenario in the
         <span class="ui">Name</span> box; <span class="ui">Copy this scenario into&hellip;</span>
         duplicates the one showing into another slot as a starting point. An untouched scenario
@@ -1282,8 +1133,7 @@
         exactly what the waterfall placed. Until you edit it, it follows the household numbers above:
         change Annual Needs or the buffer and it re-flows.</p>
 
-      <p>Each row is one transfer. The <b>Current position</b> column beside the from account is
-        read from section&nbsp;06 and follows it. You set the <b>from account</b>, the <b>Fortress level</b> and
+      <p>Each row is one transfer. You set the <b>from account</b>, the <b>Fortress level</b> and
         the <b>transfer amount</b>; the tool proposes the <b>to account</b>, <b>custodian or
         carrier</b> and <b>product</b>, and you can pick a different one from each list or choose
         <span class="ui">Custom…</span> and type your own — a changed one is shaded, with the
@@ -1298,21 +1148,18 @@
         amount; pick the other spouse's contract under <b>To account</b> to move a line across.
         An account you type under <span class="ui">Custom…</span> is then offered in the
         <b>To account</b> list on every other line, and it becomes a registration of its own:
-        section&nbsp;20's ending positions, the transfer sequence, the Roof growth rows and the
+        section&nbsp;21's ending positions, the transfer sequence, the Roof growth rows and the
         report all show it by that name, with the tax type read from the name (Roth, IRA,
         after-tax) and the custodian you picked on the line.</p>
 
       <p>The carrier list is Alto's October 2026 inventory of
-        eighteen carriers plus Schwab and Fidelity; the product list opens with the model's own
-        proposal for the line, then the six generic choices &mdash; <span class="ui">TBD</span>,
-        <span class="ui">Checking/Savings</span>, <span class="ui">CD</span>,
-        <span class="ui">Money Market</span>, <span class="ui">AUM</span>, <span class="ui">AUM - Tax
-        Free</span> (a Walls line in municipal bonds: its yield is federally tax-free, see the Walls
-        income assumptions below), <span class="ui">Life Insurance Cash Value</span> &mdash; and then that custodian's or
-        carrier's own products, so pick the carrier first. The proposals are
-        <span class="ui">Checking/Savings</span> for the liquidity buffer, <span class="ui">AUM</span>
-        for the Walls and Roof, <span class="ui">TBD</span> for the Moat until a carrier product is
-        picked, and <span class="ui">Fixed Indexed Annuity</span> for a Foundation income line. A short name typed as an account's custodian
+        eighteen carriers plus Schwab and Fidelity; the product list opens with the generic
+        families &mdash; <span class="ui">Savings</span>, <span class="ui">Checking</span>,
+        <span class="ui">Money Market</span>, <span class="ui">CD</span>,
+        <span class="ui">Fixed Indexed Annuity</span>, <span class="ui">MYGA</span>,
+        <span class="ui">Managed portfolio</span> &mdash; and then that custodian's or carrier's
+        own products, so pick the carrier first. A Foundation income line defaults to
+        <span class="ui">Fixed Indexed Annuity</span>. A short name typed as an account's custodian
         in section&nbsp;06 — <em>Athene</em>, <em>F&amp;G</em>, <em>OneAmerica</em> — is enough to
         bring up the right product list. The last columns are worked out for you: what the
         source account has left after that line, and running totals for Foundation, Walls, Roof
@@ -1343,11 +1190,7 @@
 
       <dl class="fields">
         <dt>Annuity income</dt>
-        <dd>A table under the transfer list. It opens with one row for every income annuity in
-          force &mdash; every account whose current position in section&nbsp;06 is <b>Income Annuity
-          (FIA)</b> &mdash; showing its value, that it pays now, its monthly income and whether it pays
-          for the owner's life or to the end of plan; those figures are set in the Annuities panel of
-          section&nbsp;06, not here. Then one row for every Foundation annuity contract
+        <dd>A table under the transfer list with one row for every Foundation annuity contract
           above whose product is <span class="ui">Fixed Indexed Annuity</span> &mdash; the default
           for a Foundation line &mdash; named for the account it goes to (the from account is noted
           beneath; a line that stays put keeps its own name), with its carrier and amount. Lines
@@ -1379,13 +1222,11 @@
           <span class="ui">Monthly benefit</span>, the age it is quoted <span class="ui">At</span>
           (80 by default), the <span class="ui">Benefit period</span> in years (5 by default) and an
           <span class="ui">Inflation</span> rider that raises the monthly benefit each year past
-          that age (0% by default), and the <span class="ui">Growth</span> of the contract's value in
-          the projections (3% a year by default): the Moat in section&nbsp;17 grows at the
-          premium-weighted rate of its contracts while it pays out. Blank cells follow the Moat sizing: the person's target benefit
+          that age (0% by default). Blank cells follow the Moat sizing: the person's target benefit
           from section&nbsp;09 spread evenly over a five-year benefit period, from age 80, level, and
           the placeholders show those figures. Once a cell is set, the contract's benefit becomes monthly
           &times; 12 &times; years wherever the Moat's benefit is shown, and the care-event projections
-          in sections&nbsp;06 and 17 pay from each contract at its own yearly maximum for its own
+          in sections&nbsp;06 and 18 pay from each contract at its own yearly maximum for its own
           period before anything comes out of the accounts.</dd>
         <dt>Roof growth</dt>
         <dd>One row for every account the Roof lines go <em>to</em> &mdash; the Roth IRA, the
@@ -1397,28 +1238,16 @@
           the amount-weighted blend of the rows, which the hint beneath reports and sections&nbsp;16
           and 17 use; the scenario strip shows the blended rate for each scenario.</dd>
         <dt>Walls income assumptions</dt>
-        <dd>Two lines. <b>Taxable income accounts</b> &mdash; every Walls line except those in AUM -
-          Tax Free &mdash; take four fields: the <span class="ui">Walls yield</span>, when
+        <dd>Four fields for the Walls as adjusted: the <span class="ui">Walls yield</span>, when
           <span class="ui">Walls income starts</span>, and the Walls growth rate <span class="ui">before
-          income starts</span> and <span class="ui">after</span>. <b>Tax-free income accounts</b> &mdash;
-          the Walls lines in AUM - Tax Free, with the amount shown &mdash; take their own
-          <span class="ui">Tax-free yield</span> and growth before and after income starts, each
-          following the taxable line while blank; their income starts with the Walls, their yield is
-          federally tax-free, and the projections, the asset growth and the line beneath the fields
-          all use them. Every field is blank by default
-          and then follows the plan &mdash; the Walls growth <em>before</em> income starts is a plan
-          assumption of 5%, the growth <em>after</em> is section&nbsp;03's Walls growth rate, and the
-          start is the first retirement date; the plan figure is shown under each label. Type a value and the projections in sections&nbsp;15, 16 and 17,
-          the worksheet and the executive summary report follow it; the sizing in section&nbsp;13
+          income starts</span> and <span class="ui">after</span>. Every field is blank by default
+          and then follows section&nbsp;03 and the first retirement date &mdash; the plan figure is
+          shown under each label. Type a value and the projections in sections&nbsp;15, 17 and 17,
+          the worksheet and the Retirement Fortress Plan report follow it; the sizing in section&nbsp;13
           keeps the plan assumptions, so a lower yield here shows up as a Needs or Wants shortfall
           in the projections rather than a bigger target. A line beneath states the result in words,
           <span class="ui">Follow the plan assumptions</span> clears the annuity table and these
-          four fields, and everything saves with the case. A tax-free yield is set line by line: pick
-          <span class="ui">AUM - Tax Free</span> in the Product/Strategy column of a Walls line held in
-          municipal bonds and that line's share of the non-qualified Walls yield leaves federal taxable
-          income; it still counts toward the taxation of Social Security (as tax-exempt interest does),
-          the state model still taxes it, and the yield on IRA money in the Walls is a taxable
-          distribution whatever the product, so the product changes nothing on a qualified line. Every date in the projections &mdash;
+          four fields, and everything saves with the case. Every date in the projections &mdash;
           these, the retirement dates and each benefit's start and end &mdash; lands in the calendar
           year it names: a July 2030 start pays half a year in the 2030 row and the full amount
           from 2031.</dd>
@@ -1441,17 +1270,70 @@
         each year to the <span class="ui">End of plan age</span> &mdash; salaries while they last, Social
         Security, pensions, annuity income (the Foundation annuity plus any contracts already paying),
         the Walls yield, non-guaranteed income and what the plan draws from the accounts in the
-        section&nbsp;16 order, RMDs taken beyond the draw included &mdash; with a dark red tick on each
+        section&nbsp;17 order, RMDs taken beyond the draw included &mdash; with a dark red tick on each
         bar for that year's total expenses. Retired years are shaded and the first RMD year marked;
         hover a year for every figure including the tax. The table beneath carries each source, all
         income, Needs, Wants, total expenses, <b>Income tax</b> (federal plus state, from the
-        section&nbsp;16 projection; hover a cell for the split) and <b>Net cash flow</b> (all income less
+        section&nbsp;17 projection; hover a cell for the split) and <b>Net cash flow</b> (all income less
         total expenses less income tax): before retirement that is the after-tax salary surplus, and in
         retirement it is zero because the plan withdraws exactly what expenses and both taxes require.</p>
     </div>
   </section>
   <section>
     <div class="num">16<small>Input</small></div>
+    <div class="body">
+      <h2>Investment Portfolio</h2>
+      <p>The household's investments as Nitrogen sees them. Print the <i>Investment Portfolio Proposal</i>
+        from Nitrogen for the current portfolio and press <span class="ui">Upload Nitrogen portfolio
+        proposal</span>. The page reads the PDF itself, page by page, and lays out what it found; nothing
+        leaves the page unless it runs inside Claude, where the figures it read are sent to Claude to write
+        the two summaries. The proposal and its reading are saved with the case; <span class="ui">Clear</span>
+        removes them, and <span class="ui">Read the text below</span> runs the reading again on the text in
+        the <i>Report text</i> box, so a report that will not open as a PDF can be pasted.</p>
+      <dl>
+        <dt>The tiles</dt>
+        <dd>The household's Risk Number from the questionnaire with its six-month comfort zone; the
+          portfolio's Risk Number, coloured by how far it sits from the household's (green within five
+          points, amber within fifteen, red beyond), with its own 95% six-month range; the portfolio value
+          with the number of accounts and holdings; GPA against the benchmark's; and the total annual cost
+          with expense ratios, tax drag and the dividend yield.</dd>
+        <dt>The holdings and The risk assessment</dt>
+        <dd>Two short readings an advisor can read aloud. Inside Claude they are written by Claude from the
+          figures the page read (never from guesses &mdash; every number comes from the PDF); elsewhere the
+          page writes them itself from the same figures. Both say which.</dd>
+        <dt>Asset classification</dt>
+        <dd>Stocks, bonds, cash and other as Nitrogen classifies the holdings, the benchmark's split beside
+          each. Index-linked annuity segments land in <i>other</i>, because Nitrogen models them through proxy
+          funds rather than as stocks or bonds.</dd>
+        <dt>By holding type · By Risk Number</dt>
+        <dd>The money by what it is in &mdash; annuity contracts, cash and money market, ETFs, single stocks,
+          mutual funds &mdash; and by the Risk Number of each holding, in five bands.</dd>
+        <dt>Largest positions · Single-stock exposure</dt>
+        <dd>The ten largest holdings combined across accounts, cash aside, each with its Risk Number and the
+          account it sits in when there is one; then Nitrogen's stock intersection &mdash; the single stocks
+          held directly and through funds, as a share of the equities.</dd>
+        <dt>Holdings by account</dt>
+        <dd>Every account in the proposal with its Risk Number, total and GPA, and under it every holding:
+          ticker, type, amount, share of the account and of the portfolio, SEC yield, the holding's Risk
+          Number and GPA, and its 95% six-month range. Check the account totals against the PDF before the
+          figures travel.</dd>
+        <dt>Stress tests · Performance · Sectors, regions, size and style</dt>
+        <dd>Nitrogen's historical stress tests with the index it pairs with each, the trailing returns and the
+          statistics against the benchmark, the equity and bond sectors, the regions, market cap and style,
+          and the diversification figures &mdash; the points the holdings' relationships take off the Risk
+          Number and the share of the benchmark's upside and downside the portfolio captures.</dd>
+      </dl>
+      <div class="callout">
+        <h3>It reads; it does not change the plan</h3>
+        <p>This section is for understanding the current portfolio. It does not change the accounts in
+          section&nbsp;06, the risk score in section&nbsp;12 or any allocation. The reading is by Nitrogen's
+          labels, so a report in a different layout may show fewer figures; a page the parser does not
+          recognise is skipped, not guessed.</p>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="num">17<small>Input</small></div>
     <div class="body">
       <h2>Strategic Tax Planning</h2>
       <p>Everything in this section runs on the <b>adjusted</b> allocation in section&nbsp;15 &mdash; the
@@ -1486,7 +1368,7 @@
           total assets at the end. A bar chart shows the conversion each year with the tax on it, and
           the schedule lists every year in the window with what limited it (bracket, IRMAA, funding or
           nothing left). With <span class="ui">Apply the conversion strategy</span> ticked, the tax
-          projection below and the asset projection in section&nbsp;17 run with the conversions in;
+          projection below and the asset projection in section&nbsp;18 run with the conversions in;
           untick it to see the plan without them.</dd>
 
         <dt>Required minimum distributions, with and without the conversion strategy</dt>
@@ -1549,17 +1431,9 @@
           deduction and the capital-gains thresholds indexed at the plan's inflation rate; the Social
           Security thresholds are not indexed, so up to 85% of benefits becomes taxable over time.
           Wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs are ordinary income;
-          a tax-deferred withdrawal taken before 59&frac12; carries the 10% additional federal tax
-          (the birthday from the section&nbsp;02 date of birth, or taken as mid-year without one; the
-          withdrawal is grossed up for it, the table shows it in its own column and the assumptions
-          line totals it);
           the Foundation annuity is taxed by its funding (qualified money fully, a non-qualified annuity
-          half, Roth money not at all), and annuity income already in force the same way by the account
-          that pays it &mdash; a section&nbsp;04 line with no account, or a qualified contract, fully; a
-          non-qualified contract half; a Roth contract not at all; a MYGA's interest fully unless the
-          contract is Roth. The non-qualified share of the Walls yield and half of each taxable-account
-          withdrawal are long-term gains, unless the Walls yield is marked federally tax-free in
-          section&nbsp;14. RMDs follow the Uniform Lifetime Table from 73 or 75 by birth
+          half); the non-qualified share of the Walls yield and half of each taxable-account
+          withdrawal are long-term gains. RMDs follow the Uniform Lifetime Table from 73 or 75 by birth
           year; an RMD larger than the plan's own tax-deferred draw is taxed, spent first and otherwise
           reinvested in the after-tax Roof account. Both spouses are assumed living to the end of plan; no itemising, credits or IRMAA.</p>
         <p><b>State tax</b> follows the state in section&nbsp;02 through a planning model of each
@@ -1584,10 +1458,10 @@
     </div>
   </section>
   <section>
-    <div class="num">17<small>Read</small></div>
+    <div class="num">18<small>Read</small></div>
     <div class="body">
       <h2>Projected Retirement Assets</h2>
-      <p>What is left each year after the withdrawals in section&nbsp;16, in total and by Fortress
+      <p>What is left each year after the withdrawals in section&nbsp;17, in total and by Fortress
         level, to the end of plan. Five tiles &mdash; assets today, at full retirement, at the end of
         plan, total withdrawn beyond the plan's income, and the peak (or the year the accounts run
         out) &mdash; then a stacked bar for every year: liquidity buffer, Foundation annuity, Walls,
@@ -1602,42 +1476,32 @@
           liquidity buffer as cash with no growth. The Foundation annuity falls by the income it pays
           (and keeps paying for life if <span class="ui">Guaranteed lifetime income</span> is Yes); the
           Moat is an LTC contract, shown at the amount placed while it pays out. Withdrawals
-          are the section&nbsp;16 draws &mdash; what Needs and Wants (and the tax on the draw) need
+          are the section&nbsp;17 draws &mdash; what Needs and Wants (and the tax on the draw) need
           beyond the plan's income &mdash; taken in the withdrawal order, cash first within each tier,
           then Walls, then Roof; RMDs above the plan's own tax-deferred draw are spent first and otherwise
           reinvested after tax in the Roof. Future dollars with no market variation: a planning estimate, and it prints in
           the worksheet under <em>Projected retirement assets</em>.</p>
       </div>
 
-      <h3 style="margin-top:18px">Your Personal Cash Flow Statement</h3>
-      <p>The same projection read as a cash flow, one row a year, beneath the asset chart. Four tiles
-        &mdash; income over the plan, expenses and taxes, withdrawals, and net worth at the end of plan
-        &mdash; then the table: income by source without touching the accounts (salaries to each
-        retirement date, Social Security, pensions, annuity income, the Walls yield, other income, and
-        RMDs above the plan's own tax-deferred draw; a source with nothing in it is left out), total
-        income, Needs and Wants in future dollars, any care cost paid from the accounts, federal and
-        state tax (Roth conversion tax included), the cash flow before withdrawals, the section&nbsp;16
-        withdrawals (grossed up for the tax they cause), the net cash flow, the ending account balance
-        and the ending net worth. The net cash flow is zero in a year the accounts fund and positive in
-        a surplus year; spare RMD money is reinvested in the Roof and other surplus income is not banked,
-        so a surplus does not add to the balances. Net worth is the section&nbsp;17 total plus the
-        section&nbsp;06 other assets at their growth rates, less the section&nbsp;07 debts as their
-        payments retire them (a debt with no payment or interest only stands; one with a maturity date
-        is gone by then). The footer totals every column over the plan. It is for the advisor's
-        analysis and the screen; it does not print in the worksheet or the executive summary.</p>
-
+      <h3 style="margin-top:18px">If a long term care event occurs</h3>
+      <p>Under the chart, the same three care-event projections as section&nbsp;06 &mdash; male, female,
+        both &mdash; run through the plan as adjusted. The insured's Moat benefit pays first and falls
+        as it does (the Moat bar shrinks); anything above the benefit comes out of the accounts in the
+        withdrawal order, with the tax on the draw. The tiles show the cost of care, how much the Moat
+        paid, what came from the accounts and where the plan ends against the projection without a
+        care event. Set against the same charts in section&nbsp;06, they show what the Moat is for.</p>
     </div>
   </section>
   <section>
-    <div class="num">18<small>Read</small></div>
+    <div class="num">19<small>Read</small></div>
     <div class="body">
       <h2>Sensitivity Analysis</h2>
-      <p>The section&nbsp;17 projection for the scenario being viewed, run again under three stresses
+      <p>The section&nbsp;18 projection for the scenario being viewed, run again under three stresses
         one at a time with everything else unchanged, each with its own tiles, chart and note and the
         base case drawn as a dashed line:</p>
       <dl class="fields">
         <dt>Sequence of returns risk</dt>
-        <dd>The Walls earn &minus;8% and the Roof &minus;16% a year in the first three years of full
+        <dd>The Walls earn &minus;4% and the Roof &minus;15% a year in the first three years of full
           retirement (from the year after the last retirement date), then return to the assumed rates.
           The chart marks where the bad years begin; the tiles show the returns, what is withdrawn,
           the lowest point and where the plan ends against the base case.</dd>
@@ -1646,31 +1510,20 @@
           &mdash; for everyone, with the tax on Social Security following the reduced benefit. The
           tiles total the benefit lost over the plan.</dd>
         <dt>Higher inflation</dt>
-        <dd>Long-term inflation 30% above the section&nbsp;03 assumption (4.24% instead of 3.26%, say),
+        <dd>Long-term inflation 30% above the section&nbsp;03 assumption (3.9% instead of 3.0%, say),
           applied to Needs and Wants and to the indexing of the tax brackets alike. The tiles total
           the extra spending over the plan.</dd>
       </dl>
       <p>The stresses use the scenario's own transfers, annuity income, Roof growth and Roth
-        strategy, so each scenario has its own set; the scenario cards at the top of section&nbsp;14
-        show each scenario's end-of-plan assets under all three, side by side. The report carries them
-        after the projected assets, a full page for each.</p>
-
-      <h3 style="margin-top:18px">If a long term care event occurs</h3>
-      <p>Under the three stress tests, the same three care-event projections as section&nbsp;06 &mdash; male, female,
-        both &mdash; run through the plan as adjusted. The insured's Moat benefit pays first and falls
-        as it does (the Moat bar shrinks); anything above the benefit comes out of the accounts in the
-        withdrawal order, with the tax on the draw. The tiles show the cost of care, how much the Moat
-        paid, what came from the accounts and where the plan ends against the projection without a
-        care event. As in section&nbsp;06, each person who needs care is assumed to pass away at the
-        end of care, with the survivor's Social Security, pension and annuity income adjusted from
-        then and the plan ending with the second death. Set against the same charts in section&nbsp;06, they show what the Moat is for.</p>
+        strategy, so each scenario has its own set. The report carries them after the projected
+        assets, a full page for each.</p>
     </div>
   </section>
   <section>
-    <div class="num">19 · 20<small>Read</small></div>
+    <div class="num">20 · 21<small>Read</small></div>
     <div class="body">
       <h2>Transfer sequence and ending positions</h2>
-      <p>Section&nbsp;19 is the paperwork in order. <b>Step&nbsp;1</b> consolidates everything at the
+      <p>Section&nbsp;20 is the paperwork in order. <b>Step&nbsp;1</b> consolidates everything at the
         new custodian — qualified plans into one Rollover IRA per owner, Roth into one Roth IRA per
         owner, after-tax into a single joint account. <b>Step&nbsp;2</b> moves the Foundation and Moat
         allocations on to the carriers. A <b>Stays put</b> block covers what never moves. Both
@@ -1682,15 +1535,7 @@
         transfers or surprise clients: a registration mismatch, an in-force annuity that will not
         move by ACATS, a surrender charge worth checking, capital gains from liquidating a taxable
         position.</p>
-      <p>Section&nbsp;20 opens with the <b>asset map</b>: every current account drawn as a box on the
-        outside &mdash; the client&rsquo;s on the left, the spouse&rsquo;s on the right, joint and trust
-        accounts on whichever side has room &mdash; with its name, type and balance, and the ending
-        registrations and contracts in the middle, coloured by Fortress level. A line runs from each
-        account to wherever its money ends up, its width by the amount; an account that splits
-        shows how much goes each way. The map reads the same ledger as the transfer sequence and the
-        ending positions, so the three always agree, and the executive summary carries it on as many
-        pages as the accounts need.</p>
-      <p>Below the map is where every account lands, plus assets under management and the advisory
+      <p>Section&nbsp;21 is where every account lands, plus assets under management and the advisory
         fee. The fee schedule is flat, not marginal — wherever the managed total falls, that band's
         rate applies to the whole balance. Billable assets are the Walls and Roof only; the cash
         buffer, the Foundation annuity and the Moat contracts are out. The <b>weighted average</b>
@@ -1707,27 +1552,26 @@
     </div>
   </section>
   <section>
-    <div class="num">21<small>Output</small></div>
+    <div class="num">22<small>Output</small></div>
     <div class="body">
-      <h2>The reports</h2>
-      <p>Three of these go to a client (a fourth, the risk profile report, opens from
-        section&nbsp;12). The other two are marked
+      <h2>The five downloads</h2>
+      <p>Three of these go to a client. The other two are marked
         <em>not for client distribution</em> on every page. <span class="ui">Scenario for the
         reports</span> at the top of the section picks which of the three scenarios they are built
         from &mdash; the same choice as <span class="ui">Use for reports</span> in section&nbsp;14. When
         it is not the scenario showing, the page switches to it while the documents build and
-        switches back; the educational slides (their button sits in the header) are the same whichever is chosen.</p>
+        switches back; the educational slides are the same whichever is chosen. <span class="ui">Plan status</span> beside it marks Your Retirement Fortress Plan <b>Draft</b> or <b>Final</b>: the cover reads <i>Draft &mdash; for discussion</i> or <i>Final plan</i> and the same stamp sits at the foot of every page. The choice is saved with the case; a new case starts as a draft.</p>
 
       <div class="exports">
         <div class="exp client">
           <span class="tag">Client-facing</span>
-          <b>Executive summary report</b>
-          <p>A 39-page HTML document (40 with a Nitrogen report uploaded, a page more with qualified
-            charitable distributions applied, and another when the consolidation list runs past ten
-            lines) in Alto's template style &mdash; Montserrat throughout, the logo on
+          <b>Your Retirement Fortress Plan</b>
+          <p>An HTML slide document of about 50 pages (a page more with a Nitrogen report uploaded, with
+            qualified charitable distributions applied, and when the consolidation list runs past ten
+            lines, plus the appendix) in Alto's template style &mdash; Montserrat throughout, the logo on
             every page, no text smaller than 16 point, annuities always called annuities &mdash; for the
-            client meeting: goals, household, income and the income gap, expenses (plus the detailed
-            budget when one is completed), assets and net worth with a tax-type pie, the status-quo
+            client meeting: goals, household, income and the income gap, expenses (the detailed
+            budget, when one is completed, prints in the appendix), assets and net worth with a tax-type pie, the status-quo
             projection, the cost of long-term care and then the status-quo projection with a care event
             added, life insurance, legacy, risk, the current investment portfolio when a Nitrogen report
             is uploaded, the Fortress framework graphic, the
@@ -1739,14 +1583,11 @@
             the tax rate and tax bill year by year, projected
             assets (and the same with a long term care event), the three stress tests &mdash; a full page each
             for the bad start to retirement, the Social Security cut and higher inflation &mdash; the
-            transfer sequence on two pages (<i>What Moves Where, and in What Order</i> lists every
-            consolidation line, spilling onto a continuation page when there are more than ten;
-            <i>Then, Fund the Protected Pieces</i> details each Foundation annuity contract with its
-            carrier, product and income terms and each LTC contract with its premium and benefit, the
-            accounts that fund them, anything left in place, and the totals, continuing onto a
-            further page when the rows do not fit), the ending positions, the asset map (<i>Where Each
-            Account Ends Up</i>, at most seven accounts to a page), then how the picture improves, what it
-            costs, working with Alto and the moving parts. The charts are the tool's own, carried over as drawn; every figure comes from the
+            ending positions (the transfer sequence itself prints in the appendix: <i>What Moves Where, and in What Order</i>,
+            then <i>Then, Fund the Protected Pieces</i> with each Foundation annuity contract's carrier, product and income
+            terms, each LTC contract's premium and benefit, the accounts that fund them, anything left in place, and the totals),
+            then how the picture improves, what it
+            costs, working with Alto and the moving parts. A <b>Contents</b> page with page numbers follows the cover, and an <b>Appendix Contents</b> page opens the appendix. After the closing page the appendix prints the detailed monthly budget when one is completed, then the personal cash flow statement from section&nbsp;18 as tables &mdash; income by source, then the cash flow and ending balances, about fourteen years to a page, with any shortfall before withdrawals in red; the transfer sequence (<i>What Moves Where, and in What Order</i>, every consolidation line with its destination, then <i>Then, Fund the Protected Pieces</i>, each annuity and LTC contract with what funds it); and, when a Nitrogen proposal is loaded in section&nbsp;16, the investment portfolio in full &mdash; every account and holding (sixteen rows to a page), the stress tests and performance statistics, sectors, regions, size and style, and the largest positions and single stocks. The same proposal adds one page to the main deck after the withdrawal-order page, <i>Your Investment Portfolio Summary</i>: the five tiles, the two readings shortened to their first sentences, the asset classification and the stress tests. The charts are the tool's own, carried over as drawn; every figure comes from the
             same run as the PDFs. It opens in a new browser tab; when a file is needed, the browser's
             Print &rarr; Save as PDF gives a 16:9 PDF (20 &times; 11.25 in), one page per topic, with
             margins set to none and background graphics on. A view that does not allow new tabs saves the
@@ -1754,13 +1595,12 @@
         </div>
         <div class="exp client">
           <span class="tag">Client-facing</span>
-          <b>Social Security optimizer report</b>
+          <b>Social Security analysis</b>
           <p>The claiming optimizer's findings as a letter-size client report, <em>Social Security
             Planning Analysis</em>: a cover with the client names, date and advisor; an introduction
             and key terms (PIA, full retirement age, COLA, life expectancy, spousal and survivor
             benefits, with the FRA and percentage-of-PIA reference tables); the inputs and
-            assumptions; the five best strategies and the four always-shown ones (both at 62, both at 70,
-            one early and the other late) with their claiming events and lifetime totals, and where
+            assumptions; the five strategies with their claiming events and lifetime totals, and where
             the plan's own ages rank; bar charts of lifetime benefits with and without the reduction,
             the surviving spouse's first full-year income, the cumulative chart and the break-even
             table; a year-by-year schedule for each strategy; how to file; and what the analysis leaves
@@ -1777,20 +1617,6 @@
             &mdash; the need, the average length of care and the 2025 median costs. It needs no case loaded. Use it for the first
             meeting or as a leave-behind; to update the deck, replace the file in the tool.</p>
         </div>
-        <div class="exp client">
-          <span class="tag">Client-facing</span>
-          <b>Risk profile report</b>
-          <p>The section&nbsp;12 questionnaire as a letter: the score and category, what a typical year
-            could look like on the portfolio assessed, willingness against capacity, the answers in
-            plain words, where the score fits in the Fortress and next steps, with no vendor named.</p>
-        </div>
-        <div class="exp client">
-          <span class="tag">Client-facing</span>
-          <b>Pension benefits report</b>
-          <p>The last estimate from the section&nbsp;04 Pension Benefits Calculator as a letter page:
-            the benefit by option, eligibility, the inputs, the formula, the COLA note and the
-            reference tool's disclaimer. Calculate a benefit there first.</p>
-        </div>
         <div class="exp internal">
           <span class="tag">Internal only</span>
           <b>Internal worksheet</b>
@@ -1798,17 +1624,16 @@
             item flagged for confirmation, and any transfer you set by hand recorded against the
             waterfall's own proposal.</p>
         </div>
+        <div class="exp internal">
+          <span class="tag">Internal only</span>
+          <b>Nitrogen account upload</b>
+          <p>A bare list of ending positions named
+            <span class="ui">Owner's Custodian Tax type (Level)</span> for keying into risk analysis.</p>
+        </div>
       </div>
 
-      <p>Every report &mdash; the executive summary, the Social Security optimizer report, the risk profile
-        report, the pension benefits report and the internal worksheet &mdash; ends with the
-        <b>Important Disclosures &ndash; Retirement Fortress Blueprint&trade;</b> page, the same text as
-        the gold <span class="ui">Important Disclosures</span> block at the foot of the application
-        (open it with the +). The educational slides are a fixed PDF and carry Alto's own slide
-        disclosures instead.</p>
-
       <div class="note stop">
-        <h3>Before the executive summary report leaves the office</h3>
+        <h3>Before the Retirement Fortress Plan report leaves the office</h3>
         <p>Its disclosure pages are a draft. Have compliance approve that language — and the AEWM
           paragraph in particular — before you hand it to anyone. Check that both carriers are
           named rather than "TBD", and read the fee figures once against what the client will
@@ -1817,7 +1642,7 @@
     </div>
   </section>
   <section>
-    <div class="num">22<small>Save</small></div>
+    <div class="num">23<small>Save</small></div>
     <div class="body">
       <h2>Saving and reopening a case</h2>
       <p>Press <span class="ui">Copy case data</span> and paste the block into your CRM note, an
@@ -1828,6 +1653,18 @@
         re-pointed at the right accounts.</p>
       <p>Do this before every meeting where you might change something, and again at the end. It
         takes five seconds and it is the only backup that exists.</p>
+      <h3>Saved cases on Alto's site</h3>
+      <p>When the Blueprint runs on Alto's own site rather than as the claude.ai demo, you sign in with
+        your Microsoft account and a <b>Saved cases</b> panel appears above the paste box. <span
+        class="ui">Save</span> keeps the open case on Alto's server under the client's name and your
+        sign-in, and saving again updates the same record; <span class="ui">Save as new</span> makes a
+        second copy; <span class="ui">Open</span> brings one back; <span class="ui">Delete</span> removes
+        it from the list (an administrator can restore it for 30 days); <span class="ui">Export
+        all</span> downloads every case you can see as one JSON file. Advisors see their own cases;
+        the firm's administrators see all of them. The written summaries in sections 12 and 16 run
+        there too, through Alto's server, so nothing but the figures on the page is sent to Claude.
+        The paste box keeps working alongside the panel, and the signed-in name fills the
+        <span class="ui">Advisor</span> field on a new case.</p>
     </div>
   </section>
 

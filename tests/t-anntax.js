@@ -7,7 +7,7 @@ const path = require('path');
   const b=await chromium.launch(process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH} : {});
   const ctx=await b.newContext({acceptDownloads:true}); const p=await ctx.newPage({viewport:{width:1500,height:950}});
   const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
-  await p.goto('file://'+path.resolve(__dirname,'../dist/preview.html'),{waitUntil:'load'}); await p.waitForTimeout(900);
+  await p.goto('file://'+path.resolve(__dirname,'../dist/preview-smith.html'),{waitUntil:'load'}); await p.waitForTimeout(900);
   await p.click('#expandAll'); await p.waitForTimeout(400);
   await p.click('#scnTabs [data-scn="0"]'); await p.waitForTimeout(500);
   const txt=async sel=>(await p.$eval(sel,e=>e.textContent)).replace(/\s+/g,' ').trim();
@@ -47,7 +47,7 @@ const path = require('path');
   // 1d. every section carries its User Guide Notes, collapsed, with the guide's text; no section-note paragraphs remain
   const notes=await p.$$eval('section details.guide-notes',ds=>ds.map(d=>({open:d.open, len:d.querySelector('.guide-body').textContent.replace(/\s+/g,' ').trim().length, sum:d.querySelector('summary').textContent.trim().slice(0,16)})));
   console.log('guide notes:', notes.length, 'shortest', Math.min(...notes.map(n=>n.len)), '| sec-notes left:', await p.$$eval('.sec-note',e=>e.length));
-  if(notes.length!==22) errs.push('every section should carry User Guide Notes ('+notes.length+')');
+  if(notes.length!==23) errs.push('every section should carry User Guide Notes ('+notes.length+')');
   if(notes.some(n=>n.open || n.len<150 || !/^User Guide Notes/.test(n.sum))) errs.push('guide notes should be collapsed, titled User Guide Notes and carry the guide text');
   if(await p.$$eval('.sec-note',e=>e.length)) errs.push('section-note paragraphs should be gone');
   await p.click('#acctSec details.guide-notes summary'); await p.waitForTimeout(200);

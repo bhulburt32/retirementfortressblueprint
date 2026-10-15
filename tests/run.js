@@ -5,7 +5,7 @@
 const { spawnSync } = require('child_process');
 const path = require('path');
 const SUITE = [
-  't-default',   // the default (Smith) case loads and renders
+  't-cfneg', 't-status', 't-empty',
   't-report',    // executive summary: slide count, zero overflowing text boxes
   't-sso',       // Social Security claiming optimizer + report
   't-qcd',       // qualified charitable distributions

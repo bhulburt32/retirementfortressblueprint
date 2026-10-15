@@ -1,11 +1,12 @@
 {
   "name": "retirement-fortress-blueprint",
-  "version": "1.140.0",
+  "version": "1.172.0",
   "private": true,
   "description": "Alto Financial Group's Retirement Fortress Blueprint — single-file planning application and its reports",
   "scripts": {
     "notes": "python3 scripts/guide-notes.py",
     "build": "python3 scripts/build.py && node --check dist/_x.js",
+    "build:azure": "python3 scripts/build.py --azure && node --check dist/_x.js",
     "test": "npm run build && node tests/run.js",
     "test:one": "node tests/run.js",
     "guide:pdf": "node scripts/build-guide-pdf.js",

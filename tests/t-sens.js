@@ -4,7 +4,7 @@ const path = require('path');
   const b=await chromium.launch(process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH} : {});
   const ctx=await b.newContext(); const p=await ctx.newPage({viewport:{width:1400,height:900}});
   const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
-  await p.goto('file://'+path.resolve(__dirname,'../dist/preview.html'),{waitUntil:'load'}); await p.waitForTimeout(900);
+  await p.goto('file://'+path.resolve(__dirname,'../dist/preview-smith.html'),{waitUntil:'load'}); await p.waitForTimeout(900);
   await p.click('#expandAll'); await p.waitForTimeout(400);
   const txt=async sel=>(await p.$eval(sel,e=>e.textContent)).replace(/\s+/g,' ').trim();
   console.log('lead:', await txt('#sensLead'));

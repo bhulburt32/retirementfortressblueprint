@@ -5,7 +5,7 @@ const path = require('path');
   const b=await chromium.launch(process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH} : {});
   const ctx=await b.newContext(); const p=await ctx.newPage({viewport:{width:1500,height:950}});
   const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
-  await p.goto('file://'+path.resolve(__dirname,'../dist/preview.html'),{waitUntil:'load'}); await p.waitForTimeout(900);
+  await p.goto('file://'+path.resolve(__dirname,'../dist/preview-smith.html'),{waitUntil:'load'}); await p.waitForTimeout(900);
   await p.click('#expandAll'); await p.waitForTimeout(400);
   const txt=async sel=>(await p.$eval(sel,e=>e.textContent)).replace(/\s+/g,' ').trim();
   const v=async id=>p.$eval('#'+id,e=>e.value);
@@ -48,7 +48,7 @@ const path = require('path');
   console.log('answers kept after relabel:', await p.$$eval('#rqForm input:checked',o=>o.length));
   // the deck's risk page carries the category
   let [pop]=await Promise.all([ctx.waitForEvent('page',{timeout:30000}), p.click('#makeDeck')]); await pop.waitForLoadState('load'); await pop.waitForTimeout(800);
-  const deck=await pop.evaluate(()=>{ const sl=[...document.querySelectorAll('.sl')].find(s=>/Your Risk Tolerance, and the Risks We Found/.test(s.textContent)); const over=[...sl.querySelectorAll('.tx')].filter(e=>e.scrollHeight-e.clientHeight>6).length; return {over, text:sl.textContent.replace(/\s+/g,' ').slice(0,420)}; });
+  const deck=await pop.evaluate(()=>{ const sl=[...document.querySelectorAll('.sl')].find(s=>/Your Risk Tolerance, and the Risks We Found/.test(s.textContent) && !/Contents/.test(s.textContent.slice(0,40))); const over=[...sl.querySelectorAll('.tx')].filter(e=>e.scrollHeight-e.clientHeight>6).length; return {over, text:sl.textContent.replace(/\s+/g,' ').slice(0,420)}; });
   console.log('deck risk page:', JSON.stringify(deck)); if(!/Moderate · willingness/.test(deck.text)) errs.push('deck risk page lacks the questionnaire category'); if(deck.over) errs.push('deck risk page overflow '+deck.over);
   await pop.close();
   // the client report

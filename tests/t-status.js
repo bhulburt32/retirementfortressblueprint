@@ -1,6 +1,6 @@
 const { chromium } = require('playwright-core');
 (async () => {
-  const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const b = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
   const ctx = await b.newContext({ viewport: { width: 1400, height: 900 } }); const p = await ctx.newPage();
   const errs = []; p.on('pageerror', e => errs.push(String(e)));
   await p.goto('file://' + process.cwd() + '/preview-smith.html',{waitUntil:'load'}); await p.waitForTimeout(500); await p.click('#expandAll'); await p.waitForTimeout(300);

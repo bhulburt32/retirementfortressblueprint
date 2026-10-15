@@ -4,7 +4,7 @@ const path = require('path');
   const b=await chromium.launch(process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH} : {});
   const p=await b.newPage({viewport:{width:1600,height:950}});
   const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
-  await p.goto('file://'+path.resolve(__dirname,'../dist/preview.html'),{waitUntil:'load'}); await p.waitForTimeout(900);
+  await p.goto('file://'+path.resolve(__dirname,'../dist/preview-smith.html'),{waitUntil:'load'}); await p.waitForTimeout(900);
   await p.click('#expandAll'); await p.waitForTimeout(400);
   const txt=async sel=>(await p.$eval(sel,e=>e.textContent)).replace(/\s+/g,' ').trim();
   const annRows=async()=>p.$$eval('#annIncBody tr[data-ann]',rs=>rs.map(r=>({key:r.dataset.ann,name:r.querySelector('td').textContent.replace(/\s+/g,' ').trim(),amt:r.querySelector('[data-af=amt]').textContent,mo:r.querySelector('[data-ak=monthly]').value,auto:r.querySelector('[data-ak=monthly]').classList.contains('auto'),dis:r.querySelector('[data-ak=monthly]').disabled})));

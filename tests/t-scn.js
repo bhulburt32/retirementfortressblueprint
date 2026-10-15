@@ -4,7 +4,7 @@ const path = require('path');
   const b=await chromium.launch(process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH} : {});
   const ctx=await b.newContext(); const p=await ctx.newPage({viewport:{width:1500,height:950}});
   const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
-  const t0=Date.now(); await p.goto('file://'+path.resolve(__dirname,'../dist/preview.html'),{waitUntil:'load'}); await p.waitForTimeout(900); console.log('load+first render ms', Date.now()-t0);
+  const t0=Date.now(); await p.goto('file://'+path.resolve(__dirname,'../dist/preview-smith.html'),{waitUntil:'load'}); await p.waitForTimeout(900); console.log('load+first render ms', Date.now()-t0);
   await p.click('#expandAll'); await p.waitForTimeout(400);
   const txt=async sel=>(await p.$eval(sel,e=>e.textContent)).replace(/\s+/g,' ').trim();
   const cards=async()=>p.$$eval('#scnGrid .scn-card',cs=>cs.map(c=>c.querySelector('.scn-card-head').textContent.replace(/\s+/g,' ')+' || '+[...c.querySelectorAll('dl div')].filter(d=>/Foundation|Roth conv|Assets at end|Withdrawal/.test(d.textContent)).map(d=>d.textContent.replace(/\s+/g,' ')).join(' | ')+' || '+c.querySelector('.scn-card-foot').textContent.replace(/\s+/g,' ')));

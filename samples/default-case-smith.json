@@ -1,1 +1,1474 @@
-{"household":{"clientFirst":"Jeff","clientLast":"Smith","spouseFirst":"Jane","spouseLast":"Smith","advisor":"Daniel Asti","prepDate":"2026-10-08","needs":83709,"wants":32544,"bufMonths":6,"sizeYears":5,"sizeMode":"avg","yieldF":0.06,"foundGLI":true,"yieldW":0.06,"inflation":0.0326,"endAge":100,"growthW":0.015,"growthR":0.06,"medB":202.9,"medD":38.99,"clientDob":"1962-10-10","spouseDob":"1965-01-02","clientAge":63,"spouseAge":61,"clientSex":"male","spouseSex":"female","lifeCV":"no","ltcClient":975000,"ltcSpouse":861000,"newCust":"Fidelity","annuityCarrier":"Athene","ltcCarrier":"","employment":{"client":{"salary":0,"retire":"2026-10","deduct":0,"contrib":0,"employer":0,"contribAcct":"","raise":0},"spouse":{"salary":0,"retire":"2026-10","deduct":0,"contrib":0,"employer":0,"contribAcct":"","raise":0},"extra":[]},"benefits":{"ss":{"cola":0.025,"optimizer":{"lifeC":"","lifeS":"","rate":"","cutOn":true,"dobC":"","dobS":""},"client":{"pia":3491,"age":67},"spouse":{"pia":1083,"age":62}},"nonGuar":[{"who":"client","name":"inheritance","amt":0,"start":"2027-05","end":"2027-05","ongoing":false,"raise":0,"note":""}],"pensions":[{"who":"spouse","name":"Jane's PERS Pension","amt":1830,"start":"2027-09","cola":0,"surv":100}],"annuities":[{"who":"client","name":"Investor's Heritage","amt":366,"start":"2028-05","end":"","life":true,"cola":0,"surv":100,"acctId":""},{"who":"client","name":"Sentinel","amt":233,"start":"2026-06","end":"","life":true,"cola":0,"surv":100,"acctId":""}]},"ss":56156.7,"pension":21960,"otherInc":7188},"goals":[{"title":"Make savings last for life","detail":"Jeff and Jane want their money to support them well past age 94, covering about $50,000 a year in everyday spending plus $1,500 a month of fun money, without a market drop cutting their plan short by around 10 years.","src":"claude"},{"title":"Keep more of it from taxes","detail":"Jeff wants to cut the roughly $683,000 in projected lifetime taxes. The next 8 to 10 years, before required withdrawals begin, are a chance to use lower tax rates, including on Social Security.","src":"claude"},{"title":"Jane to Retire at 60 and 8 months","detail":"Jane wants to stop working at 60 years 8 months and take her pension at 62, about $1,830 a month. They want the pension choice to keep income going for whichever of them lives longer.","src":"advisor"},{"title":"Get the best from Social Security","detail":"Jeff started at $2,677 a month in February and worries he gave up benefits by claiming early. They want to know whether to reverse it, and when Jane should start hers.","src":"claude"},{"title":"Pass wealth on to family","detail":"Jeff wants to help his three granddaughters and children, avoid Pennsylvania inheritance tax, and have wills and trusts in place, learning from what happened with his sister and brother-in-law's estate.","src":"claude"}],"meetingNotes":[{"date":"2026-05-27","text":"Learning Meeting: Jeff Smith\n\nMay 27, 2026\n\n9:33 AM - 11:34 AM\n\nParticipants:\n\n\n\n\n\nJeff\n\n\n\nDaniel Dietrich\n\n\n\nDan Asti\n\n\n\n\n\nLearning Meeting: Jeff Smith\n\nMay 27, 2026\n\n9:33 AM - 11:34 AM\n\n\n\nClients\n\nJeff(19%)\n\nFinancial Advisors\n\nDaniel Dietrich(13%),Dan Asti(68%)\n\n\n\n\n\nMeeting Purpose\n\nThis was an introductory learning meeting with Jeff Smith, a 63-year-old recently retired client, facilitated by Daniel Dietrich and Dan Asti. The discussion centered on Jeff's current financial position, retirement income planning needs, Social Security and PSERS pension optimization for himself and his wife Jane, estate and legacy planning considerations, tax planning opportunities, investment product review, and the next steps for engaging in a comprehensive retirement income planning process with Alto.\n\nNon-Financial Personal Information\n\n\n\n\n\nJeff is 63 years old\n\n\n\nJeff's wife Jane is 60 years old\n\n\n\nJane works at a charter school and wants to be done working\n\n\n\nJane will be done with her job at 60 years and 8 months\n\n\n\nJeff experienced the loss of family members including his sister who passed in August and his brother-in-law Pat\n\n\n\nJeff's brother-in-law Pat wanted to give Christmas gifts before he passed\n\n\n\nJeff has been back and forth to Erie constantly where his sister and brother-in-law lived\n\n\n\nJeff had to sell his sister and brother-in-law's house in Erie\n\n\n\nJeff is the executor of his sister and brother-in-law's estate\n\n\n\nJeff has three granddaughters under the age of 2\n\n\n\nJeff was with all three granddaughters on Memorial Day\n\n\n\nJane's four grandparents were all in their 90s\n\n\n\nJane's parents are currently 88 and 89 years old\n\n\n\nJane's dad is starting to decline at 88\n\n\n\nJeff and Jane are planning a Disney vacation in October\n\n\n\nJeff and Jane have things they want to do for many years\n\n\n\nJeff's wife Jane likes to save money in envelopes\n\n\n\nJeff attends seminar things now because he has more time than he's ever had in the past\n\n\n\nJeff wants to learn different things\n\n\n\nJeff's company changed names three times in the past four years\n\n\n\nJeff took Social Security in February at age 63\n\n\n\nJeff has no debt and their annual expenses for necessities are around $35,000\n\n\n\nJeff lives north of the meeting location\n\nFinancial Facts by Topic\n\nTax Planning\n\n\n\n\n\nJeff took Social Security in February and is concerned about giving up benefits by taking it early\n\n\n\nJeff is worried about paying 85% tax on Social Security benefits unless not making any money\n\n\n\nJeff learned about gift tax issues when his brother-in-law gave $10,000 gifts instead of splitting them as $3,000 to individuals and $3,000 to spouses to avoid Pennsylvania inheritance tax\n\n\n\nJeff is in a tax bracket where he feels he carries more weight than other income levels\n\n\n\nThe financial planning software shows Jeff will pay approximately $683,000 in lifetime taxation under current scenario\n\n\n\nJeff has tax rate opportunities in early retirement years before higher tax brackets kick in later\n\nEstate Planning\n\n\n\n\n\nJeff learned hard lessons about estate planning when his sister passed in August and brother-in-law Pat wanted to give Christmas gifts before his own death\n\n\n\nJeff is concerned about not losing money to Pennsylvania inheritance tax\n\n\n\nThe estate Jeff is inheriting from will pay all taxes, so he should receive net amounts\n\n\n\nJeff mentioned his brother-in-law had conversations that put estate planning in place during his final months\n\nProfile & Goals\n\n\n\n\n\nJeff is 63 years old and his wife Jane is 60, with Jeff recently retired and Jane planning to retire at 60 and 8 months\n\n\n\nJeff has been attending financial seminars to learn about wealth management and legacy planning after experiencing losses from family deaths\n\n\n\nJeff and Jane want to do things for their three granddaughters under age two and plan activities that will require withdrawing money from accounts\n\n\n\nJeff is in a wealth category where he feels he takes more tax hits than lower or higher income brackets\n\n\n\nJeff wants to learn strategies to avoid losing money to taxes and inheritance issues\n\nEducation Planning\n\nNo relevant information detected.\n\nEquity Compensation\n\nNo relevant information detected.\n\nInvestment Management\n\n\n\n\n\nJeff has been working with someone on income stream planning for 2-3 years but has been afraid to pull the trigger\n\n\n\nJeff has a 6-year point-to-point variable annuity with Athene worth approximately $242,000 that matures in 2027\n\n\n\nJeff has an annuity with Equitable\n\n\n\nJeff has a Sentinel annuity\n\n\n\nJeff has an Investor's Heritage joint annuity\n\n\n\nJeff has pockets of money not currently allocated from inheritance and extra 401k due to company name changes\n\n\n\nJeff has a final 401k worth approximately $35,000\n\n\n\nJeff will receive an inherited IRA worth $82,000 on a 10-year drawdown\n\n\n\nJeff may receive approximately $60,000 in cash inheritance\n\nRetirement Forecasting\n\n\n\n\n\nJeff recently started taking Social Security at $2,677 per month\n\n\n\nJane's Social Security would be $1,083 at age 62 or $1,703 at age 67\n\n\n\nJane's PSERS pension estimated at $1,830 per month if taken at age 62 with option to withdraw $72,000 lump sum\n\n\n\nJane has 21.5 years of service with PSERS and can retire without penalty at age 62\n\n\n\nFinancial planning software shows Jeff is good until age 94 under current spending of $1,500 per month fun money\n\n\n\nSequence of return risk could take 10 years off the retirement plan\n\n\n\nLong-term care costs at age 80 could have similar impact as market decline\n\nCash Flow & Debt Management\n\n\n\n\n\nJeff estimates basic living expenses at $35,000 per year if going to nitty gritty necessities\n\n\n\nJeff suggests budgeting $50,000 per year for general expenses\n\n\n\nJeff has no debt currently\n\n\n\nJeff and Jane create their own debt as they go using credit cards\n\n\n\nJeff has approximately $130,000 in cash on hand that his wife saves in envelopes\n\n\n\nJeff is planning to fund a Disney vacation in October\n\nInsurance & Risk Management\n\n\n\n\n\nJeff can continue healthcare insurance through his wife's charter school employment by paying for it himself\n\n\n\nJeff is covered under Jane's healthcare for 18 months until he reaches age 65\n\n\n\nJane can continue using the charter school healthcare until she reaches 65\n\nFinancial Discussion\n\nRetirement Income Planning and Cash Flow Projections\n\n\n\n\n\nUsing Alto's proprietary retirement planning software, the advisors built out Jeff's income and asset picture. With estimated monthly expenses of approximately $7,000 plus $1,500 in discretionary spending (totaling roughly $102,000 annually) and a 3% inflation rate applied, the baseline projection showed Jeff's assets lasting until approximately age 91–94 under normal market conditions. The advisors demonstrated how adjusting discretionary spending — up to $2,500/month or down to $1,500/month — materially shifts the outcome, underscoring the importance of accurate budgeting. Jeff estimated his bare-minimum annual living expenses at $35,000, with a more realistic working budget of approximately $50,000 per year. The software projected cumulative lifetime tax payments of approximately $683,000 under the current structure. Jeff has no current debt and approximately $130,000 in cash on hand. The advisors noted that with proper planning and defensive positioning, Jeff has sufficient assets to support his retirement and potentially transfer wealth to the next generation.\n\nSocial Security Optimization\n\n\n\n\n\nJeff began receiving Social Security benefits of $2,677 per month in February 2026 at age 63. The advisors noted that because he started benefits recently, he may still have the option to reverse this decision and delay benefits to increase his monthly amount, though the advisors indicated they would model this to determine whether reversal is worthwhile given his current cash flow needs. Jane's estimated Social Security benefit is $1,083 per month at age 62 or $1,703 per month at age 67, based on her December 2025 Social Security statement. The advisors discussed a potential strategy where Jane turns on her own benefit early and later switches to Jeff's higher benefit when he would have reached full retirement age. The advisors also noted that the spousal add-on benefit may not provide significant additional value given that Jane's own benefit is relatively close to the spousal amount. All projections are estimates based on current information and are subject to change; actual Social Security benefits will depend on individual earnings records and the age at which benefits are claimed.\n\nPSERS Pension Planning\n\n\n\n\n\nJane is in the PSERS TD membership class and plans to stop working at age 60 years and 8 months but will defer filing her PSERS retirement application until age 62 to avoid early withdrawal penalties. At age 62, she is estimated to receive approximately $1,830 per month in pension income, with an estimated lump sum withdrawal option of approximately $72,000 (reflecting approximately 21.5 years of service). The advisors discussed the various PSERS pension options. Jeff and Jane had been leaning toward Option 1, which includes a depleting death benefit currently valued at approximately $319,000. The advisors explained that Option 1's death benefit decreases by the amount of each monthly pension payment received and typically depletes within approximately 10 years. Given Jane's strong family longevity — all four of her grandparents lived into their 90s and her parents are currently 88–89 years old — the advisors recommended reconsidering Option 1 in favor of a joint and survivorship option, which would provide continued income to Jeff if Jane predeceases him. The advisors also noted that the tax treatment of the PSERS death benefit (whether it is paid as a life insurance benefit or an IRA balance transfer) requires further research, as it affects the tax consequences. No final recommendation was made; further analysis is needed.\n\nSequence of Returns Risk and Market Volatility Protection\n\n\n\n\n\nThe advisors identified sequence of returns risk as Jeff's primary retirement concern at this stage. When the advisors applied a 2000-era geometric market risk scenario to the planning model, the projection showed the portfolio could be depleted approximately 10 years earlier than the baseline. The advisors explained that a significant market downturn in the early years of retirement, combined with ongoing withdrawals to fund living expenses, can substantially erode portfolio longevity. They discussed the concept of a defensive allocation — using a portion of assets in products with downside protection (such as indexed or fixed products) — to help preserve the portfolio base during market downturns. The advisors noted that if markets experience a prolonged decline and the client has no defensive buffer, the combination of declining asset values and ongoing withdrawals creates a compounding negative effect. They emphasized that this risk diminishes over time as the portfolio matures, with tax risk becoming the more prominent concern in later years (approximately 10–15 years into retirement). Past market performance is not indicative of future results, and all projections are illustrative estimates subject to change.\n\nLong-Term Care Planning and Healthcare Cost Inflation\n\n\n\n\n\nThe advisors modeled a long-term care scenario in which costs of approximately $10,000 per month begin at age 80. When healthcare inflation was increased to 7% in the model (noted as a conservative estimate given that healthcare inflation has historically run at 8–15% annually), the projection showed assets potentially depleting by age 81. The advisors noted that the average annual out-of-pocket medical expense for seniors is approximately $13,000, and that healthcare cost inflation continues to outpace general inflation significantly. Jeff is currently covered under Jane's charter school healthcare plan for 18 months following his retirement, which will carry him to age 65 and Medicare eligibility. Jane can continue coverage under the charter school plan until she reaches age 65. The advisors recommended evaluating whether the charter school plan is the most cost-effective option compared to marketplace alternatives, though they noted it is likely competitive. The advisors emphasized the importance of building a defensive position to address potential long-term care costs without depleting the core retirement portfolio. All healthcare cost projections are estimates and actual costs will vary based on individual health circumstances and future cost trends.\n\nTax Planning Opportunities\n\n\n\n\n\nThe advisors identified a meaningful tax planning window for Jeff over the next 8–10 years. The software analysis showed Jeff's current effective tax rate at approximately 7–22%, projected to increase to 24% and higher in later years as required minimum distributions (RMDs) begin and Social Security taxation increases. Dan Asti explained that Jeff is currently in an opportunity window before RMDs begin, during which strategic Roth conversions and other tax planning strategies could be implemented to reduce lifetime tax burden. The advisors noted that approximately $683,000 in projected lifetime taxes could be reduced with proper planning. They also emphasized the importance of understanding how different withdrawal strategies affect not only current taxes but also future Medicare IRMAA surcharges, which are determined based on income from two years prior. Jeff expressed frustration with his current tax burden, noting that his income bracket appears to carry a disproportionate tax load. The advisors acknowledged this and stressed the importance of strategic, coordinated planning across all accounts and income sources. Tax laws are subject to change, and the impact of any tax strategy should be evaluated in consultation with a qualified tax professional.\n\nEstate Planning and Legacy Considerations\n\n\n\n\n\nJeff shared that he learned difficult and costly lessons about estate and inheritance planning following the deaths of his sister and brother-in-law Pat. Specifically, Pat had intended to give $10,000 Christmas gifts to family members before his death, but the family later discovered that Pennsylvania imposes inheritance tax on gifts exceeding $3,000 per person per year. Jeff noted that had they known, they could have structured the gifts as $3,000 from Pat and $3,000 from his sister to each recipient (or split between spouses in the receiving households) to avoid the tax. The advisors discussed generational wealth transfer strategies, including the use of life insurance to pass inherited wealth to the next generation, stepped-up cost basis planning for non-qualified assets, and the importance of proper trust and will structures. The advisors noted that Jeff's three young granddaughters represent a meaningful legacy planning opportunity. They also discussed the challenges younger generations face in building wealth, including the widening gap between housing costs and income, and how strategic gifting — such as contributing to a down payment — can have a transformative long-term impact. The advisors noted their estate planning services (wills and trusts) are available at approximately half the cost of traditional attorneys, with comprehensive services available for around $4,000. Estate planning strategies involve complex legal and tax considerations; clients should consult with qualified legal and tax professionals.\n\nInvestment Portfolio Review and Fee Analysis\n\n\n\n\n\nThe advisors reviewed Jeff's current investment holdings, which include: a six-year point-to-point variable annuity with Sentinel valued at approximately $242,000 (maturing in 2027, annual fee approximately 0.95% or roughly $2,400/year); income annuities with Investors Heritage (joint) and Equitable totaling approximately $100,000; an inherited IRA of approximately $82,000–$90,000 subject to a 10-year drawdown requirement; a 401(k) with approximately $35,000; and approximately $130,000 in cash. Jeff also expects to receive approximately $60,000 in cash from an estate settlement, with the estate paying all associated inheritance taxes. The advisors expressed concern about the six-year point-to-point crediting structure of the Sentinel annuity, explaining that gains are not credited annually but only at the end of the six-year period, eliminating the benefit of annual compounding. They calculated that a straightforward 5% fixed product over five years would grow approximately $242,000 to approximately $308,000; accounting for the annuity's estimated $11,000 in fees over the period, the variable annuity would need to achieve approximately a 33% gain to match the fixed alternative on a net basis. The advisors noted the annuity has approximately one year remaining before it is free of surrender charges (2027) and recommended against renewing with another six-year crediting strategy. They also flagged the need to conduct detailed fact-finding calls with all carriers (Athene, Equitable, Sentinel) to fully understand fees, riders, surrender charges, and product terms before making any recommendations. No account movements or changes were recommended at this time. All investment comparisons are illustrative and based on assumptions that may not reflect actual future results; past performance does not guarantee future results.\n\n[Repeat as many as relevant topic are in the meeting.]\n\n\n\nClient's Talking Points\n\n\n\n\n\nJeff expressed uncertainty about how to strategically manage inherited funds for his children, particularly regarding whether to apply inheritance money toward their mortgage or invest it given current interest rates.\n\n\n\nJeff and Jane face significant tax liability exposure, with projections showing approximately $683,000 in cumulative lifetime taxes that could substantially reduce their legacy and retirement flexibility.\n\n\n\nJeff brought up concerns about sequence of returns risk and healthcare cost inflation potentially depleting his retirement assets, particularly noting that a market downturn combined with rising healthcare expenses could reduce his plan by up to 10 years and force him to rely on home equity in later years.\n\n\n\nFuture Meetings\n\nFinancial Plan Refinement Session\n\n2026-06-10T11:00:00\n\nAccount Information Gathering Call\n\n2026-06-01T12:30:00\n\nRisk Assessment and Strategy Discussion\n\n2026-06-03T11:00:00"}],"ltc":{"infl":0.045,"room":"semi","mem":0.25,"hours":44,"costs":null,"start":{"client":80,"spouse":80},"cog":{"client":true,"spouse":false},"dur":{"client":null,"spouse":null},"cov":{"client":0,"spouse":0},"link":true,"open":true},"estate":{"will":"no","willDate":"","trust":"no","trustDate":"","funded":"","poa":"no","poaDate":"","mpoa":"no","mpoaDate":"","bene":"no","beneDate":""},"debts":null,"lifePolicies":null,"ltcPolicies":null,"otherAssets":null,"nitrogen":{"name":"Jeff-and-Jane-Smith-Wealth-Report.pdf","text":"","analysis":{"riskNumber":50,"clientRiskNumber":48,"range":{"down":-9.66,"up":14.52},"rangeDollars":{"down":-166433,"up":250292},"value":1723208,"gpa":3.6,"dividend":0.67,"expense":0.56,"allocation":[{"cls":"Stocks","pct":32.03},{"cls":"Bonds","pct":2.8},{"cls":"Cash","pct":18.3},{"cls":"Other","pct":46.87}],"stress":[{"name":"2008 Bear Market","pct":-15.95,"dollars":-274770,"benchmark":-36.81},{"name":"Financial Crisis","pct":-23.79,"dollars":-410009,"benchmark":-54.78},{"name":"2013 Bull Market","pct":12.31,"dollars":212139,"benchmark":32.31},{"name":"Interest Rate Hike","pct":0.91,"dollars":15654,"benchmark":-5.13},{"name":"2020 Pandemic Crash","pct":-14.09,"dollars":-242858,"benchmark":-33.7},{"name":"2022 Inflation Crash","pct":-8.45,"dollars":-145673,"benchmark":-18.17}],"largest":[{"name":"Athene Amplify Var. Annuity - IRA (SPX 6-Year PTP with 20% Buffer)","pct":27.78,"riskNumber":52},{"name":"Allianz Index Advantage Var. Annuity - IRA","pct":17.37,"riskNumber":null},{"name":"Equitable Investment Edge 21 Select Var. Annuity - IRA","pct":12.61,"riskNumber":null},{"name":"Savings Account (Cash / Money Market)","pct":7.54,"riskNumber":1},{"name":"Jeff Fidelity IRA - 1509","pct":6.93,"riskNumber":null}],"summary":"The portfolio totals $1,723,208 across 15 accounts and has a Risk Number of 50, slightly above the clients' own Risk Number of 48. Its 95% six-month historical range runs from -9.66% (-$166,433) to +14.52% (+$250,292), and the allocation is roughly 32% stocks, 3% bonds, 18% cash and 47% other, which is mostly annuities. In the historical stress tests, the portfolio fell less than the S&P 500, for example -23.79% versus -54.78% in the Financial Crisis and -8.45% versus -18.17% in the 2022 Inflation Crash. It also captured less of the gain in the 2013 bull market (+12.31% versus +32.31%).","holdings":134},"src":"claude","at":"2026-10-08T21:43:38.384Z"},"risk":{"score":"50","tolerance":"","questionnaire":{"answers":{"q1":1,"q2":0,"q3":1,"q5":2,"q6":1,"q7":2,"q8":0,"q9":1,"q12":1,"q10":1,"q11":0},"amount":""},"selected":["seq","found","wd","walls","estate","bene","score"],"custom":[]},"tax":{"withdrawalOrder":["taxable","deferred","roth"],"roth":{"apply":true,"target":0.22,"start":"auto","order":"roof","irmaa":true},"qcd":{"apply":true,"client":"","spouse":"","startAge":71,"mode":"budget"}},"life":{"client":{"existing":100000,"relies":true,"years":"","health":"p","tobacco":false,"group":false},"spouse":{"existing":0,"relies":true,"years":"","health":"p","tobacco":false,"group":false},"mortgage":0,"debt":0,"college":0,"replace":0.7,"rate":0.02,"indep":22,"collegeCost":120000,"fin":15000,"open":true},"client":{"state":"PA","adults":[],"minors":[]},"accounts":[{"name":"Inherited IRA","owner":"client","cust":"Citizens","tax":"Qualified","pos":"Market","val":72000,"move":"yes","growth":null},{"name":"After Tax ","owner":"client","cust":"Fidelity/AssetMark","tax":"Non-Qualified","pos":"Market","val":66772,"move":"yes","growth":null},{"name":"Variable Annuity1","owner":"client","cust":"Equitable","tax":"Non-Qualified","pos":"Market","val":72330,"move":"yes","growth":null},{"name":"Fixed Annuity","owner":"client","cust":"ISDA Financial Life","tax":"Non-Qualified","pos":"MYGA Annuity","val":46572,"move":"yes","growth":null,"ann":{"company":"","product":"","rate":0.05,"interest":"deferred","maturity":"2029-10","monthly":null,"payout":"single","fees":null,"cap":null,"part":null,"floor":null}},{"name":"RILA Annuity","owner":"client","cust":"Athene","tax":"Qualified","pos":"RILA Annuity","val":404633,"move":"yes","growth":null,"ann":{"company":"","product":"","rate":null,"interest":"deferred","maturity":"","monthly":null,"payout":"single","fees":0.03,"cap":null,"part":null,"floor":null}},{"name":"Variable Annuity2","owner":"client","cust":"Allianz","tax":"Qualified","pos":"Variable Annuity","val":299235,"move":"yes","growth":null,"ann":{"company":"","product":"","rate":null,"interest":"deferred","maturity":"","monthly":null,"payout":"single","fees":0.03,"cap":null,"part":null,"floor":null}},{"name":"Variable Annuity3","owner":"client","cust":"Equitable","tax":"Qualified","pos":"Variable Annuity","val":58452,"move":"yes","growth":null,"ann":{"company":"","product":"","rate":null,"interest":"deferred","maturity":"","monthly":null,"payout":"single","fees":0.03,"cap":null,"part":null,"floor":null}},{"name":"Variable Annuity4 ","owner":"client","cust":"Equitable","tax":"Qualified","pos":"Variable Annuity","val":219397,"move":"yes","growth":null,"ann":{"company":"","product":"","rate":null,"interest":"deferred","maturity":"","monthly":null,"payout":"single","fees":0.03,"cap":null,"part":null,"floor":null}},{"name":"Jeff's IRA","owner":"client","cust":"Fidelity/AssetMark","tax":"Qualified","pos":"Market","val":67109,"move":"yes","growth":null},{"name":"Jeff's 2nd IRA","owner":"client","cust":"Fidelity/AssetMark","tax":"Qualified","pos":"Market","val":41121,"move":"yes","growth":null},{"name":"Jeff's Roth IRA","owner":"client","cust":"Fidelity/AssetMark","tax":"Roth","pos":"Market","val":6470,"move":"yes","growth":null},{"name":"Jane's Roth IRA","owner":"spouse","cust":"Fidelity/AssetMark","tax":"Roth","pos":"Market","val":47533,"move":"yes","growth":null},{"name":"Joint Checking","owner":"joint","cust":"Citizens","tax":"Non-Qualified","pos":"Cash","val":130000,"move":"yes","growth":null},{"name":"Inherited IRA Cash","owner":"client","cust":"Citizens","tax":"Qualified","pos":"Cash","val":10000,"move":"yes","growth":null},{"name":"Investor's Heritage","owner":"client","cust":"Investors Heritage","tax":"Qualified","pos":"Income Annuity (FIA)","val":49482,"move":"no","growth":null,"ann":{"company":"","product":"","rate":null,"interest":"deferred","maturity":"","monthly":400,"payout":"joint","fees":0.01,"cap":0.03,"part":null,"floor":null}},{"name":"Sentinel","owner":"client","cust":"Sentinel","tax":"Qualified","pos":"Income Annuity (FIA)","val":51151,"move":"no","growth":null,"ann":{"company":"","product":"","rate":null,"interest":"deferred","maturity":"","monthly":200,"payout":"joint","fees":0.01,"cap":0.03,"part":null,"floor":null}},{"name":"Jane's Pension","owner":"spouse","cust":"PSERS","tax":"Qualified","pos":"Market","val":72000,"move":"yes","growth":null},{"name":"Future Inheritancd","owner":"client","cust":"TBD","tax":"Non-Qualified","pos":"Cash","val":60000,"move":"yes","growth":null}],"budget":{"lines":{"hh:1":{"amt":389,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"hh:2":{"amt":73,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"hh:3":{"amt":1000,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"hh:7":{"amt":181,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"hh:9":{"amt":226,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"hh:10":{"amt":200,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"dl:0":{"amt":400,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"dl:1":{"amt":450,"nw":"want","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"hc:0":{"amt":1000,"nw":"need","start":"","end":"2027-10","note":"","label":"","auto":false,"autoStart":false},"hc:6":{"amt":155,"nw":"need","start":"2041-06","end":"","note":"","label":"","auto":false,"autoStart":false},"hc:8":{"amt":7,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"tr:1":{"amt":205,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"tr:2":{"amt":500,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"tr:3":{"amt":241,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"db:0":{"amt":779,"nw":"need","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"eo:2":{"amt":242,"nw":"want","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"eo:4":{"amt":2000,"nw":"want","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"eo:5":{"amt":20,"nw":"want","start":"","end":"","note":"","label":"","auto":false,"autoStart":false},"eo:7":{"amt":1000,"nw":"need","start":"2030-09","end":"","note":"","label":"Health Insurance HOP","auto":false,"autoStart":false},"eo:8":{"amt":136,"nw":"need","start":"","end":"","note":"","label":"Misc. Taxes","auto":false,"autoStart":false}},"link":true,"open":true},"scenarios":[{"adjMoves":[{"acct":14,"bucket":"foundation","amt":49482},{"acct":15,"bucket":"foundation","amt":51151},{"acct":12,"bucket":"reserve","amt":41854.5},{"acct":4,"bucket":"foundation","amt":228494.03158229153},{"acct":12,"bucket":"moat","amt":88145.5,"person":"client"},{"acct":2,"bucket":"moat","amt":72330,"person":"client"},{"acct":1,"bucket":"moat","amt":66772,"person":"client"},{"acct":17,"bucket":"moat","amt":60000,"person":"client"},{"acct":3,"bucket":"moat","amt":24453.267263427086,"person":"client"},{"acct":3,"bucket":"moat","amt":22118.732736572914,"person":"spouse"},{"acct":11,"bucket":"roof","amt":47533},{"acct":10,"bucket":"roof","amt":6470},{"acct":5,"bucket":"walls","amt":299235},{"acct":7,"bucket":"walls","amt":219397},{"acct":4,"bucket":"walls","amt":23768},{"acct":4,"bucket":"moat","amt":152370.96841770847,"person":"spouse"},{"acct":0,"bucket":"moat","amt":72000,"person":"spouse"},{"acct":16,"bucket":"moat","amt":26323.98705864628,"person":"spouse"},{"acct":8,"bucket":"roof","amt":67109},{"acct":6,"bucket":"roof","amt":58452},{"acct":16,"bucket":"roof","amt":45676.01294135372},{"acct":9,"bucket":"roof","amt":41121},{"acct":13,"bucket":"roof","amt":10000}],"incomeAdj":{"yF":"","fStart":"","yW":"","wStart":"","gPre":"","gPost":""},"annuityIncome":{"to:Jeff's Income Anuity":{"gli":"yes","start":"2026-10","monthly":"980","cola":"","wd":""},"to:Jeff Rollover IRA":{"gli":"yes","start":"","monthly":"1,142","cola":"","wd":""}},"ltcBenefits":{"who:client":{"monthly":"16,250","age":"80","years":"5.0","infl":"","growth":""},"who:spouse":{"monthly":"15,250","age":"80","years":"5.0","infl":"","growth":""}},"roofGrowth":{},"withdrawalOrder":["taxable","deferred","roth"],"roth":{"apply":true,"target":0.12,"start":"auto","order":"roof","irmaa":true},"qcd":{"apply":true,"client":"","spouse":"","startAge":71,"mode":"budget"},"name":"With Moat and 12% Roth Target"},{"adjMoves":[{"acct":14,"bucket":"foundation","amt":49482},{"acct":15,"bucket":"foundation","amt":51151},{"acct":12,"bucket":"reserve","amt":41854.5},{"acct":4,"bucket":"foundation","amt":228494.03158229153},{"acct":12,"bucket":"reserve","amt":57704.60358056266},{"acct":12,"bucket":"reserve","amt":30440.89641943734},{"acct":2,"bucket":"roof","amt":72330},{"acct":1,"bucket":"walls","amt":10061.803200334514,"prod":"AUM - Tax Free"},{"acct":11,"bucket":"roof","amt":47533},{"acct":10,"bucket":"roof","amt":6470},{"acct":5,"bucket":"walls","amt":299235},{"acct":7,"bucket":"walls","amt":219397},{"acct":4,"bucket":"walls","amt":23768},{"acct":17,"bucket":"walls","amt":60000,"prod":"AUM - Tax Free"},{"acct":1,"bucket":"walls","amt":56710.196799665486,"prod":"AUM - Tax Free"},{"acct":3,"bucket":"walls","amt":46572,"prod":"AUM - Tax Free"},{"acct":4,"bucket":"roof","amt":152370.96841770847},{"acct":0,"bucket":"roof","amt":72000},{"acct":16,"bucket":"roof","amt":72000},{"acct":8,"bucket":"roof","amt":67109},{"acct":6,"bucket":"roof","amt":58452},{"acct":9,"bucket":"roof","amt":41121},{"acct":13,"bucket":"roof","amt":10000}],"incomeAdj":{"yF":"","fStart":"","yW":"","wStart":"","gPre":"","gPost":""},"annuityIncome":{"to:Jeff Rollover IRA":{"start":"2026-10","monthly":"1,142"}},"ltcBenefits":{},"roofGrowth":{},"withdrawalOrder":["taxable","deferred","roth"],"roth":{"apply":false,"target":"auto","start":"auto","order":"roof","irmaa":true},"qcd":{"apply":true,"client":"","spouse":"","startAge":71,"mode":"budget"},"name":"No Moat without Roth Conversions"},{"adjMoves":[{"acct":14,"bucket":"foundation","amt":49482},{"acct":15,"bucket":"foundation","amt":51151},{"acct":12,"bucket":"reserve","amt":41854.5},{"acct":4,"bucket":"foundation","amt":228494.03158229153},{"acct":12,"bucket":"moat","amt":88145.5,"person":"client"},{"acct":2,"bucket":"moat","amt":72330,"person":"client"},{"acct":1,"bucket":"moat","amt":66772,"person":"client"},{"acct":17,"bucket":"moat","amt":60000,"person":"client"},{"acct":3,"bucket":"moat","amt":24453.267263427086,"person":"client"},{"acct":3,"bucket":"moat","amt":22118.732736572914,"person":"spouse"},{"acct":11,"bucket":"roof","amt":47533},{"acct":10,"bucket":"roof","amt":6470},{"acct":5,"bucket":"walls","amt":299235},{"acct":7,"bucket":"walls","amt":219397},{"acct":4,"bucket":"walls","amt":23768},{"acct":4,"bucket":"moat","amt":152370.96841770847,"person":"spouse"},{"acct":0,"bucket":"moat","amt":72000,"person":"spouse"},{"acct":16,"bucket":"moat","amt":26323.98705864628,"person":"spouse"},{"acct":8,"bucket":"roof","amt":67109},{"acct":6,"bucket":"roof","amt":58452},{"acct":16,"bucket":"roof","amt":45676.01294135372},{"acct":9,"bucket":"roof","amt":41121},{"acct":13,"bucket":"roof","amt":10000}],"incomeAdj":{"yF":"","fStart":"","yW":"","wStart":"","gPre":"","gPost":""},"annuityIncome":{"to:Jeff's Income Anuity":{"gli":"yes","start":"2026-10","monthly":"980","cola":"","wd":""},"to:Jeff Rollover IRA":{"gli":"yes","start":"","monthly":"1,142","cola":"","wd":""}},"ltcBenefits":{"who:client":{"monthly":"16,250","age":"80","years":"5.0","infl":"","growth":""},"who:spouse":{"monthly":"15,200","age":"80","years":"5.0","infl":"","growth":""}},"roofGrowth":{},"withdrawalOrder":["taxable","deferred","roth"],"roth":{"apply":true,"target":0.22,"start":"auto","order":"roof","irmaa":true},"qcd":{"apply":true,"client":"","spouse":"","startAge":71,"mode":"budget"},"name":"With Moat and 22% Roth Target"}],"activeScenario":2,"reportScenario":0,"incomeAdj":null,"annuityIncome":{"to:Jeff's Income Anuity":{"gli":"yes","start":"2026-10","monthly":"980","cola":"","wd":""},"to:Jeff Rollover IRA":{"gli":"yes","start":"","monthly":"1,142","cola":"","wd":""}},"ltcBenefits":{"who:client":{"monthly":"16,250","age":"80","years":"5.0","infl":"","growth":""},"who:spouse":{"monthly":"15,200","age":"80","years":"5.0","infl":"","growth":""}},"roofGrowth":null,"transfers":[{"acct":14,"bucket":"foundation","amt":49482},{"acct":15,"bucket":"foundation","amt":51151},{"acct":12,"bucket":"reserve","amt":41854.5},{"acct":4,"bucket":"foundation","amt":228494.03158229153},{"acct":12,"bucket":"moat","amt":88145.5,"person":"client"},{"acct":2,"bucket":"moat","amt":72330,"person":"client"},{"acct":1,"bucket":"moat","amt":66772,"person":"client"},{"acct":17,"bucket":"moat","amt":60000,"person":"client"},{"acct":3,"bucket":"moat","amt":24453.267263427086,"person":"client"},{"acct":3,"bucket":"moat","amt":22118.732736572914,"person":"spouse"},{"acct":11,"bucket":"roof","amt":47533},{"acct":10,"bucket":"roof","amt":6470},{"acct":5,"bucket":"walls","amt":299235},{"acct":7,"bucket":"walls","amt":219397},{"acct":4,"bucket":"walls","amt":23768},{"acct":4,"bucket":"moat","amt":152370.96841770847,"person":"spouse"},{"acct":0,"bucket":"moat","amt":72000,"person":"spouse"},{"acct":16,"bucket":"moat","amt":26323.98705864628,"person":"spouse"},{"acct":8,"bucket":"roof","amt":67109},{"acct":6,"bucket":"roof","amt":58452},{"acct":16,"bucket":"roof","amt":45676.01294135372},{"acct":9,"bucket":"roof","amt":41121},{"acct":13,"bucket":"roof","amt":10000}]}
+{
+ "household": {
+  "clientFirst": "Jeff",
+  "clientLast": "Smith",
+  "spouseFirst": "Jane",
+  "spouseLast": "Smith",
+  "advisor": "Daniel Asti",
+  "prepDate": "2026-10-08",
+  "needs": 83709,
+  "wants": 32544,
+  "bufMonths": 6,
+  "sizeYears": 5,
+  "sizeMode": "avg",
+  "yieldF": 0.06,
+  "foundGLI": true,
+  "yieldW": 0.06,
+  "inflation": 0.0326,
+  "endAge": 100,
+  "growthW": 0.015,
+  "growthR": 0.06,
+  "medB": 202.9,
+  "medD": 38.99,
+  "clientDob": "1962-10-10",
+  "spouseDob": "1965-01-02",
+  "clientAge": 63,
+  "spouseAge": 61,
+  "clientSex": "male",
+  "spouseSex": "female",
+  "lifeCV": "no",
+  "ltcClient": 975000,
+  "ltcSelf": 0,
+  "ltcSpouse": 861000,
+  "newCust": "Fidelity",
+  "annuityCarrier": "Athene",
+  "ltcCarrier": "",
+  "employment": {
+   "client": {
+    "salary": 0,
+    "retire": "2026-10",
+    "deduct": 0,
+    "contrib": 0,
+    "employer": 0,
+    "contribAcct": "",
+    "raise": 0
+   },
+   "spouse": {
+    "salary": 0,
+    "retire": "2026-10",
+    "deduct": 0,
+    "contrib": 0,
+    "employer": 0,
+    "contribAcct": "",
+    "raise": 0
+   },
+   "extra": []
+  },
+  "benefits": {
+   "ss": {
+    "cola": 0.025,
+    "optimizer": {
+     "lifeC": "",
+     "lifeS": "",
+     "rate": "",
+     "cutOn": true,
+     "dobC": "",
+     "dobS": ""
+    },
+    "client": {
+     "pia": 3491,
+     "age": 67
+    },
+    "spouse": {
+     "pia": 1083,
+     "age": 62
+    }
+   },
+   "nonGuar": [
+    {
+     "who": "client",
+     "name": "inheritance",
+     "amt": 0,
+     "start": "2027-05",
+     "end": "2027-05",
+     "ongoing": false,
+     "raise": 0,
+     "note": ""
+    }
+   ],
+   "pensions": [
+    {
+     "who": "spouse",
+     "name": "Jane's PERS Pension",
+     "amt": 1830,
+     "start": "2027-09",
+     "cola": 0,
+     "surv": 100
+    }
+   ],
+   "annuities": [
+    {
+     "who": "client",
+     "name": "Investor's Heritage",
+     "amt": 366,
+     "start": "2028-05",
+     "end": "",
+     "life": true,
+     "cola": 0,
+     "surv": 100,
+     "acctId": ""
+    },
+    {
+     "who": "client",
+     "name": "Sentinel",
+     "amt": 233,
+     "start": "2026-06",
+     "end": "",
+     "life": true,
+     "cola": 0,
+     "surv": 100,
+     "acctId": ""
+    }
+   ]
+  },
+  "ss": 56156.7,
+  "pension": 21960,
+  "otherInc": 7188
+ },
+ "goals": [
+  {
+   "title": "Make savings last for life",
+   "detail": "Jeff and Jane want their money to support them well past age 94, covering about $50,000 a year in everyday spending plus $1,500 a month of fun money, without a market drop cutting their plan short by around 10 years.",
+   "src": "claude"
+  },
+  {
+   "title": "Keep more of it from taxes",
+   "detail": "Jeff wants to cut the roughly $683,000 in projected lifetime taxes. The next 8 to 10 years, before required withdrawals begin, are a chance to use lower tax rates, including on Social Security.",
+   "src": "claude"
+  },
+  {
+   "title": "Jane to Retire at 60 and 8 months",
+   "detail": "Jane wants to stop working at 60 years 8 months and take her pension at 62, about $1,830 a month. They want the pension choice to keep income going for whichever of them lives longer.",
+   "src": "advisor"
+  },
+  {
+   "title": "Get the best from Social Security",
+   "detail": "Jeff started at $2,677 a month in February and worries he gave up benefits by claiming early. They want to know whether to reverse it, and when Jane should start hers.",
+   "src": "claude"
+  },
+  {
+   "title": "Pass wealth on to family",
+   "detail": "Jeff wants to help his three granddaughters and children, avoid Pennsylvania inheritance tax, and have wills and trusts in place, learning from what happened with his sister and brother-in-law's estate.",
+   "src": "claude"
+  }
+ ],
+ "meetingNotes": [
+  {
+   "date": "2026-05-27",
+   "text": "Learning Meeting: Jeff Smith\\\\n\\\\nMay 27, 2026\\\\n\\\\n9:33 AM - 11:34 AM\\\\n\\\\nParticipants:\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff\\\\n\\\\n\\\\n\\\\nDaniel Dietrich\\\\n\\\\n\\\\n\\\\nDan Asti\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nLearning Meeting: Jeff Smith\\\\n\\\\nMay 27, 2026\\\\n\\\\n9:33 AM - 11:34 AM\\\\n\\\\n\\\\n\\\\nClients\\\\n\\\\nJeff(19%)\\\\n\\\\nFinancial Advisors\\\\n\\\\nDaniel Dietrich(13%),Dan Asti(68%)\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nMeeting Purpose\\\\n\\\\nThis was an introductory learning meeting with Jeff Smith, a 63-year-old recently retired client, facilitated by Daniel Dietrich and Dan Asti. The discussion centered on Jeff's current financial position, retirement income planning needs, Social Security and PSERS pension optimization for himself and his wife Jane, estate and legacy planning considerations, tax planning opportunities, investment product review, and the next steps for engaging in a comprehensive retirement income planning process with Alto.\\\\n\\\\nNon-Financial Personal Information\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff is 63 years old\\\\n\\\\n\\\\n\\\\nJeff's wife Jane is 60 years old\\\\n\\\\n\\\\n\\\\nJane works at a charter school and wants to be done working\\\\n\\\\n\\\\n\\\\nJane will be done with her job at 60 years and 8 months\\\\n\\\\n\\\\n\\\\nJeff experienced the loss of family members including his sister who passed in August and his brother-in-law Pat\\\\n\\\\n\\\\n\\\\nJeff's brother-in-law Pat wanted to give Christmas gifts before he passed\\\\n\\\\n\\\\n\\\\nJeff has been back and forth to Erie constantly where his sister and brother-in-law lived\\\\n\\\\n\\\\n\\\\nJeff had to sell his sister and brother-in-law's house in Erie\\\\n\\\\n\\\\n\\\\nJeff is the executor of his sister and brother-in-law's estate\\\\n\\\\n\\\\n\\\\nJeff has three granddaughters under the age of 2\\\\n\\\\n\\\\n\\\\nJeff was with all three granddaughters on Memorial Day\\\\n\\\\n\\\\n\\\\nJane's four grandparents were all in their 90s\\\\n\\\\n\\\\n\\\\nJane's parents are currently 88 and 89 years old\\\\n\\\\n\\\\n\\\\nJane's dad is starting to decline at 88\\\\n\\\\n\\\\n\\\\nJeff and Jane are planning a Disney vacation in October\\\\n\\\\n\\\\n\\\\nJeff and Jane have things they want to do for many years\\\\n\\\\n\\\\n\\\\nJeff's wife Jane likes to save money in envelopes\\\\n\\\\n\\\\n\\\\nJeff attends seminar things now because he has more time than he's ever had in the past\\\\n\\\\n\\\\n\\\\nJeff wants to learn different things\\\\n\\\\n\\\\n\\\\nJeff's company changed names three times in the past four years\\\\n\\\\n\\\\n\\\\nJeff took Social Security in February at age 63\\\\n\\\\n\\\\n\\\\nJeff has no debt and their annual expenses for necessities are around $35,000\\\\n\\\\n\\\\n\\\\nJeff lives north of the meeting location\\\\n\\\\nFinancial Facts by Topic\\\\n\\\\nTax Planning\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff took Social Security in February and is concerned about giving up benefits by taking it early\\\\n\\\\n\\\\n\\\\nJeff is worried about paying 85% tax on Social Security benefits unless not making any money\\\\n\\\\n\\\\n\\\\nJeff learned about gift tax issues when his brother-in-law gave $10,000 gifts instead of splitting them as $3,000 to individuals and $3,000 to spouses to avoid Pennsylvania inheritance tax\\\\n\\\\n\\\\n\\\\nJeff is in a tax bracket where he feels he carries more weight than other income levels\\\\n\\\\n\\\\n\\\\nThe financial planning software shows Jeff will pay approximately $683,000 in lifetime taxation under current scenario\\\\n\\\\n\\\\n\\\\nJeff has tax rate opportunities in early retirement years before higher tax brackets kick in later\\\\n\\\\nEstate Planning\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff learned hard lessons about estate planning when his sister passed in August and brother-in-law Pat wanted to give Christmas gifts before his own death\\\\n\\\\n\\\\n\\\\nJeff is concerned about not losing money to Pennsylvania inheritance tax\\\\n\\\\n\\\\n\\\\nThe estate Jeff is inheriting from will pay all taxes, so he should receive net amounts\\\\n\\\\n\\\\n\\\\nJeff mentioned his brother-in-law had conversations that put estate planning in place during his final months\\\\n\\\\nProfile & Goals\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff is 63 years old and his wife Jane is 60, with Jeff recently retired and Jane planning to retire at 60 and 8 months\\\\n\\\\n\\\\n\\\\nJeff has been attending financial seminars to learn about wealth management and legacy planning after experiencing losses from family deaths\\\\n\\\\n\\\\n\\\\nJeff and Jane want to do things for their three granddaughters under age two and plan activities that will require withdrawing money from accounts\\\\n\\\\n\\\\n\\\\nJeff is in a wealth category where he feels he takes more tax hits than lower or higher income brackets\\\\n\\\\n\\\\n\\\\nJeff wants to learn strategies to avoid losing money to taxes and inheritance issues\\\\n\\\\nEducation Planning\\\\n\\\\nNo relevant information detected.\\\\n\\\\nEquity Compensation\\\\n\\\\nNo relevant information detected.\\\\n\\\\nInvestment Management\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff has been working with someone on income stream planning for 2-3 years but has been afraid to pull the trigger\\\\n\\\\n\\\\n\\\\nJeff has a 6-year point-to-point variable annuity with Athene worth approximately $242,000 that matures in 2027\\\\n\\\\n\\\\n\\\\nJeff has an annuity with Equitable\\\\n\\\\n\\\\n\\\\nJeff has a Sentinel annuity\\\\n\\\\n\\\\n\\\\nJeff has an Investor's Heritage joint annuity\\\\n\\\\n\\\\n\\\\nJeff has pockets of money not currently allocated from inheritance and extra 401k due to company name changes\\\\n\\\\n\\\\n\\\\nJeff has a final 401k worth approximately $35,000\\\\n\\\\n\\\\n\\\\nJeff will receive an inherited IRA worth $82,000 on a 10-year drawdown\\\\n\\\\n\\\\n\\\\nJeff may receive approximately $60,000 in cash inheritance\\\\n\\\\nRetirement Forecasting\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff recently started taking Social Security at $2,677 per month\\\\n\\\\n\\\\n\\\\nJane's Social Security would be $1,083 at age 62 or $1,703 at age 67\\\\n\\\\n\\\\n\\\\nJane's PSERS pension estimated at $1,830 per month if taken at age 62 with option to withdraw $72,000 lump sum\\\\n\\\\n\\\\n\\\\nJane has 21.5 years of service with PSERS and can retire without penalty at age 62\\\\n\\\\n\\\\n\\\\nFinancial planning software shows Jeff is good until age 94 under current spending of $1,500 per month fun money\\\\n\\\\n\\\\n\\\\nSequence of return risk could take 10 years off the retirement plan\\\\n\\\\n\\\\n\\\\nLong-term care costs at age 80 could have similar impact as market decline\\\\n\\\\nCash Flow & Debt Management\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff estimates basic living expenses at $35,000 per year if going to nitty gritty necessities\\\\n\\\\n\\\\n\\\\nJeff suggests budgeting $50,000 per year for general expenses\\\\n\\\\n\\\\n\\\\nJeff has no debt currently\\\\n\\\\n\\\\n\\\\nJeff and Jane create their own debt as they go using credit cards\\\\n\\\\n\\\\n\\\\nJeff has approximately $130,000 in cash on hand that his wife saves in envelopes\\\\n\\\\n\\\\n\\\\nJeff is planning to fund a Disney vacation in October\\\\n\\\\nInsurance & Risk Management\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff can continue healthcare insurance through his wife's charter school employment by paying for it himself\\\\n\\\\n\\\\n\\\\nJeff is covered under Jane's healthcare for 18 months until he reaches age 65\\\\n\\\\n\\\\n\\\\nJane can continue using the charter school healthcare until she reaches 65\\\\n\\\\nFinancial Discussion\\\\n\\\\nRetirement Income Planning and Cash Flow Projections\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nUsing Alto's proprietary retirement planning software, the advisors built out Jeff's income and asset picture. With estimated monthly expenses of approximately $7,000 plus $1,500 in discretionary spending (totaling roughly $102,000 annually) and a 3% inflation rate applied, the baseline projection showed Jeff's assets lasting until approximately age 91–94 under normal market conditions. The advisors demonstrated how adjusting discretionary spending — up to $2,500/month or down to $1,500/month — materially shifts the outcome, underscoring the importance of accurate budgeting. Jeff estimated his bare-minimum annual living expenses at $35,000, with a more realistic working budget of approximately $50,000 per year. The software projected cumulative lifetime tax payments of approximately $683,000 under the current structure. Jeff has no current debt and approximately $130,000 in cash on hand. The advisors noted that with proper planning and defensive positioning, Jeff has sufficient assets to support his retirement and potentially transfer wealth to the next generation.\\\\n\\\\nSocial Security Optimization\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff began receiving Social Security benefits of $2,677 per month in February 2026 at age 63. The advisors noted that because he started benefits recently, he may still have the option to reverse this decision and delay benefits to increase his monthly amount, though the advisors indicated they would model this to determine whether reversal is worthwhile given his current cash flow needs. Jane's estimated Social Security benefit is $1,083 per month at age 62 or $1,703 per month at age 67, based on her December 2025 Social Security statement. The advisors discussed a potential strategy where Jane turns on her own benefit early and later switches to Jeff's higher benefit when he would have reached full retirement age. The advisors also noted that the spousal add-on benefit may not provide significant additional value given that Jane's own benefit is relatively close to the spousal amount. All projections are estimates based on current information and are subject to change; actual Social Security benefits will depend on individual earnings records and the age at which benefits are claimed.\\\\n\\\\nPSERS Pension Planning\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJane is in the PSERS TD membership class and plans to stop working at age 60 years and 8 months but will defer filing her PSERS retirement application until age 62 to avoid early withdrawal penalties. At age 62, she is estimated to receive approximately $1,830 per month in pension income, with an estimated lump sum withdrawal option of approximately $72,000 (reflecting approximately 21.5 years of service). The advisors discussed the various PSERS pension options. Jeff and Jane had been leaning toward Option 1, which includes a depleting death benefit currently valued at approximately $319,000. The advisors explained that Option 1's death benefit decreases by the amount of each monthly pension payment received and typically depletes within approximately 10 years. Given Jane's strong family longevity — all four of her grandparents lived into their 90s and her parents are currently 88–89 years old — the advisors recommended reconsidering Option 1 in favor of a joint and survivorship option, which would provide continued income to Jeff if Jane predeceases him. The advisors also noted that the tax treatment of the PSERS death benefit (whether it is paid as a life insurance benefit or an IRA balance transfer) requires further research, as it affects the tax consequences. No final recommendation was made; further analysis is needed.\\\\n\\\\nSequence of Returns Risk and Market Volatility Protection\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nThe advisors identified sequence of returns risk as Jeff's primary retirement concern at this stage. When the advisors applied a 2000-era geometric market risk scenario to the planning model, the projection showed the portfolio could be depleted approximately 10 years earlier than the baseline. The advisors explained that a significant market downturn in the early years of retirement, combined with ongoing withdrawals to fund living expenses, can substantially erode portfolio longevity. They discussed the concept of a defensive allocation — using a portion of assets in products with downside protection (such as indexed or fixed products) — to help preserve the portfolio base during market downturns. The advisors noted that if markets experience a prolonged decline and the client has no defensive buffer, the combination of declining asset values and ongoing withdrawals creates a compounding negative effect. They emphasized that this risk diminishes over time as the portfolio matures, with tax risk becoming the more prominent concern in later years (approximately 10–15 years into retirement). Past market performance is not indicative of future results, and all projections are illustrative estimates subject to change.\\\\n\\\\nLong-Term Care Planning and Healthcare Cost Inflation\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nThe advisors modeled a long-term care scenario in which costs of approximately $10,000 per month begin at age 80. When healthcare inflation was increased to 7% in the model (noted as a conservative estimate given that healthcare inflation has historically run at 8–15% annually), the projection showed assets potentially depleting by age 81. The advisors noted that the average annual out-of-pocket medical expense for seniors is approximately $13,000, and that healthcare cost inflation continues to outpace general inflation significantly. Jeff is currently covered under Jane's charter school healthcare plan for 18 months following his retirement, which will carry him to age 65 and Medicare eligibility. Jane can continue coverage under the charter school plan until she reaches age 65. The advisors recommended evaluating whether the charter school plan is the most cost-effective option compared to marketplace alternatives, though they noted it is likely competitive. The advisors emphasized the importance of building a defensive position to address potential long-term care costs without depleting the core retirement portfolio. All healthcare cost projections are estimates and actual costs will vary based on individual health circumstances and future cost trends.\\\\n\\\\nTax Planning Opportunities\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nThe advisors identified a meaningful tax planning window for Jeff over the next 8–10 years. The software analysis showed Jeff's current effective tax rate at approximately 7–22%, projected to increase to 24% and higher in later years as required minimum distributions (RMDs) begin and Social Security taxation increases. Dan Asti explained that Jeff is currently in an opportunity window before RMDs begin, during which strategic Roth conversions and other tax planning strategies could be implemented to reduce lifetime tax burden. The advisors noted that approximately $683,000 in projected lifetime taxes could be reduced with proper planning. They also emphasized the importance of understanding how different withdrawal strategies affect not only current taxes but also future Medicare IRMAA surcharges, which are determined based on income from two years prior. Jeff expressed frustration with his current tax burden, noting that his income bracket appears to carry a disproportionate tax load. The advisors acknowledged this and stressed the importance of strategic, coordinated planning across all accounts and income sources. Tax laws are subject to change, and the impact of any tax strategy should be evaluated in consultation with a qualified tax professional.\\\\n\\\\nEstate Planning and Legacy Considerations\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff shared that he learned difficult and costly lessons about estate and inheritance planning following the deaths of his sister and brother-in-law Pat. Specifically, Pat had intended to give $10,000 Christmas gifts to family members before his death, but the family later discovered that Pennsylvania imposes inheritance tax on gifts exceeding $3,000 per person per year. Jeff noted that had they known, they could have structured the gifts as $3,000 from Pat and $3,000 from his sister to each recipient (or split between spouses in the receiving households) to avoid the tax. The advisors discussed generational wealth transfer strategies, including the use of life insurance to pass inherited wealth to the next generation, stepped-up cost basis planning for non-qualified assets, and the importance of proper trust and will structures. The advisors noted that Jeff's three young granddaughters represent a meaningful legacy planning opportunity. They also discussed the challenges younger generations face in building wealth, including the widening gap between housing costs and income, and how strategic gifting — such as contributing to a down payment — can have a transformative long-term impact. The advisors noted their estate planning services (wills and trusts) are available at approximately half the cost of traditional attorneys, with comprehensive services available for around $4,000. Estate planning strategies involve complex legal and tax considerations; clients should consult with qualified legal and tax professionals.\\\\n\\\\nInvestment Portfolio Review and Fee Analysis\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nThe advisors reviewed Jeff's current investment holdings, which include: a six-year point-to-point variable annuity with Sentinel valued at approximately $242,000 (maturing in 2027, annual fee approximately 0.95% or roughly $2,400/year); income annuities with Investors Heritage (joint) and Equitable totaling approximately $100,000; an inherited IRA of approximately $82,000–$90,000 subject to a 10-year drawdown requirement; a 401(k) with approximately $35,000; and approximately $130,000 in cash. Jeff also expects to receive approximately $60,000 in cash from an estate settlement, with the estate paying all associated inheritance taxes. The advisors expressed concern about the six-year point-to-point crediting structure of the Sentinel annuity, explaining that gains are not credited annually but only at the end of the six-year period, eliminating the benefit of annual compounding. They calculated that a straightforward 5% fixed product over five years would grow approximately $242,000 to approximately $308,000; accounting for the annuity's estimated $11,000 in fees over the period, the variable annuity would need to achieve approximately a 33% gain to match the fixed alternative on a net basis. The advisors noted the annuity has approximately one year remaining before it is free of surrender charges (2027) and recommended against renewing with another six-year crediting strategy. They also flagged the need to conduct detailed fact-finding calls with all carriers (Athene, Equitable, Sentinel) to fully understand fees, riders, surrender charges, and product terms before making any recommendations. No account movements or changes were recommended at this time. All investment comparisons are illustrative and based on assumptions that may not reflect actual future results; past performance does not guarantee future results.\\\\n\\\\n[Repeat as many as relevant topic are in the meeting.]\\\\n\\\\n\\\\n\\\\nClient's Talking Points\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff expressed uncertainty about how to strategically manage inherited funds for his children, particularly regarding whether to apply inheritance money toward their mortgage or invest it given current interest rates.\\\\n\\\\n\\\\n\\\\nJeff and Jane face significant tax liability exposure, with projections showing approximately $683,000 in cumulative lifetime taxes that could substantially reduce their legacy and retirement flexibility.\\\\n\\\\n\\\\n\\\\nJeff brought up concerns about sequence of returns risk and healthcare cost inflation potentially depleting his retirement assets, particularly noting that a market downturn combined with rising healthcare expenses could reduce his plan by up to 10 years and force him to rely on home equity in later years.\\\\n\\\\n\\\\n\\\\nFuture Meetings\\\\n\\\\nFinancial Plan Refinement Session\\\\n\\\\n2026-06-10T11:00:00\\\\n\\\\nAccount Information Gathering Call\\\\n\\\\n2026-06-01T12:30:00\\\\n\\\\nRisk Assessment and Strategy Discussion\\\\n\\\\n2026-06-03T11:00:00"
+  }
+ ],
+ "ltc": {
+  "infl": 0.045,
+  "room": "semi",
+  "mem": 0.25,
+  "hours": 44,
+  "costs": null,
+  "start": {
+   "client": 80,
+   "spouse": 80
+  },
+  "cog": {
+   "client": true,
+   "spouse": false
+  },
+  "dur": {
+   "client": null,
+   "spouse": null
+  },
+  "cov": {
+   "client": 0,
+   "spouse": 0
+  },
+  "link": true,
+  "open": true
+ },
+ "estate": {
+  "will": "no",
+  "willDate": "",
+  "trust": "no",
+  "trustDate": "",
+  "funded": "",
+  "poa": "no",
+  "poaDate": "",
+  "mpoa": "no",
+  "mpoaDate": "",
+  "bene": "no",
+  "beneDate": ""
+ },
+ "debts": null,
+ "lifePolicies": null,
+ "ltcPolicies": null,
+ "otherAssets": null,
+ "nitrogen": null,
+ "risk": {
+  "score": "50",
+  "tolerance": "",
+  "questionnaire": {
+   "answers": {
+    "q1": 1,
+    "q2": 0,
+    "q3": 1,
+    "q5": 2,
+    "q6": 1,
+    "q7": 2,
+    "q8": 0,
+    "q9": 1,
+    "q12": 1,
+    "q10": 1,
+    "q11": 0
+   },
+   "amount": ""
+  },
+  "selected": [
+   "seq",
+   "found",
+   "wd",
+   "walls",
+   "estate",
+   "bene",
+   "score",
+   "ltc",
+   "tax",
+   "written"
+  ],
+  "custom": []
+ },
+ "tax": {
+  "withdrawalOrder": [
+   "taxable",
+   "deferred",
+   "roth"
+  ],
+  "roth": {
+   "apply": true,
+   "target": 0.22,
+   "start": "auto",
+   "order": "roof",
+   "irmaa": true
+  },
+  "qcd": {
+   "apply": true,
+   "client": "",
+   "spouse": "",
+   "startAge": 71,
+   "mode": "budget"
+  }
+ },
+ "life": {
+  "client": {
+   "existing": 100000,
+   "relies": true,
+   "years": "",
+   "health": "p",
+   "tobacco": false,
+   "group": false
+  },
+  "spouse": {
+   "existing": 0,
+   "relies": true,
+   "years": "",
+   "health": "p",
+   "tobacco": false,
+   "group": false
+  },
+  "mortgage": 0,
+  "debt": 0,
+  "college": 0,
+  "replace": 0.7,
+  "rate": 0.02,
+  "indep": 22,
+  "collegeCost": 120000,
+  "fin": 15000,
+  "open": true
+ },
+ "client": {
+  "state": "PA",
+  "adults": [],
+  "minors": []
+ },
+ "accounts": [
+  {
+   "name": "Inherited IRA",
+   "owner": "client",
+   "cust": "Citizens",
+   "tax": "Qualified",
+   "pos": "Market",
+   "val": 72000,
+   "move": "yes",
+   "growth": 0.05
+  },
+  {
+   "name": "After Tax ",
+   "owner": "client",
+   "cust": "Fidelity/AssetMark",
+   "tax": "Non-Qualified",
+   "pos": "Market",
+   "val": 66772,
+   "move": "yes",
+   "growth": 0.05
+  },
+  {
+   "name": "Variable Annuity1",
+   "owner": "client",
+   "cust": "Equitable",
+   "tax": "Non-Qualified",
+   "pos": "Market",
+   "val": 72330,
+   "move": "yes",
+   "growth": 0.05
+  },
+  {
+   "name": "Fixed Annuity",
+   "owner": "client",
+   "cust": "ISDA Financial Life",
+   "tax": "Non-Qualified",
+   "pos": "MYGA Annuity",
+   "val": 46572,
+   "move": "yes",
+   "growth": 0.05,
+   "ann": {
+    "company": "",
+    "product": "",
+    "rate": 0.05,
+    "interest": "deferred",
+    "maturity": "2029-10",
+    "monthly": null,
+    "payout": "single",
+    "fees": null,
+    "cap": null,
+    "part": null,
+    "floor": null
+   }
+  },
+  {
+   "name": "RILA Annuity",
+   "owner": "client",
+   "cust": "Athene",
+   "tax": "Qualified",
+   "pos": "RILA Annuity",
+   "val": 404633,
+   "move": "yes",
+   "growth": 0.05,
+   "ann": {
+    "company": "",
+    "product": "",
+    "rate": null,
+    "interest": "deferred",
+    "maturity": "",
+    "monthly": null,
+    "payout": "single",
+    "fees": 0.03,
+    "cap": null,
+    "part": null,
+    "floor": null
+   }
+  },
+  {
+   "name": "Variable Annuity2",
+   "owner": "client",
+   "cust": "Allianz",
+   "tax": "Qualified",
+   "pos": "Variable Annuity",
+   "val": 299235,
+   "move": "yes",
+   "growth": 0.05,
+   "ann": {
+    "company": "",
+    "product": "",
+    "rate": null,
+    "interest": "deferred",
+    "maturity": "",
+    "monthly": null,
+    "payout": "single",
+    "fees": 0.03,
+    "cap": null,
+    "part": null,
+    "floor": null
+   }
+  },
+  {
+   "name": "Variable Annuity3",
+   "owner": "client",
+   "cust": "Equitable",
+   "tax": "Qualified",
+   "pos": "Variable Annuity",
+   "val": 58452,
+   "move": "yes",
+   "growth": 0.05,
+   "ann": {
+    "company": "",
+    "product": "",
+    "rate": null,
+    "interest": "deferred",
+    "maturity": "",
+    "monthly": null,
+    "payout": "single",
+    "fees": 0.03,
+    "cap": null,
+    "part": null,
+    "floor": null
+   }
+  },
+  {
+   "name": "Variable Annuity4 ",
+   "owner": "client",
+   "cust": "Equitable",
+   "tax": "Qualified",
+   "pos": "Variable Annuity",
+   "val": 219397,
+   "move": "yes",
+   "growth": 0.05,
+   "ann": {
+    "company": "",
+    "product": "",
+    "rate": null,
+    "interest": "deferred",
+    "maturity": "",
+    "monthly": null,
+    "payout": "single",
+    "fees": 0.03,
+    "cap": null,
+    "part": null,
+    "floor": null
+   }
+  },
+  {
+   "name": "Jeff's IRA",
+   "owner": "client",
+   "cust": "Fidelity/AssetMark",
+   "tax": "Qualified",
+   "pos": "Market",
+   "val": 67109,
+   "move": "yes",
+   "growth": 0.05
+  },
+  {
+   "name": "Jeff's 2nd IRA",
+   "owner": "client",
+   "cust": "Fidelity/AssetMark",
+   "tax": "Qualified",
+   "pos": "Market",
+   "val": 41121,
+   "move": "yes",
+   "growth": 0.05
+  },
+  {
+   "name": "Jeff's Roth IRA",
+   "owner": "client",
+   "cust": "Fidelity/AssetMark",
+   "tax": "Roth",
+   "pos": "Market",
+   "val": 6470,
+   "move": "yes",
+   "growth": 0.05
+  },
+  {
+   "name": "Jane's Roth IRA",
+   "owner": "spouse",
+   "cust": "Fidelity/AssetMark",
+   "tax": "Roth",
+   "pos": "Market",
+   "val": 47533,
+   "move": "yes",
+   "growth": 0.05
+  },
+  {
+   "name": "Joint Checking",
+   "owner": "joint",
+   "cust": "Citizens",
+   "tax": "Non-Qualified",
+   "pos": "Cash",
+   "val": 130000,
+   "move": "yes",
+   "growth": 0.0
+  },
+  {
+   "name": "Inherited IRA Cash",
+   "owner": "client",
+   "cust": "Citizens",
+   "tax": "Qualified",
+   "pos": "Cash",
+   "val": 10000,
+   "move": "yes",
+   "growth": 0.0
+  },
+  {
+   "name": "Investor's Heritage",
+   "owner": "client",
+   "cust": "Investors Heritage",
+   "tax": "Qualified",
+   "pos": "Income Annuity (FIA)",
+   "val": 49482,
+   "move": "no",
+   "growth": 0.03,
+   "ann": {
+    "company": "",
+    "product": "",
+    "rate": null,
+    "interest": "deferred",
+    "maturity": "",
+    "monthly": 400,
+    "payout": "joint",
+    "fees": 0.01,
+    "cap": 0.03,
+    "part": null,
+    "floor": null
+   }
+  },
+  {
+   "name": "Sentinel",
+   "owner": "client",
+   "cust": "Sentinel",
+   "tax": "Qualified",
+   "pos": "Income Annuity (FIA)",
+   "val": 51151,
+   "move": "no",
+   "growth": 0.03,
+   "ann": {
+    "company": "",
+    "product": "",
+    "rate": null,
+    "interest": "deferred",
+    "maturity": "",
+    "monthly": 200,
+    "payout": "joint",
+    "fees": 0.01,
+    "cap": 0.03,
+    "part": null,
+    "floor": null
+   }
+  },
+  {
+   "name": "Jane's Pension",
+   "owner": "spouse",
+   "cust": "PSERS",
+   "tax": "Qualified",
+   "pos": "Market",
+   "val": 72000,
+   "move": "yes",
+   "growth": 0.05
+  },
+  {
+   "name": "Future Inheritancd",
+   "owner": "client",
+   "cust": "TBD",
+   "tax": "Non-Qualified",
+   "pos": "Cash",
+   "val": 60000,
+   "move": "yes",
+   "growth": 0.0
+  }
+ ],
+ "budget": {
+  "lines": {
+   "hh:1": {
+    "amt": 389,
+    "nw": "need",
+    "start": "",
+    "end": "",
+    "note": "",
+    "label": "",
+    "auto": false,
+    "autoStart": false
+   },
+   "hh:2": {
+    "amt": 73,
+    "nw": "need",
+    "start": "",
+    "end": "",
+    "note": "",
+    "label": "",
+    "auto": false,
+    "autoStart": false
+   },
+   "hh:3": {
+    "amt": 1000,
+    "nw": "need",
+    "start": "",
+    "end": "",
+    "note": "",
+    "label": "",
+    "auto": false,
+    "autoStart": false
+   },
+   "hh:7": {
+    "amt": 181,
+    "nw": "need",
+    "start": "",
+    "end": "",
+    "note": "",
+    "label": "",
+    "auto": false,
+    "autoStart": false
+   },
+   "hh:9": {
+    "amt": 226,
+    "nw": "need",
+    "start": "",
+    "end": "",
+    "note": "",
+    "label": "",
+    "auto": false,
+    "autoStart": false
+   },
+   "hh:10": {
+    "amt": 200,
+    "nw": "need",
+    "start": "",
+    "end": "",
+    "note": "",
+    "label": "",
+    "auto": false,
+    "autoStart": false
+   },
+   "dl:0": {
+    "amt": 400,
+    "nw": "need",
+    "start": "",
+    "end": "",
+    "note": "",
+    "label": "",
+    "auto": false,
+    "autoStart": false
+   },
+   "dl:1": {
+    "amt": 450,
+    "nw": "want",
+    "start": "",
+    "end": "",
+    "note": "",
+    "label": "",
+    "auto": false,
+    "autoStart": false
+   },
+   "hc:0": {
+    "amt": 1000,
+    "nw": "need",
+    "start": "",
+    "end": "2027-10",
+    "note": "",
+    "label": "",
+    "auto": false,
+    "autoStart": false
+   },
+   "hc:6": {
+    "amt": 155,
+    "nw": "need",
+    "start": "2041-06",
+    "end": "",
+    "note": "",
+    "label": "",
+    "auto": false,
+    "autoStart": false
+   },
+   "hc:8": {
+    "amt": 7,
+    "nw": "need",
+    "start": "",
+    "end": "",
+    "note": "",
+    "label": "",
+    "auto": false,
+    "autoStart": false
+   },
+   "tr:1": {
+    "amt": 205,
+    "nw": "need",
+    "start": "",
+    "end": "",
+    "note": "",
+    "label": "",
+    "auto": false,
+    "autoStart": false
+   },
+   "tr:2": {
+    "amt": 500,
+    "nw": "need",
+    "start": "",
+    "end": "",
+    "note": "",
+    "label": "",
+    "auto": false,
+    "autoStart": false
+   },
+   "tr:3": {
+    "amt": 241,
+    "nw": "need",
+    "start": "",
+    "end": "",
+    "note": "",
+    "label": "",
+    "auto": false,
+    "autoStart": false
+   },
+   "db:0": {
+    "amt": 779,
+    "nw": "need",
+    "start": "",
+    "end": "",
+    "note": "",
+    "label": "",
+    "auto": false,
+    "autoStart": false
+   },
+   "eo:2": {
+    "amt": 242,
+    "nw": "want",
+    "start": "",
+    "end": "",
+    "note": "",
+    "label": "",
+    "auto": false,
+    "autoStart": false
+   },
+   "eo:4": {
+    "amt": 2000,
+    "nw": "want",
+    "start": "",
+    "end": "",
+    "note": "",
+    "label": "",
+    "auto": false,
+    "autoStart": false
+   },
+   "eo:5": {
+    "amt": 20,
+    "nw": "want",
+    "start": "",
+    "end": "",
+    "note": "",
+    "label": "",
+    "auto": false,
+    "autoStart": false
+   },
+   "eo:7": {
+    "amt": 1000,
+    "nw": "need",
+    "start": "2030-09",
+    "end": "",
+    "note": "",
+    "label": "Health Insurance HOP",
+    "auto": false,
+    "autoStart": false
+   },
+   "eo:8": {
+    "amt": 136,
+    "nw": "need",
+    "start": "",
+    "end": "",
+    "note": "",
+    "label": "Misc. Taxes",
+    "auto": false,
+    "autoStart": false
+   }
+  },
+  "link": true,
+  "open": true
+ },
+ "scenarios": [
+  {
+   "adjMoves": [
+    {
+     "acct": 14,
+     "bucket": "foundation",
+     "amt": 49482
+    },
+    {
+     "acct": 15,
+     "bucket": "foundation",
+     "amt": 51151
+    },
+    {
+     "acct": 12,
+     "bucket": "reserve",
+     "amt": 41854.5
+    },
+    {
+     "acct": 4,
+     "bucket": "foundation",
+     "amt": 228494.03158229153
+    },
+    {
+     "acct": 12,
+     "bucket": "moat",
+     "amt": 88145.5,
+     "person": "client"
+    },
+    {
+     "acct": 2,
+     "bucket": "moat",
+     "amt": 72330,
+     "person": "client"
+    },
+    {
+     "acct": 1,
+     "bucket": "moat",
+     "amt": 66772,
+     "person": "client"
+    },
+    {
+     "acct": 17,
+     "bucket": "moat",
+     "amt": 60000,
+     "person": "client"
+    },
+    {
+     "acct": 3,
+     "bucket": "moat",
+     "amt": 24453.267263427086,
+     "person": "client"
+    },
+    {
+     "acct": 3,
+     "bucket": "moat",
+     "amt": 22118.732736572914,
+     "person": "spouse"
+    },
+    {
+     "acct": 11,
+     "bucket": "roof",
+     "amt": 47533
+    },
+    {
+     "acct": 10,
+     "bucket": "roof",
+     "amt": 6470
+    },
+    {
+     "acct": 5,
+     "bucket": "walls",
+     "amt": 299235
+    },
+    {
+     "acct": 7,
+     "bucket": "walls",
+     "amt": 219397
+    },
+    {
+     "acct": 4,
+     "bucket": "walls",
+     "amt": 23768
+    },
+    {
+     "acct": 4,
+     "bucket": "moat",
+     "amt": 152370.96841770847,
+     "person": "spouse"
+    },
+    {
+     "acct": 0,
+     "bucket": "moat",
+     "amt": 72000,
+     "person": "spouse"
+    },
+    {
+     "acct": 16,
+     "bucket": "moat",
+     "amt": 26323.98705864628,
+     "person": "spouse"
+    },
+    {
+     "acct": 8,
+     "bucket": "roof",
+     "amt": 67109
+    },
+    {
+     "acct": 6,
+     "bucket": "roof",
+     "amt": 58452
+    },
+    {
+     "acct": 16,
+     "bucket": "roof",
+     "amt": 45676.01294135372
+    },
+    {
+     "acct": 9,
+     "bucket": "roof",
+     "amt": 41121
+    },
+    {
+     "acct": 13,
+     "bucket": "roof",
+     "amt": 10000
+    }
+   ],
+   "incomeAdj": {
+    "yF": "",
+    "fStart": "",
+    "yW": "",
+    "wStart": "",
+    "gPre": "",
+    "gPost": ""
+   },
+   "annuityIncome": {
+    "to:Jeff's Income Anuity": {
+     "gli": "yes",
+     "start": "2026-10",
+     "monthly": "980",
+     "cola": "",
+     "wd": ""
+    },
+    "to:Jeff Rollover IRA": {
+     "gli": "yes",
+     "start": "",
+     "monthly": "1,142",
+     "cola": "",
+     "wd": ""
+    }
+   },
+   "ltcBenefits": {
+    "who:client": {
+     "monthly": "16,250",
+     "age": "80",
+     "years": "5.0",
+     "infl": "",
+     "growth": ""
+    },
+    "who:spouse": {
+     "monthly": "15,250",
+     "age": "80",
+     "years": "5.0",
+     "infl": "",
+     "growth": ""
+    }
+   },
+   "roofGrowth": {},
+   "withdrawalOrder": [
+    "taxable",
+    "deferred",
+    "roth"
+   ],
+   "roth": {
+    "apply": true,
+    "target": 0.12,
+    "start": "auto",
+    "order": "roof",
+    "irmaa": true
+   },
+   "qcd": {
+    "apply": true,
+    "client": "",
+    "spouse": "",
+    "startAge": 71,
+    "mode": "budget"
+   },
+   "name": "With Moat and 12% Roth Target"
+  },
+  {
+   "adjMoves": [
+    {
+     "acct": 14,
+     "bucket": "foundation",
+     "amt": 49482
+    },
+    {
+     "acct": 15,
+     "bucket": "foundation",
+     "amt": 51151
+    },
+    {
+     "acct": 12,
+     "bucket": "reserve",
+     "amt": 41854.5
+    },
+    {
+     "acct": 4,
+     "bucket": "foundation",
+     "amt": 228494.03158229153
+    },
+    {
+     "acct": 12,
+     "bucket": "reserve",
+     "amt": 57704.60358056266
+    },
+    {
+     "acct": 12,
+     "bucket": "reserve",
+     "amt": 30440.89641943734
+    },
+    {
+     "acct": 2,
+     "bucket": "roof",
+     "amt": 72330
+    },
+    {
+     "acct": 1,
+     "bucket": "walls",
+     "amt": 10061.803200334514,
+     "prod": "AUM - Tax Free"
+    },
+    {
+     "acct": 11,
+     "bucket": "roof",
+     "amt": 47533
+    },
+    {
+     "acct": 10,
+     "bucket": "roof",
+     "amt": 6470
+    },
+    {
+     "acct": 5,
+     "bucket": "walls",
+     "amt": 299235
+    },
+    {
+     "acct": 7,
+     "bucket": "walls",
+     "amt": 219397
+    },
+    {
+     "acct": 4,
+     "bucket": "walls",
+     "amt": 23768
+    },
+    {
+     "acct": 17,
+     "bucket": "walls",
+     "amt": 60000,
+     "prod": "AUM - Tax Free"
+    },
+    {
+     "acct": 1,
+     "bucket": "walls",
+     "amt": 56710.196799665486,
+     "prod": "AUM - Tax Free"
+    },
+    {
+     "acct": 3,
+     "bucket": "walls",
+     "amt": 46572,
+     "prod": "AUM - Tax Free"
+    },
+    {
+     "acct": 4,
+     "bucket": "roof",
+     "amt": 152370.96841770847
+    },
+    {
+     "acct": 0,
+     "bucket": "roof",
+     "amt": 72000
+    },
+    {
+     "acct": 16,
+     "bucket": "roof",
+     "amt": 72000
+    },
+    {
+     "acct": 8,
+     "bucket": "roof",
+     "amt": 67109
+    },
+    {
+     "acct": 6,
+     "bucket": "roof",
+     "amt": 58452
+    },
+    {
+     "acct": 9,
+     "bucket": "roof",
+     "amt": 41121
+    },
+    {
+     "acct": 13,
+     "bucket": "roof",
+     "amt": 10000
+    }
+   ],
+   "incomeAdj": {
+    "yF": "",
+    "fStart": "",
+    "yW": "",
+    "wStart": "",
+    "gPre": "",
+    "gPost": ""
+   },
+   "annuityIncome": {
+    "to:Jeff Rollover IRA": {
+     "gli": "",
+     "start": "2026-10",
+     "monthly": "1,142",
+     "cola": "",
+     "wd": ""
+    }
+   },
+   "ltcBenefits": {},
+   "roofGrowth": {},
+   "withdrawalOrder": [
+    "taxable",
+    "deferred",
+    "roth"
+   ],
+   "roth": {
+    "apply": false,
+    "target": "auto",
+    "start": "auto",
+    "order": "roof",
+    "irmaa": true
+   },
+   "qcd": {
+    "apply": true,
+    "client": "",
+    "spouse": "",
+    "startAge": 71,
+    "mode": "budget"
+   },
+   "name": "No Moat without Roth Conversions"
+  },
+  {
+   "adjMoves": [
+    {
+     "acct": 14,
+     "bucket": "foundation",
+     "amt": 49482
+    },
+    {
+     "acct": 15,
+     "bucket": "foundation",
+     "amt": 51151
+    },
+    {
+     "acct": 12,
+     "bucket": "reserve",
+     "amt": 41854.5
+    },
+    {
+     "acct": 4,
+     "bucket": "foundation",
+     "amt": 228494.03158229153
+    },
+    {
+     "acct": 12,
+     "bucket": "moat",
+     "amt": 88145.5,
+     "person": "client"
+    },
+    {
+     "acct": 2,
+     "bucket": "moat",
+     "amt": 72330,
+     "person": "client"
+    },
+    {
+     "acct": 1,
+     "bucket": "moat",
+     "amt": 66772,
+     "person": "client"
+    },
+    {
+     "acct": 17,
+     "bucket": "moat",
+     "amt": 60000,
+     "person": "client"
+    },
+    {
+     "acct": 3,
+     "bucket": "moat",
+     "amt": 24453.267263427086,
+     "person": "client"
+    },
+    {
+     "acct": 3,
+     "bucket": "moat",
+     "amt": 22118.732736572914,
+     "person": "spouse"
+    },
+    {
+     "acct": 11,
+     "bucket": "roof",
+     "amt": 47533
+    },
+    {
+     "acct": 10,
+     "bucket": "roof",
+     "amt": 6470
+    },
+    {
+     "acct": 5,
+     "bucket": "walls",
+     "amt": 299235
+    },
+    {
+     "acct": 7,
+     "bucket": "walls",
+     "amt": 219397
+    },
+    {
+     "acct": 4,
+     "bucket": "walls",
+     "amt": 23768
+    },
+    {
+     "acct": 4,
+     "bucket": "moat",
+     "amt": 152370.96841770847,
+     "person": "spouse"
+    },
+    {
+     "acct": 0,
+     "bucket": "moat",
+     "amt": 72000,
+     "person": "spouse"
+    },
+    {
+     "acct": 16,
+     "bucket": "moat",
+     "amt": 26323.98705864628,
+     "person": "spouse"
+    },
+    {
+     "acct": 8,
+     "bucket": "roof",
+     "amt": 67109
+    },
+    {
+     "acct": 6,
+     "bucket": "roof",
+     "amt": 58452
+    },
+    {
+     "acct": 16,
+     "bucket": "roof",
+     "amt": 45676.01294135372
+    },
+    {
+     "acct": 9,
+     "bucket": "roof",
+     "amt": 41121
+    },
+    {
+     "acct": 13,
+     "bucket": "roof",
+     "amt": 10000
+    }
+   ],
+   "incomeAdj": {
+    "yF": "",
+    "fStart": "",
+    "yW": "",
+    "wStart": "",
+    "gPre": "",
+    "gPost": ""
+   },
+   "annuityIncome": {
+    "to:Jeff's Income Anuity": {
+     "gli": "yes",
+     "start": "2026-10",
+     "monthly": "980",
+     "cola": "",
+     "wd": ""
+    },
+    "to:Jeff Rollover IRA": {
+     "gli": "yes",
+     "start": "",
+     "monthly": "1,142",
+     "cola": "",
+     "wd": ""
+    }
+   },
+   "ltcBenefits": {
+    "who:client": {
+     "monthly": "16,250",
+     "age": "80",
+     "years": "5.0",
+     "infl": "",
+     "growth": ""
+    },
+    "who:spouse": {
+     "monthly": "15,200",
+     "age": "80",
+     "years": "5.0",
+     "infl": "",
+     "growth": ""
+    }
+   },
+   "roofGrowth": {},
+   "withdrawalOrder": [
+    "taxable",
+    "deferred",
+    "roth"
+   ],
+   "roth": {
+    "apply": true,
+    "target": 0.22,
+    "start": "auto",
+    "order": "roof",
+    "irmaa": true
+   },
+   "qcd": {
+    "apply": true,
+    "client": "",
+    "spouse": "",
+    "startAge": 71,
+    "mode": "budget"
+   },
+   "name": "With Moat and 22% Roth Target"
+  }
+ ],
+ "activeScenario": 2,
+ "reportScenario": 0,
+ "incomeAdj": null,
+ "annuityIncome": {
+  "to:Jeff's Income Anuity": {
+   "gli": "yes",
+   "start": "2026-10",
+   "monthly": "980",
+   "cola": "",
+   "wd": ""
+  },
+  "to:Jeff Rollover IRA": {
+   "gli": "yes",
+   "start": "",
+   "monthly": "1,142",
+   "cola": "",
+   "wd": ""
+  }
+ },
+ "ltcBenefits": {
+  "who:client": {
+   "monthly": "16,250",
+   "age": "80",
+   "years": "5.0",
+   "infl": "",
+   "growth": ""
+  },
+  "who:spouse": {
+   "monthly": "15,200",
+   "age": "80",
+   "years": "5.0",
+   "infl": "",
+   "growth": ""
+  }
+ },
+ "roofGrowth": null,
+ "transfers": [
+  {
+   "acct": 14,
+   "bucket": "foundation",
+   "amt": 49482
+  },
+  {
+   "acct": 15,
+   "bucket": "foundation",
+   "amt": 51151
+  },
+  {
+   "acct": 12,
+   "bucket": "reserve",
+   "amt": 41854.5
+  },
+  {
+   "acct": 4,
+   "bucket": "foundation",
+   "amt": 228494.03158229153
+  },
+  {
+   "acct": 12,
+   "bucket": "moat",
+   "amt": 88145.5,
+   "person": "client"
+  },
+  {
+   "acct": 2,
+   "bucket": "moat",
+   "amt": 72330,
+   "person": "client"
+  },
+  {
+   "acct": 1,
+   "bucket": "moat",
+   "amt": 66772,
+   "person": "client"
+  },
+  {
+   "acct": 17,
+   "bucket": "moat",
+   "amt": 60000,
+   "person": "client"
+  },
+  {
+   "acct": 3,
+   "bucket": "moat",
+   "amt": 24453.267263427086,
+   "person": "client"
+  },
+  {
+   "acct": 3,
+   "bucket": "moat",
+   "amt": 22118.732736572914,
+   "person": "spouse"
+  },
+  {
+   "acct": 11,
+   "bucket": "roof",
+   "amt": 47533
+  },
+  {
+   "acct": 10,
+   "bucket": "roof",
+   "amt": 6470
+  },
+  {
+   "acct": 5,
+   "bucket": "walls",
+   "amt": 299235
+  },
+  {
+   "acct": 7,
+   "bucket": "walls",
+   "amt": 219397
+  },
+  {
+   "acct": 4,
+   "bucket": "walls",
+   "amt": 23768
+  },
+  {
+   "acct": 4,
+   "bucket": "moat",
+   "amt": 152370.96841770847,
+   "person": "spouse"
+  },
+  {
+   "acct": 0,
+   "bucket": "moat",
+   "amt": 72000,
+   "person": "spouse"
+  },
+  {
+   "acct": 16,
+   "bucket": "moat",
+   "amt": 26323.98705864628,
+   "person": "spouse"
+  },
+  {
+   "acct": 8,
+   "bucket": "roof",
+   "amt": 67109
+  },
+  {
+   "acct": 6,
+   "bucket": "roof",
+   "amt": 58452
+  },
+  {
+   "acct": 16,
+   "bucket": "roof",
+   "amt": 45676.01294135372
+  },
+  {
+   "acct": 9,
+   "bucket": "roof",
+   "amt": 41121
+  },
+  {
+   "acct": 13,
+   "bucket": "roof",
+   "amt": 10000
+  }
+ ],
+ "notes": "Meeting notes — May 27, 2026\\\\nLearning Meeting: Jeff Smith\\\\n\\\\nMay 27, 2026\\\\n\\\\n9:33 AM - 11:34 AM\\\\n\\\\nParticipants:\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff\\\\n\\\\n\\\\n\\\\nDaniel Dietrich\\\\n\\\\n\\\\n\\\\nDan Asti\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nLearning Meeting: Jeff Smith\\\\n\\\\nMay 27, 2026\\\\n\\\\n9:33 AM - 11:34 AM\\\\n\\\\n\\\\n\\\\nClients\\\\n\\\\nJeff(19%)\\\\n\\\\nFinancial Advisors\\\\n\\\\nDaniel Dietrich(13%),Dan Asti(68%)\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nMeeting Purpose\\\\n\\\\nThis was an introductory learning meeting with Jeff Smith, a 63-year-old recently retired client, facilitated by Daniel Dietrich and Dan Asti. The discussion centered on Jeff's current financial position, retirement income planning needs, Social Security and PSERS pension optimization for himself and his wife Jane, estate and legacy planning considerations, tax planning opportunities, investment product review, and the next steps for engaging in a comprehensive retirement income planning process with Alto.\\\\n\\\\nNon-Financial Personal Information\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff is 63 years old\\\\n\\\\n\\\\n\\\\nJeff's wife Jane is 60 years old\\\\n\\\\n\\\\n\\\\nJane works at a charter school and wants to be done working\\\\n\\\\n\\\\n\\\\nJane will be done with her job at 60 years and 8 months\\\\n\\\\n\\\\n\\\\nJeff experienced the loss of family members including his sister who passed in August and his brother-in-law Pat\\\\n\\\\n\\\\n\\\\nJeff's brother-in-law Pat wanted to give Christmas gifts before he passed\\\\n\\\\n\\\\n\\\\nJeff has been back and forth to Erie constantly where his sister and brother-in-law lived\\\\n\\\\n\\\\n\\\\nJeff had to sell his sister and brother-in-law's house in Erie\\\\n\\\\n\\\\n\\\\nJeff is the executor of his sister and brother-in-law's estate\\\\n\\\\n\\\\n\\\\nJeff has three granddaughters under the age of 2\\\\n\\\\n\\\\n\\\\nJeff was with all three granddaughters on Memorial Day\\\\n\\\\n\\\\n\\\\nJane's four grandparents were all in their 90s\\\\n\\\\n\\\\n\\\\nJane's parents are currently 88 and 89 years old\\\\n\\\\n\\\\n\\\\nJane's dad is starting to decline at 88\\\\n\\\\n\\\\n\\\\nJeff and Jane are planning a Disney vacation in October\\\\n\\\\n\\\\n\\\\nJeff and Jane have things they want to do for many years\\\\n\\\\n\\\\n\\\\nJeff's wife Jane likes to save money in envelopes\\\\n\\\\n\\\\n\\\\nJeff attends seminar things now because he has more time than he's ever had in the past\\\\n\\\\n\\\\n\\\\nJeff wants to learn different things\\\\n\\\\n\\\\n\\\\nJeff's company changed names three times in the past four years\\\\n\\\\n\\\\n\\\\nJeff took Social Security in February at age 63\\\\n\\\\n\\\\n\\\\nJeff has no debt and their annual expenses for necessities are around $35,000\\\\n\\\\n\\\\n\\\\nJeff lives north of the meeting location\\\\n\\\\nFinancial Facts by Topic\\\\n\\\\nTax Planning\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff took Social Security in February and is concerned about giving up benefits by taking it early\\\\n\\\\n\\\\n\\\\nJeff is worried about paying 85% tax on Social Security benefits unless not making any money\\\\n\\\\n\\\\n\\\\nJeff learned about gift tax issues when his brother-in-law gave $10,000 gifts instead of splitting them as $3,000 to individuals and $3,000 to spouses to avoid Pennsylvania inheritance tax\\\\n\\\\n\\\\n\\\\nJeff is in a tax bracket where he feels he carries more weight than other income levels\\\\n\\\\n\\\\n\\\\nThe financial planning software shows Jeff will pay approximately $683,000 in lifetime taxation under current scenario\\\\n\\\\n\\\\n\\\\nJeff has tax rate opportunities in early retirement years before higher tax brackets kick in later\\\\n\\\\nEstate Planning\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff learned hard lessons about estate planning when his sister passed in August and brother-in-law Pat wanted to give Christmas gifts before his own death\\\\n\\\\n\\\\n\\\\nJeff is concerned about not losing money to Pennsylvania inheritance tax\\\\n\\\\n\\\\n\\\\nThe estate Jeff is inheriting from will pay all taxes, so he should receive net amounts\\\\n\\\\n\\\\n\\\\nJeff mentioned his brother-in-law had conversations that put estate planning in place during his final months\\\\n\\\\nProfile & Goals\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff is 63 years old and his wife Jane is 60, with Jeff recently retired and Jane planning to retire at 60 and 8 months\\\\n\\\\n\\\\n\\\\nJeff has been attending financial seminars to learn about wealth management and legacy planning after experiencing losses from family deaths\\\\n\\\\n\\\\n\\\\nJeff and Jane want to do things for their three granddaughters under age two and plan activities that will require withdrawing money from accounts\\\\n\\\\n\\\\n\\\\nJeff is in a wealth category where he feels he takes more tax hits than lower or higher income brackets\\\\n\\\\n\\\\n\\\\nJeff wants to learn strategies to avoid losing money to taxes and inheritance issues\\\\n\\\\nEducation Planning\\\\n\\\\nNo relevant information detected.\\\\n\\\\nEquity Compensation\\\\n\\\\nNo relevant information detected.\\\\n\\\\nInvestment Management\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff has been working with someone on income stream planning for 2-3 years but has been afraid to pull the trigger\\\\n\\\\n\\\\n\\\\nJeff has a 6-year point-to-point variable annuity with Athene worth approximately $242,000 that matures in 2027\\\\n\\\\n\\\\n\\\\nJeff has an annuity with Equitable\\\\n\\\\n\\\\n\\\\nJeff has a Sentinel annuity\\\\n\\\\n\\\\n\\\\nJeff has an Investor's Heritage joint annuity\\\\n\\\\n\\\\n\\\\nJeff has pockets of money not currently allocated from inheritance and extra 401k due to company name changes\\\\n\\\\n\\\\n\\\\nJeff has a final 401k worth approximately $35,000\\\\n\\\\n\\\\n\\\\nJeff will receive an inherited IRA worth $82,000 on a 10-year drawdown\\\\n\\\\n\\\\n\\\\nJeff may receive approximately $60,000 in cash inheritance\\\\n\\\\nRetirement Forecasting\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff recently started taking Social Security at $2,677 per month\\\\n\\\\n\\\\n\\\\nJane's Social Security would be $1,083 at age 62 or $1,703 at age 67\\\\n\\\\n\\\\n\\\\nJane's PSERS pension estimated at $1,830 per month if taken at age 62 with option to withdraw $72,000 lump sum\\\\n\\\\n\\\\n\\\\nJane has 21.5 years of service with PSERS and can retire without penalty at age 62\\\\n\\\\n\\\\n\\\\nFinancial planning software shows Jeff is good until age 94 under current spending of $1,500 per month fun money\\\\n\\\\n\\\\n\\\\nSequence of return risk could take 10 years off the retirement plan\\\\n\\\\n\\\\n\\\\nLong-term care costs at age 80 could have similar impact as market decline\\\\n\\\\nCash Flow & Debt Management\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff estimates basic living expenses at $35,000 per year if going to nitty gritty necessities\\\\n\\\\n\\\\n\\\\nJeff suggests budgeting $50,000 per year for general expenses\\\\n\\\\n\\\\n\\\\nJeff has no debt currently\\\\n\\\\n\\\\n\\\\nJeff and Jane create their own debt as they go using credit cards\\\\n\\\\n\\\\n\\\\nJeff has approximately $130,000 in cash on hand that his wife saves in envelopes\\\\n\\\\n\\\\n\\\\nJeff is planning to fund a Disney vacation in October\\\\n\\\\nInsurance & Risk Management\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff can continue healthcare insurance through his wife's charter school employment by paying for it himself\\\\n\\\\n\\\\n\\\\nJeff is covered under Jane's healthcare for 18 months until he reaches age 65\\\\n\\\\n\\\\n\\\\nJane can continue using the charter school healthcare until she reaches 65\\\\n\\\\nFinancial Discussion\\\\n\\\\nRetirement Income Planning and Cash Flow Projections\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nUsing Alto's proprietary retirement planning software, the advisors built out Jeff's income and asset picture. With estimated monthly expenses of approximately $7,000 plus $1,500 in discretionary spending (totaling roughly $102,000 annually) and a 3% inflation rate applied, the baseline projection showed Jeff's assets lasting until approximately age 91–94 under normal market conditions. The advisors demonstrated how adjusting discretionary spending — up to $2,500/month or down to $1,500/month — materially shifts the outcome, underscoring the importance of accurate budgeting. Jeff estimated his bare-minimum annual living expenses at $35,000, with a more realistic working budget of approximately $50,000 per year. The software projected cumulative lifetime tax payments of approximately $683,000 under the current structure. Jeff has no current debt and approximately $130,000 in cash on hand. The advisors noted that with proper planning and defensive positioning, Jeff has sufficient assets to support his retirement and potentially transfer wealth to the next generation.\\\\n\\\\nSocial Security Optimization\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff began receiving Social Security benefits of $2,677 per month in February 2026 at age 63. The advisors noted that because he started benefits recently, he may still have the option to reverse this decision and delay benefits to increase his monthly amount, though the advisors indicated they would model this to determine whether reversal is worthwhile given his current cash flow needs. Jane's estimated Social Security benefit is $1,083 per month at age 62 or $1,703 per month at age 67, based on her December 2025 Social Security statement. The advisors discussed a potential strategy where Jane turns on her own benefit early and later switches to Jeff's higher benefit when he would have reached full retirement age. The advisors also noted that the spousal add-on benefit may not provide significant additional value given that Jane's own benefit is relatively close to the spousal amount. All projections are estimates based on current information and are subject to change; actual Social Security benefits will depend on individual earnings records and the age at which benefits are claimed.\\\\n\\\\nPSERS Pension Planning\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJane is in the PSERS TD membership class and plans to stop working at age 60 years and 8 months but will defer filing her PSERS retirement application until age 62 to avoid early withdrawal penalties. At age 62, she is estimated to receive approximately $1,830 per month in pension income, with an estimated lump sum withdrawal option of approximately $72,000 (reflecting approximately 21.5 years of service). The advisors discussed the various PSERS pension options. Jeff and Jane had been leaning toward Option 1, which includes a depleting death benefit currently valued at approximately $319,000. The advisors explained that Option 1's death benefit decreases by the amount of each monthly pension payment received and typically depletes within approximately 10 years. Given Jane's strong family longevity — all four of her grandparents lived into their 90s and her parents are currently 88–89 years old — the advisors recommended reconsidering Option 1 in favor of a joint and survivorship option, which would provide continued income to Jeff if Jane predeceases him. The advisors also noted that the tax treatment of the PSERS death benefit (whether it is paid as a life insurance benefit or an IRA balance transfer) requires further research, as it affects the tax consequences. No final recommendation was made; further analysis is needed.\\\\n\\\\nSequence of Returns Risk and Market Volatility Protection\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nThe advisors identified sequence of returns risk as Jeff's primary retirement concern at this stage. When the advisors applied a 2000-era geometric market risk scenario to the planning model, the projection showed the portfolio could be depleted approximately 10 years earlier than the baseline. The advisors explained that a significant market downturn in the early years of retirement, combined with ongoing withdrawals to fund living expenses, can substantially erode portfolio longevity. They discussed the concept of a defensive allocation — using a portion of assets in products with downside protection (such as indexed or fixed products) — to help preserve the portfolio base during market downturns. The advisors noted that if markets experience a prolonged decline and the client has no defensive buffer, the combination of declining asset values and ongoing withdrawals creates a compounding negative effect. They emphasized that this risk diminishes over time as the portfolio matures, with tax risk becoming the more prominent concern in later years (approximately 10–15 years into retirement). Past market performance is not indicative of future results, and all projections are illustrative estimates subject to change.\\\\n\\\\nLong-Term Care Planning and Healthcare Cost Inflation\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nThe advisors modeled a long-term care scenario in which costs of approximately $10,000 per month begin at age 80. When healthcare inflation was increased to 7% in the model (noted as a conservative estimate given that healthcare inflation has historically run at 8–15% annually), the projection showed assets potentially depleting by age 81. The advisors noted that the average annual out-of-pocket medical expense for seniors is approximately $13,000, and that healthcare cost inflation continues to outpace general inflation significantly. Jeff is currently covered under Jane's charter school healthcare plan for 18 months following his retirement, which will carry him to age 65 and Medicare eligibility. Jane can continue coverage under the charter school plan until she reaches age 65. The advisors recommended evaluating whether the charter school plan is the most cost-effective option compared to marketplace alternatives, though they noted it is likely competitive. The advisors emphasized the importance of building a defensive position to address potential long-term care costs without depleting the core retirement portfolio. All healthcare cost projections are estimates and actual costs will vary based on individual health circumstances and future cost trends.\\\\n\\\\nTax Planning Opportunities\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nThe advisors identified a meaningful tax planning window for Jeff over the next 8–10 years. The software analysis showed Jeff's current effective tax rate at approximately 7–22%, projected to increase to 24% and higher in later years as required minimum distributions (RMDs) begin and Social Security taxation increases. Dan Asti explained that Jeff is currently in an opportunity window before RMDs begin, during which strategic Roth conversions and other tax planning strategies could be implemented to reduce lifetime tax burden. The advisors noted that approximately $683,000 in projected lifetime taxes could be reduced with proper planning. They also emphasized the importance of understanding how different withdrawal strategies affect not only current taxes but also future Medicare IRMAA surcharges, which are determined based on income from two years prior. Jeff expressed frustration with his current tax burden, noting that his income bracket appears to carry a disproportionate tax load. The advisors acknowledged this and stressed the importance of strategic, coordinated planning across all accounts and income sources. Tax laws are subject to change, and the impact of any tax strategy should be evaluated in consultation with a qualified tax professional.\\\\n\\\\nEstate Planning and Legacy Considerations\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff shared that he learned difficult and costly lessons about estate and inheritance planning following the deaths of his sister and brother-in-law Pat. Specifically, Pat had intended to give $10,000 Christmas gifts to family members before his death, but the family later discovered that Pennsylvania imposes inheritance tax on gifts exceeding $3,000 per person per year. Jeff noted that had they known, they could have structured the gifts as $3,000 from Pat and $3,000 from his sister to each recipient (or split between spouses in the receiving households) to avoid the tax. The advisors discussed generational wealth transfer strategies, including the use of life insurance to pass inherited wealth to the next generation, stepped-up cost basis planning for non-qualified assets, and the importance of proper trust and will structures. The advisors noted that Jeff's three young granddaughters represent a meaningful legacy planning opportunity. They also discussed the challenges younger generations face in building wealth, including the widening gap between housing costs and income, and how strategic gifting — such as contributing to a down payment — can have a transformative long-term impact. The advisors noted their estate planning services (wills and trusts) are available at approximately half the cost of traditional attorneys, with comprehensive services available for around $4,000. Estate planning strategies involve complex legal and tax considerations; clients should consult with qualified legal and tax professionals.\\\\n\\\\nInvestment Portfolio Review and Fee Analysis\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nThe advisors reviewed Jeff's current investment holdings, which include: a six-year point-to-point variable annuity with Sentinel valued at approximately $242,000 (maturing in 2027, annual fee approximately 0.95% or roughly $2,400/year); income annuities with Investors Heritage (joint) and Equitable totaling approximately $100,000; an inherited IRA of approximately $82,000–$90,000 subject to a 10-year drawdown requirement; a 401(k) with approximately $35,000; and approximately $130,000 in cash. Jeff also expects to receive approximately $60,000 in cash from an estate settlement, with the estate paying all associated inheritance taxes. The advisors expressed concern about the six-year point-to-point crediting structure of the Sentinel annuity, explaining that gains are not credited annually but only at the end of the six-year period, eliminating the benefit of annual compounding. They calculated that a straightforward 5% fixed product over five years would grow approximately $242,000 to approximately $308,000; accounting for the annuity's estimated $11,000 in fees over the period, the variable annuity would need to achieve approximately a 33% gain to match the fixed alternative on a net basis. The advisors noted the annuity has approximately one year remaining before it is free of surrender charges (2027) and recommended against renewing with another six-year crediting strategy. They also flagged the need to conduct detailed fact-finding calls with all carriers (Athene, Equitable, Sentinel) to fully understand fees, riders, surrender charges, and product terms before making any recommendations. No account movements or changes were recommended at this time. All investment comparisons are illustrative and based on assumptions that may not reflect actual future results; past performance does not guarantee future results.\\\\n\\\\n[Repeat as many as relevant topic are in the meeting.]\\\\n\\\\n\\\\n\\\\nClient's Talking Points\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nJeff expressed uncertainty about how to strategically manage inherited funds for his children, particularly regarding whether to apply inheritance money toward their mortgage or invest it given current interest rates.\\\\n\\\\n\\\\n\\\\nJeff and Jane face significant tax liability exposure, with projections showing approximately $683,000 in cumulative lifetime taxes that could substantially reduce their legacy and retirement flexibility.\\\\n\\\\n\\\\n\\\\nJeff brought up concerns about sequence of returns risk and healthcare cost inflation potentially depleting his retirement assets, particularly noting that a market downturn combined with rising healthcare expenses could reduce his plan by up to 10 years and force him to rely on home equity in later years.\\\\n\\\\n\\\\n\\\\nFuture Meetings\\\\n\\\\nFinancial Plan Refinement Session\\\\n\\\\n2026-06-10T11:00:00\\\\n\\\\nAccount Information Gathering Call\\\\n\\\\n2026-06-01T12:30:00\\\\n\\\\nRisk Assessment and Strategy Discussion\\\\n\\\\n2026-06-03T11:00:00"
+}

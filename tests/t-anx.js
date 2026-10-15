@@ -5,7 +5,7 @@ const path = require('path');
   const b=await chromium.launch(process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH} : {});
   const ctx=await b.newContext({acceptDownloads:true}); const p=await ctx.newPage({viewport:{width:1500,height:950}});
   const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
-  await p.goto('file://'+path.resolve(__dirname,'../dist/preview.html'),{waitUntil:'load'}); await p.waitForTimeout(900);
+  await p.goto('file://'+path.resolve(__dirname,'../dist/preview-smith.html'),{waitUntil:'load'}); await p.waitForTimeout(900);
   const txt=async sel=>(await p.$eval(sel,e=>e.textContent)).replace(/\s+/g,' ').trim();
   // 1. opening the Assets section opens the account list
   const listClosed=async()=>p.$eval('#acctSec .tgl-head.tbl-head',h=>h.classList.contains('closed'));
@@ -67,7 +67,7 @@ const path = require('path');
   // 5. the worksheet and the deck still build (the deck shows the short label)
   const [dl]=await Promise.all([p.waitForEvent('download',{timeout:60000}), p.click('#makePdf')]); console.log('worksheet:', dl.suggestedFilename());
   const [pop]=await Promise.all([ctx.waitForEvent('page',{timeout:30000}), p.click('#makeDeck')]); await pop.waitForLoadState('load'); await pop.waitForTimeout(800);
-  const deck=await pop.evaluate(()=>{ const sl=[...document.querySelectorAll('.sl')].find(s=>/Your Assets and Net Worth/.test(s.textContent)); return {incomeFia:/Income FIA/.test(sl.textContent), long:/Income Annuity \(FIA\)/.test(sl.textContent)}; });
+  const deck=await pop.evaluate(()=>{ const sl=[...document.querySelectorAll('.sl')].find(s=>/Your Assets and Net Worth/.test(s.textContent) && !/Contents/.test(s.textContent.slice(0,40))); return {incomeFia:/Income FIA/.test(sl.textContent), long:/Income Annuity \(FIA\)/.test(sl.textContent)}; });
   console.log('deck assets page:', JSON.stringify(deck)); if(!deck.incomeFia || deck.long) errs.push('deck should show the short position label'); await pop.close();
   // 6. pasted positions resolve to the right type
   const before=await p.$$eval('#acctBody tr[data-id]',rs=>rs.length);

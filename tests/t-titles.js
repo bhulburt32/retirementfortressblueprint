@@ -1,12 +1,12 @@
-const { chromium } = (function(){ try { return require('playwright'); } catch(e){ return require('playwright-core'); } })();
-const path = require('path');
-(async()=>{
-  const b=await chromium.launch(process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH} : {});
-  const p=await b.newPage({viewport:{width:1600,height:950}});
-  await p.goto('file://'+path.resolve(__dirname,'../dist/preview.html'),{waitUntil:'load'}); await p.waitForTimeout(1200);
-  await p.click('#expandAll'); await p.waitForTimeout(300);
-  const [pop]=await Promise.all([p.waitForEvent('popup'),p.click('#makeDeck')]); await pop.waitForLoadState(); await pop.waitForTimeout(1500);
-  const info=await pop.evaluate(()=>{ const sl=[...document.querySelectorAll('.slide, section.sl, .dk-slide')]; return sl.map((s,i)=>{ const h=s.querySelector('h1,h2,.dk-title,.ttl'); return (i+1)+': '+(h?h.textContent.trim():'?').slice(0,70)+' | '+s.innerText.replace(/\s+/g,' ').slice(0,160); }); });
-  console.log(info.join('\n'));
+const { chromium } = require('playwright-core');
+(async () => {
+  const b = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
+  const ctx = await b.newContext(); const p = await ctx.newPage({ viewport: { width: 1500, height: 1000 } });
+  await p.goto('file://' + process.cwd() + '/preview.html',{waitUntil:'load'}); await p.waitForTimeout(500); await p.click('#expandAll'); await p.waitForTimeout(300);
+  if(!process.env.NOPF){ await p.setInputFiles('#pfFile', 'nitro2/proposal.pdf'); await p.waitForTimeout(8000); }
+  const [pop] = await Promise.all([ctx.waitForEvent('page', { timeout: 20000 }), p.click('#makeDeck')]);
+  await pop.waitForLoadState('load'); await pop.waitForTimeout(2000);
+  const t = await pop.evaluate(() => [...document.querySelectorAll('.sl')].map((sl, k) => (k + 1) + ': ' + [...sl.querySelectorAll('.tx')].map(t => t.textContent.trim()).filter(x => x.length > 3 && !/Illustrative only|DRAFT|altofinancial/.test(x)).slice(0, 2).map(x => x.slice(0, 48)).join(' | ')));
+  console.log(t.slice(30).join('\n'));
   await b.close();
 })();
