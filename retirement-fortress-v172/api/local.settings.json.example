@@ -1,0 +1,14 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "COSMOS_ENDPOINT": "https://localhost:8081/",
+    "COSMOS_DATABASE": "fortress",
+    "COSMOS_CONTAINER": "cases",
+    "KEYVAULT_URI": "",
+    "ANTHROPIC_API_KEY": "sk-ant-... (local only; production reads Key Vault)",
+    "ANTHROPIC_MODEL": "claude-sonnet-4-5",
+    "OWNER_IDS": "<Ben's Entra object id>,<second owner's object id>",
+    "SUMMARIES_ENABLED": "true"
+  }
+}

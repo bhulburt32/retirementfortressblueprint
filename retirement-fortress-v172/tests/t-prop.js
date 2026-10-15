@@ -1,0 +1,24 @@
+const { chromium } = require('playwright-core'); const fs = require('fs');
+(async () => {
+  const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const pg = await b.newPage({ viewport: { width: 1500, height: 1000 } }); const errs=[]; pg.on('pageerror', e => errs.push(String(e)));
+  await pg.goto('file://' + process.cwd() + '/preview-smith.html',{waitUntil:'load'}); await pg.waitForTimeout(500); await pg.click('#expandAll'); await pg.waitForTimeout(300);
+  await pg.setInputFiles('#pfFile', process.argv[2] || (process.env.PROPOSAL_PDF || 'samples/portfolio-proposal.pdf')); await pg.waitForTimeout(8000);
+  const msg = await pg.$eval('#pfMsg', e => e.textContent);
+  const A = await pg.evaluate(() => JSON.parse(document.getElementById('caseJson').value).portfolio);
+  fs.writeFileSync('nitro2/analysis.json', JSON.stringify(A.analysis, null, 1));
+  const an = A.analysis;
+  console.log('msg:', msg);
+  console.log('client', an.clientRiskNumber, an.clientRange, 'portfolio', an.riskNumber, an.value, an.accountCount, an.range, 'delta', an.riskDelta, 'gpa', an.gpa, an.benchGpa, 'bench', an.benchmark);
+  console.log('alloc', JSON.stringify(an.allocation), JSON.stringify(an.benchAllocation), 'div', an.dividend, 'costs', JSON.stringify(an.costs));
+  console.log('accounts', an.accounts.length, an.accounts.map(a => a.name + ' $' + a.total + ' r' + a.riskNumber + ' h' + a.holdings.length + ' sum' + Math.round(a.holdings.reduce((s,h)=>s+h.amount,0))).join('\n  '));
+  console.log('stress', JSON.stringify(an.stress));
+  console.log('trailing', JSON.stringify(an.trailing), 'perf', JSON.stringify(an.perf), 'period', an.perfPeriod);
+  console.log('sectors', an.sectors.length, an.bondSectors.length, 'regions', an.regions.length, 'cap', JSON.stringify(an.cap), 'style', JSON.stringify(an.style), 'dur', an.duration, an.maturity, 'eq', an.equityPct);
+  console.log('div', JSON.stringify(an.diversification), JSON.stringify(an.capture), 'inter', an.intersection.length, JSON.stringify(an.intersection.slice(0,3)));
+  console.log('horizon', JSON.stringify(an.horizon), JSON.stringify(an.sentiment), an.questionnaireDate, an.preparedFor, an.date, an.title);
+  console.log('SUMMARY:', JSON.stringify(an.summary, null, 1));
+  const el = await pg.$('#pfSec'); await el.screenshot({ path: 'pf-shot.png' });
+  console.log('ERRORS:', errs.length ? errs : 'none');
+  await b.close();
+})();

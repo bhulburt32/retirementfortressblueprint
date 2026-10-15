@@ -1,0 +1,14 @@
+{
+  "name": "fortress-api",
+  "version": "1.0.0",
+  "description": "Retirement Fortress Blueprint — saved cases and Claude summaries (Azure Functions, Static Web Apps managed API)",
+  "main": "src/functions/*.js",
+  "engines": { "node": ">=20" },
+  "scripts": { "start": "func start" },
+  "dependencies": {
+    "@azure/cosmos": "^4.1.1",
+    "@azure/functions": "^4.5.1",
+    "@azure/identity": "^4.4.1",
+    "@azure/keyvault-secrets": "^4.8.0"
+  }
+}
