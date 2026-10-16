@@ -3638,6 +3638,8 @@
       <div class="btn-row" style="margin-top:10px">
         <button type="button" id="copyCase">Copy case data</button>
         <button type="button" id="loadCase">Load pasted case</button>
+        <button type="button" id="caseFilePick">Upload case file</button>
+        <input type="file" id="caseFile" accept=".json,.txt,.docx,application/json,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
         <span class="hint" id="caseMsg"></span>
       </div>
     </div>
@@ -13114,6 +13116,21 @@
   }
 
   /* notes from a file: plain text as is, Word documents by their paragraphs */
+  /* A .docx file's body as plain text: one line per paragraph. */
+  function docxText(file){
+    return file.arrayBuffer().then(function(buf){
+      var zip = ZIP.open(buf);
+      return ZIP.read(zip, 'word/document.xml');
+    }).then(function(xml){
+      if(!xml) throw new Error('no document body');
+      return xml.replace(/<\/w:p>/g, '\n').replace(/<w:tab\/>/g, '\t').replace(/<w:br\/>/g, '\n').replace(/<[^>]+>/g, '')
+        .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'")
+        .replace(/&#(\d+);/g, function(m, n){ return String.fromCharCode(+n); })
+        .replace(/&#x([0-9a-f]+);/gi, function(m, n){ return String.fromCharCode(parseInt(n, 16)); })
+        .replace(/&amp;/g, '&');
+    });
+  }
+
   function readNotesFile(file){
     if(!file) return;
     var name = (file.name || '').toLowerCase();
@@ -13123,15 +13140,7 @@
       $('goalsMsg').textContent = 'Loaded ' + (file.name || 'the file') + ' as a new meeting entry \u2014 now press Draft or update goals from the notes.';
     };
     if(/\.docx$/.test(name)){
-      file.arrayBuffer().then(function(buf){
-        var zip = ZIP.open(buf);
-        return ZIP.read(zip, 'word/document.xml');
-      }).then(function(xml){
-        if(!xml) throw new Error('no document body');
-        var txt = xml.replace(/<\/w:p>/g, '\n').replace(/<w:tab\/>/g, '\t').replace(/<[^>]+>/g, '')
-          .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'");
-        done(txt);
-      }).catch(function(){ $('goalsMsg').textContent = 'That Word file could not be read \u2014 paste the text instead.'; });
+      docxText(file).then(done).catch(function(){ $('goalsMsg').textContent = 'That Word file could not be read \u2014 paste the text instead.'; });
       return;
     }
     if(/\.pdf$/.test(name)){ $('goalsMsg').textContent = 'PDF notes cannot be read here \u2014 copy the text and paste it.'; return; }
@@ -15317,6 +15326,41 @@
       navigator.clipboard.writeText(ta.value).then(function(){ done(true); }, function(){ done(false); });
     } else { done(false); }
   });
+  /* Case data saved into a Word or text file. Word turns straight quotes
+     into curly ones and may wrap the block in other text, so take the
+     outermost braces, and straighten the quotes only if the block will not
+     parse as it stands (notes may hold curly quotes of their own). */
+  function caseFromText(txt){
+    txt = String(txt || '');
+    var a = txt.indexOf('{'), b = txt.lastIndexOf('}');
+    if(a < 0 || b < a) throw new Error('no case block');
+    var block = txt.slice(a, b + 1);
+    try{ JSON.parse(block); return block; }catch(e){}
+    block = block.replace(/[\u201C\u201D\u201E\u201F\u2033]/g, '"').replace(/[\u2018\u2019\u201A\u201B\u2032]/g, "'")
+      .replace(/[\u00A0\u2007\u202F]/g, ' ');
+    JSON.parse(block);
+    return block;
+  }
+  function readCaseFile(file){
+    if(!file) return;
+    var name = (file.name || '').toLowerCase(), label = file.name || 'the file';
+    if(/\.(doc|pdf|rtf|pages)$/.test(name)){
+      $('caseMsg').textContent = 'Save ' + label + ' as a Word .docx or a plain .txt file and upload it again.';
+      return;
+    }
+    (/\.docx$/.test(name) ? docxText(file) : file.text()).then(function(txt){
+      var json;
+      try{ json = caseFromText(txt); loadCase(json); }
+      catch(err){ $('caseMsg').textContent = label + " doesn't hold readable case data \u2014 it needs the full block from Copy case data, braces included."; return; }
+      $('caseJson').value = json;
+      if($('sampleBanner')) $('sampleBanner').hidden = true;
+      renderAll();
+      $('caseMsg').textContent = 'Case loaded from ' + label + '.';
+    }, function(){ $('caseMsg').textContent = label + ' could not be read.'; });
+  }
+  $('caseFilePick').addEventListener('click', function(){ $('caseFile').click(); });
+  $('caseFile').addEventListener('change', function(e){ readCaseFile(e.target.files[0]); e.target.value = ''; });
+
   $('loadCase').addEventListener('click', function(){
     try{
       loadCase($('caseJson').value);
