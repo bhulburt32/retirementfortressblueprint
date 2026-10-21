@@ -2862,6 +2862,27 @@
           these, the retirement dates and each benefit's start and end &mdash; lands in the calendar
           year it names: a July 2030 start pays half a year in the 2030 row and the full amount
           from 2031.</dd>
+        <dt>Walls income by account</dt>
+        <dd>A table under the two lines above with one row for every Walls line in the transfer list
+          &mdash; the account, its destination and product, and the amount &mdash; so each account's Walls
+          money can pay on its own dates. A row takes <span class="ui">Distributions start</span> and
+          <span class="ui">Distributions stop</span> (months; distributions stop at the start of the stop
+          month, and blank runs to the end of plan), the account's <span class="ui">Total yield</span> while it
+          pays, the <span class="ui">Distribution</span> paid out each year as a share of the balance, its
+          <span class="ui">Growth before start</span> and its <span class="ui">Growth after stop</span>. While an
+          account pays, the total yield less the distribution is reinvested in the same account; a distribution
+          above the total yield is paid from the balance, which then falls. <span class="ui">+ Add restart</span>
+          adds a line beneath for a later period when the account pays again: it needs a start on or after the
+          stop above it, and the balance grows at the rate after stop in between. Every cell is blank by default
+          and follows the line above for its kind of account (the taxable line, or the tax-free line for an AUM -
+          Tax Free product): the start follows <span class="ui">Walls income starts</span>, the distribution the
+          Walls yield, the total yield the yield plus the growth after income starts, and the growth rates the
+          growth before and after. While the whole table is blank the two lines run the Walls as one pool and
+          nothing changes; fill any cell and every Walls account runs on this schedule. The Walls income, its tax
+          (by each account's tax type and owner), the asset projections, the stress tests and the scenario cards
+          then follow each account. A line beneath gives the first year's Walls income and names any restart left
+          out (no start date, no stop above it, or a start before that stop). The table belongs to the scenario
+          on view, <span class="ui">Follow the plan assumptions</span> clears it, and it saves with the case.</dd>
       </dl>
       </div>
     </details>
@@ -2966,6 +2987,14 @@
           <label class="f"><span>Growth before income starts<small>Follows the taxable line, <span id="adjGPreTDef"></span></small></span><input type="text" inputmode="decimal" id="adjGPreT" placeholder="follows" autocomplete="off"></label>
           <label class="f"><span>Growth after income starts<small>Follows the taxable line, <span id="adjGPostTDef"></span></small></span><input type="text" inputmode="decimal" id="adjGPostT" placeholder="follows" autocomplete="off"></label>
         </div>
+        <p class="hint" style="margin:16px 0 4px"><b>Walls income by account</b> &mdash; each account&rsquo;s Walls money on its own dates &middot; while it pays, the total yield less the distribution is reinvested in the account (a distribution above the total yield comes out of the balance) &middot; <b>+ Add restart</b> starts it paying again after it stops &middot; blank follows the line above for its kind of account; entirely blank, the two lines above run the Walls as one pool</p>
+        <div class="tbl-wrap" style="margin-top:6px">
+          <table id="wallsSTable" class="adj-ann">
+            <thead><tr><th>Account</th><th class="num">Amount</th><th>Distributions start</th><th>Distributions stop</th><th class="num">Total yield</th><th class="num">Distribution</th><th class="num">Growth before start</th><th class="num">Growth after stop</th><th></th></tr></thead>
+            <tbody id="wallsSBody"></tbody>
+          </table>
+        </div>
+        <p class="hint" id="wallsSHint" style="margin:8px 0 0"></p>
         <div class="btn-row" style="margin-top:12px">
           <button type="button" id="adjIncReset">Follow the plan assumptions</button>
           <span class="hint" id="adjIncMsg"></span>
@@ -5970,6 +5999,94 @@
       any: Object.keys(INC_ADJ).some(function(k){ return INC_ADJ[k] !== ''; })
     };
   }
+  /* Walls income schedule by account (section 14): each Walls line on its own dates. A line grows at its
+     rate before income starts; while it pays, it earns its total yield, pays its distribution rate and keeps
+     the difference (a distribution above the total yield comes out of the balance); after it stops it grows at
+     its rate after the end, until a restart line, if any, starts it paying again. Blank cells follow the two
+     Walls lines above (taxable or tax-free by the line's product). Entirely blank, the Walls stay one pool on
+     those two lines — the projections do not change. WALLS_SCHED[key] is a list of periods, the first the line
+     itself and any after it restarts: {start, end, ty, dist, gPre, gAfter}, strings as typed. */
+  var WALLS_SCHED = {}, wallsSchedSig = '';
+  var WS_FIELDS = ['start', 'end', 'ty', 'dist', 'gPre', 'gAfter'];
+  function wsClean(d){             // a saved schedule, sanitized: {key: [period, ...]}, every field a string
+    var out = {};
+    if(d && typeof d === 'object') Object.keys(d).forEach(function(k){
+      if(!Array.isArray(d[k])) return;
+      out[k] = d[k].map(function(P){ var q = {}; WS_FIELDS.forEach(function(f){ q[f] = String((P && P[f]) || ''); }); return q; });
+    });
+    return out;
+  }
+  function wallsKeyOf(L){ return 'w:' + L.a.id + '|' + (L.to || '') + '|' + (L.prod || ''); }
+  function wallsLines(r){
+    if(!r || r.statusQuo || !r.moves || typeof lineLedger !== 'function') return [];
+    var groups = {}, order = [];
+    lineLedger(r).lines.forEach(function(L){
+      if(!(L.a && L.eff > 0.5 && L.m.bucket === 'walls')) return;
+      var key = wallsKeyOf(L);
+      if(!groups[key]){ groups[key] = {key:key, a:L.a, name:L.a.name || 'Account', owner:L.a.owner, to:L.to, cust:L.cust, prod:L.prod, tf:String(L.prod || '').trim() === AUM_TAX_FREE, amt:0}; order.push(key); }
+      groups[key].amt += L.eff;
+    });
+    return order.map(function(k){ return groups[k]; });
+  }
+  function wsBlank(P){ return !P || WS_FIELDS.every(function(f){ return P[f] == null || String(P[f]).trim() === ''; }); }
+  function wallsSchedOn(r){
+    var keys = Object.keys(WALLS_SCHED); if(!keys.length) return false;
+    var live = {}; wallsLines(r).forEach(function(x){ live[x.key] = 1; });
+    return keys.some(function(k){ return live[k] && (WALLS_SCHED[k] || []).some(function(P){ return !wsBlank(P); }); });
+  }
+  /* one line's periods, blank cells filled from the two Walls lines; restarts need a start on or after the end before them */
+  function wallsPeriods(x, A, wStart){
+    var raw = WALLS_SCHED[x.key] || [], P0 = raw[0] || {}, notes = [];
+    var yrs = function(ym){ var v = ym ? planYears(ym) : null; return v == null ? null : Math.max(0, v); };
+    var pc = function(v, d){ return (v != null && String(v).trim() !== '') ? pctIn(v) : d; };
+    var dY = x.tf ? A.yWt : A.yW, dPre = x.tf ? A.gPreT : A.gPre, dPost = x.tf ? A.gPostT : A.gPost;
+    var mk = function(P, s){ var D = Math.max(0, pc(P.dist, dY)); return {s:s, e:yrs(P.end), T:pc(P.ty, dY + dPost), D:D, gAfter:pc(P.gAfter, dPost)}; };
+    var first = mk(P0, P0.start ? yrs(P0.start) : wStart), out = [first];
+    if(first.e != null && first.e <= first.s){ notes.push('stops before it starts'); first.e = first.s; }
+    for(var k = 1; k < raw.length; k++){
+      var P = raw[k] || {}, prev = out[out.length - 1];
+      if(!P.start){ if(!wsBlank(P)) notes.push('restart ' + k + ' has no start date'); continue; }
+      if(prev.e == null){ notes.push('restart ' + k + ' needs an end date on the line above'); continue; }
+      var Q = mk(P, yrs(P.start));
+      if(Q.s < prev.e){ notes.push('restart ' + k + ' starts before the line above stops'); continue; }
+      if(Q.e != null && Q.e <= Q.s){ notes.push('restart ' + k + ' stops before it starts'); Q.e = Q.s; }
+      out.push(Q);
+    }
+    return {periods:out, gPre:pc(P0.gPre, dPre), notes:notes};
+  }
+  /* the net rate the line's balance grows at, plan time tau (years) */
+  function wsRate(W, tau){
+    var ps = W.periods;
+    if(tau < ps[0].s) return W.gPre;
+    for(var k = 0; k < ps.length; k++){
+      var p = ps[k], next = ps[k + 1];
+      if(p.e == null || tau < p.e) return tau >= p.s ? p.T - p.D : W.gPre;
+      if(!next || tau < next.s) return p.gAfter;
+    }
+    return ps[ps.length - 1].gAfter;
+  }
+  /* the balance factor from plan time 0 to t: each stretch at its own rate, as the pooled Walls formula does */
+  function wsFactor(W, t){
+    var cuts = [0, t];
+    W.periods.forEach(function(p){ [p.s, p.e].forEach(function(c){ if(c != null && c > 0 && c < t) cuts.push(c); }); });
+    cuts.sort(function(a, b){ return a - b; });
+    var f = 1;
+    for(var k = 0; k + 1 < cuts.length; k++){ var a = cuts[k], b = cuts[k + 1]; if(b > a) f *= Math.pow(Math.max(1e-9, 1 + wsRate(W, (a + b) / 2)), b - a); }
+    return f;
+  }
+  /* every Walls line on its schedule, or null when the table is blank (the pooled Walls lines run the plan) */
+  function wallsSchedule(r, A, wStart){
+    if(!wallsSchedOn(r)) return null;
+    var lines = wallsLines(r), tot = lines.reduce(function(s, x){ return s + x.amt; }, 0);
+    if(!(tot > 0.5)) return null;
+    var k = (r.funded && r.funded.walls > 0) ? r.funded.walls / tot : 1, i = r.inputs;
+    return {lines:lines.map(function(x){
+      var W = wallsPeriods(x, A, wStart), tier = wdTierOf(x.a);
+      W.x = x; W.amt = x.amt * k; W.tf = x.tf; W.tier = tier === 'deferred' ? 'def:' + personOwner(x.a.owner, i) : (tier || 'none');
+      return W;
+    })};
+  }
+
   /* Roof growth by account (section 14): a rate typed for a Roof line wins over
      the account's own rate and the plan rate; the Roof grows at the
      amount-weighted blend. */
@@ -6054,6 +6171,7 @@
     var newC = contracts.filter(function(c){ return !c.income; });
     if(newC.length) fStart = Math.min.apply(null, newC.map(function(c){ return c.start != null ? c.start : firstRet; }));
     var incomeAcctIds = {}; contracts.forEach(function(c){ if(c.income) incomeAcctIds[c.key.replace('income:', '')] = 1; });
+    var WS = wallsSchedule(r, A, wStart);   // section 14's Walls income schedule by account, when any of it is set
     var mygaTaken = accounts.filter(function(a){ return a.pos === 'MYGA Annuity' && a.ann && a.ann.interest === 'taken' && a.ann.rate > 0 && a.val > 0.5; });
     /* how much of an annuity payment is taxable: a line with no account, or qualified money, fully; a non-qualified
        contract by its exclusion ratio (MYGA interest fully: interest comes out first); a Roth contract not at all */
@@ -6193,6 +6311,20 @@
       row.sleeveBal = sBal;
       row.wallsYield = (wallsBal * A.yW + wallsBalT * A.yWt) * onW;
       row.wallsYieldTF = wallsBalT * A.yWt * onW;      // the tax-free accounts' part, federally tax-free
+      if(WS){                                          // the schedule by account: each line's balance on its own dates, paying its distribution rate while on
+        var wsPay = 0, wsTF = 0, wsTier = {pay:{}, bal:{}};
+        WS.lines.forEach(function(W){
+          var B = W.amt * wsFactor(W, t);
+          if(r.stress && r.stress.seq){                // the bad years replace the line's own rate for those years
+            var SQw = r.stress.seq;
+            for(var sy = SQw.from; sy < Math.min(t, SQw.from + SQw.years); sy++) B *= (1 + stressRates(r, SQw, sy).w) / Math.max(1e-9, 1 + wsRate(W, sy + 0.5));
+          }
+          var pay = 0; W.periods.forEach(function(p){ pay += B * p.D * act(p.s, p.e); });
+          wsPay += pay; if(W.tf) wsTF += pay;
+          wsTier.pay[W.tier] = (wsTier.pay[W.tier] || 0) + pay; wsTier.bal[W.tier] = (wsTier.bal[W.tier] || 0) + B;
+        });
+        row.wallsYield = wsPay; row.wallsYieldTF = wsTF; row.wallsTier = wsTier;
+      }
       /* the plan has ended (a care-event projection where no one is left): no expenses or income from then */
       row.household = endT == null ? 1 : act(null, endT);
       if(endT != null){ var hh = row.household; row.needs *= hh; row.wants *= hh; row.wallsYield *= hh; row.wallsYieldTF *= hh; row.ng *= hh; if(t >= endT){ row.ann = 0; row.annTax = 0; row.sleeve = 0; } }
@@ -6204,7 +6336,7 @@
       row.expenses = row.needs + row.wants;           // total expenses, Needs + Wants
       rows.push(row);
     }
-    return {rows:rows, firstRet:firstRet, lastRet:lastRet, year0:year0, ppl:ppl, N:N, fStart:fStart, wStart:wStart, adj:A, frac0:frac0, start:PS, death:DT, endT:endT};
+    return {rows:rows, firstRet:firstRet, lastRet:lastRet, year0:year0, ppl:ppl, N:N, fStart:fStart, wStart:wStart, adj:A, frac0:frac0, start:PS, death:DT, endT:endT, ws:WS};
   }
 
   /* Two stacked bars a year: income (Foundation, Walls, then salary while it
@@ -6323,7 +6455,8 @@
       + ' and Walls income of <b>' + money(r0.walls) + '</b> covers ' + Math.round(wCover * 100) + '% of Wants (<b>' + money(r0.wants) + '</b>)'
       + ' \u2014 together, total Fortress income of <b>' + money(r0.income) + '</b> against total expenses of <b>' + money(r0.expenses) + '</b>, ' + (r0.expenses > 0.5 ? Math.round(r0.income / r0.expenses * 100) : 0) + '% covered.'
       + ' Needs and Wants grow at ' + infl2(i) + ' a year. The Foundation annuit' + (annuitySummary(r).count === 1 ? 'y pays' : 'ies pay') + ' about ' + money(annuitySummary(r).total)
-      + ' a year at the start; the Walls pay ' + money(rows[Math.min(P.N, Math.ceil(P.wStart))].wallsYield / Math.max(0.01, clamp01(Math.ceil(P.wStart) + 1 - P.wStart))) + ' at first from ' + (P.adj.wStart != null ? longDate(INC_ADJ.wStart + '-01').replace(/ \d+,/, '') : 'the first retirement') + ', the Walls growing ' + (effGrowth(r).wPre * 100).toFixed(1) + '% a year before income starts and ' + (effGrowth(r).w * 100).toFixed(1) + '% after'
+      + ' a year at the start; ' + (P.ws ? 'the Walls pay account by account, on the section 14 Walls income by account table'
+        : 'the Walls pay ' + money(rows[Math.min(P.N, Math.ceil(P.wStart))].wallsYield / Math.max(0.01, clamp01(Math.ceil(P.wStart) + 1 - P.wStart))) + ' at first from ' + (P.adj.wStart != null ? longDate(INC_ADJ.wStart + '-01').replace(/ \d+,/, '') : 'the first retirement') + ', the Walls growing ' + (effGrowth(r).wPre * 100).toFixed(1) + '% a year before income starts and ' + (effGrowth(r).w * 100).toFixed(1) + '% after')
       + '; the Roof grows at ' + (effGrowth(r).r * 100).toFixed(1) + '%' + (effGrowth(r).any ? ' (account rates from section 06 weighted in)' : '') + ' \u2014 ' + money(rows[rows.length - 1].roof) + ' by ' + rows[rows.length - 1].year + ' (in the table).';
 
     /* table view */
@@ -6428,6 +6561,7 @@
     renderAnnuityIncome(r, AS);
     renderLtcBenefits(r);
     renderRoofGrowth(r);
+    renderWallsSched(r);
     var retWord = function(c){ return c.name + ' \u2014 ' + annWords(c, retTxt); };
     var incC = AS.income || [];
     $('annIncHint').textContent = (incC.length ? incC.length + ' income annuit' + (incC.length === 1 ? 'y' : 'ies') + ' in force paying ' + money(incC.reduce(function(a, c){ return a + c.monthly * 12; }, 0)) + ' a year: ' + incC.map(function(c){ return c.name + ' \u2014 ' + money(c.monthly) + ' a month ' + (c.payout === 'joint' ? 'to the end of plan' : 'for the owner\u2019s life') + ', the value falling as it pays'; }).join('; ') + ' (monthly income, payout and company are set in the Annuities panel of section 06). ' : '')
@@ -6443,10 +6577,11 @@
     var TFW = taxFreeWalls(r); $('adjYWtDef').textContent = pc1(A.yW); $('adjGPreTDef').textContent = pc1(A.gPre); $('adjGPostTDef').textContent = pc1(A.gPost);
     $('adjTfAmt').textContent = TFW.total > 0.5 ? money(TFW.total) + ' of ' + money(r.funded.walls) : 'none in this plan';
     var wRow = P.rows[Math.min(P.N, Math.ceil(P.wStart))];
-    $('adjIncMsg').textContent = ((A.any || AS.any || Object.keys(ROOF_G).some(function(k){ return String(ROOF_G[k]).trim() !== ''; })) ? 'Adjusted: ' : 'Following the plan assumptions: ')
+    $('adjIncMsg').textContent = ((A.any || AS.any || wallsSchedOn(r) || Object.keys(ROOF_G).some(function(k){ return String(ROOF_G[k]).trim() !== ''; })) ? 'Adjusted: ' : 'Following the plan assumptions: ')
       + 'the Foundation annuit' + (AS.count === 1 ? 'y pays' : 'ies pay') + ' about ' + money(AS.total) + ' a year at the start'
-      + '; the Walls pay ' + pc1(A.yW) + ' of their balance from ' + (A.wStart != null ? longDate(INC_ADJ.wStart + '-01').replace(/ \d+,/, '') : 'the first retirement')
-      + ' \u2014 about ' + money(wRow ? wRow.wallsYield / Math.max(0.01, clamp01(Math.ceil(P.wStart) + 1 - P.wStart)) : r.funded.walls * A.yW) + ' in the first full year \u2014 growing ' + pc1(A.gPre) + ' before income starts and ' + pc1(A.gPost) + ' after'
+      + (P.ws ? '; the Walls pay account by account, on the Walls income by account table'
+      : '; the Walls pay ' + pc1(A.yW) + ' of their balance from ' + (A.wStart != null ? longDate(INC_ADJ.wStart + '-01').replace(/ \d+,/, '') : 'the first retirement')
+      + ' \u2014 about ' + money(wRow ? wRow.wallsYield / Math.max(0.01, clamp01(Math.ceil(P.wStart) + 1 - P.wStart)) : r.funded.walls * A.yW) + ' in the first full year \u2014 growing ' + pc1(A.gPre) + ' before income starts and ' + pc1(A.gPost) + ' after')
       + (TFW.total > 0.5 ? '; the tax-free income accounts (' + money(TFW.total) + ' in AUM - Tax Free) pay ' + pc1(A.yWt) + ', federally tax-free, growing ' + pc1(A.gPreT) + ' before and ' + pc1(A.gPostT) + ' after' : '') + '.'
   }
   function renderAdjAlloc(base, r){
@@ -8003,9 +8138,10 @@
     table(acols, arows, {rowH:13});
     (function(){
       var PA = projectIncome(r), A = PA.adj, AS = annuitySummary(r);
-      if(!A.any && !AS.any) return;
+      if(!A.any && !AS.any && !PA.ws) return;
       para('Income assumptions as adjusted (section 14): ' + AS.contracts.map(function(c){ return c.name + ' (' + money(c.amt) + ') \u2014 ' + annWords(c, 'the first retirement'); }).join('; ')
-        + '; Walls pay ' + (A.yW * 100).toFixed(1) + '% of their balance from ' + (A.wStart != null ? INC_ADJ.wStart : 'the first retirement') + ', growing ' + (A.gPre * 100).toFixed(1) + '% before income starts and ' + (A.gPost * 100).toFixed(1) + '% after. The Fortress sizing above uses the plan assumptions; the projections use these.', {rgb:INK});
+        + (PA.ws ? '; Walls pay account by account on the section 14 Walls income by account table.' : '; Walls pay ' + (A.yW * 100).toFixed(1) + '% of their balance from ' + (A.wStart != null ? INC_ADJ.wStart : 'the first retirement') + ', growing ' + (A.gPre * 100).toFixed(1) + '% before income starts and ' + (A.gPost * 100).toFixed(1) + '% after.')
+        + ' The Fortress sizing above uses the plan assumptions; the projections use these.', {rgb:INK});
     })();
 
     /* ---------- debts ---------- */
@@ -8175,7 +8311,7 @@
     /* ---------- projected assets ---------- */
     h2('Projected retirement assets (after withdrawals, by Fortress level)');
     var AL = TX.rows[TX.rows.length - 1].layers, A0 = TX.rows[0].layers;
-    para('Assets ' + (AL.total >= A0.total ? 'grow' : 'fall') + ' from ' + money(A0.total) + ' today to ' + money(AL.total) + ' at the end of plan. Walls at ' + pc(effGrowth(r).w) + ' after the Walls yield, Roof at ' + pc(effGrowth(r).r) + ', accounts left in place at ' + pc(effGrowth(r).i) + (effGrowth(r).any ? ' (plan rates blended with the account rates in section 06)' : '') + ', the liquidity buffer as cash; the Foundation annuity falls by the income it pays' + (i.foundGLI ? ' (guaranteed lifetime income continues after it is exhausted)' : ' (income stops once it is exhausted)') + ' and the Moat grows at ' + pc(moatGrowth(r)) + ' while it pays out. Withdrawals are the section 17 draws in the withdrawal order; RMD money not needed for spending and tax is reinvested, after tax, in the Roof. Future dollars, before market variation.', {rgb:INK});
+    para('Assets ' + (AL.total >= A0.total ? 'grow' : 'fall') + ' from ' + money(A0.total) + ' today to ' + money(AL.total) + ' at the end of plan. ' + (wallsSchedOn(r) ? 'Walls account by account on the section 14 Walls income schedule' : 'Walls at ' + pc(effGrowth(r).w) + ' after the Walls yield') + ', Roof at ' + pc(effGrowth(r).r) + ', accounts left in place at ' + pc(effGrowth(r).i) + (effGrowth(r).any ? ' (plan rates blended with the account rates in section 06)' : '') + ', the liquidity buffer as cash; the Foundation annuity falls by the income it pays' + (i.foundGLI ? ' (guaranteed lifetime income continues after it is exhausted)' : ' (income stops once it is exhausted)') + ' and the Moat grows at ' + pc(moatGrowth(r)) + ' while it pays out. Withdrawals are the section 17 draws in the withdrawal order; RMD money not needed for spending and tax is reinvested, after tax, in the Roof. Future dollars, before market variation.', {rgb:INK});
     var anyOutP = TX.rows.some(function(x){ return x.layers.outside > 0.5; });
     var acols2 = [{t:'Year', w:34, s:7}, {t:'Ages', w:46, s:7}, {t:'Withdrawn', w:58, a:'r', f:'F3', s:7}, {t:'Buffer', w:56, a:'r', f:'F3', s:7},
                   {t:'Foundation', w:60, a:'r', f:'F3', s:7}, {t:'Walls', w:60, a:'r', f:'F3', s:7}, {t:'Roof', w:64, a:'r', f:'F3', s:7}, {t:'Moat', w:56, a:'r', f:'F3', s:7}];
@@ -9068,6 +9204,7 @@
       annuityIncome:Object.keys(ANN_INC).length ? ANN_INC : null,
       ltcBenefits:Object.keys(LTC_BEN).length ? LTC_BEN : null,
       roofGrowth:Object.keys(ROOF_G).length ? ROOF_G : null,
+      wallsSchedule:Object.keys(WALLS_SCHED).length ? WALLS_SCHED : null,
       transfers:adjMoves ? adjMoves.map(function(m){
         var idx = accounts.map(function(a){ return a.id; }).indexOf(m.acctId);
         var t = {acct:idx, bucket:m.bucket, amt:m.amt};
@@ -9280,6 +9417,7 @@
     }
     ROOF_G = {}; roofGSig = '';
     if(d.roofGrowth && typeof d.roofGrowth === 'object') Object.keys(d.roofGrowth).forEach(function(k){ ROOF_G[k] = String(d.roofGrowth[k] || ''); });
+    WALLS_SCHED = wsClean(d.wallsSchedule); wallsSchedSig = '';
     LTC_BEN = {}; ltcBenSig = '';
     if(d.ltcBenefits && typeof d.ltcBenefits === 'object'){
       Object.keys(d.ltcBenefits).forEach(function(k){ var v = d.ltcBenefits[k] || {}; LTC_BEN[k] = {monthly:String(v.monthly || ''), age:String(v.age || ''), years:String(v.years || ''), infl:String(v.infl || ''), growth:String(v.growth || '')}; });
@@ -9966,8 +10104,13 @@
         var gWy = (t <= P.wStart) ? Gt.wPre : Gt.w, gRy = Gt.r;   // Walls grow at the pre-income rate until they start paying
         var SQ = r.stress && r.stress.seq;                        // sensitivity: bad market years (the return earned during year t-1), blended by what each level holds
         if(SQ && (t - 1) >= SQ.from && (t - 1) < SQ.from + SQ.years){ var SR = stressRates(r, SQ, t - 1); gWy = SR.w; gRy = SR.r; if(SR.i != null) gIy = SR.i; }
-        ['taxable','roth'].forEach(function(k){ bal[k].w *= 1 + gWy; bal[k].r *= 1 + gRy; bal[k].i *= 1 + gIy; });
-        ['client','spouse'].forEach(function(o){ bal.deferred[o].w *= 1 + gWy; bal.deferred[o].r *= 1 + gRy; bal.deferred[o].i *= 1 + gIy; });
+        /* the Walls income schedule by account: each tax tier's Walls grow as its own lines did over the year (stress included) */
+        var wsG = function(tk){
+          var a = rows[t - 1].wallsTier, b = row.wallsTier;
+          return (P.ws && a && b && (a.bal[tk] || 0) > 0.5) ? (b.bal[tk] || 0) / a.bal[tk] - 1 : gWy;
+        };
+        ['taxable','roth'].forEach(function(k){ bal[k].w *= 1 + wsG(k); bal[k].r *= 1 + gRy; bal[k].i *= 1 + gIy; });
+        ['client','spouse'].forEach(function(o){ bal.deferred[o].w *= 1 + wsG('def:' + o); bal.deferred[o].r *= 1 + gRy; bal.deferred[o].i *= 1 + gIy; });
       }
       if(row.dep && !(endT != null && t >= endT)){   // this year's retirement-plan contributions, into their destination accounts
         Object.keys(row.dep).forEach(function(id){ var D = depKey[id]; if(!D) return; var amt = row.dep[id]; depositTotal += amt;
@@ -9981,7 +10124,12 @@
       var sleeveOrd = row.sleeve * foundTaxShare;
       var wallsNow = bal.taxable.w + bal.roth.w + bal.deferred.client.w + bal.deferred.spouse.w;
       var wQ = {client: wallsNow > 0.5 ? bal.deferred.client.w / wallsNow : 0, spouse: wallsNow > 0.5 ? bal.deferred.spouse.w / wallsNow : 0};
-      var wallsOrd = row.wallsYield * (wQ.client + wQ.spouse), wallsNQy = row.wallsYield * (wallsNow > 0.5 ? bal.taxable.w / wallsNow : 0);
+      var wNQ = wallsNow > 0.5 ? bal.taxable.w / wallsNow : 0;
+      if(P.ws && row.wallsTier){                    // on the schedule by account: the yield's tax character from what each tier's own lines paid
+        var wp = row.wallsTier.pay, wpT = (wp.taxable || 0) + (wp.roth || 0) + (wp['def:client'] || 0) + (wp['def:spouse'] || 0);
+        if(wpT > 0.005){ wQ = {client:(wp['def:client'] || 0) / wpT, spouse:(wp['def:spouse'] || 0) / wpT}; wNQ = (wp.taxable || 0) / wpT; }
+      }
+      var wallsOrd = row.wallsYield * (wQ.client + wQ.spouse), wallsNQy = row.wallsYield * wNQ;
       /* the non-qualified share of the yield: long-term gains, or, federally tax-free, out of federal income but still in Social Security's
          provisional income and in the state model; the share paid from IRA money (wallsOrd) is a taxable distribution either way */
       var wallsExempt = Math.min(wallsNQy, row.wallsYieldTF || 0), wallsCG = wallsNQy - wallsExempt;   // the tax-free accounts' yield leaves federal income, within the non-qualified share
@@ -11570,7 +11718,7 @@
             + '<td class="num">' + money(Ly.buffer) + '</td><td class="num">' + money(Ly.sleeve) + '</td><td class="num">' + money(Ly.walls) + '</td><td class="num">' + money(Ly.roof) + '</td><td class="num">' + money(Ly.moat) + '</td>'
             + (anyOut ? '<td class="num">' + money(Ly.outside) + '</td>' : '') + '<td class="num"><b>' + money(Ly.total) + '</b></td>' + (anyUnf ? '<td class="num">' + (x.unfunded > 0.5 ? money(x.unfunded) : '—') + '</td>' : '') + '</tr>';
         }).join('') + '</tbody>';
-    $('assetAssume').innerHTML = '<b>Assumptions.</b> Balances start from the plan’s own transfers in section 14 and are carried forward a year at a time: the Walls at ' + pct(effGrowth(r).w) + ' (after the Walls yield is paid), the Roof at ' + pct(effGrowth(r).r) + ', accounts left in place at ' + pct(effGrowth(r).i) + (effGrowth(r).any ? ' \u2014 each a balance-weighted blend of the plan rate and the account rates typed in section 06 \u2014' : '') + ', the liquidity buffer as cash with no growth. The Foundation annuity is an income annuity: its value falls by the income it pays each year' + (i.foundGLI ? ', and with guaranteed lifetime income the payment continues at the same level for life once the value reaches zero' : ', and without guaranteed lifetime income the payment stops once the value is gone') + '. The Moat is an LTC contract, its value growing ' + (moatGrowth(r) * 100).toFixed(1) + '% a year (section 14) while it pays out. The first year runs from ' + planStart().label + ', so its income, Needs and Wants are all prorated' + (planStart().frac < 0.999 ? ' (' + Math.round(planStart().frac * 12) + ' months)' : '') + '. Withdrawals are the section 17 draws — whatever Needs and Wants (and the tax on the draw) need beyond wages, Social Security, pensions, annuities, non-guaranteed income, the Foundation annuity and the Walls yield — taken in the withdrawal order, cash first within each tier, then Walls, then Roof. RMDs above the plan’s own tax-deferred draw are spent first and whatever is not needed is reinvested after tax in the Roof. Future dollars, before any market variation; a planning estimate.';
+    $('assetAssume').innerHTML = '<b>Assumptions.</b> Balances start from the plan’s own transfers in section 14 and are carried forward a year at a time: ' + (wallsSchedOn(r) ? 'the Walls account by account, on the Walls income by account table in section 14 (the total yield less the distribution while an account pays)' : 'the Walls at ' + pct(effGrowth(r).w) + ' (after the Walls yield is paid)') + ', the Roof at ' + pct(effGrowth(r).r) + ', accounts left in place at ' + pct(effGrowth(r).i) + (effGrowth(r).any ? ' \u2014 each a balance-weighted blend of the plan rate and the account rates typed in section 06 \u2014' : '') + ', the liquidity buffer as cash with no growth. The Foundation annuity is an income annuity: its value falls by the income it pays each year' + (i.foundGLI ? ', and with guaranteed lifetime income the payment continues at the same level for life once the value reaches zero' : ', and without guaranteed lifetime income the payment stops once the value is gone') + '. The Moat is an LTC contract, its value growing ' + (moatGrowth(r) * 100).toFixed(1) + '% a year (section 14) while it pays out. The first year runs from ' + planStart().label + ', so its income, Needs and Wants are all prorated' + (planStart().frac < 0.999 ? ' (' + Math.round(planStart().frac * 12) + ' months)' : '') + '. Withdrawals are the section 17 draws — whatever Needs and Wants (and the tax on the draw) need beyond wages, Social Security, pensions, annuities, non-guaranteed income, the Foundation annuity and the Walls yield — taken in the withdrawal order, cash first within each tier, then Walls, then Roof. RMDs above the plan’s own tax-deferred draw are spent first and whatever is not needed is reinvested after tax in the Roof. Future dollars, before any market variation; a planning estimate.';
     return X0;
   }
 
@@ -11812,6 +11960,57 @@
     $('roofGHint').textContent = rows.length
       ? 'The Roof grows at ' + pc1(G.r) + ' \u2014 the amount-weighted blend of ' + rows.length + ' destination account' + (rows.length === 1 ? '' : 's') + ' (' + money(tot) + ')' + (nSet ? ', ' + nSet + ' with a rate set here' : ', all on their default rates') + '. The plan rate in section 03 is ' + pc1(r.inputs.growthR || 0) + '; blank cells follow the account\u2019s own rate from section 06 where one is typed, else the plan rate.'
       : 'The Roof grows at the section 03 rate (' + pc1(r.inputs.growthR || 0) + ') until a Roof line is listed above.';
+  }
+  /* section 14: the Walls income schedule by account, one row per Walls line and one per restart */
+  function renderWallsSched(r){
+    var body = $('wallsSBody'); if(!body) return;
+    var lines = wallsLines(r), A = incomeAdj(r), pc1 = function(v){ return (v * 100).toFixed(1) + '%'; };
+    var perOf = function(x){ var L = WALLS_SCHED[x.key]; return (L && L.length) ? L : [{}]; };
+    var sig = lines.map(function(x){ return x.key + '#' + perOf(x).length; }).join(';');
+    if(sig !== wallsSchedSig){
+      wallsSchedSig = sig;
+      var pctIn_ = function(f, title){ return '<td class="num"><input class="num" inputmode="decimal" data-wk="' + f + '" autocomplete="off" title="' + title + '"></td>'; };
+      body.innerHTML = !lines.length ? '<tr><td colspan="9"><div class="empty-state">No line in the transfer list above goes to the <b>Walls</b> yet.</div></td></tr>' : lines.map(function(x){
+        return perOf(x).map(function(P, k){
+          var head = k === 0
+            ? '<td><b>' + esc(x.name) + '</b>' + (x.owner ? ' · ' + esc(ownerLabel(x.owner)) : '') + '<small class="sub">' + esc([x.to && x.to !== x.name ? 'to ' + x.to : '', x.prod].filter(Boolean).join(' · ')) + (x.tf ? ' · tax-free income' : '') + '</small></td><td class="num" data-wf="amt"></td>'
+            : '<td style="padding-left:22px">↳ Restart ' + k + '<small class="sub">' + esc(x.name) + ' pays again</small></td><td></td>';
+          return '<tr data-ws="' + esc(x.key) + '" data-wp="' + k + '">' + head
+            + '<td><input type="month" data-wk="start" title="The month distributions start"><small class="sub" data-wf="sdef"></small></td>'
+            + '<td><input type="month" data-wk="end" title="The month distributions stop (none in that month)"><small class="sub">blank: to the end of plan</small></td>'
+            + pctIn_('ty', 'The account’s total yield (return) while it pays')
+            + pctIn_('dist', 'The share of the balance paid out each year while it pays')
+            + (k === 0 ? pctIn_('gPre', 'Growth before distributions start') : '<td class="num"><small class="sub" style="margin:0">at the stop rate above</small></td>')
+            + pctIn_('gAfter', 'Growth after distributions stop, until a restart')
+            + '<td>' + (k === 0 ? '<button type="button" class="bud-add" data-wsadd title="Add a later period when this account pays again">+ Add restart</button>' : '<button type="button" class="row-x" data-wsdel aria-label="Remove restart">&times;</button>') + '</td></tr>';
+        }).join('');
+      }).join('');
+      body.querySelectorAll('tr[data-ws]').forEach(function(tr){
+        var P = (WALLS_SCHED[tr.getAttribute('data-ws')] || [])[+tr.getAttribute('data-wp')] || {};
+        tr.querySelectorAll('[data-wk]').forEach(function(el){ el.value = P[el.getAttribute('data-wk')] || ''; });
+      });
+    }
+    var wStartTxt = INC_ADJ.wStart ? longDate(INC_ADJ.wStart + '-01').replace(/ \d+,/, '') : 'the first retirement', notes = [];
+    var P = lines.length ? projectIncome(r) : null, on = !!(P && P.ws), first = null;
+    lines.forEach(function(x){
+      var W = wallsPeriods(x, A, P.wStart), dY = x.tf ? A.yWt : A.yW, dPre = x.tf ? A.gPreT : A.gPre, dPost = x.tf ? A.gPostT : A.gPost;
+      W.notes.forEach(function(n){ notes.push(x.name + ': ' + n); });
+      body.querySelectorAll('tr[data-ws="' + CSS.escape(x.key) + '"]').forEach(function(tr){
+        var k = +tr.getAttribute('data-wp'), amt = tr.querySelector('[data-wf="amt"]'), sd = tr.querySelector('[data-wf="sdef"]');
+        if(amt) amt.textContent = money(x.amt);
+        if(sd) sd.textContent = k === 0 ? 'blank: ' + wStartTxt : 'required';
+        var ph = {ty:pc1(dY + dPost), dist:pc1(dY), gPre:pc1(dPre), gAfter:pc1(dPost)};
+        tr.querySelectorAll('input[data-wk]').forEach(function(el){
+          var f = el.getAttribute('data-wk'); if(ph[f]) el.placeholder = ph[f];
+          if(document.activeElement !== el) el.classList.toggle('auto', el.value.trim() === '');
+        });
+      });
+    });
+    if(on){ for(var t = 0; t <= P.N; t++){ if(P.rows[t].wallsYield > 0.5){ first = P.rows[t]; break; } } }
+    $('wallsSHint').textContent = !lines.length ? ''
+      : (on ? 'The Walls follow this schedule, account by account' + (first ? ' — ' + money(first.wallsYield) + ' of Walls income in ' + first.year + ', the first year any account pays' : ' — no account pays within the plan') + '.'
+            : 'All blank: the Walls run as one pool on the two lines above. Fill any cell to put every Walls account on this schedule (blank cells keep the line above).')
+        + (notes.length ? ' Not used: ' + notes.join('; ') + '.' : '');
   }
   function ltcScenarios(r){
     var est = ltcEstimate(), i = r.inputs;
@@ -14366,13 +14565,13 @@
     var m = $('deckStatusMsg'); if(m) m.textContent = deckStatus === 'final' ? 'The plan prints as FINAL.' : 'The plan prints as DRAFT \u2014 for discussion, until it is marked final.';
   }
   function scnDefault(){
-    return {adjMoves:null, INC_ADJ:{yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:'', yWt:'', gPreT:'', gPostT:'', ssC:'', ssS:''}, ANN_INC:{}, LTC_BEN:{}, ROOF_G:{},
+    return {adjMoves:null, INC_ADJ:{yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:'', yWt:'', gPreT:'', gPostT:'', ssC:'', ssS:''}, ANN_INC:{}, LTC_BEN:{}, ROOF_G:{}, WALLS_SCHED:{},
             wdOrder:WD_DEFAULT.slice(), rothCfg:{apply:true, target:'auto', start:'auto', order:'roof', irmaa:true, irmaaTier:1, ssGuard:'none'}, qcdCfg:qcdDefault()};
   }
   function scnClone(v){ return v == null ? v : JSON.parse(JSON.stringify(v)); }
   /* the working variables, parked */
   function scnSnapshot(){
-    return {adjMoves:adjMoves ? adjMoves.map(scnClone) : null, INC_ADJ:scnClone(INC_ADJ), ANN_INC:scnClone(ANN_INC), LTC_BEN:scnClone(LTC_BEN), ROOF_G:scnClone(ROOF_G),
+    return {adjMoves:adjMoves ? adjMoves.map(scnClone) : null, INC_ADJ:scnClone(INC_ADJ), ANN_INC:scnClone(ANN_INC), LTC_BEN:scnClone(LTC_BEN), ROOF_G:scnClone(ROOF_G), WALLS_SCHED:scnClone(WALLS_SCHED),
             wdOrder:wdOrder.slice(), rothCfg:scnClone(rothCfg), qcdCfg:scnClone(qcdCfg)};
   }
   /* a parked state back into the working variables (the engine's view only) */
@@ -14381,7 +14580,7 @@
     adjMoves = S.adjMoves ? S.adjMoves.map(scnClone).filter(function(m){ return !!acctById(m.acctId); }) : null;
     if(adjMoves && !adjMoves.length) adjMoves = null;
     INC_ADJ = scnClone(S.INC_ADJ) || scnDefault().INC_ADJ;
-    ANN_INC = scnClone(S.ANN_INC) || {}; LTC_BEN = scnClone(S.LTC_BEN) || {}; ROOF_G = scnClone(S.ROOF_G) || {};
+    ANN_INC = scnClone(S.ANN_INC) || {}; LTC_BEN = scnClone(S.LTC_BEN) || {}; ROOF_G = scnClone(S.ROOF_G) || {}; WALLS_SCHED = scnClone(S.WALLS_SCHED) || {}; wallsSchedSig = '';
     wdOrder = (S.wdOrder || WD_DEFAULT).slice(); rothCfg = scnClone(S.rothCfg) || scnDefault().rothCfg; qcdCfg = S.qcdCfg ? qcdFrom(S.qcdCfg) : qcdDefault();
   }
   /* …and the page's controls with it */
@@ -14571,7 +14770,7 @@
               if(m.person) t.person = m.person;
               OVR_KEYS.forEach(function(k){ if(m[k] != null){ t[k] = m[k]; if(m[k + 'C']) t[k + 'C'] = true; } });
               return t; }).filter(function(t){ return t.acct >= 0; }) : null,
-            incomeAdj:S.INC_ADJ, annuityIncome:S.ANN_INC, ltcBenefits:S.LTC_BEN, roofGrowth:S.ROOF_G, withdrawalOrder:S.wdOrder, roth:S.rothCfg, qcd:S.qcdCfg || qcdDefault()};
+            incomeAdj:S.INC_ADJ, annuityIncome:S.ANN_INC, ltcBenefits:S.LTC_BEN, roofGrowth:S.ROOF_G, wallsSchedule:S.WALLS_SCHED, withdrawalOrder:S.wdOrder, roth:S.rothCfg, qcd:S.qcdCfg || qcdDefault()};
   }
   function scnParse(d){
     var S = scnDefault(); if(!d || typeof d !== 'object') return S;
@@ -14588,6 +14787,7 @@
     if(d.annuityIncome && typeof d.annuityIncome === 'object') Object.keys(d.annuityIncome).forEach(function(k){ var v = d.annuityIncome[k] || {}; S.ANN_INC[k] = {gli:String(v.gli || ''), start:String(v.start || ''), monthly:String(v.monthly || ''), cola:String(v.cola || ''), wd:String(v.wd || '')}; });
     if(d.ltcBenefits && typeof d.ltcBenefits === 'object') Object.keys(d.ltcBenefits).forEach(function(k){ var v = d.ltcBenefits[k] || {}; S.LTC_BEN[k] = {monthly:String(v.monthly || ''), age:String(v.age || ''), years:String(v.years || ''), infl:String(v.infl || ''), growth:String(v.growth || '')}; });
     if(d.roofGrowth && typeof d.roofGrowth === 'object') Object.keys(d.roofGrowth).forEach(function(k){ S.ROOF_G[k] = String(d.roofGrowth[k] || ''); });
+    S.WALLS_SCHED = wsClean(d.wallsSchedule);
     if(Array.isArray(d.withdrawalOrder)){
       var seen = d.withdrawalOrder.filter(function(k, i, arr){ return WD_TIERS[k] && arr.indexOf(k) === i; });
       WD_DEFAULT.forEach(function(k){ if(seen.indexOf(k) < 0) seen.push(k); });
@@ -15388,6 +15588,29 @@
     var k = e.target.getAttribute('data-rk'), tr = e.target.closest('tr[data-roof]'); if(!k || !tr || e.target.value.trim() === '') return;
     var v = (pctIn(e.target.value) * 100).toFixed(1) + '%'; e.target.value = v; ROOF_G[tr.getAttribute('data-roof')] = v; render();
   }, true);
+  /* section 14: the Walls income schedule by account */
+  var wsCell = function(e){
+    var f = e.target.getAttribute('data-wk'), tr = e.target.closest('tr[data-ws]'); if(!f || !tr) return null;
+    var key = tr.getAttribute('data-ws'), k = +tr.getAttribute('data-wp'), L = WALLS_SCHED[key] || (WALLS_SCHED[key] = [{}]);
+    while(L.length <= k) L.push({});
+    return {f:f, key:key, P:L[k]};
+  };
+  var wsTidy = function(key){ var L = WALLS_SCHED[key]; if(L && L.every(function(P){ return wsBlank(P); }) && L.length <= 1) delete WALLS_SCHED[key]; };
+  $('wallsSBody').addEventListener('input', function(e){
+    var c = wsCell(e); if(!c) return;
+    c.P[c.f] = e.target.value.trim(); wsTidy(c.key); render();
+  });
+  $('wallsSBody').addEventListener('blur', function(e){
+    if(e.target.type === 'month' || !e.target.getAttribute('data-wk') || e.target.value.trim() === '') return;
+    var c = wsCell(e); if(!c) return;
+    var v = (pctIn(e.target.value) * 100).toFixed(1) + '%'; e.target.value = v; c.P[c.f] = v; render();
+  }, true);
+  $('wallsSBody').addEventListener('click', function(e){
+    var tr = e.target.closest('tr[data-ws]'); if(!tr) return;
+    var key = tr.getAttribute('data-ws'), k = +tr.getAttribute('data-wp');
+    if(e.target.closest('[data-wsadd]')){ var L = WALLS_SCHED[key] || (WALLS_SCHED[key] = [{}]); L.push({}); wallsSchedSig = ''; render(); }
+    else if(e.target.closest('[data-wsdel]')){ var M = WALLS_SCHED[key]; if(M && k > 0){ M.splice(k, 1); wsTidy(key); } wallsSchedSig = ''; render(); }
+  });
   $('ltcBenBody').addEventListener('input', function(e){
     var k = e.target.getAttribute('data-lk'), tr = e.target.closest('tr[data-ltc]'); if(!k || !tr) return;
     var key = tr.getAttribute('data-ltc'); LTC_BEN[key] = LTC_BEN[key] || {}; LTC_BEN[key][k] = e.target.value.trim();
@@ -15493,7 +15716,7 @@
   });
   function resetIncomeAdj(){
     INC_ADJ = {yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:'', yWt:'', gPreT:'', gPostT:'', ssC:'', ssS:''};
-    ANN_INC = {}; annSig = ''; LTC_BEN = {}; ltcBenSig = ''; ROOF_G = {}; roofGSig = '';
+    ANN_INC = {}; annSig = ''; LTC_BEN = {}; ltcBenSig = ''; ROOF_G = {}; roofGSig = ''; WALLS_SCHED = {}; wallsSchedSig = '';
     ['adjYW','adjGPre','adjGPost','adjWStart','adjYWt','adjGPreT','adjGPostT','adjSsC','adjSsS'].forEach(function(id){ $(id).value = ''; });
   }
   $('adjIncReset').addEventListener('click', function(){ resetIncomeAdj(); render(); });
@@ -17053,13 +17276,14 @@
       dkLabel(s, 1.4, 3.5, 9, 'Walls assets');
       dkHoldings(s, 1.4, 3.9, 9.6, 3.2, holdingRows('walls', r), {max:5, empty:'No Walls assets placed'});
       dkTile(s, 1.4, 7.3, 4.6, 1.8, 'The Walls', money(r.funded.walls), 'Managed portfolio at ' + (i.newCust || 'the new custodian'), {valueColor:DECK_C.W});
-      dkTile(s, 6.3, 7.3, 4.7, 1.8, 'Assumed Growth Rate', pc1(A.gPre) + ' / ' + pc1(A.gPost), 'Before income starts / after', {valueColor:DECK_C.W});
+      var wsOn = wallsSchedOn(r);
+      dkTile(s, 6.3, 7.3, 4.7, 1.8, 'Assumed Growth Rate', wsOn ? 'By account' : pc1(A.gPre) + ' / ' + pc1(A.gPost), wsOn ? 'Each account on its own dates' : 'Before income starts / after', {valueColor:DECK_C.W});
       dkLabel(s, 11.9, 1.95, 7, 'Walls income in ' + firstRetRow.year);
       var r0 = firstRetRow;
-      var inc = [['Walls yield at ' + pc1(A.yW), money(r0.wallsYield)], ['Non-guaranteed income', money(r0.ng)], {cls:'tot', cells:['Walls income', money(r0.walls)]}, ['Wants in ' + r0.year, money(r0.wants)], {cls:'tot', cells:[{t:r0.walls >= r0.wants ? 'Surplus over Wants' : 'Wants not covered by the Walls', color:r0.walls >= r0.wants ? DECK_C.M : DECK_C.red}, {t:money(Math.abs(r0.walls - r0.wants)), color:r0.walls >= r0.wants ? DECK_C.M : DECK_C.red}]}];
+      var inc = [[wsOn ? 'Walls distributions' : 'Walls yield at ' + pc1(A.yW), money(r0.wallsYield)], ['Non-guaranteed income', money(r0.ng)], {cls:'tot', cells:['Walls income', money(r0.walls)]}, ['Wants in ' + r0.year, money(r0.wants)], {cls:'tot', cells:[{t:r0.walls >= r0.wants ? 'Surplus over Wants' : 'Wants not covered by the Walls', color:r0.walls >= r0.wants ? DECK_C.M : DECK_C.red}, {t:money(Math.abs(r0.walls - r0.wants)), color:r0.walls >= r0.wants ? DECK_C.M : DECK_C.red}]}];
       dkHtmlTable(s, 11.9, 2.35, 7.2, 2.9, [{t:'Source'}, {t:'A year', align:'r'}], inc);
       dkTile(s, 11.9, 5.5, 7.2, 1.9, 'Wants covered by the Walls', wCover + '%', money(r0.walls) + ' against Wants of ' + money(r0.wants) + ' in ' + r0.year, {valueColor:DECK_C.W});
-      dkBody(s, 11.9, 7.6, 7.2, 2.3, 'Walls income starts ' + (A.wStart != null ? mon(INC_ADJ.wStart) : 'at the first retirement') + '. The balance grows at ' + pc1(A.gPre) + ' until then and ' + pc1(A.gPost) + ' after; the Walls are spent down last, after the Roof.', {sz:16});
+      dkBody(s, 11.9, 7.6, 7.2, 2.3, (wallsSchedOn(r) ? 'Each Walls account pays on its own dates: until it starts the balance grows, while it pays the yield above the payout is reinvested. The Walls are spent down last, after the Roof.' : 'Walls income starts ' + (A.wStart != null ? mon(INC_ADJ.wStart) : 'at the first retirement') + '. The balance grows at ' + pc1(A.gPre) + ' until then and ' + pc1(A.gPost) + ' after; the Walls are spent down last, after the Roof.'), {sz:16});
     })();
 
     /* 18. what's in the Roof */

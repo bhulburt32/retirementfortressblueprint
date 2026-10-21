@@ -24,6 +24,7 @@ const SUITE = [
   't-riskq',     // risk profile questionnaire, the tolerance cell that follows it, the client report
   't-tglbtn',    // Adjust Target Allocations button
   't-assetmap',  // the asset map (page and deck), the -8%/-16% sequence stress, the 3.26% inflation default, the protected-pieces continuation slide
+  't-wallssched', // section 14 Walls income by account: start/stop dates, total yield vs distribution, restarts; blank = pooled, unchanged
 ];
 const only = process.argv.slice(2);
 let failed = 0;
