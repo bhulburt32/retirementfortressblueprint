@@ -430,7 +430,10 @@
       </div>
 
       <p>The page opens empty — a new case, every field blank, today's date in section&nbsp;01. To pick up
-        a household, paste its block from section&nbsp;23 into <span class="ui">Load pasted case</span>.
+        a household, press <span class="ui">Load case</span> in the top right and open its case file (the
+        .json or .txt from <span class="ui">Download case file</span>, or a Word .docx of the household) —
+        the same as <span class="ui">Upload case file</span> in section&nbsp;23 — or paste its block from
+        section&nbsp;23 into <span class="ui">Load pasted case</span>.
         <span class="ui">Start new case</span> in the top right — twice, it asks you to confirm — empties
         every field again; your name and the date carry over, the client's details do not. There is no
         sample household in the page; a training copy can be opened with one by defining
@@ -619,8 +622,12 @@
 
       <p>It opens with an <b>Employment income</b> table, one column per person: annual salary, target
         retirement date, annual payroll deductions, the employee and employer retirement contributions
-        as percentages of salary, which account from section&nbsp;06 those contributions land in, and
-        the annual salary increase. Beneath it the tool works out each person's <b>net before-tax
+        as percentages of salary, which account from section&nbsp;06 each lands in &mdash; the employee's
+        contribution and the employer's match have their own destinations, so a Roth 401(k) deferral
+        and a pre-tax match are kept apart (the employer's blank means the same account) &mdash; and
+        the annual salary increase. The contributions are deposited into those accounts each working
+        year in every projection, growing with them, and an employee contribution into a Roth account
+        is taxed as wages; a line with no destination is treated as not saved, and the table says so. Beneath it the tool works out each person's <b>net before-tax
         annual salary</b> (salary less payroll deductions and the employee contribution), the dollars
         going into retirement accounts each year, and the time to retirement with the salary projected
         to that date. These describe the working years and are recorded for the plan; the Fortress
@@ -635,7 +642,19 @@
         income gap, the tax projection, the status quo and the reports (they appear as rows on the
         Employment income table of the Retirement Fortress Plan and in the Household income tile); no payroll
         deductions or retirement contributions are assumed on them, and they do not move the retirement
-        dates. They save with the case.</p>
+        dates. Tick <span class="ui">Self-employed</span> on a line for consulting or practice income and the
+        projections charge self-employment tax on it instead of the employee's payroll tax, deducting half
+        of it from income. They save with the case.</p>
+
+      <p><b>Payroll taxes</b> are taken automatically in every projection, so <span class="ui">Payroll
+        deductions</span> is for benefits only: on each person's gross salary (retirement deferrals do not
+        reduce it) and on the additional lines, 6.2% Social Security tax to the 2026 wage base of $184,500,
+        indexed with the plan's inflation, 1.45% Medicare on every dollar, and the 0.9% Additional Medicare
+        tax on household wages over $200,000 (single) or $250,000 (joint), which is not indexed. Self-employed
+        lines pay 12.4% and 2.9% on 92.35% of the income, sharing the wage base with any wages. The payroll
+        tax appears in the section&nbsp;04 salary breakdown, as its own column in the cash flow and tax tables
+        while anyone is working, and in the lifetime totals; the Fortress sizing, which runs off the retirement
+        figures, is not affected.</p>
 
       <p>Next comes <b>Social Security and pension income</b>. For Social Security enter each person's
         <span class="ui">Primary Insurance Amount</span> from their SSA statement, the age they will
@@ -660,10 +679,16 @@
         strategies are ranked on the 22%-from-2032 reduction used in section&nbsp;19, with the no-cut
         total alongside. Tiles name the top strategy, its lifetime benefit, the surviving spouse's
         income under it, and where the plan's own claiming ages rank among everything tested; the
-        table lists the five best with each person's monthly amounts, lifetime totals and the age at
-        which each catches up to filing earliest; a chart runs the cumulative benefits (the plan's
-        own ages as a dashed line when they are outside the five), and <span class="ui">Break-even
-        ages</span> opens the full strategy-versus-strategy table. <span class="ui">Use the top
+        table always lists the same six scenarios in the same order, each with its true rank among
+        everything tested: <b>1 Highest lifetime benefit</b>; <b>2 File late</b>, both at 70;
+        <b>3 File early</b>, both at 62; <b>4</b> the client early at 62 and the spouse late at 70;
+        <b>5</b> the client late at 70 and the spouse early at 62; <b>6 File at full retirement age</b>,
+        both at FRA (a single person gets 1, 2, 3 and 6; a person already past an age files at the
+        earliest age still open to them; a scenario whose ages match an earlier one says so). Each
+        shows the person's monthly amounts, lifetime totals and the age at which it catches up to
+        filing earliest; a chart runs the cumulative benefits (the plan's own ages as a dashed line
+        when they are not among the scenarios), and <span class="ui">Break-even
+        ages</span> opens the full scenario-versus-scenario table. <span class="ui">Use the top
         strategy in the plan</span> sets the benefit starting ages above to strategy #1 (whole years),
         so the income projections, the Foundation sizing and every report follow. The optimizer's
         settings save with the case. Not modelled: the earnings test, tax on benefits, WEP/GPO,
@@ -725,11 +750,18 @@
       <p>Type both straight in from a client's own figures, or press
         the green <span class="ui">Complete Detailed Expenses</span> bar to open Alto's monthly budget worksheet, line
         for line — six categories from Household to Entertainment &amp; other, with three
-        <em>Other</em> lines you can name. Enter monthly amounts. Each line carries a
+        <em>Other</em> lines you can name and an <span class="ui">+ Add line</span> button on every
+        category heading for an expense the worksheet has no row for (a name, an amount, a Need/Want
+        switch, dates and a note like any other line; the &times; at its right removes it). Enter monthly amounts. Each line carries a
         <span class="ui">Need / Want</span> switch, preset the way most households would answer
         (mortgage and groceries are Needs; dining out and travel are Wants); change any of them.
-        Start and end dates and notes are for the file &mdash; a mortgage that ends in 2031, a
-        tuition line that starts next autumn &mdash; and do not change the arithmetic.</p>
+        Start and end dates shape the arithmetic: a line counts in today's Needs and Wants &mdash; the
+        total at the foot of the worksheet, the figures it applies above, the Foundation sizing &mdash;
+        only while its dates cover the month the plan starts, and the year-by-year projections carry
+        each line on its own dates, so a mortgage that ends in 2031 drops out of the expenses then and a
+        tuition line that starts next autumn comes in then. A line outside today's figures is struck
+        through with a note under its date, and the footer shows the all-lines total beside today's.
+        Notes are for the file.</p>
 
       <p>Under <em>Healthcare &amp; insurance</em> the worksheet carries four lines it fills for you:
         <b>Medicare Part B</b> and <b>Part D</b> for each person, at the premiums set in
@@ -816,8 +848,19 @@
       </ul>
 
       <p>The <span class="ui">Transfer?</span> column at the end holds an account back. Set it to
-        <b>Stay as is</b> and that account funds no level, generates no paperwork, and drops out of
-        the billable base — the fee note names the amount so nothing hides.</p>
+        <b>Stay as is</b> and that account still takes its place in the Fortress levels but stays at
+        its institution, generates no paperwork, and drops out of the billable base — the fee note
+        names the amount so nothing hides. <b>Transfer part</b> opens an amount box: only that much of
+        the account enters the plan and the waterfall; the rest stays where it is, held outside the
+        plan at the account's own growth rate, shown as <em>Held as is</em> on the scenario cards and
+        out of the billable base.</p>
+
+      <p><b>Excess cash flow</b>, beneath the table, picks the account or accounts a year's income left
+        over after expenses and tax is deposited into in the projections — after-tax money, so the list
+        offers the taxable and Roth accounts. Several split it equally. With nothing picked the surplus goes
+        to the household's <b>Cash</b> accounts (savings, checking, money market, in equal shares), shown
+        with a dashed outline as the default; a household with no Cash account banks nothing until one
+        is picked (spare RMD money is still reinvested in the after-tax Roof account).</p>
 
       <p>The <span class="ui">Growth</span> column is each account's assumed annual growth. Leave it
         blank (<em>default</em>) and the account takes the plan rate from section&nbsp;03 for the
@@ -842,10 +885,24 @@
           accounts at the Roof rate), current income &mdash; salary to each retirement date, Social
           Security, pensions, annuity and non-guaranteed income &mdash; against the Needs and Wants
           budget growing with inflation, and any gap drawn in the section&nbsp;17 withdrawal order
-          with the tax on the draw. Five tiles, a stacked bar by tax type for every year with the
+          with the tax on the draw. Five tiles; two donut charts of today's accounts &mdash;
+          <b>Qualified vs. non-qualified</b> (Qualified and Roth tax types, with the Roth share noted,
+          against Non-Qualified) and <b>At risk vs. not at risk</b> (Market positions, RILA and variable
+          annuities against cash, MYGA and fixed indexed annuities, life and LTC; an Unassigned position
+          counts as not at risk and the card says so) &mdash; each with the dollar amounts and the share
+          of the total; a stacked bar by tax type for every year with the
           retired years shaded and the first RMD year marked, a note that sets the end-of-plan figure
           against the Fortress projection, and a year-by-year table behind a <b>+</b>. It runs on the
           same engine as section&nbsp;18 and prints in the worksheet.</dd>
+
+        <dt>If something goes wrong before the plan</dt>
+        <dd>Under the status-quo chart, the same projection run again under the three section&nbsp;19
+          stresses, one at a time: three bad market years at the start of retirement (the market money
+          takes the Roof's bad years where it sits; cash, fixed annuities and MYGAs behave as they do in
+          the plan), the Social Security cut, and higher inflation. Each has its tiles, chart and a
+          sentence; the dashed line is the projection above. They print as <i>If Nothing Changes and
+          Something Goes Wrong</i> in the Retirement Fortress Plan, after the status-quo page, and as
+          three small charts on page two of the initial observations and findings.</dd>
 
         <dt>If a long term care event occurs</dt>
         <dd>Under the status-quo chart, the same projection run again with a care event added, as a
@@ -1062,7 +1119,13 @@
           &mdash; nothing is sent anywhere &mdash; and summarises the portfolio in aggregate: the
           Risk Number, the 95% historical range in percent and dollars, the portfolio value and
           number of positions, yield and expense ratio, the allocation by asset class, the largest
-          positions and every stress test the report shows, each against its benchmark. Inside
+          positions and every stress test the report shows, each against its benchmark, and the
+          report's <b>Performance Analysis</b>: the modeled-performance chart (the portfolio's
+          cumulative return against the benchmark's, read back from the PDF's own drawing and redrawn
+          here), the trailing returns for 3 months to 10 years, and the statistics table &mdash; total
+          return, standard deviation, drawdown, Sharpe, Sortino, beta, alpha, R&sup2;, batting average
+          and the up/down capture. The chart and tables print in the Retirement Fortress Plan as
+          <i>Your Portfolio Against Its Benchmark</i>, right after the current-portfolio page. Inside
           Claude the summary is drafted by Claude from the report text, with a plain-language
           paragraph; elsewhere the figures are read by their labels. The text appears under
           <span class="ui">Report text</span> for checking, and can be edited or pasted in and
@@ -1076,8 +1139,12 @@
           stress tests. Upload, text and summary
           save with the case; <span class="ui">Clear</span> removes them.</dd>
         <dt>Identified risks</dt>
-        <dd>Twelve boxes: portfolio risk exceeding tolerance (the point gap is filled in), sequence
-          risk (the share of assets in market positions in section&nbsp;06 is filled in), no long-term
+        <dd>Thirteen boxes: portfolio risk exceeding tolerance (the point gap is filled in), sequence
+          risk (the share of assets in market positions in section&nbsp;06 is filled in), the current
+          portfolio underperforming its benchmark (from the Wealth Report's Performance Analysis: the
+          modeled total return against the benchmark over the report's period, or the chart's end
+          points, and how many of the trailing periods the portfolio trailed in &mdash; suggested when
+          the total return is behind or most trailing periods are), no long-term
           care plan, no strategic tax plan, no written retirement plan, life insurance short of the
           needs analysis, no withdrawal order plan, no Foundation income to cover Needs, no Walls
           income to cover Wants, no estate plan, an estate plan more than five years old, and missing
@@ -1120,11 +1187,20 @@
         rates, Walls assumptions, withdrawal order and Roth strategy; everything above
         section&nbsp;14 is shared.
         The tabs at the top of the section switch between them, and sections 14&ndash;20 take the
-        colour of the one showing, with its name on every header. <b>Three scenarios side by
-        side</b> beneath the tabs sets their headline figures in three columns &mdash; the four
-        levels funded, annuity income, LTC benefit, Roth conversions, withdrawal order, lifetime tax
-        and assets at the end of plan &mdash; each with a <span class="ui">View</span> button and a
-        <span class="ui">Use for reports</span> pick. Rename a scenario in the
+        colour of the one showing, with its name on every header. <b>Baseline and three scenarios side by
+        side</b> beneath the tabs sets their headline figures in columns &mdash; the four
+        levels funded (the Foundation figure includes the liquidity buffer, with the buffer's share
+        noted), annuity income, LTC benefit, Roth conversions, withdrawal order, lifetime tax
+        and assets at the end of plan, then the assets at the end of plan under each of the three
+        section&nbsp;19 stress tests and under each section&nbsp;18 care-event projection, or the year
+        they run out &mdash; each with a <span class="ui">View</span> button and a
+        <span class="ui">Use for reports</span> pick. A fourth column on the left, <b>Baseline</b> in slate, is the client's accounts as
+        they stand today with no plan applied &mdash; the status quo of section&nbsp;06 &mdash; run
+        through the same stress tests and care events, so every scenario is measured against where
+        the client is now. It shows the money held as is, any annuity income and LTC coverage already
+        in force, the blended growth of the accounts as held, and no Roth conversions; in its
+        sequence-of-returns test the market money takes the Roof's bad years where it sits. It needs
+        a growth rate on every account in section&nbsp;06, like the status-quo projection. Rename a scenario in the
         <span class="ui">Name</span> box; <span class="ui">Copy this scenario into&hellip;</span>
         duplicates the one showing into another slot as a starting point. An untouched scenario
         follows the model's own proposal.</p>
@@ -1237,6 +1313,16 @@
           rate in section&nbsp;03; the <span class="ui">Default</span> column says which. The Roof grows at
           the amount-weighted blend of the rows, which the hint beneath reports and sections&nbsp;16
           and 17 use; the scenario strip shows the blended rate for each scenario.</dd>
+        <dt>Social Security claiming ages</dt>
+        <dd>The benefit starting age for this scenario, one select for each person. Blank follows the
+          household's ages in section&nbsp;04 (shown beside each); pick 62&ndash;70 to test a different
+          claiming decision in this scenario alone &mdash; the hint beneath gives the resulting monthly
+          benefit with its reduction or delayed credits. The income projection, the tax model, the
+          stress tests and the reports built from this scenario all use the scenario's ages; the
+          scenario strip has a <b>Social Security claimed at</b> row (an asterisk marks an age that
+          departs from section&nbsp;04), and section&nbsp;04's Social Security table notes when the
+          scenario showing claims at a different age. Section&nbsp;04 keeps the base assumption and
+          the claiming optimizer still writes there. Baseline always claims at the section&nbsp;04 ages.</dd>
         <dt>Walls income assumptions</dt>
         <dd>Four fields for the Walls as adjusted: the <span class="ui">Walls yield</span>, when
           <span class="ui">Walls income starts</span>, and the Walls growth rate <span class="ui">before
@@ -1360,9 +1446,16 @@
           the year before RMDs begin, it converts as much qualified money in the Walls and Roof as
           fits under the top of the <span class="ui">target tax bracket</span> &mdash; by default the
           bracket the household sits in during its first full retirement year &mdash; without pushing
-          modified AGI over the first IRMAA threshold once either person is within two years of
-          Medicare (<span class="ui">Stay under the IRMAA threshold</span>), since the surcharge is set
-          from income two years back. <span class="ui">Convert from</span> picks Roof first or Walls
+          modified AGI over an IRMAA threshold once either person is within two years of Medicare
+          (<span class="ui">Medicare premiums (IRMAA)</span> picks which of the five 2026 thresholds to
+          stay under &mdash; the first keeps the standard premium &mdash; or none), since the surcharge
+          is set from income two years back. <span class="ui">Social Security taxation</span> adds a
+          second guard: keep provisional income (AGI before benefits, plus tax-exempt interest, plus
+          half the benefits) under the 50% or the 85% threshold in any year benefits are paid, so a
+          conversion does not pull more of the benefit into taxable income. Those thresholds are not
+          indexed and most retired households already exceed them; the schedule then converts nothing
+          in those years and names the threshold as the limit. The note beneath the controls states
+          both guards in dollars. <span class="ui">Convert from</span> picks Roof first or Walls
           first. The tiles compare the plan with and without the strategy: amount converted, tax on
           the conversions, lifetime tax saved, Roth and tax-deferred balances at the end of plan, and
           total assets at the end. A bar chart shows the conversion each year with the tax on it, and
@@ -1600,8 +1693,9 @@
             Planning Analysis</em>: a cover with the client names, date and advisor; an introduction
             and key terms (PIA, full retirement age, COLA, life expectancy, spousal and survivor
             benefits, with the FRA and percentage-of-PIA reference tables); the inputs and
-            assumptions; the five strategies with their claiming events and lifetime totals, and where
-            the plan's own ages rank; bar charts of lifetime benefits with and without the reduction,
+            assumptions; the six scenarios (the highest lifetime benefit, both at 70, both at 62, one
+            early and the other late, both at full retirement age) with their claiming events, lifetime
+            totals and rank among everything tested, and where the plan's own ages rank; bar charts of lifetime benefits with and without the reduction,
             the surviving spouse's first full-year income, the cumulative chart and the break-even
             table; a year-by-year schedule for each strategy; how to file; and what the analysis leaves
             out, with the AEWM disclosures. It opens in a new tab and prints to Letter pages from the
@@ -1610,11 +1704,14 @@
         <div class="exp client">
           <span class="tag">Client-facing</span>
           <b>Educational slides</b>
-          <p>Alto's <em>Protecting Your Retirement Income</em> deck as a 21-page PDF, carried inside
+          <p>Alto's <em>Protecting Your Retirement Income</em> deck as a 24-page PDF, carried inside
             the tool and the same for every client: the three core principles, market cycles and
             sequence-of-returns risk, the protected-income approach, fixed and indexed annuities,
-            downside protection, the Fortress levels and a closing slide on long-term care in America
-            &mdash; the need, the average length of care and the 2025 median costs. It needs no case loaded. Use it for the first
+            downside protection, the Fortress levels, a slide on long-term care in America
+            &mdash; the need, the average length of care and the 2025 median costs &mdash; and three
+            closing slides on required minimum distributions: how the starting age moved from
+            70&frac12; to 73 and to 75 from 2033, the Uniform Lifetime Table percentages by age, and
+            the compression effect of a later start. It needs no case loaded. Use it for the first
             meeting or as a leave-behind; to update the deck, replace the file in the tool.</p>
         </div>
         <div class="exp internal">
@@ -1650,7 +1747,10 @@
         any transfers you adjusted by hand.</p>
       <p>To pick it back up, paste the block into the same box and press
         <span class="ui">Load pasted case</span>. Everything comes back, including your adjustments,
-        re-pointed at the right accounts.</p>
+        re-pointed at the right accounts. If the block was saved in a file, press <span class="ui">Upload
+        case file</span> instead and pick it &mdash; a Word document (.docx), a plain text file or a .json
+        file; other text around the block is ignored and Word's curly quotes are straightened. An older
+        .doc, a PDF or a Pages file won't open; save it as .docx or .txt first.</p>
       <p>Do this before every meeting where you might change something, and again at the end. It
         takes five seconds and it is the only backup that exists.</p>
       <h3>Saved cases on Alto's site</h3>

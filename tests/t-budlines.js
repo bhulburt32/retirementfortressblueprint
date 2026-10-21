@@ -1,0 +1,26 @@
+const { chromium } = require('playwright');
+(async () => {
+  const b = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const p = await b.newPage({ viewport: { width: 1500, height: 1000 } }); const errs = []; p.on('pageerror', e => errs.push(String(e)));
+  await p.goto('file://' + process.cwd() + '/preview-smith.html', { waitUntil: 'load' }); await p.waitForTimeout(800);
+  await p.click('#expandAll'); await p.waitForTimeout(300);
+  const tot = () => p.evaluate(() => document.getElementById('budFoot').textContent.replace(/\s+/g, ' ').trim());
+  console.log('before:', await tot(), '| rows', await p.evaluate(() => document.querySelectorAll('#budBody tr[data-bud]').length));
+  await p.click('#budBody [data-addline="tr"]'); await p.waitForTimeout(300);
+  const id = await p.evaluate(() => document.activeElement && document.activeElement.closest('tr') ? document.activeElement.closest('tr').getAttribute('data-bud') : null);
+  console.log('new row id:', id, '| focused label:', await p.evaluate(() => document.activeElement.getAttribute('data-bk')));
+  await p.keyboard.type('Parking'); await p.fill(`#budBody tr[data-bud="${id}"] input[data-bk="amt"]`, '150'); await p.waitForTimeout(400);
+  console.log('after add:', await tot(), '| sub tr:', await p.evaluate(() => document.querySelector('#budBody [data-sub="tr"]').textContent));
+  await p.click('#budBody [data-addline="hh"]'); await p.waitForTimeout(200); await p.keyboard.type('Lawn care');
+  const id2 = await p.evaluate(() => document.activeElement.closest('tr').getAttribute('data-bud')); await p.fill(`#budBody tr[data-bud="${id2}"] input[data-bk="amt"]`, '80'); await p.waitForTimeout(400);
+  console.log('two added:', await tot());
+  const json = await p.evaluate(() => document.getElementById('caseJson').value); const o = JSON.parse(json);
+  console.log('saved custom:', JSON.stringify(o.budget.custom), 'lines with labels:', Object.entries(o.budget.lines).filter(([k, v]) => v.label).map(([k, v]) => k + '=' + v.label + ':' + v.amt).join(', '));
+  await p.click('#newCase'); await p.waitForTimeout(200); await p.click('#newCase'); await p.waitForTimeout(600);
+  console.log('after new case rows:', await p.evaluate(() => document.querySelectorAll('#budBody tr[data-bud]').length));
+  await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(1200);
+  console.log('after reload:', await tot(), '| custom rows:', await p.evaluate(() => [...document.querySelectorAll('#budBody [data-budx]')].map(b => { const tr = b.closest('tr'); return tr.getAttribute('data-bud') + '=' + tr.querySelector('[data-bk="label"]').value + ':' + tr.querySelector('[data-bk="amt"]').value; }).join(', ')));
+  await p.click(`#budBody [data-budx="${id}"]`); await p.waitForTimeout(400);
+  console.log('after remove first:', await tot(), '| custom rows:', await p.evaluate(() => [...document.querySelectorAll('#budBody [data-budx]')].map(b => b.closest('tr').querySelector('[data-bk="label"]').value).join(', ')));
+  console.log('ERRORS:', errs.length ? errs : 'none'); await b.close();
+})();
