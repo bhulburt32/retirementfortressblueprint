@@ -5,7 +5,7 @@
      PUT    /api/cases/{id}       create or replace; advisorId always comes from the sign-in
      DELETE /api/cases/{id}       soft delete; purged after 30 days by purge.js */
 const { app } = require('@azure/functions');
-const { principal, cases, json, text } = require('../shared');
+const { principal, cases, json, text, guard } = require('../shared');
 
 const LIST_FIELDS = 'c.id, c.advisorId, c.advisorName, c.clientLabel, c.savedAt, c.updatedAt, c.sharedWith';
 const MAX_CASE_BYTES = 1.5 * 1024 * 1024;   // a case with a long Nitrogen text runs about 200 KB
@@ -21,7 +21,7 @@ async function readDoc(container, id, me) {
 
 app.http('casesList', {
   methods: ['GET'], authLevel: 'anonymous', route: 'cases',
-  handler: async (request, context) => {
+  handler: guard(async (request, context) => {
     const me = principal(request); if (!me) return text(401, 'Sign in required.');
     const container = await cases();
     const all = me.isOwner && request.query.get('all') === '1';
@@ -31,36 +31,36 @@ app.http('casesList', {
     const { resources } = await container.items.query(q).fetchAll();
     context.log(`cases.list ${me.id} ${all ? 'all' : 'own'} ${resources.length}`);
     return json(200, resources);
-  }
+  })
 });
 
 app.http('casesExport', {
   methods: ['GET'], authLevel: 'anonymous', route: 'cases/export',
-  handler: async (request, context) => {
+  handler: guard(async (request, context) => {
     const me = principal(request); if (!me) return text(401, 'Sign in required.');
     const container = await cases();
     const { resources } = await container.items.query({ query: 'SELECT * FROM c WHERE c.advisorId = @me AND NOT IS_DEFINED(c.deletedAt) ORDER BY c.updatedAt DESC', parameters: [{ name: '@me', value: me.id }] }).fetchAll();
     const out = resources.map(({ _rid, _self, _etag, _attachments, _ts, ...keep }) => keep);
     context.log(`cases.export ${me.id} ${out.length}`);
     return { status: 200, body: JSON.stringify(out, null, 1), headers: { 'content-type': 'application/json', 'content-disposition': `attachment; filename="fortress-cases-${new Date().toISOString().slice(0, 10)}.json"` } };
-  }
+  })
 });
 
 app.http('casesGet', {
   methods: ['GET'], authLevel: 'anonymous', route: 'cases/{id}',
-  handler: async (request, context) => {
+  handler: guard(async (request, context) => {
     const me = principal(request); if (!me) return text(401, 'Sign in required.');
     const doc = await readDoc(await cases(), request.params.id, me);
     if (!doc) return text(404, 'No such case.');
     context.log(`cases.get ${me.id} ${doc.id}${doc.advisorId !== me.id ? ' (owner/shared read)' : ''}`);
     const { _rid, _self, _etag, _attachments, _ts, ...keep } = doc;
     return json(200, keep);
-  }
+  })
 });
 
 app.http('casesPut', {
   methods: ['PUT'], authLevel: 'anonymous', route: 'cases/{id}',
-  handler: async (request, context) => {
+  handler: guard(async (request, context) => {
     const me = principal(request); if (!me) return text(401, 'Sign in required.');
     const id = String(request.params.id || '');
     if (!/^[A-Za-z0-9_-]{8,64}$/.test(id)) return text(400, 'Bad case id.');
@@ -85,12 +85,12 @@ app.http('casesPut', {
     await container.items.upsert(doc);
     context.log(`cases.put ${me.id} ${id} ${existing ? 'update' : 'create'}`);
     return json(200, { id, savedAt: doc.savedAt, updatedAt: doc.updatedAt });
-  }
+  })
 });
 
 app.http('casesDelete', {
   methods: ['DELETE'], authLevel: 'anonymous', route: 'cases/{id}',
-  handler: async (request, context) => {
+  handler: guard(async (request, context) => {
     const me = principal(request); if (!me) return text(401, 'Sign in required.');
     const container = await cases();
     const doc = await readDoc(container, request.params.id, me);
@@ -100,5 +100,5 @@ app.http('casesDelete', {
     await container.items.upsert(doc);
     context.log(`cases.delete ${me.id} ${doc.id}`);
     return { status: 204 };
-  }
+  })
 });
