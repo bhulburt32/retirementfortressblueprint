@@ -5,7 +5,11 @@ const { CosmosClient } = require('@azure/cosmos');
 const { DefaultAzureCredential } = require('@azure/identity');
 const { SecretClient } = require('@azure/keyvault-secrets');
 
-const credential = new DefaultAzureCredential();            // the Static Web App's managed identity when deployed; your az login locally
+/* Static Web Apps *managed* functions have no managed identity, so Cosmos is reached with the account's
+   connection string (COSMOS_CONNECTION_STRING, from Cosmos → Settings → Keys). The Entra credential path
+   below stays for a "bring your own" Functions app or local development with az login. */
+let credential = null;
+function cred() { if (!credential) credential = new DefaultAzureCredential(); return credential; }
 const OWNER_IDS = (process.env.OWNER_IDS || '').split(',').map(s => s.trim()).filter(Boolean);   // Entra object ids allowed to list every case
 
 function principal(request) {
@@ -23,9 +27,11 @@ function principal(request) {
 let containerPromise = null;
 function cases() {
   if (!containerPromise) {
-    const endpoint = process.env.COSMOS_ENDPOINT;
-    if (!endpoint) throw new Error('COSMOS_ENDPOINT is not set');
-    const client = new CosmosClient({ endpoint, aadCredentials: credential });
+    const conn = process.env.COSMOS_CONNECTION_STRING, endpoint = process.env.COSMOS_ENDPOINT;
+    let client;
+    if (conn) client = new CosmosClient(conn);
+    else if (endpoint) client = new CosmosClient({ endpoint, aadCredentials: cred() });
+    else throw new Error('Neither COSMOS_CONNECTION_STRING nor COSMOS_ENDPOINT is set');
     containerPromise = Promise.resolve(client.database(process.env.COSMOS_DATABASE || 'fortress').container(process.env.COSMOS_CONTAINER || 'cases'));
   }
   return containerPromise;
@@ -37,7 +43,7 @@ async function getAnthropicKey() {
   if (anthropicKey) return anthropicKey;
   const uri = process.env.KEYVAULT_URI;
   if (!uri) throw new Error('KEYVAULT_URI is not set');
-  const secret = await new SecretClient(uri, credential).getSecret(process.env.ANTHROPIC_SECRET_NAME || 'anthropic-api-key');
+  const secret = await new SecretClient(uri, cred()).getSecret(process.env.ANTHROPIC_SECRET_NAME || 'anthropic-api-key');
   anthropicKey = secret.value;
   return anthropicKey;
 }
@@ -45,4 +51,18 @@ async function getAnthropicKey() {
 const json = (status, body) => ({ status, jsonBody: body });
 const text = (status, body) => ({ status, body, headers: { 'content-type': 'text/plain; charset=utf-8' } });
 
-module.exports = { principal, cases, getAnthropicKey, json, text };
+/* Wraps a handler so an exception becomes a 500 with a one-line reason the page can show
+   ("Not saved: Database: …") and a full stack in the function log, instead of an empty 500. */
+function guard(fn) {
+  return async (request, context) => {
+    try { return await fn(request, context); }
+    catch (e) {
+      context.error(e && e.stack || e);
+      const msg = (e && e.message) || String(e);
+      const kind = /cosmos|database|container|partition|resource not found|403|401|credential|managed identity|token/i.test(msg) ? 'Database' : 'Server';
+      return text(500, kind + ': ' + msg.split('\n')[0].slice(0, 300));
+    }
+  };
+}
+
+module.exports = { principal, cases, getAnthropicKey, json, text, guard };

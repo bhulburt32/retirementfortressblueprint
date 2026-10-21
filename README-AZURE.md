@@ -36,7 +36,8 @@ old sample banner, which no longer exists. (`t-pfdeck`, `t-prop`, `t-prop2` need
 |---|---|
 | `AAD_CLIENT_ID` | the Entra app's Application (client) ID |
 | `AAD_CLIENT_SECRET` | `@Microsoft.KeyVault(SecretUri=https://<vault>.vault.azure.net/secrets/aad-client-secret/)` |
-| `COSMOS_ENDPOINT` | `https://<account>.documents.azure.com:443/` |
+| `COSMOS_CONNECTION_STRING` | the account's **Primary Connection String** (Cosmos DB → Settings → Keys). Managed functions have no managed identity, so this is how the API reaches the database. |
+| `COSMOS_ENDPOINT` | only for a bring-your-own Functions app with a managed identity; ignored when the connection string is set |
 | `COSMOS_DATABASE` | `fortress` |
 | `COSMOS_CONTAINER` | `cases` |
 | `KEYVAULT_URI` | `https://<vault>.vault.azure.net/` |
@@ -45,9 +46,11 @@ old sample banner, which no longer exists. (`t-pfdeck`, `t-prop`, `t-prop2` need
 | `SUMMARIES_ENABLED` | `false` until compliance signs off on section 3 of the plan, then `true` |
 | `OWNER_IDS` | comma-separated Entra object IDs of the administrators who may see every advisor's cases (from Entra → Users → the person → Object ID) |
 
-The managed identity needs **Cosmos DB Built-in Data Contributor** on the account (done in step 6) and
-**Key Vault Secrets User** on the vault (step 4). Nothing secret goes in the repo or in these settings
-except through the Key Vault references.
+Static Web Apps **managed** functions run without a managed identity, so the Cosmos DB role assignment and the
+Key Vault references do not apply to them: the Cosmos connection string and the Entra client secret go straight
+into the settings above (the settings blade is encrypted at rest and visible only to people with access to the
+Static Web App). Nothing secret goes in the repo. Moving to a bring-your-own Functions app later restores the
+managed-identity path without code changes.
 
 ## Local run (optional)
 
