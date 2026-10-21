@@ -160,7 +160,7 @@ const path = require('path');
   if(await p.$eval('#clientAge',e=>e.value)!=='57' || await p.$eval('#spouseAge',e=>e.value)!=='55' || !(await p.$eval('#clientAge',e=>e.readOnly))) errs.push('the ages should be calculated from the birthdates at the plan date');
   if(!JSON.parse(await p.$eval('#caseJson',e=>e.value)).household.clientDob) errs.push('the birthdate should save with the case');
   await p.click('#wdList button[data-wd="up"][data-k="1"]'); await p.waitForTimeout(700);   // tax-deferred first, so the early years draw on the IRAs
-  const th=await p.$eval('#taxTable thead',e=>[...e.querySelectorAll('th')].map(t=>t.textContent.trim()));
+  const th=await p.$eval('#taxTable thead',e=>[...e.querySelectorAll('tr:last-child th')].map(t=>t.textContent.trim()));
   const tr=await p.$$eval('#taxTable tbody tr',rs=>rs.map(r=>[...r.querySelectorAll('td')].map(t=>t.textContent.trim())));
   const iPen=th.findIndex(h=>/Early withdrawal penalty/.test(h)), iWd=th.findIndex(h=>/^Withdrawals/.test(h));
   console.log('penalty column:', iPen>=0, '| first rows:', tr.slice(0,3).map(r=>r[1]+' wd '+r[iWd]+' pen '+(iPen>=0?r[iPen]:'-')).join(' ; '));

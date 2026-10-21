@@ -3193,9 +3193,19 @@
           rate</b>, each bar coloured by the highest federal bracket that year reaches (lighter to
           darker as the rate rises) with the rate written inside; and <b>federal and state tax</b>
           stacked. On all three the year RMDs begin is picked out with a tinted column and a dashed
-          marker. Beneath them a table for every year to the end of plan: all income, taxable
-          Social Security, withdrawals by tier, RMDs, AGI, deductions, taxable income, the bracket,
-          the federal tax and effective rate, the state tax, all tax and the combined effective rate. Income is the same projection the section&nbsp;13
+          marker. Beneath them a table for every year to the end of plan, in five groups. <b>All
+          income</b> shows what the year paid in &mdash; wages, Social Security, pensions, annuities, the
+          Walls yield, other income, any RMD drawn beyond the Walls yield and the withdrawals by tier
+          &mdash; and their sum. <b>AGI</b> shows what the federal tax counts: the ordinary income (the
+          taxable part of wages, pensions, annuities, the Walls yield and IRA money), any income from
+          earlier in the first calendar year, a Roth conversion, capital gains (the Walls yield in
+          taxable accounts and half of each taxable-account withdrawal) and the taxable Social
+          Security &mdash; and their sum. <b>Medicare and Social Security tests</b> give MAGI for IRMAA
+          (AGI plus tax-exempt interest, which sets Medicare premiums two years later) and provisional
+          income (AGI before benefits, plus tax-exempt interest, plus half the benefits, against the
+          50% and 85% thresholds). Then the required RMD, deductions, taxable income, the bracket, the
+          federal tax and its effective rate (federal tax &divide; all income), the state tax, all tax and
+          the combined effective rate. A column that is empty in every year is left out. Income is the same projection the section&nbsp;13
           chart uses &mdash; wages to each retirement date, Social Security, pensions, annuities,
           non-guaranteed income, the Foundation annuity and the Walls yield &mdash; plus required
           minimum distributions on the tax-deferred market balances and whatever has to be drawn, in
@@ -9958,8 +9968,7 @@
     var ded = (T.std + T.extra65 * ages65) * g;
     var senior = 0;
     if(calYear >= 2025 && calYear <= 2028 && ages65 > 0){
-      senior = SENIOR_BONUS * ages65 - Math.max(0, agi - T.seniorPhase) * 0.06;
-      senior = Math.max(0, Math.min(SENIOR_BONUS * ages65, senior));
+      senior = ages65 * Math.max(0, SENIOR_BONUS - Math.max(0, agi - T.seniorPhase) * 0.06);   // each person's $6,000 less 6% of the excess: gone at $175,000 single, $250,000 joint
     }
     var deductions = ded + senior;
     var taxable = Math.max(0, agi - deductions);
@@ -10269,7 +10278,7 @@
         var irmaaCap = (irmaaThr != null && medicareSoon) ? irmaaThr * g : Infinity;
         /* the Social Security guard: keep provisional income under the 50% or the 85% threshold (not indexed) in a year benefits are paid */
         var TSS = TAX_2026[status], ssCap = (GD.ssGuard !== 'none' && row.ss > 0.5) ? (GD.ssGuard === 'base' ? TSS.ssBase : TSS.ssTop) : Infinity;
-        var ok = function(R){ return R.tx.ordTaxable <= topNow + 0.5 && R.tx.agi <= irmaaCap + 0.5 && (R.tx.prov == null || R.tx.prov <= ssCap + 0.5) && R.unfunded <= base.unfunded + 0.5; };
+        var ok = function(R){ return R.tx.ordTaxable <= topNow + 0.5 && R.tx.agi + wallsExempt <= irmaaCap + 0.5 && (R.tx.prov == null || R.tx.prov <= ssCap + 0.5) && R.unfunded <= base.unfunded + 0.5; };
         var C = 0;
         if(avail > 0.5 && ok(base)){
           var full = runYear(avail);
@@ -10286,7 +10295,7 @@
         var stBase0 = null;
         cvInfo = {amt:res.cv.amt, roof:res.cv.roof, walls:res.cv.walls, topNow:topNow, irmaaCap:irmaaCap, irmaaTier:GD.irmaaTier, ssCap:ssCap, ssGuard:GD.ssGuard, medicareSoon:medicareSoon,
                   fedTax:res.tx.tax - base.tx.tax, baseTax:base.tx.tax, headroom:Math.max(0, topNow - base.tx.ordTaxable), avail:avail,
-                  limitedBy: C <= 0 ? (avail <= 0.5 ? 'nothing left to convert' : (!ok(base) ? (base.tx.ordTaxable > topNow + 0.5 ? 'already above the target bracket' : base.tx.agi > irmaaCap + 0.5 ? 'already above the IRMAA threshold' : (base.tx.prov != null && base.tx.prov > ssCap + 0.5) ? 'already above the Social Security threshold' : 'already above the target bracket') : 'no room')) : (res.tx.ordTaxable >= topNow - 100 ? 'bracket' : (res.tx.agi >= irmaaCap - 100 ? 'IRMAA' : ((res.tx.prov || 0) >= ssCap - 100 ? 'Social Security' : (C >= avail - 100 ? 'all converted' : 'funding'))))};
+                  limitedBy: C <= 0 ? (avail <= 0.5 ? 'nothing left to convert' : (!ok(base) ? (base.tx.ordTaxable > topNow + 0.5 ? 'already above the target bracket' : base.tx.agi + wallsExempt > irmaaCap + 0.5 ? 'already above the IRMAA threshold' : (base.tx.prov != null && base.tx.prov > ssCap + 0.5) ? 'already above the Social Security threshold' : 'already above the target bracket') : 'no room')) : (res.tx.ordTaxable >= topNow - 100 ? 'bracket' : (res.tx.agi >= irmaaCap - 100 ? 'IRMAA' : ((res.tx.prov || 0) >= ssCap - 100 ? 'Social Security' : (C >= avail - 100 ? 'all converted' : 'funding'))))};
         convTotal += res.cv.amt;
       }
       bal = res.bal; var wd = res.wd, unfunded = res.unfunded, tx = res.tx, tax = tx.tax;
@@ -10318,7 +10327,14 @@
       }
       lifetime += tx.tax; lifetimeGross += gross; lifetimeState += st.tax; lifetimePenalty += tx.penalty || 0; lifetimePayroll += pay;
       if(tx.marginal > peak.rate){ peak = {rate:tx.marginal, year:calYear}; }
+      /* section 17's breakdown. All income: what the year paid in, cash. AGI: the ordinary income the tax counted (the year's
+         plan income, IRA draws and any pre-plan income of the first calendar year), the conversion, gains and taxable Social Security.
+         MAGI for IRMAA adds tax-exempt interest; provisional income for Social Security is AGI before benefits + exempt + half. */
+      var cvAmt = cvInfo ? cvInfo.amt : 0, agiCG = wallsCG + wd.taxable * TAXABLE_GAIN_SHARE;
+      var incParts = {emp:row.emp, ss:row.ss, pen:row.pen, ann:row.ann + row.sleeve, walls:row.wallsYield, ng:row.ng, rmd:rmdExcess, wdTaxable:wd.taxable, wdDeferred:wd.deferred, wdRoth:wd.roth};
+      var agiParts = {ord:ordBase + wd.deferred, pre:preOrd, conv:cvAmt, cg:agiCG, ss:tx.ssTaxable};
       out.push({t:t, year:calYear, ages:row.ages, gross:gross, ss:row.ss, ssTaxable:tx.ssTaxable, agi:tx.agi, deductions:tx.deductions, senior:tx.senior,
+                incParts:incParts, agiParts:agiParts, exempt:wallsExempt, magi:tx.agi + wallsExempt, prov:tx.prov, preSS:preSS,
                 taxable:tx.taxable, ordTaxable:tx.ordTaxable, cgTaxable:tx.cgTaxable, tax:tx.tax, penalty:tx.penalty || 0, marginal:tx.marginal,
                 effective: gross > 0.5 ? tx.tax / gross : 0, rmd:rmd, rmdExcess:rmdExcess, qcd:qcd, qcdBy:qcdBy, gift:gift, wd:wd, unfunded:unfunded, ages65:ages65,
                 stateTax:st.tax, stateTaxable:st.taxable, stateRate:st.rate, stateEffective: gross > 0.5 ? st.tax / gross : 0,
@@ -10451,7 +10467,7 @@
       + (convRows.length ? (function(){ var cum = 0; return convRows.map(function(x){
           var c = x.conv; cum += c.amt;
           return '<tr' + (c.amt > 0.5 ? '' : ' class="off"') + '><td>' + x.year + '</td><td>' + x.ages.join(' / ') + '</td><td class="num"><b>' + (c.amt > 0.5 ? money(c.amt) : '—') + '</b></td><td class="num">' + (c.amt > 0.5 ? money(c.roof) + ' / ' + money(c.walls) : '—') + '</td>'
-            + '<td class="num">' + money(c.headroom) + '</td><td class="num">' + money(x.taxable) + '</td><td class="num br">' + Math.round(x.marginal * 100) + '%</td><td class="num">' + money(x.agi) + '</td><td class="num">' + (c.medicareSoon && isFinite(c.irmaaCap) ? money(c.irmaaCap) : '—') + '</td>'
+            + '<td class="num">' + money(c.headroom) + '</td><td class="num">' + money(x.taxable) + '</td><td class="num br">' + Math.round(x.marginal * 100) + '%</td><td class="num">' + money(x.magi) + '</td><td class="num">' + (c.medicareSoon && isFinite(c.irmaaCap) ? money(c.irmaaCap) : '—') + '</td>'
             + '<td class="num">' + (c.amt > 0.5 ? money(c.tax || 0) : '—') + '</td><td class="num">' + money(cum) + '</td><td class="num">' + money(x.balances.deferred) + '</td><td>' + c.limitedBy + '</td></tr>';
         }).join(''); })() : '<tr><td colspan="13" class="off">The strategy is off, or there is no conversion window.</td></tr>')
       + '</tbody>';
@@ -11237,19 +11253,61 @@
               : 'retirement income is taxed in full.') + (X0.stateInfo.local ? ' ' + X0.stateInfo.local + ' is not included.' : ''))
           : 'Pick a state in section 02 for the state tax.');
 
-    /* table */
-    var anyUnf = rows.some(function(x){ return x.unfunded > 0.5; }), anyPen = rows.some(function(x){ return x.penalty > 0.5; }), anyPay = rows.some(function(x){ return x.payroll > 0.5; });
-    $('taxTable').innerHTML = '<thead><tr><th>Year</th><th>Age' + (X0.ppl.length > 1 ? 's' : '') + '</th><th class="num">All income</th><th class="num">Taxable SS</th>'
-      + '<th class="num">Withdrawals<small>taxable / deferred / Roth</small></th><th class="num">RMD</th><th class="num">AGI</th><th class="num">Deductions</th><th class="num">Taxable income</th><th class="num">Bracket</th><th class="num">Federal tax</th>' + (anyPen ? '<th class="num">Early withdrawal penalty<small>in the federal tax</small></th>' : '') + '<th class="num">Fed. effective</th><th class="num">State tax</th>' + (anyPay ? '<th class="num">Payroll tax<small>Social Security and Medicare</small></th>' : '') + '<th class="num">All tax</th><th class="num">Effective</th>' + (anyUnf ? '<th class="num">Unfunded</th>' : '') + '</tr></thead><tbody>'
+    /* table: what makes up All income, how AGI is built, MAGI for IRMAA and provisional income for Social Security,
+       then the tax. Columns that are empty in every year are left out. */
+    var TQ = TAX_2026[X0.status] || TAX_2026.single;
+    var dash = function(v){ return v > 0.5 ? money(v) : '—'; };
+    var any = function(f){ return rows.some(function(x){ return f(x) > 0.5; }); };
+    var sumOf = function(f){ return rows.reduce(function(a, x){ return a + (f(x) || 0); }, 0); };
+    var IP = function(k){ return function(x){ return (x.incParts || {})[k] || 0; }; }, AP = function(k){ return function(x){ return (x.agiParts || {})[k] || 0; }; };
+    var wdAll = function(x){ return x.wd.taxable + x.wd.deferred + x.wd.roth; };
+    var hasSS = function(x){ return (x.ss + (x.preSS || 0)) > 0.5; };
+    var C = function(g, h, sub, cell, tot, o){ o = o || {}; return {g:g, h:h, sub:sub, cell:cell, tot:tot, bold:o.bold, show:o.show == null ? true : o.show, sep:o.sep}; };
+    var money0 = function(f){ return function(x){ return dash(f(x)); }; }, sumT = function(f){ return function(){ return money(sumOf(f)); }; };
+    var cols = [
+      C('', 'Year', '', function(x){ return String(x.year); }, function(){ return 'Total'; }),
+      C('', 'Age' + (X0.ppl.length > 1 ? 's' : ''), '', function(x){ return x.ages.join(' / '); }, null),
+      C('inc', 'Wages', 'after retirement-plan deferrals', money0(IP('emp')), sumT(IP('emp')), {show:any(IP('emp')), sep:true}),
+      C('inc', 'Social Security', '', money0(IP('ss')), sumT(IP('ss')), {show:any(IP('ss'))}),
+      C('inc', 'Pensions', '', money0(IP('pen')), sumT(IP('pen')), {show:any(IP('pen'))}),
+      C('inc', 'Annuities', 'in force + the Foundation annuity', money0(IP('ann')), sumT(IP('ann')), {show:any(IP('ann'))}),
+      C('inc', 'Walls yield', '', money0(IP('walls')), sumT(IP('walls')), {show:any(IP('walls'))}),
+      C('inc', 'Other income', 'non-guaranteed', money0(IP('ng')), sumT(IP('ng')), {show:any(IP('ng'))}),
+      C('inc', 'RMD drawn', 'beyond the Walls yield', money0(IP('rmd')), sumT(IP('rmd')), {show:any(IP('rmd'))}),
+      C('inc', 'Withdrawals', 'taxable / deferred / Roth', function(x){ return wdAll(x) > 0.5 ? money(x.wd.taxable) + ' / ' + money(x.wd.deferred) + ' / ' + money(x.wd.roth) : '—'; }, function(){ return money(sumOf(wdAll)); }, {show:any(wdAll)}),
+      C('inc', 'All income', 'the sum, as paid in', function(x){ return money(x.gross); }, function(){ return money(X0.lifetimeGross); }, {bold:true}),
+      C('agi', 'Ordinary income', 'taxable wages, pensions, annuities, Walls and IRA money', money0(AP('ord')), sumT(AP('ord')), {sep:true}),
+      C('agi', 'Earlier this year', 'before the plan date', money0(AP('pre')), sumT(AP('pre')), {show:any(AP('pre'))}),
+      C('agi', 'Roth conversion', '', money0(AP('conv')), sumT(AP('conv')), {show:any(AP('conv'))}),
+      C('agi', 'Capital gains', 'taxable-account Walls yield + ' + Math.round(TAXABLE_GAIN_SHARE * 100) + '% of taxable withdrawals', money0(AP('cg')), sumT(AP('cg')), {show:any(AP('cg'))}),
+      C('agi', 'Taxable SS', '', function(x){ return hasSS(x) ? money(x.ssTaxable) : '—'; }, sumT(AP('ss')), {show:rows.some(hasSS)}),
+      C('agi', 'AGI', 'the sum', function(x){ return money(x.agi); }, sumT(function(x){ return x.agi; }), {bold:true}),
+      C('tst', 'Tax-exempt interest', 'AUM - Tax Free Walls yield', money0(function(x){ return x.exempt; }), sumT(function(x){ return x.exempt; }), {show:any(function(x){ return x.exempt; }), sep:true}),
+      C('tst', 'MAGI for IRMAA', 'AGI + tax-exempt interest; sets Medicare premiums two years later', function(x){ return money(x.magi); }, null, {sep:!any(function(x){ return x.exempt; })}),
+      C('tst', 'Provisional income', 'AGI before benefits + exempt + ½ SS; 50% taxable over ' + money(TQ.ssBase) + ', 85% over ' + money(TQ.ssTop), function(x){ return hasSS(x) && x.prov != null ? money(x.prov) : '—'; }, null, {show:rows.some(hasSS)}),
+      C('fed', 'RMD', 'required', money0(function(x){ return x.rmd; }), null, {show:any(function(x){ return x.rmd; }), sep:true}),
+      C('fed', 'Deductions', '', function(x){ return money(x.deductions); }, null, {sep:!any(function(x){ return x.rmd; })}),
+      C('fed', 'Taxable income', '', function(x){ return '<b>' + money(x.taxable) + '</b>'; }, null),
+      C('fed', 'Bracket', '', function(x){ return Math.round(x.marginal * 100) + '%'; }, null),
+      C('fed', 'Federal tax', '', function(x){ return money(x.tax); }, function(){ return '<b>' + money(X0.lifetime) + '</b>'; }),
+      C('fed', 'Early withdrawal penalty', 'in the federal tax', money0(function(x){ return x.penalty; }), sumT(function(x){ return x.penalty; }), {show:any(function(x){ return x.penalty; })}),
+      C('fed', 'Fed. effective', 'federal tax ÷ all income', function(x){ return pct(x.effective); }, function(){ return pct(X0.avgEffective); }),
+      C('all', 'State tax', '', money0(function(x){ return x.stateTax; }), function(){ return money(X0.lifetimeState); }, {sep:true}),
+      C('all', 'Payroll tax', 'Social Security and Medicare', money0(function(x){ return x.payroll; }), function(){ return money(X0.lifetimePayroll); }, {show:any(function(x){ return x.payroll; })}),
+      C('all', 'All tax', '', function(x){ return '<b>' + money(x.totalTax) + '</b>'; }, function(){ return '<b>' + money(X0.lifetime + X0.lifetimeState + (X0.lifetimePayroll || 0)) + '</b>'; }),
+      C('all', 'Effective', 'all tax ÷ all income', function(x){ return pct(x.totalEffective); }, function(){ return pct(X0.avgTotalEffective); }),
+      C('all', 'Unfunded', '', money0(function(x){ return x.unfunded; }), null, {show:any(function(x){ return x.unfunded; })})
+    ].filter(function(c){ return c.show; });
+    var GRP = {inc:'All income — what the year paid in', agi:'AGI — what the federal tax counts', tst:'Medicare and Social Security tests', fed:'Federal tax', all:'State and all tax'};
+    var grpRow = [], gi = 0;
+    while(gi < cols.length){ var g0 = cols[gi].g, n = 0; while(gi + n < cols.length && cols[gi + n].g === g0) n++; grpRow.push('<th colspan="' + n + '" style="text-align:center;border-bottom:1px solid var(--line)' + (g0 ? ';border-left:1px solid var(--line)' : '') + '">' + (GRP[g0] || '') + '</th>'); gi += n; }
+    var sepS = ' style="border-left:1px solid var(--line)"';
+    $('taxTable').innerHTML = '<thead><tr class="grp">' + grpRow.join('') + '</tr><tr>'
+      + cols.map(function(c){ return '<th' + (c.g ? ' class="num"' : '') + (c.sep ? sepS : '') + '>' + c.h + (c.sub ? '<small>' + c.sub + '</small>' : '') + '</th>'; }).join('') + '</tr></thead><tbody>'
       + rows.map(function(x){
-          return '<tr><td>' + x.year + '</td><td>' + x.ages.join(' / ') + '</td><td class="num">' + money(x.gross) + '</td><td class="num">' + (x.ss > 0.5 ? money(x.ssTaxable) : '—') + '</td>'
-            + '<td class="num">' + ((x.wd.taxable + x.wd.deferred + x.wd.roth) > 0.5 ? money(x.wd.taxable) + ' / ' + money(x.wd.deferred) + ' / ' + money(x.wd.roth) : '—') + '</td>'
-            + '<td class="num">' + (x.rmd > 0.5 ? money(x.rmd) : '—') + '</td><td class="num">' + money(x.agi) + '</td><td class="num">' + money(x.deductions) + '</td>'
-            + '<td class="num"><b>' + money(x.taxable) + '</b></td><td class="num br">' + Math.round(x.marginal * 100) + '%</td><td class="num">' + money(x.tax) + '</td>' + (anyPen ? '<td class="num">' + (x.penalty > 0.5 ? money(x.penalty) : '\u2014') + '</td>' : '') + '<td class="num">' + pct(x.effective) + '</td>'
-            + '<td class="num">' + (x.stateTax > 0.5 ? money(x.stateTax) : '\u2014') + '</td>' + (anyPay ? '<td class="num">' + (x.payroll > 0.5 ? money(x.payroll) : '\u2014') + '</td>' : '') + '<td class="num"><b>' + money(x.totalTax) + '</b></td><td class="num">' + pct(x.totalEffective) + '</td>'
-            + (anyUnf ? '<td class="num">' + (x.unfunded > 0.5 ? money(x.unfunded) : '—') : '') + '</tr>';
+          return '<tr>' + cols.map(function(c){ return '<td' + (c.g ? ' class="num' + (c.h === 'Bracket' ? ' br' : '') + '"' : '') + (c.sep ? sepS : '') + '>' + (c.bold ? '<b>' + c.cell(x) + '</b>' : c.cell(x)) + '</td>'; }).join('') + '</tr>';
         }).join('')
-      + '</tbody><tfoot><tr><td colspan="2">Total</td><td class="num">' + money(X0.lifetimeGross) + '</td><td colspan="7"></td><td class="num"><b>' + money(X0.lifetime) + '</b></td><td class="num">' + pct(X0.avgEffective) + '</td><td class="num">' + money(X0.lifetimeState) + '</td>' + (anyPay ? '<td class="num">' + money(X0.lifetimePayroll) + '</td>' : '') + '<td class="num"><b>' + money(X0.lifetime + X0.lifetimeState + (X0.lifetimePayroll || 0)) + '</b></td><td class="num">' + pct(X0.avgTotalEffective) + '</td>' + (anyUnf ? '<td></td>' : '') + '</tr></tfoot>';
+      + '</tbody><tfoot><tr>' + cols.map(function(c){ return '<td' + (c.g ? ' class="num"' : '') + (c.sep ? sepS : '') + '>' + (c.tot ? (c.bold ? '<b>' + c.tot() + '</b>' : c.tot()) : '') + '</td>'; }).join('') + '</tr></tfoot>';
 
     $('taxAssume').innerHTML = (X0.lifetimePayroll > 0.5 ? '<b>Payroll tax.</b> ' + money(X0.lifetimePayroll) + ' of Social Security and Medicare tax on wages over the plan (6.2% to the indexed wage base, 1.45% on all wages, 0.9% Additional Medicare over the household threshold; self-employment tax on lines marked self-employed, half deducted above the line) is in the All tax column and the cash flow, separate from the income tax below. ' : '') + '<b>Assumptions.</b> 2026 federal law: standard deduction ' + money(TAX_2026[X0.status].std) + (X0.status === 'mfj' ? ' plus $1,650 for each spouse 65 or older' : ' plus $2,050 at 65') + ', brackets ' + T.brackets.map(function(b){ return Math.round(b[0] * 100) + '%'; }).join(' / ') + ', and the $6,000 senior deduction for 2025–2028 (phasing out above ' + money(T.seniorPhase) + ' of AGI); brackets, the standard deduction and the capital-gains thresholds are indexed at the ' + pct(i.inflation || 0) + ' inflation assumption, the Social Security thresholds are not. Up to 85% of Social Security is taxable by the provisional-income formula. Wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs are ordinary income; a tax-deferred withdrawal before 59\u00bd carries the 10% additional federal tax' + (X0.lifetimePenalty > 0.5 ? ' (' + money(X0.lifetimePenalty) + ' over the plan)' : '') + ', the birthday from the section 02 date of birth or, without one, taken as mid-year; the Foundation annuity is ' + Math.round(X0.foundTaxShare * 100) + '% taxable (qualified money fully, a non-qualified annuity half, Roth money not at all), and annuity income already in force the same way by the account that pays it; the Walls yield follows the Walls funding mix, with the non-qualified share taxed as long-term gains' + (X0.wallsTaxFree > 0.001 ? ' except the yield of the tax-free income accounts (the ' + Math.round(X0.wallsTaxFree * 100) + '% of the Walls in AUM - Tax Free, on their own yield and growth), which is federally tax-free (it still counts toward the taxation of Social Security and in the state model)' : '') + '; half of each taxable-account withdrawal is assumed to be gain. RMDs use the Uniform Lifetime Table from age ' + rmdAge(X0.year0 - i.clientAge) + ' on the tax-deferred market balances (the Foundation annuity’s payments satisfy its own). Both spouses are assumed living to the end of plan; no itemising, credits or Medicare IRMAA. <b>State tax</b> uses a planning model of each state\u2019s 2025 rates, brackets, standard deduction or exemptions and retirement-income exclusions, indexed the same way, with Social Security exempt except where the state taxes it; local income taxes are left out. A planning estimate, not tax advice.';
     return X0;
@@ -12853,7 +12911,7 @@
     });
   }
 
-  window.__rfb = Object.assign(window.__rfb || {}, {pdfLayoutText:pdfLayoutText, propParse:function(p){ return propParse(p); }, propDerived:function(a){ return propDerived(a); }, propSummaries:function(a, d){ return propSummaries(a, d); }, canAskClaude:function(){ return canAskClaude(); }, nitroPerf:function(pg){ return nitroPerf(pg); }, askClaudeJson:function(q){ return askClaudeJson(q); }, compute:function(){ return compute(); }, projectTax:function(r, o){ return projectTax(r, o); }, accounts:function(){ return accounts; }});   // for the test scripts
+  window.__rfb = Object.assign(window.__rfb || {}, {taxLast:function(){ return taxLast; }, fedTax:function(){ return fedTax.apply(null, arguments); }, pdfLayoutText:pdfLayoutText, propParse:function(p){ return propParse(p); }, propDerived:function(a){ return propDerived(a); }, propSummaries:function(a, d){ return propSummaries(a, d); }, canAskClaude:function(){ return canAskClaude(); }, nitroPerf:function(pg){ return nitroPerf(pg); }, askClaudeJson:function(q){ return askClaudeJson(q); }, compute:function(){ return compute(); }, projectTax:function(r, o){ return projectTax(r, o); }, accounts:function(){ return accounts; }});   // for the test scripts
   /* ---- reading the figures out of the text ---- */
   function nitroNum(s){ var v = parseFloat(String(s).replace(/\u2212/g, '-').replace(/[^0-9.\-]/g, '')); return isFinite(v) ? v : null; }
   /* text out of a PDF carries kerning breaks ("V anguard", "GP A") and letter-spaced headings ("A l l o c a t i o n") */
