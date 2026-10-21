@@ -23,6 +23,7 @@ const SUITE = [
   't-tbd',       // TBD carrier option; top banner removed
   't-riskq',     // risk profile questionnaire, the tolerance cell that follows it, the client report
   't-tglbtn',    // Adjust Target Allocations button
+  't-casefile',  // section 23: load a case from an uploaded .txt or Word .docx file
   't-assetmap',  // the asset map (page and deck), the -8%/-16% sequence stress, the 3.26% inflation default, the protected-pieces continuation slide
 ];
 const only = process.argv.slice(2);
