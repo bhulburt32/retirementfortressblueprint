@@ -1,0 +1,21 @@
+const { chromium } = require('playwright');
+(async () => {
+  const b = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const p = await b.newPage({ viewport: { width: 1500, height: 1000 } }); const errs = []; p.on('pageerror', e => errs.push(String(e)));
+  await p.goto('file://' + process.cwd() + '/preview-smith.html', { waitUntil: 'load' }); await p.waitForTimeout(800);
+  await p.click('#expandAll'); await p.waitForTimeout(300);
+  const st = () => p.evaluate(() => ({ conv: [...document.querySelectorAll('#scnGrid .scn-card')].map(c => [...c.querySelectorAll('dl div')].find(x => x.querySelector('dt') && x.querySelector('dt').textContent.startsWith('Roth')).querySelector('dd').textContent), note: document.getElementById('rothGuardNote').textContent.slice(0, 110), msg: document.getElementById('rothNote').textContent.slice(0, 160) }));
+  console.log('default ', JSON.stringify(await st()));
+  await p.selectOption('#rothIrmaa', '0'); await p.waitForTimeout(700); console.log('irmaa off', JSON.stringify((await st()).conv));
+  await p.selectOption('#rothIrmaa', '3'); await p.waitForTimeout(700); console.log('irmaa 3rd', JSON.stringify((await st()).conv));
+  await p.selectOption('#rothSsGuard', 'top'); await p.waitForTimeout(700); const s3 = await st(); console.log('ss 85%  ', JSON.stringify(s3.conv), '|', s3.msg);
+  await p.selectOption('#rothSsGuard', 'base'); await p.waitForTimeout(700); console.log('ss 50%  ', JSON.stringify((await st()).conv));
+  console.log('limitedBy words:', await p.evaluate(() => (document.getElementById('rothTable') ? document.getElementById('rothTable').textContent : document.body.textContent).match(/Social Security threshold|already above[^.<]{0,60}/g) ? 'found' : 'none'));
+  const json = await p.evaluate(() => document.getElementById('caseJson').value); const o = JSON.parse(json);
+  console.log('saved:', JSON.stringify(o.tax.roth), '| scn:', JSON.stringify(o.scenarios.map(s => [s.roth.irmaaTier, s.roth.ssGuard])));
+  await p.click('#newCase'); await p.waitForTimeout(200); await p.click('#newCase'); await p.waitForTimeout(500);
+  console.log('after new:', await p.evaluate(() => document.getElementById('rothIrmaa').value + '/' + document.getElementById('rothSsGuard').value));
+  await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(1200);
+  console.log('after reload:', await p.evaluate(() => document.getElementById('rothIrmaa').value + '/' + document.getElementById('rothSsGuard').value), JSON.stringify((await st()).conv));
+  console.log('ERRORS:', errs.length ? errs : 'none'); await b.close();
+})();

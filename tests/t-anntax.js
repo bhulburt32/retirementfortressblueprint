@@ -15,7 +15,7 @@ const path = require('path');
   const figs=async()=>({fed:await tile('#taxTiles','lifetime federal'), state:await tile('#taxTiles','lifetime pennsylvania'), end:await tile('#assetTiles','at end of plan')});
   const acct=async name=>p.$$eval('#acctBody tr[data-id]',(rs,n)=>{ const r=rs.find(x=>x.querySelector('input[data-k=name]').value.trim()===n); return r? r.dataset.id : null; }, name);
   const cell=async(id,k,v)=>{ const sel=`#anxBody tr[data-anx="${id}"] [data-ax="${k}"]`; const tag=await p.$eval(sel,e=>e.tagName); if(tag==='SELECT'){ await p.selectOption(sel,v); } else { await p.fill(sel,v); await p.$eval(sel,e=>{e.dispatchEvent(new Event('input',{bubbles:true})); e.blur();}); } await p.waitForTimeout(500); };
-  const cards=async()=>p.$$eval('#scnGrid .scn-card',cs=>cs.map(c=>[...c.querySelectorAll('dl div')].map(d=>d.textContent.replace(/\s+/g,' ').trim())));
+  const cards=async()=>p.$$eval('#scnGrid .scn-card:not(.base)',cs=>cs.map(c=>[...c.querySelectorAll('dl div')].map(d=>d.textContent.replace(/\s+/g,' ').trim())));
   const base=await figs(); console.log('baseline:', JSON.stringify(base));
   // 1. the scenario cards carry the three stress tests, and the viewed scenario's match section 18
   const C=await cards(); console.log('card A rows:', JSON.stringify(C[0].slice(-4)));
