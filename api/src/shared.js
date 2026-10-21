@@ -39,7 +39,7 @@ function cases() {
 
 let anthropicKey = null;
 async function getAnthropicKey() {
-  if (process.env.ANTHROPIC_API_KEY) return process.env.ANTHROPIC_API_KEY;          // local development only
+  if (process.env.ANTHROPIC_API_KEY) return process.env.ANTHROPIC_API_KEY;          // managed functions: the key is an app setting (no managed identity for Key Vault); the vault path below is for a bring-your-own Functions app
   if (anthropicKey) return anthropicKey;
   const uri = process.env.KEYVAULT_URI;
   if (!uri) throw new Error('KEYVAULT_URI is not set');
