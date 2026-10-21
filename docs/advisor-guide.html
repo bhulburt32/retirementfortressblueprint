@@ -1337,6 +1337,27 @@
           these, the retirement dates and each benefit's start and end &mdash; lands in the calendar
           year it names: a July 2030 start pays half a year in the 2030 row and the full amount
           from 2031.</dd>
+        <dt>Walls income by account</dt>
+        <dd>A table under the two lines above with one row for every Walls line in the transfer list
+          &mdash; the account, its destination and product, and the amount &mdash; so each account's Walls
+          money can pay on its own dates. A row takes <span class="ui">Distributions start</span> and
+          <span class="ui">Distributions stop</span> (months; distributions stop at the start of the stop
+          month, and blank runs to the end of plan), the account's <span class="ui">Total yield</span> while it
+          pays, the <span class="ui">Distribution</span> paid out each year as a share of the balance, its
+          <span class="ui">Growth before start</span> and its <span class="ui">Growth after stop</span>. While an
+          account pays, the total yield less the distribution is reinvested in the same account; a distribution
+          above the total yield is paid from the balance, which then falls. <span class="ui">+ Add restart</span>
+          adds a line beneath for a later period when the account pays again: it needs a start on or after the
+          stop above it, and the balance grows at the rate after stop in between. Every cell is blank by default
+          and follows the line above for its kind of account (the taxable line, or the tax-free line for an AUM -
+          Tax Free product): the start follows <span class="ui">Walls income starts</span>, the distribution the
+          Walls yield, the total yield the yield plus the growth after income starts, and the growth rates the
+          growth before and after. While the whole table is blank the two lines run the Walls as one pool and
+          nothing changes; fill any cell and every Walls account runs on this schedule. The Walls income, its tax
+          (by each account's tax type and owner), the asset projections, the stress tests and the scenario cards
+          then follow each account. A line beneath gives the first year's Walls income and names any restart left
+          out (no start date, no stop above it, or a start before that stop). The table belongs to the scenario
+          on view, <span class="ui">Follow the plan assumptions</span> clears it, and it saves with the case.</dd>
       </dl>
     </div>
   </section>
