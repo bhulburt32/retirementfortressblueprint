@@ -161,10 +161,14 @@
     letter-spacing:-.01em;text-align:left;
   }
   .sec-head h2{color:#fff}
+  /* gold: the header holds an output graphic (markGraphicHeads) */
+  .sec-head.gold{background:var(--accent)} .sec-head.gold h2{color:#1F3162} .sec-head.gold .sec-num{color:#1F3162}
+  .inc-title.gold,.inc-title.sub.gold{background:var(--accent);color:#1F3162;border-bottom-color:var(--accent)} .inc-title.gold small,.inc-title.sub.gold small{color:rgba(31,49,98,.82)}
+  .bkt-head.gold{background:var(--accent);border-bottom-color:var(--accent);border-radius:var(--radius) var(--radius) 0 0} .bkt-head.gold .bkt-name{color:#1F3162} .bkt-head.gold .bkt-cust{color:rgba(31,49,98,.82)}
   /* scenarios: sections 14–20 carry the colour of the scenario showing */
   .scn-tag{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#fff;padding:4px 10px;border-radius:999px;white-space:nowrap}
   body.scn-a{--scn:#2E7D32;--scn-bg:rgba(46,125,50,.10)} body.scn-b{--scn:#B07D00;--scn-bg:rgba(201,152,0,.13)} body.scn-c{--scn:#6A3FA0;--scn-bg:rgba(106,63,160,.12)}
-  section.scn{background:var(--scn-bg);box-shadow:inset 6px 0 0 var(--scn);border-radius:var(--radius);padding:14px 18px 8px 22px}
+  section.scn{padding:0}   /* flush with every other section; the scenario colour is on the header's underline and tag */
   section.scn.closed{padding-bottom:0}
   section.scn .sec-head{box-shadow:inset 0 -3px 0 var(--scn)}
   .scn-bar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:0 0 14px}
@@ -1214,6 +1218,16 @@
           drive the projection chart there &mdash; Walls income rising with the Walls, and the Roof
           balance column.</dd>
 
+        <dt>Walls income start, growth before income starts, and the tax-free line</dt>
+        <dd><span class="ui">Walls income starts</span> is the month the Walls begin paying (blank: the first
+          retirement). <span class="ui">Walls growth before income starts</span> (5.0% by default) is the Walls
+          growth until then; the Walls growth rate above applies once they pay. The tax-free line applies to
+          Walls money in AUM - Tax Free (municipal bonds), whose yield is federally tax-free:
+          <span class="ui">Tax-free Walls yield</span>, <span class="ui">Tax-free growth before income
+          starts</span> and <span class="ui">after</span>, each following the Walls figure while blank. These
+          are plan assumptions for every scenario; the Walls income by account table in section&nbsp;14
+          overrides them account by account.</dd>
+
         <dt><span class="ui">Inflation</span></dt>
         <dd>What Needs and Wants grow at in the projection. Defaults to 3.26%. The tax projection in
           section&nbsp;17 indexes the brackets and deductions at the same rate.</dd>
@@ -1248,7 +1262,12 @@
         <label class="f"><span>Foundation yield<small>Income paid by the annuity</small></span><input type="text" inputmode="decimal" id="yieldF" value="6.0%"></label>
         <label class="f"><span>Guaranteed lifetime income<small>Does the Foundation annuity pay for life?</small></span><select id="foundGLI"><option value="yes" selected>Yes — income continues for life</option><option value="no">No — income stops when the value is gone</option></select></label>
         <label class="f"><span>Walls yield<small>Income drawn from the Walls</small></span><input type="text" inputmode="decimal" id="yieldW" value="6.0%"></label>
-        <label class="f"><span>Walls growth rate<small>Growth of the Walls balance</small></span><input type="text" inputmode="decimal" id="growthW" value="1.5%"></label>
+        <label class="f"><span>Walls growth rate<small>Growth of the Walls balance after income starts</small></span><input type="text" inputmode="decimal" id="growthW" value="1.5%"></label>
+        <label class="f"><span>Walls income starts<small>Blank: the first retirement</small></span><input type="month" id="wallsStart"></label>
+        <label class="f"><span>Walls growth before income starts<small>Growth until the Walls pay</small></span><input type="text" inputmode="decimal" id="growthWPre" value="5.0%"></label>
+        <label class="f"><span>Tax-free Walls yield<small>AUM - Tax Free lines &middot; blank: the Walls yield</small></span><input type="text" inputmode="decimal" id="yieldWt" placeholder="Walls yield" autocomplete="off"></label>
+        <label class="f"><span>Tax-free growth before income starts<small>Blank: the Walls rate before</small></span><input type="text" inputmode="decimal" id="growthWtPre" placeholder="Walls rate" autocomplete="off"></label>
+        <label class="f"><span>Tax-free growth after income starts<small>Blank: the Walls growth rate</small></span><input type="text" inputmode="decimal" id="growthWt" placeholder="Walls rate" autocomplete="off"></label>
         <label class="f"><span>Roof growth rate<small>Growth of the Roof</small></span><input type="text" inputmode="decimal" id="growthR" value="6.0%"></label>
         <label class="f"><span>Inflation<small>Needs and Wants grow at</small></span><input type="text" inputmode="decimal" id="inflation" value="3.26%"></label>
         <label class="f"><span>End of plan age<small>Age of the younger client when the plan ends</small></span><input type="text" inputmode="numeric" id="endAge" value="100"></label>
@@ -1893,8 +1912,8 @@
           residence, vacation home, rental property, land, a business interest, vehicles or other
           real assets &mdash; each with a value and an assumed appreciation rate. They do not enter
           the levels or the projections (nothing in them is invested), but they complete the balance
-          sheet: the <b>Net worth</b> readout is the accounts plus these, less the debts in
-          section&nbsp;07, and both print in the worksheet. Rent from a rental property belongs in
+          sheet: the <b>Net worth</b> readout, in section&nbsp;07 under the debts, is the accounts plus
+          these, less the debts, and both print in the worksheet. Rent from a rental property belongs in
           Non-guaranteed income in section&nbsp;04, and the mortgage on a home in section&nbsp;07.</dd>
 
         <dt>Projected assets before the Fortress</dt>
@@ -2041,7 +2060,6 @@
       <div class="btn-row" style="margin-top:10px">
         <button type="button" id="oaAdd">Add an asset</button>
       </div>
-      <div class="moat-readout" id="nwReadout" data-tgl-stop></div>
     </div>
     <div class="panel" style="margin-top:18px">
       <div class="bkt-head"><span class="bkt-name">Projected assets before the Fortress</span>
@@ -2098,6 +2116,13 @@
           <em>not</em> added to the expense budget in section&nbsp;05 &mdash; the budget is your own
           worksheet, so enter them there if it should carry them. Debts travel with the case and
           print in the worksheet under <em>Debts</em>.</p>
+      <p>Beneath the debts, the <b>Net worth</b> readout totals the balance sheet today: the accounts in
+        section&nbsp;06, plus the other assets, less every debt above. The <b>Net worth over time</b>
+        chart follows it a year at a time to the end of plan: the accounts as the plan projects them
+        for the scenario on view (the same run as sections&nbsp;17 and 18), the other assets at their
+        growth rates, and the debts, shown below the line, as their payments amortize them; the line
+        is net worth at the end of each year, and the note gives the first and last years and when the
+        debts are paid off.</p>
       </div>
       </div>
     </details>
@@ -2116,6 +2141,13 @@
         <button type="button" id="debtAdd">Add a debt</button>
       </div>
       <div class="moat-readout" id="debtReadout"></div>
+      <div class="moat-readout" id="nwReadout" data-tgl-stop></div>
+    </div>
+    <div class="inc-title gap">Net worth over time<small>Accounts as the plan projects them (section&nbsp;18) plus other assets at their growth rates, less the debts as they amortize</small></div>
+    <div class="panel panel-pad">
+      <div class="pj-legend" id="nwLegend"></div>
+      <div class="pj-wrap"><svg id="nwSvg" class="pj" viewBox="0 0 1000 320" role="img" aria-label="Net worth by year: accounts and other assets less debts"></svg></div>
+      <p class="hint" id="nwNote" style="margin-top:10px"></p>
     </div>
   </section>
   <!-- 8. LIFE INSURANCE -->
@@ -2847,31 +2879,15 @@
           scenario showing claims at a different age. Section&nbsp;04 keeps the base assumption and
           the claiming optimizer still writes there. Baseline always claims at the section&nbsp;04 ages.</dd>
         <dt>Walls income assumptions</dt>
-        <dd>Two lines. <b>Taxable income accounts</b> &mdash; every Walls line except those in AUM -
-          Tax Free &mdash; take four fields: the <span class="ui">Walls yield</span>, when
-          <span class="ui">Walls income starts</span>, and the Walls growth rate <span class="ui">before
-          income starts</span> and <span class="ui">after</span>. <b>Tax-free income accounts</b> &mdash;
-          the Walls lines in AUM - Tax Free, with the amount shown &mdash; take their own
-          <span class="ui">Tax-free yield</span> and growth before and after income starts, each
-          following the taxable line while blank; their income starts with the Walls, their yield is
-          federally tax-free, and the projections, the asset growth and the line beneath the fields
-          all use them. Every field is blank by default
-          and then follows the plan &mdash; the Walls growth <em>before</em> income starts is a plan
-          assumption of 5%, the growth <em>after</em> is section&nbsp;03's Walls growth rate, and the
-          start is the first retirement date; the plan figure is shown under each label. Type a value and the projections in sections&nbsp;15, 17 and 17,
-          the worksheet and the Retirement Fortress Plan report follow it; the sizing in section&nbsp;13
-          keeps the plan assumptions, so a lower yield here shows up as a Needs or Wants shortfall
-          in the projections rather than a bigger target. A line beneath states the result in words,
-          <span class="ui">Follow the plan assumptions</span> clears the annuity table and these
-          four fields, and everything saves with the case. A tax-free yield is set line by line: pick
-          <span class="ui">AUM - Tax Free</span> in the Product/Strategy column of a Walls line held in
-          municipal bonds and that line's share of the non-qualified Walls yield leaves federal taxable
-          income; it still counts toward the taxation of Social Security (as tax-exempt interest does),
-          the state model still taxes it, and the yield on IRA money in the Walls is a taxable
-          distribution whatever the product, so the product changes nothing on a qualified line. Every date in the projections &mdash;
-          these, the retirement dates and each benefit's start and end &mdash; lands in the calendar
-          year it names: a July 2030 start pays half a year in the 2030 row and the full amount
-          from 2031.</dd>
+        <dd>The Walls yield, when Walls income starts, the growth before and after, and the tax-free line
+          for AUM - Tax Free money are Plan Assumptions in section&nbsp;03, shared by every scenario. This
+          subsection holds only the <b>Walls income by account</b> table below, which overrides them
+          account by account for the scenario on view, its blank cells following section&nbsp;03. A case
+          saved by an earlier version may carry Walls overrides that were made here; they show in this
+          subsection with a note, still apply to their scenario, and <span class="ui">Clear them</span>
+          returns that scenario to section&nbsp;03 and the table. Every date in the projections lands in
+          the calendar year it names: a July 2030 start pays half a year in the 2030 row and the full
+          amount from 2031.</dd>
         <dt>Walls income by account</dt>
         <dd>A table under the two lines above with one row for every Walls line in the transfer list
           &mdash; the account, its destination and product, and the amount &mdash; so each account's Walls
@@ -2884,11 +2900,11 @@
           above the total yield is paid from the balance, which then falls. <span class="ui">+ Add restart</span>
           adds a line beneath for a later period when the account pays again: it needs a start on or after the
           stop above it, and the balance grows at the rate after stop in between. Every cell is blank by default
-          and follows the line above for its kind of account (the taxable line, or the tax-free line for an AUM -
-          Tax Free product): the start follows <span class="ui">Walls income starts</span>, the distribution the
+          and follows the section&nbsp;03 Walls assumptions for its kind of account (the Walls line, or the
+          tax-free line for an AUM - Tax Free product): the start follows <span class="ui">Walls income starts</span>, the distribution the
           Walls yield, the total yield the yield plus the growth after income starts, and the growth rates the
-          growth before and after. While the whole table is blank the two lines run the Walls as one pool and
-          nothing changes; fill any cell and every Walls account runs on this schedule. The Walls income, its tax
+          growth before and after. While the whole table is blank the section&nbsp;03 assumptions run the Walls as one
+          pool; fill any cell and every Walls account runs on this schedule. The Walls income, its tax
           (by each account's tax type and owner), the asset projections, the stress tests and the scenario cards
           then follow each account. A line beneath gives the first year's Walls income and names any restart left
           out (no start date, no stop above it, or a start before that stop). The table belongs to the scenario
@@ -2983,7 +2999,9 @@
           <label class="f"><span><span id="adjSsSName">Spouse</span> claims at<small>Section 04: <span id="adjSsSDef">67</span></small></span><select id="adjSsS"></select></label>
         </div>
         <p class="hint" id="adjSsHint" style="margin:8px 0 0"></p>
-        <div class="inc-title gap">Walls income assumptions<small>Yield, start date and growth for the Walls as adjusted, the taxable and the tax-free income accounts apart &middot; blank follows section 03 and the first retirement date</small></div>
+        <div class="inc-title gap">Walls income assumptions<small>Account by account, overriding the Walls assumptions in section 03 &middot; blank follows section 03</small></div>
+        <div id="adjWLegacy" hidden>
+          <p class="hint" style="margin:14px 0 4px;color:var(--st-caution)"><b>Walls overrides saved with this case by an earlier version.</b> The Walls yield, start and growth are Plan Assumptions now (section&nbsp;03), and the table below overrides them account by account. These values still apply to this scenario until cleared. <button type="button" id="adjWLegacyClear">Clear them</button></p>
         <p class="hint" style="margin:14px 0 4px"><b>Taxable income accounts</b> &mdash; every Walls line except those in AUM - Tax Free</p>
         <div class="assump first">
           <label class="f"><span>Walls yield<small>Plan assumption <span id="adjYWDef"></span></small></span><input type="text" inputmode="decimal" id="adjYW" placeholder="plan" autocomplete="off"></label>
@@ -2997,7 +3015,8 @@
           <label class="f"><span>Growth before income starts<small>Follows the taxable line, <span id="adjGPreTDef"></span></small></span><input type="text" inputmode="decimal" id="adjGPreT" placeholder="follows" autocomplete="off"></label>
           <label class="f"><span>Growth after income starts<small>Follows the taxable line, <span id="adjGPostTDef"></span></small></span><input type="text" inputmode="decimal" id="adjGPostT" placeholder="follows" autocomplete="off"></label>
         </div>
-        <p class="hint" style="margin:16px 0 4px"><b>Walls income by account</b> &mdash; each account&rsquo;s Walls money on its own dates &middot; while it pays, the total yield less the distribution is reinvested in the account (a distribution above the total yield comes out of the balance) &middot; <b>+ Add restart</b> starts it paying again after it stops &middot; blank follows the line above for its kind of account; entirely blank, the two lines above run the Walls as one pool</p>
+        </div>
+        <p class="hint" style="margin:16px 0 4px"><b>Walls income by account</b> &mdash; each account&rsquo;s Walls money on its own dates &middot; while it pays, the total yield less the distribution is reinvested in the account (a distribution above the total yield comes out of the balance) &middot; <b>+ Add restart</b> starts it paying again after it stops &middot; blank follows the section&nbsp;03 Walls assumptions for its kind of account (taxable or tax-free); entirely blank, the Walls run as one pool on those assumptions</p>
         <div class="tbl-wrap" style="margin-top:6px">
           <table id="wallsSTable" class="adj-ann">
             <thead><tr><th>Account</th><th class="num">Amount</th><th>Distributions start</th><th>Distributions stop</th><th class="num">Total yield</th><th class="num">Distribution</th><th class="num">Growth before start</th><th class="num">Growth after stop</th><th></th></tr></thead>
@@ -3140,7 +3159,8 @@
 
         <dt>Roth conversion analysis</dt>
         <dd>Builds a conversion schedule: each year from the <span class="ui">start year</span> until
-          the year before RMDs begin, it converts as much qualified money in the Walls and Roof as
+          the <span class="ui">last year</span> &mdash; on Auto, the year before RMDs begin; pick an earlier
+          year to stop conversions sooner (they still stop when RMDs begin) &mdash; it converts as much qualified money in the Walls and Roof as
           fits under the top of the <span class="ui">target tax bracket</span> &mdash; by default the
           bracket the household sits in during its first full retirement year &mdash; without pushing
           modified AGI over an IRMAA threshold once either person is within two years of Medicare
@@ -3280,12 +3300,12 @@
         <span class="hint" id="wdMsg"></span>
       </div>
 
-      <div class="inc-title gap">Roth conversion analysis<small>Qualified money in the Walls and Roof, converted a year at a time until RMDs begin</small></div>
+      <div class="inc-title gap">Roth conversion analysis<small>Qualified money in the Walls and Roof, converted a year at a time until RMDs begin or the last year picked</small></div>
       <div class="assump first" style="margin-top:14px">
         <label class="f"><span>Target tax bracket<small>Convert up to the top of this federal bracket</small></span><select id="rothTarget"></select></label>
         <label class="f"><span>Start year<small>First year of conversions</small></span><select id="rothStart"></select></label>
         <label class="f"><span>Convert from<small>Which level first</small></span><select id="rothOrder"><option value="roof" selected>Roof first, then Walls</option><option value="walls">Walls first, then Roof</option></select></label>
-        <label class="f"><span>Last year<small>Conversions stop before RMDs</small></span><input type="text" id="rothEnd" readonly></label>
+        <label class="f"><span>Last year<small>The last year to convert; auto stops before RMDs</small></span><select id="rothEnd"></select></label>
       </div>
       <div class="btn-row" style="margin-top:14px">
         <label class="chk"><input type="checkbox" id="rothApply" checked> Apply the conversion strategy to the plan projections</label>
@@ -4100,6 +4120,11 @@
       inflation: pctIn($('inflation').value),
       endAge: Math.max(50, Math.min(120, Math.round(num($('endAge').value)) || 100)),
       growthW: pctIn($('growthW').value),
+      wallsStart: $('wallsStart').value || '',
+      growthWPre: $('growthWPre').value.trim() === '' ? null : pctIn($('growthWPre').value),
+      yieldWt: $('yieldWt').value.trim() === '' ? null : pctIn($('yieldWt').value),
+      growthWtPre: $('growthWtPre').value.trim() === '' ? null : pctIn($('growthWtPre').value),
+      growthWt: $('growthWt').value.trim() === '' ? null : pctIn($('growthWt').value),
       growthR: pctIn($('growthR').value),
       medB: Math.max(0, num($('medB').value)),
       medD: Math.max(0, num($('medD').value)),
@@ -5905,6 +5930,7 @@
      Each is blank by default and then follows section 03 and the first
      retirement date. They drive the projections, not the sizing in section 13. */
   var INC_ADJ = {yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:'', yWt:'', gPreT:'', gPostT:'', ssC:'', ssS:''};
+  function wallsStartYm(){ return INC_ADJ.wStart || ($('wallsStart') && $('wallsStart').value) || ''; }   // the Walls income start month in effect, '' = the first retirement
   var WALLS_PRE_GROWTH = 0.05;   // the plan's Walls growth before their income starts; section 03's Walls rate applies once it does
   /* Per-annuity income settings for the Foundation lines in section 14, keyed
      by the account's row order, the level and the line's ordinal. Every field
@@ -6018,18 +6044,18 @@
     return any;
   }
   function incomeAdj(r){
-    var i = r.inputs, gW = i.growthW || 0;
+    var i = r.inputs, gW = i.growthW || 0, gWpre0 = i.growthWPre != null ? i.growthWPre : WALLS_PRE_GROWTH;   // section 03
     var yrs = function(ym){ var v = ym ? planYears(ym) : null; return v == null ? null : Math.max(0, v); };
     return {
       yF: INC_ADJ.yF !== '' ? pctIn(INC_ADJ.yF) : r.yF,
       yW: INC_ADJ.yW !== '' ? pctIn(INC_ADJ.yW) : r.yW,
-      fStart: yrs(INC_ADJ.fStart), wStart: yrs(INC_ADJ.wStart),
-      gPre: INC_ADJ.gPre !== '' ? pctIn(INC_ADJ.gPre) : WALLS_PRE_GROWTH,
+      fStart: yrs(INC_ADJ.fStart), wStart: yrs(INC_ADJ.wStart || i.wallsStart || ''),
+      gPre: INC_ADJ.gPre !== '' ? pctIn(INC_ADJ.gPre) : gWpre0,
       gPost: INC_ADJ.gPost !== '' ? pctIn(INC_ADJ.gPost) : gW,
       /* the tax-free income accounts (Walls lines in AUM - Tax Free): their own yield and growth, each following the taxable line when blank */
-      yWt: INC_ADJ.yWt !== '' ? pctIn(INC_ADJ.yWt) : (INC_ADJ.yW !== '' ? pctIn(INC_ADJ.yW) : r.yW),
-      gPreT: INC_ADJ.gPreT !== '' ? pctIn(INC_ADJ.gPreT) : (INC_ADJ.gPre !== '' ? pctIn(INC_ADJ.gPre) : WALLS_PRE_GROWTH),
-      gPostT: INC_ADJ.gPostT !== '' ? pctIn(INC_ADJ.gPostT) : (INC_ADJ.gPost !== '' ? pctIn(INC_ADJ.gPost) : gW),
+      yWt: INC_ADJ.yWt !== '' ? pctIn(INC_ADJ.yWt) : (INC_ADJ.yW !== '' ? pctIn(INC_ADJ.yW) : (i.yieldWt != null ? i.yieldWt : r.yW)),
+      gPreT: INC_ADJ.gPreT !== '' ? pctIn(INC_ADJ.gPreT) : (INC_ADJ.gPre !== '' ? pctIn(INC_ADJ.gPre) : (i.growthWtPre != null ? i.growthWtPre : gWpre0)),
+      gPostT: INC_ADJ.gPostT !== '' ? pctIn(INC_ADJ.gPostT) : (INC_ADJ.gPost !== '' ? pctIn(INC_ADJ.gPost) : (i.growthWt != null ? i.growthWt : gW)),
       any: Object.keys(INC_ADJ).some(function(k){ return INC_ADJ[k] !== ''; })
     };
   }
@@ -6493,7 +6519,7 @@
       + ' \u2014 together, total Fortress income of <b>' + money(r0.income) + '</b> against total expenses of <b>' + money(r0.expenses) + '</b>, ' + (r0.expenses > 0.5 ? Math.round(r0.income / r0.expenses * 100) : 0) + '% covered.'
       + ' Needs and Wants grow at ' + infl2(i) + ' a year. The Foundation annuit' + (annuitySummary(r).count === 1 ? 'y pays' : 'ies pay') + ' about ' + money(annuitySummary(r).total)
       + ' a year at the start; ' + (P.ws ? 'the Walls pay account by account, on the section 14 Walls income by account table'
-        : 'the Walls pay ' + money(rows[Math.min(P.N, Math.ceil(P.wStart))].wallsYield / Math.max(0.01, clamp01(Math.ceil(P.wStart) + 1 - P.wStart))) + ' at first from ' + (P.adj.wStart != null ? longDate(INC_ADJ.wStart + '-01').replace(/ \d+,/, '') : 'the first retirement') + ', the Walls growing ' + (effGrowth(r).wPre * 100).toFixed(1) + '% a year before income starts and ' + (effGrowth(r).w * 100).toFixed(1) + '% after')
+        : 'the Walls pay ' + money(rows[Math.min(P.N, Math.ceil(P.wStart))].wallsYield / Math.max(0.01, clamp01(Math.ceil(P.wStart) + 1 - P.wStart))) + ' at first from ' + (P.adj.wStart != null ? longDate(wallsStartYm() + '-01').replace(/ \d+,/, '') : 'the first retirement') + ', the Walls growing ' + (effGrowth(r).wPre * 100).toFixed(1) + '% a year before income starts and ' + (effGrowth(r).w * 100).toFixed(1) + '% after')
       + '; the Roof grows at ' + (effGrowth(r).r * 100).toFixed(1) + '%' + (effGrowth(r).any ? ' (account rates from section 06 weighted in)' : '') + ' \u2014 ' + money(rows[rows.length - 1].roof) + ' by ' + rows[rows.length - 1].year + ' (in the table).';
 
     /* table view */
@@ -6608,7 +6634,8 @@
       + (AS.others.length ? AS.others.length + ' other Foundation line' + (AS.others.length === 1 ? '' : 's') + ' (' + AS.others.map(function(c){ return c.name + ': ' + (c.prod || 'no product') ; }).join(', ') + ') pay' + (AS.others.length === 1 ? 's' : '') + ' on the plan assumptions \u2014 ' + pc1(A.yF) + ' from the first retirement' + (i.foundGLI ? ', guaranteed for life' : ', until the value is spent') + ' \u2014 and can be set here once chosen as a Fixed Indexed Annuity.' : '')
       + (!AS.fias.length && !AS.others.length ? 'The Foundation annuity follows the plan assumptions until a Foundation line is listed above.' : '');
     $('adjYWDef').textContent = pc1(r.yW);
-    $('adjGPreDef').textContent = pc1(WALLS_PRE_GROWTH); $('adjGPostDef').textContent = pc1(i.growthW || 0);
+    $('adjWLegacy').hidden = !['yW','wStart','gPre','gPost','yWt','gPreT','gPostT'].some(function(k){ return INC_ADJ[k] != null && String(INC_ADJ[k]).trim() !== ''; });
+    $('adjGPreDef').textContent = pc1(i.growthWPre != null ? i.growthWPre : WALLS_PRE_GROWTH); $('adjGPostDef').textContent = pc1(i.growthW || 0);
     $('adjWStartDef').textContent = retTxt;
     ['adjYW','adjGPre','adjGPost','adjWStart','adjYWt','adjGPreT','adjGPostT'].forEach(function(id){ $(id).classList.toggle('auto', $(id).value.trim() === ''); });
     var TFW = taxFreeWalls(r); $('adjYWtDef').textContent = pc1(A.yW); $('adjGPreTDef').textContent = pc1(A.gPre); $('adjGPostTDef').textContent = pc1(A.gPost);
@@ -6617,7 +6644,7 @@
     $('adjIncMsg').textContent = ((A.any || AS.any || wallsSchedOn(r) || Object.keys(ROOF_G).some(function(k){ return String(ROOF_G[k]).trim() !== ''; })) ? 'Adjusted: ' : 'Following the plan assumptions: ')
       + 'the Foundation annuit' + (AS.count === 1 ? 'y pays' : 'ies pay') + ' about ' + money(AS.total) + ' a year at the start'
       + (P.ws ? '; the Walls pay account by account, on the Walls income by account table'
-      : '; the Walls pay ' + pc1(A.yW) + ' of their balance from ' + (A.wStart != null ? longDate(INC_ADJ.wStart + '-01').replace(/ \d+,/, '') : 'the first retirement')
+      : '; the Walls pay ' + pc1(A.yW) + ' of their balance from ' + (A.wStart != null ? longDate(wallsStartYm() + '-01').replace(/ \d+,/, '') : 'the first retirement')
       + ' \u2014 about ' + money(wRow ? wRow.wallsYield / Math.max(0.01, clamp01(Math.ceil(P.wStart) + 1 - P.wStart)) : r.funded.walls * A.yW) + ' in the first full year \u2014 growing ' + pc1(A.gPre) + ' before income starts and ' + pc1(A.gPost) + ' after')
       + (TFW.total > 0.5 ? '; the tax-free income accounts (' + money(TFW.total) + ' in AUM - Tax Free) pay ' + pc1(A.yWt) + ', federally tax-free, growing ' + pc1(A.gPreT) + ' before and ' + pc1(A.gPostT) + ' after' : '') + '.'
   }
@@ -8177,7 +8204,7 @@
       var PA = projectIncome(r), A = PA.adj, AS = annuitySummary(r);
       if(!A.any && !AS.any && !PA.ws) return;
       para('Income assumptions as adjusted (section 14): ' + AS.contracts.map(function(c){ return c.name + ' (' + money(c.amt) + ') \u2014 ' + annWords(c, 'the first retirement'); }).join('; ')
-        + (PA.ws ? '; Walls pay account by account on the section 14 Walls income by account table.' : '; Walls pay ' + (A.yW * 100).toFixed(1) + '% of their balance from ' + (A.wStart != null ? INC_ADJ.wStart : 'the first retirement') + ', growing ' + (A.gPre * 100).toFixed(1) + '% before income starts and ' + (A.gPost * 100).toFixed(1) + '% after.')
+        + (PA.ws ? '; Walls pay account by account on the section 14 Walls income by account table.' : '; Walls pay ' + (A.yW * 100).toFixed(1) + '% of their balance from ' + (A.wStart != null ? wallsStartYm() : 'the first retirement') + ', growing ' + (A.gPre * 100).toFixed(1) + '% before income starts and ' + (A.gPost * 100).toFixed(1) + '% after.')
         + ' The Fortress sizing above uses the plan assumptions; the projections use these.', {rgb:INK});
     })();
 
@@ -8299,7 +8326,7 @@
       h2('Roth conversion strategy');
       var cRows = TX.rows.filter(function(x){ return x.conv && x.conv.amt > 0.5; });
       var lB = TXb.rows[TXb.rows.length - 1], lP = TX.rows[TX.rows.length - 1], sv = (TXb.lifetime + TXb.lifetimeState) - (TX.lifetime + TX.lifetimeState);
-      para('Convert qualified money in the Roof and Walls each year from ' + cfgR.startYear + (TX.rmdStartYear != null ? ' until RMDs begin in ' + TX.rmdStartYear : '') + ', up to the top of the ' + Math.round(cfgR.targetRate * 100) + '% federal bracket' + (cfgR.irmaa ? ' and under ' + (cfgR.irmaaTier > 1 ? 'the ' + ['', '1st', '2nd', '3rd', '4th', '5th'][cfgR.irmaaTier] + ' IRMAA threshold' : 'the first IRMAA threshold') + ' once Medicare is two years away' : '') + (cfgR.ssGuard && cfgR.ssGuard !== 'none' ? ', keeping provisional income under the ' + (cfgR.ssGuard === 'base' ? '50%' : '85%') + ' Social Security threshold' : '') + '. '
+      para('Convert qualified money in the Roof and Walls each year from ' + cfgR.startYear + (cfgR.endYear != null ? ' through ' + cfgR.endYear + (TX.rmdStartYear != null && TX.rmdStartYear <= cfgR.endYear ? ' (or until RMDs begin in ' + TX.rmdStartYear + ')' : '') : TX.rmdStartYear != null ? ' until RMDs begin in ' + TX.rmdStartYear : '') + ', up to the top of the ' + Math.round(cfgR.targetRate * 100) + '% federal bracket' + (cfgR.irmaa ? ' and under ' + (cfgR.irmaaTier > 1 ? 'the ' + ['', '1st', '2nd', '3rd', '4th', '5th'][cfgR.irmaaTier] + ' IRMAA threshold' : 'the first IRMAA threshold') + ' once Medicare is two years away' : '') + (cfgR.ssGuard && cfgR.ssGuard !== 'none' ? ', keeping provisional income under the ' + (cfgR.ssGuard === 'base' ? '50%' : '85%') + ' Social Security threshold' : '') + '. '
         + (cRows.length ? 'Total converted ' + money(TX.convTotal) + ' over ' + cRows.length + ' years (' + cRows[0].year + '-' + cRows[cRows.length - 1].year + '), tax on the conversions ' + money(TX.convTax) + '. Lifetime federal and state tax ' + money(TX.lifetime + TX.lifetimeState) + ' with the strategy against ' + money(TXb.lifetime + TXb.lifetimeState) + ' without (' + (sv >= 0 ? 'saving ' : 'adding ') + money(Math.abs(sv)) + '); Roth at the end of plan ' + money(lP.balances.roth) + ' against ' + money(lB.balances.roth) + ', tax-deferred ' + money(lP.balances.deferred) + ' against ' + money(lB.balances.deferred) + '; total assets ' + money(lP.layers.total) + ' against ' + money(lB.layers.total) + '.' : 'Nothing converts under these limits.'), {rgb:INK});
       if(cRows.length){
         var ccols = [{t:'Year', w:40, s:7.5}, {t:'Ages', w:50, s:7.5}, {t:'Converted', w:70, a:'r', f:'F3', s:7.5}, {t:'Roof / Walls', w:96, a:'r', f:'F3', s:7.5}, {t:'Taxable after', w:72, a:'r', f:'F3', s:7.5}, {t:'Bracket', w:44, a:'r', f:'F3', s:7.5}, {t:'MAGI', w:66, a:'r', f:'F3', s:7.5}, {t:'Tax on conv.', w:66, a:'r', f:'F3', s:7.5}];
@@ -9205,7 +9232,7 @@
       otherAssets:otherAssets.length ? otherAssets.map(function(x){ return {type:x.type, name:x.name, val:x.val, growth:x.growth, note:x.note}; }) : null,
       nitrogen:nitro ? {name:nitro.name, text:nitro.text, analysis:nitro.analysis, src:nitro.src, at:nitro.at} : null,
       risk:{score:$('riskScore').value.trim(), tolerance:$('riskTol').classList.contains('auto') ? '' : $('riskTol').value.trim(), questionnaire:{answers:rq.a, amount:rq.amt}, selected:Object.keys(risk.selected).filter(function(k){ return risk.selected[k]; }), custom:risk.custom.filter(function(c){ return c.text.trim(); })},
-      tax:{withdrawalOrder:wdOrder.slice(), roth:{apply:rothCfg.apply, target:rothCfg.target, start:rothCfg.start, order:rothCfg.order, irmaa:rothCfg.irmaa, irmaaTier:rothGuards(rothCfg).irmaaTier, ssGuard:rothGuards(rothCfg).ssGuard}, qcd:qcdFrom(qcdCfg)},
+      tax:{withdrawalOrder:wdOrder.slice(), roth:{apply:rothCfg.apply, target:rothCfg.target, start:rothCfg.start, end:rothCfg.end || 'auto', order:rothCfg.order, irmaa:rothCfg.irmaa, irmaaTier:rothGuards(rothCfg).irmaaTier, ssGuard:rothGuards(rothCfg).ssGuard}, qcd:qcdFrom(qcdCfg)},
       life:(function(){
         var per = function(P){ return {existing:num($('lifeExist' + P).value), relies:$('lifeRelies' + P).checked, years:$('lifeYears' + P).value.trim(),
                                         health:$('lifeHealth' + P).value, tobacco:$('lifeTob' + P).checked, group:$('lifeGroup' + P).checked}; };
@@ -9272,6 +9299,9 @@
       if(h.inflation != null) $('inflation').value = pctFmt2(h.inflation);
       if(h.endAge != null) $('endAge').value = String(Math.round(h.endAge));
       if(h.growthW != null) $('growthW').value = (h.growthW * 100).toFixed(1) + '%';
+      var p1 = function(v){ return v == null ? '' : (v * 100).toFixed(1) + '%'; };
+      $('wallsStart').value = h.wallsStart || ''; $('growthWPre').value = h.growthWPre != null ? p1(h.growthWPre) : '5.0%';
+      $('yieldWt').value = p1(h.yieldWt); $('growthWtPre').value = p1(h.growthWtPre); $('growthWt').value = p1(h.growthWt);
       $('foundGLI').value = h.foundGLI === false ? 'no' : 'yes';
       if(h.growthR != null) $('growthR').value = (h.growthR * 100).toFixed(1) + '%';
       if(h.medB != null) $('medB').value = Number(h.medB).toFixed(2);
@@ -9369,11 +9399,11 @@
       (Array.isArray(d.risk.selected) ? d.risk.selected : []).forEach(function(k){ risk.selected[k] = true; });
       (Array.isArray(d.risk.custom) ? d.risk.custom : []).forEach(function(c){ risk.custom.push({on:c.on !== false, text:String(c.text || '')}); });
     }
-    rothCfg = {apply:true, target:'auto', start:'auto', order:'roof', irmaa:true, irmaaTier:1, ssGuard:'none'};
+    rothCfg = {apply:true, target:'auto', start:'auto', end:'auto', order:'roof', irmaa:true, irmaaTier:1, ssGuard:'none'};
     if(d.tax && d.tax.roth){
       var RC = d.tax.roth;
       rothCfg = {apply:RC.apply !== false, target:(RC.target === 'auto' || RC.target == null) ? 'auto' : Number(RC.target),
-                 start:(RC.start === 'auto' || RC.start == null) ? 'auto' : Number(RC.start), order:RC.order === 'walls' ? 'walls' : 'roof', irmaa:rothGuards(RC).irmaaTier > 0, irmaaTier:rothGuards(RC).irmaaTier, ssGuard:rothGuards(RC).ssGuard};
+                 start:(RC.start === 'auto' || RC.start == null) ? 'auto' : Number(RC.start), end:(RC.end === 'auto' || RC.end == null) ? 'auto' : Number(RC.end), order:RC.order === 'walls' ? 'walls' : 'roof', irmaa:rothGuards(RC).irmaaTier > 0, irmaaTier:rothGuards(RC).irmaaTier, ssGuard:rothGuards(RC).ssGuard};
     }
     qcdCfg = (d.tax && d.tax.qcd) ? qcdFrom(d.tax.qcd) : qcdDefault();
     resetLifeInputs();
@@ -10313,7 +10343,7 @@
         return {bal:bb, wd:wd0, unfunded:unf, tx:tx0, cv:cv, spare:spare0};
       };
       var base = runYear(0), res = base, cvInfo = null;
-      if(conv && calYear >= conv.startYear && (rmdStartYear == null || calYear < rmdStartYear) && !ended(t)){
+      if(conv && calYear >= conv.startYear && (conv.endYear == null || calYear <= conv.endYear) && (rmdStartYear == null || calYear < rmdStartYear) && !ended(t)){
         var avail = ['client','spouse'].reduce(function(a, o){ return a + snap.deferred[o].w + snap.deferred[o].r; }, 0);
         var top = null; TAX_2026[status].brackets.forEach(function(b){ if(b[0] === conv.targetRate) top = b[1]; });
         if(top == null) top = Infinity;
@@ -10406,7 +10436,7 @@
      MAGI over the first IRMAA threshold (which would raise Medicare premiums
      two years later). The projection is run with and without the strategy.
      ============================================================ */
-  var rothCfg = {apply:true, target:'auto', start:'auto', order:'roof', irmaa:true, irmaaTier:1, ssGuard:'none'};
+  var rothCfg = {apply:true, target:'auto', start:'auto', end:'auto', order:'roof', irmaa:true, irmaaTier:1, ssGuard:'none'};
   var qcdCfg = {apply:true, client:'', spouse:'', startAge:71, mode:'budget'};
   function qcdDefault(){ return {apply:true, client:'', spouse:'', startAge:71, mode:'budget'}; }
   function qcdFrom(Q){ Q = Q || {}; return {apply:Q.apply !== false, client:Q.client == null ? '' : String(Q.client), spouse:Q.spouse == null ? '' : String(Q.spouse), startAge:Q.startAge ? Number(Q.startAge) : 71, mode:Q.mode === 'extra' ? 'extra' : 'budget'}; }
@@ -10416,8 +10446,9 @@
     var autoRate = rowRet.marginal || 0.12;
     var target = rothCfg.target === 'auto' ? autoRate : rothCfg.target;
     var startYear = rothCfg.start === 'auto' ? baseRun.year0 : rothCfg.start;
+    var endYear = (rothCfg.end == null || rothCfg.end === 'auto') ? null : rothCfg.end;   // the last year to convert; auto: until RMDs begin
     var GD = rothGuards(rothCfg);
-    return {apply:rothCfg.apply, targetRate:target, autoRate:autoRate, startYear:startYear, order:rothCfg.order, irmaa:GD.irmaaTier > 0, irmaaTier:GD.irmaaTier, ssGuard:GD.ssGuard};
+    return {apply:rothCfg.apply, targetRate:target, autoRate:autoRate, startYear:startYear, endYear:endYear, order:rothCfg.order, irmaa:GD.irmaaTier > 0, irmaaTier:GD.irmaaTier, ssGuard:GD.ssGuard};
   }
   function renderRoth(base, plan, cfg){
     var rows = (plan || base).rows, i = base.rows ? null : null;
@@ -10439,7 +10470,11 @@
       parts.push(GD.ssGuard !== 'none' ? 'Social Security: provisional income (AGI before benefits + tax-exempt interest + half the benefits) kept under ' + money(GD.ssGuard === 'base' ? Tq.ssBase : Tq.ssTop) + ', so no more than ' + (GD.ssGuard === 'base' ? '0%' : '50%') + ' of benefits is taxable in a conversion year. These thresholds are not indexed, so most retired households already sit above them \u2014 the tool then converts nothing and says so.' : 'Social Security: not limited \u2014 conversions may push more of the benefits into taxable income.');
       $('rothGuardNote').textContent = parts.join(' ');
     })();
-    $('rothEnd').value = base.rmdStartYear != null ? endYear + ' (RMDs begin ' + base.rmdStartYear + ')' : 'end of plan (no RMDs)';
+    var esel = $('rothEnd'), fromY = cfg.startYear || base.year0;
+    esel.innerHTML = '<option value="auto">Auto \u2014 ' + (base.rmdStartYear != null ? endYear + ' (RMDs begin ' + base.rmdStartYear + ')' : 'end of plan (no RMDs)') + '</option>'
+      + base.rows.filter(function(x){ return x.year >= fromY && x.year <= endYear; }).map(function(x){ return '<option value="' + x.year + '">' + x.year + ' \u00b7 age ' + x.ages.join(' / ') + '</option>'; }).join('');
+    if(rothCfg.end !== 'auto' && rothCfg.end != null && !esel.querySelector('option[value="' + rothCfg.end + '"]')) esel.insertAdjacentHTML('beforeend', '<option value="' + rothCfg.end + '">' + rothCfg.end + ' (outside the conversion years)</option>');
+    esel.value = (rothCfg.end == null || rothCfg.end === 'auto') ? 'auto' : String(rothCfg.end);
 
     var P = plan || base;
     var convRows = P.rows.filter(function(x){ return x.conv; });
@@ -10503,9 +10538,9 @@
     /* note + table */
     var firstC = convRows.filter(function(x){ return x.conv.amt > 0.5; })[0];
     var byIrmaa = convRows.filter(function(x){ return x.conv.limitedBy === 'IRMAA'; }).length, byBr = convRows.filter(function(x){ return x.conv.limitedBy === 'bracket'; }).length;
-    $('rothNote').innerHTML = !plan ? 'The strategy is switched off. Tick <b>Apply</b> to convert qualified money in the Walls and Roof up to the top of the ' + Math.round(cfg.targetRate * 100) + '% bracket each year from ' + cfg.startYear + (base.rmdStartYear != null ? ' until RMDs begin in ' + base.rmdStartYear : '') + '.'
+    $('rothNote').innerHTML = !plan ? 'The strategy is switched off. Tick <b>Apply</b> to convert qualified money in the Walls and Roof up to the top of the ' + Math.round(cfg.targetRate * 100) + '% bracket each year from ' + cfg.startYear + (cfg.endYear != null ? ' through ' + cfg.endYear : base.rmdStartYear != null ? ' until RMDs begin in ' + base.rmdStartYear : '') + '.'
       : (converted > 0.5
-        ? 'Converting <b>' + money(converted) + '</b> over ' + convRows.filter(function(x){ return x.conv.amt > 0.5; }).length + ' years' + (firstC ? ', starting ' + firstC.year : '') + ', filling the <b>' + Math.round(cfg.targetRate * 100) + '%</b> bracket' + (cfg.irmaa ? ' and staying under ' + (cfg.irmaaTier > 1 ? 'the ' + ['', '1st', '2nd', '3rd', '4th', '5th'][cfg.irmaaTier] + ' IRMAA threshold' : 'the first IRMAA threshold') + ' once Medicare is two years away' : '') + (cfg.ssGuard && cfg.ssGuard !== 'none' ? ' and under the ' + (cfg.ssGuard === 'base' ? '50%' : '85%') + ' Social Security threshold' : '') + '. '
+        ? 'Converting <b>' + money(converted) + '</b> over ' + convRows.filter(function(x){ return x.conv.amt > 0.5; }).length + ' years' + (firstC ? ', starting ' + firstC.year : '') + (cfg.endYear != null ? ' and stopping after ' + cfg.endYear : '') + ', filling the <b>' + Math.round(cfg.targetRate * 100) + '%</b> bracket' + (cfg.irmaa ? ' and staying under ' + (cfg.irmaaTier > 1 ? 'the ' + ['', '1st', '2nd', '3rd', '4th', '5th'][cfg.irmaaTier] + ' IRMAA threshold' : 'the first IRMAA threshold') + ' once Medicare is two years away' : '') + (cfg.ssGuard && cfg.ssGuard !== 'none' ? ' and under the ' + (cfg.ssGuard === 'base' ? '50%' : '85%') + ' Social Security threshold' : '') + '. '
           + (byBr ? byBr + (byBr === 1 ? ' year is' : ' years are') + ' limited by the bracket' : '') + (byBr && byIrmaa ? ', ' : '') + (byIrmaa ? byIrmaa + (byIrmaa === 1 ? ' year is' : ' years are') + ' limited by IRMAA' : '') + ((byBr || byIrmaa) ? '. ' : '')
           + 'The conversions cost <b>' + money(cTax) + '</b> in tax now and ' + (saved >= 0 ? 'save <b>' + money(saved) + '</b>' : 'add <b>' + money(-saved) + '</b>') + ' of lifetime tax by shrinking later RMDs; the Roth balance at the end of plan is <b>' + money(lastP.balances.roth) + '</b> against <b>' + money(lastB.balances.roth) + '</b> without converting.'
         : 'Nothing converts: ' + (convRows.length ? convRows[0].conv.limitedBy : 'no qualified money in the Walls or Roof, or the window has closed') + '. Raise the target bracket or move the start year to open room.');
@@ -11856,10 +11891,39 @@
               wd:x.withdrawn, after:after, unfunded:x.unfunded, bal:x.layers.total, other:other, debt:debt, nw:x.layers.total + other - debt};
     });
   }
+  /* section 07: net worth over time — accounts (the plan's projection) + other assets − debts, a year at a time */
+  function renderNetWorth(rows){
+    var svg = $('nwSvg'); if(!svg) return;
+    if(!rows || !rows.length){ svg.innerHTML = ''; $('nwLegend').innerHTML = ''; $('nwNote').textContent = 'Add the client\u2019s accounts in section 06 and net worth over time appears here.'; return; }
+    var W = 1000, H = 320, L = 78, R = 16, T = 14, B = 34, pw = W - L - R, ph = H - T - B;
+    var hi = Math.max.apply(null, rows.map(function(x){ return x.bal + x.other; }).concat([1])), lo = Math.min.apply(null, rows.map(function(x){ return Math.min(-x.debt, x.nw); }).concat([0]));
+    var span = hi - lo || 1, Y = function(v){ return T + (hi - v) / span * ph; }, n = rows.length, bw = pw / n, gap = Math.min(3, bw * 0.2);
+    var tick = Math.pow(10, Math.floor(Math.log(span / 4) / Math.LN10)); [1, 2, 2.5, 5, 10].some(function(m){ if(span / (tick * m) <= 6){ tick *= m; return true; } return false; });
+    var out = '';
+    for(var v = Math.ceil(lo / tick) * tick; v <= hi + 1e-6; v += tick) out += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="var(--line)" stroke-width="' + (Math.abs(v) < 1e-6 ? 1.5 : 1) + '"/><text x="' + (L - 8) + '" y="' + (Y(v) + 4) + '" text-anchor="end" font-size="12" fill="var(--muted)">' + (v < -0.5 ? '\u2212' + fmtKM(-v) : fmtKM(Math.abs(v))) + '</text>';
+    rows.forEach(function(x, k){
+      var x0 = L + k * bw + gap / 2, w = Math.max(1, bw - gap), tip = x.year + ' \u00b7 net worth ' + money(x.nw) + ' = accounts ' + money(x.bal) + (x.other > 0.5 ? ' + other assets ' + money(x.other) : '') + (x.debt > 0.5 ? ' \u2212 debts ' + money(x.debt) : '');
+      out += '<g><title>' + esc(tip) + '</title>'
+        + '<rect x="' + x0 + '" y="' + Y(x.bal) + '" width="' + w + '" height="' + Math.max(0, Y(0) - Y(x.bal)) + '" fill="#4F6FBF"/>'
+        + (x.other > 0.5 ? '<rect x="' + x0 + '" y="' + Y(x.bal + x.other) + '" width="' + w + '" height="' + Math.max(0, Y(x.bal) - Y(x.bal + x.other)) + '" fill="var(--accent)"/>' : '')
+        + (x.debt > 0.5 ? '<rect x="' + x0 + '" y="' + Y(0) + '" width="' + w + '" height="' + Math.max(0, Y(-x.debt) - Y(0)) + '" fill="var(--st-alert)" opacity=".8"/>' : '') + '</g>';
+      if(k % Math.max(1, Math.ceil(n / 12)) === 0 || k === n - 1) out += '<text x="' + (x0 + w / 2) + '" y="' + (H - 12) + '" text-anchor="middle" font-size="12" fill="var(--muted)">' + x.year + '</text>';
+    });
+    out += '<polyline fill="none" stroke="var(--ink)" stroke-width="2.5" points="' + rows.map(function(x, k){ return (L + k * bw + bw / 2).toFixed(1) + ',' + Y(x.nw).toFixed(1); }).join(' ') + '"/>';
+    svg.innerHTML = out;
+    var anyO = rows.some(function(x){ return x.other > 0.5; }), anyD = rows.some(function(x){ return x.debt > 0.5; }), first = rows[0], last = rows[rows.length - 1];
+    $('nwLegend').innerHTML = '<span class="pj-key"><i class="sw" style="background:#4F6FBF"></i>Accounts</span>' + (anyO ? '<span class="pj-key"><i class="sw" style="background:var(--accent)"></i>Other assets</span>' : '')
+      + (anyD ? '<span class="pj-key"><i class="sw" style="background:var(--st-alert)"></i>Debts (subtracted)</span>' : '') + '<span class="pj-key"><i class="sw" style="background:var(--ink);height:3px"></i>Net worth</span>';
+    var paid = rows.find(function(x){ return x.debt <= 0.5; });
+    $('nwNote').innerHTML = 'Net worth at the end of each year goes from <b>' + money(first.nw) + '</b> in ' + first.year + ' to <b>' + money(last.nw) + '</b> in ' + last.year + ' (today, above: the accounts as they stand).'
+      + (anyD ? ' Debts of ' + money(first.debt) + ' are subtracted every year as they amortize' + (paid && paid !== first ? ', paid off by ' + paid.year : '') + '.' : ' No debts are listed above.')
+      + ' Accounts follow the scenario on view, the same projection as sections 17 and 18.';
+  }
   function renderCashFlow(r, X0){
     var tbl = $('cfTable'); if(!tbl) return;
-    if(!accounts.length || !X0 || !X0.rows || !X0.rows.length){ tbl.innerHTML = ''; $('cfTiles').innerHTML = ''; $('cfNote').textContent = ''; return; }
+    if(!accounts.length || !X0 || !X0.rows || !X0.rows.length){ tbl.innerHTML = ''; $('cfTiles').innerHTML = ''; $('cfNote').textContent = ''; renderNetWorth(null); return; }
     var rows = cashFlowRows(r, X0), last = rows[rows.length - 1], i = r.inputs;
+    renderNetWorth(rows);
     var sm = function(v){ return v < -0.5 ? '\u2212' + money(-v) : money(Math.abs(v) < 0.5 ? 0 : v); };
     var cell = function(v, cls){ return '<td class="num' + (cls ? ' ' + cls : '') + '">' + (Math.abs(v) > 0.5 ? sm(v) : '\u2014') + '</td>'; };
     var SRC = [['emp', 'Employment'], ['ss', 'Social Security'], ['pen', 'Pensions'], ['ann', 'Annuity income'], ['walls', 'Walls yield'], ['ng', 'Other income'], ['rmd', 'RMDs above the plan\u2019s draw']];
@@ -12072,7 +12136,7 @@
     var body = $('wallsSBody'); if(!body) return;
     var lines = wallsLines(r), A = incomeAdj(r), pc1 = function(v){ return (v * 100).toFixed(1) + '%'; };
     var perOf = function(x){ var L = WALLS_SCHED[x.key]; return (L && L.length) ? L : [{}]; };
-    var sig = lines.map(function(x){ return x.key + '#' + perOf(x).length; }).join(';');
+    var sig = 'scn' + activeScn + ':' + lines.map(function(x){ return x.key + '#' + perOf(x).length; }).join(';');
     if(sig !== wallsSchedSig){
       wallsSchedSig = sig;
       var pctIn_ = function(f, title){ return '<td class="num"><input class="num" inputmode="decimal" data-wk="' + f + '" autocomplete="off" title="' + title + '"></td>'; };
@@ -12096,7 +12160,7 @@
         tr.querySelectorAll('[data-wk]').forEach(function(el){ el.value = P[el.getAttribute('data-wk')] || ''; });
       });
     }
-    var wStartTxt = INC_ADJ.wStart ? longDate(INC_ADJ.wStart + '-01').replace(/ \d+,/, '') : 'the first retirement', notes = [];
+    var wStartTxt = wallsStartYm() ? longDate(wallsStartYm() + '-01').replace(/ \d+,/, '') : 'the first retirement', notes = [];
     var P = lines.length ? projectIncome(r) : null, on = !!(P && P.ws), first = null;
     lines.forEach(function(x){
       var W = wallsPeriods(x, A, P.wStart), dY = x.tf ? A.yWt : A.yW, dPre = x.tf ? A.gPreT : A.gPre, dPost = x.tf ? A.gPostT : A.gPost;
@@ -14392,7 +14456,7 @@
       : '';
     var nw = r.total + T.val - D.bal;
     $('nwReadout').innerHTML = '<span class="gap-label">Net worth</span><b>' + money(nw) + '</b>'
-      + '<span class="gap-math">Accounts above ' + money(r.total) + (T.val > 0.5 ? ' + other assets ' + money(T.val) : '') + (D.bal > 0.5 ? ' − debts ' + money(D.bal) + ' (section 07)' : '')
+      + '<span class="gap-math">Accounts (section 06) ' + money(r.total) + (T.val > 0.5 ? ' + other assets ' + money(T.val) : '') + (D.bal > 0.5 ? ' − debts ' + money(D.bal) + ' (section 07)' : '')
       + '. The Fortress levels and every projection are sized from the accounts only; other assets are carried for the balance sheet and print in the worksheet.</span>';
   }
   /* ---- Annuities (section 06): one row per account in an annuity position, with the contract
@@ -14672,7 +14736,7 @@
   }
   function scnDefault(){
     return {adjMoves:null, INC_ADJ:{yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:'', yWt:'', gPreT:'', gPostT:'', ssC:'', ssS:''}, ANN_INC:{}, LTC_BEN:{}, ROOF_G:{}, WALLS_SCHED:{},
-            wdOrder:WD_DEFAULT.slice(), rothCfg:{apply:true, target:'auto', start:'auto', order:'roof', irmaa:true, irmaaTier:1, ssGuard:'none'}, qcdCfg:qcdDefault()};
+            wdOrder:WD_DEFAULT.slice(), rothCfg:{apply:true, target:'auto', start:'auto', end:'auto', order:'roof', irmaa:true, irmaaTier:1, ssGuard:'none'}, qcdCfg:qcdDefault()};
   }
   function scnClone(v){ return v == null ? v : JSON.parse(JSON.stringify(v)); }
   /* the working variables, parked */
@@ -14686,7 +14750,7 @@
     adjMoves = S.adjMoves ? S.adjMoves.map(scnClone).filter(function(m){ return !!acctById(m.acctId); }) : null;
     if(adjMoves && !adjMoves.length) adjMoves = null;
     INC_ADJ = scnClone(S.INC_ADJ) || scnDefault().INC_ADJ;
-    ANN_INC = scnClone(S.ANN_INC) || {}; LTC_BEN = scnClone(S.LTC_BEN) || {}; ROOF_G = scnClone(S.ROOF_G) || {}; WALLS_SCHED = scnClone(S.WALLS_SCHED) || {}; wallsSchedSig = '';
+    ANN_INC = scnClone(S.ANN_INC) || {}; LTC_BEN = scnClone(S.LTC_BEN) || {}; ROOF_G = scnClone(S.ROOF_G) || {}; WALLS_SCHED = scnClone(S.WALLS_SCHED) || {};
     wdOrder = (S.wdOrder || WD_DEFAULT).slice(); rothCfg = scnClone(S.rothCfg) || scnDefault().rothCfg; qcdCfg = S.qcdCfg ? qcdFrom(S.qcdCfg) : qcdDefault();
   }
   /* …and the page's controls with it */
@@ -14902,7 +14966,7 @@
     if(d.roth && typeof d.roth === 'object'){
       var RC = d.roth;
       S.rothCfg = {apply:RC.apply !== false, target:(RC.target === 'auto' || RC.target == null) ? 'auto' : Number(RC.target),
-                   start:(RC.start === 'auto' || RC.start == null) ? 'auto' : Number(RC.start), order:RC.order === 'walls' ? 'walls' : 'roof', irmaa:rothGuards(RC).irmaaTier > 0, irmaaTier:rothGuards(RC).irmaaTier, ssGuard:rothGuards(RC).ssGuard};
+                   start:(RC.start === 'auto' || RC.start == null) ? 'auto' : Number(RC.start), end:(RC.end === 'auto' || RC.end == null) ? 'auto' : Number(RC.end), order:RC.order === 'walls' ? 'walls' : 'roof', irmaa:rothGuards(RC).irmaaTier > 0, irmaaTier:rothGuards(RC).irmaaTier, ssGuard:rothGuards(RC).ssGuard};
     }
     if(d.qcd && typeof d.qcd === 'object') S.qcdCfg = qcdFrom(d.qcd);
     return S;
@@ -14960,7 +15024,21 @@
     renderAdjust(r);
     renderBudgetTotals();
     renderScenarioBar();
+    markGraphicHeads();
     $('caseJson').value = caseData();
+  }
+  /* Headers over an output graphic are gold: a section that holds a chart, the fortress graphic, the asset donuts or
+     the asset map; a subsection title (and its body) or a panel title (and its panel) holding one. */
+  var GRAPHIC_SEL = '.pj-wrap, svg.pj, .fort, .pies, .asset-map';
+  function markGraphicHeads(){
+    document.querySelectorAll('section').forEach(function(sec){ var h = sec.querySelector('.sec-head'); if(h) h.classList.toggle('gold', !!sec.querySelector(GRAPHIC_SEL)); });
+    document.querySelectorAll('.inc-title').forEach(function(t){
+      var has = false, n = t.nextElementSibling;
+      if(n && n.classList.contains('tgl-body')) has = !!n.querySelector(GRAPHIC_SEL);
+      else for(; n && !n.classList.contains('inc-title'); n = n.nextElementSibling){ if(n.matches(GRAPHIC_SEL) || n.querySelector(GRAPHIC_SEL)){ has = true; break; } }
+      t.classList.toggle('gold', has);
+    });
+    document.querySelectorAll('.bkt-head').forEach(function(h){ var pn = h.closest('.panel'); h.classList.toggle('gold', !!(pn && pn.querySelector(GRAPHIC_SEL))); });
   }
 
   /* One run, used by the page and by both downloads. */
@@ -15649,6 +15727,7 @@
   });
   $('rothTarget').addEventListener('change', function(){ var v = $('rothTarget').value; rothCfg.target = v === 'auto' ? 'auto' : Number(v); render(); });
   $('rothStart').addEventListener('change', function(){ var v = $('rothStart').value; rothCfg.start = v === 'auto' ? 'auto' : Number(v); render(); });
+  $('rothEnd').addEventListener('change', function(){ var v = $('rothEnd').value; rothCfg.end = v === 'auto' ? 'auto' : Number(v); render(); });
   $('rothOrder').addEventListener('change', function(){ rothCfg.order = $('rothOrder').value; render(); });
   $('rothApply').addEventListener('change', function(){ rothCfg.apply = $('rothApply').checked; render(); });
   $('rothIrmaa').addEventListener('change', function(){ rothCfg.irmaaTier = +$('rothIrmaa').value; rothCfg.irmaa = rothCfg.irmaaTier > 0; render(); });
@@ -15826,6 +15905,11 @@
     ['adjYW','adjGPre','adjGPost','adjWStart','adjYWt','adjGPreT','adjGPostT','adjSsC','adjSsS'].forEach(function(id){ $(id).value = ''; });
   }
   $('adjIncReset').addEventListener('click', function(){ resetIncomeAdj(); render(); });
+  $('adjWLegacyClear').addEventListener('click', function(){   // the old section 14 Walls overrides: back to section 03 and the table
+    ['yW','wStart','gPre','gPost','yWt','gPreT','gPostT'].forEach(function(k){ INC_ADJ[k] = ''; });
+    ['adjYW','adjWStart','adjGPre','adjGPost','adjYWt','adjGPreT','adjGPostT'].forEach(function(id){ $(id).value = ''; });
+    render();
+  });
 
   ['advisor','advisorCell','advisorEmail'].forEach(function(id){
     $(id).addEventListener('input', render);
@@ -15842,7 +15926,8 @@
     var parts = [(i.advisor || '').trim(), fmtPhone(i.advisorCell), (i.advisorEmail || '').trim()].filter(Boolean);
     return parts.join(sep || ' \u00b7 ');
   }
-  ['growthW','growthR'].forEach(function(id){
+  $('wallsStart').addEventListener('input', render);
+  ['growthW','growthR','growthWPre','yieldWt','growthWtPre','growthWt'].forEach(function(id){
     $(id).addEventListener('input', render);
     $(id).addEventListener('blur', function(){ var el = $(id); el.value = el.value.trim() === '' ? '' : (pctIn(el.value) * 100).toFixed(1) + '%'; });
   });
@@ -15972,6 +16057,7 @@
     $('yieldW').value = '6.0%';
     $('inflation').value = '3.26%';
     $('growthW').value = '1.5%'; $('growthR').value = '6.0%';
+    $('wallsStart').value = ''; $('growthWPre').value = '5.0%'; $('yieldWt').value = ''; $('growthWtPre').value = ''; $('growthWt').value = '';
     $('medB').value = '202.90'; $('medD').value = '38.99';
     $('endAge').value = '100';
     $('clientAge').value = '';
@@ -15980,7 +16066,7 @@
     $('clientSex').value = 'male';
     $('spouseSex').value = 'female';
     ltcTouched.ltcClient = false; ltcTouched.ltcSpouse = false; $('ltcSelf').value = '0%';
-    resetLtcInputs(); resetLifeInputs(); wdOrder = WD_DEFAULT.slice(); rothCfg = {apply:true, target:'auto', start:'auto', order:'roof', irmaa:true, irmaaTier:1, ssGuard:'none'}; qcdCfg = qcdDefault();
+    resetLtcInputs(); resetLifeInputs(); wdOrder = WD_DEFAULT.slice(); rothCfg = {apply:true, target:'auto', start:'auto', end:'auto', order:'roof', irmaa:true, irmaaTier:1, ssGuard:'none'}; qcdCfg = qcdDefault();
     risk = {score:'', tol:'', selected:{}, custom:[]}; $('riskScore').value = ''; $('riskTol').value = ''; $('riskTol').classList.remove('auto'); rq = {a:{}, amt:''};
     nitro = null; $('nitroText').value = ''; $('nitroMsg').textContent = '';
     portfolio = null; $('pfText').value = ''; $('pfMsg').textContent = ''; renderPortfolio();
@@ -17393,7 +17479,7 @@
       var inc = [[wsOn ? 'Walls distributions' : 'Walls yield at ' + pc1(A.yW), money(r0.wallsYield)], ['Non-guaranteed income', money(r0.ng)], {cls:'tot', cells:['Walls income', money(r0.walls)]}, ['Wants in ' + r0.year, money(r0.wants)], {cls:'tot', cells:[{t:r0.walls >= r0.wants ? 'Surplus over Wants' : 'Wants not covered by the Walls', color:r0.walls >= r0.wants ? DECK_C.M : DECK_C.red}, {t:money(Math.abs(r0.walls - r0.wants)), color:r0.walls >= r0.wants ? DECK_C.M : DECK_C.red}]}];
       dkHtmlTable(s, 11.9, 2.35, 7.2, 2.9, [{t:'Source'}, {t:'A year', align:'r'}], inc);
       dkTile(s, 11.9, 5.5, 7.2, 1.9, 'Wants covered by the Walls', wCover + '%', money(r0.walls) + ' against Wants of ' + money(r0.wants) + ' in ' + r0.year, {valueColor:DECK_C.W});
-      dkBody(s, 11.9, 7.6, 7.2, 2.3, (wallsSchedOn(r) ? 'Each Walls account pays on its own dates: until it starts the balance grows, while it pays the yield above the payout is reinvested. The Walls are spent down last, after the Roof.' : 'Walls income starts ' + (A.wStart != null ? mon(INC_ADJ.wStart) : 'at the first retirement') + '. The balance grows at ' + pc1(A.gPre) + ' until then and ' + pc1(A.gPost) + ' after; the Walls are spent down last, after the Roof.'), {sz:16});
+      dkBody(s, 11.9, 7.6, 7.2, 2.3, (wallsSchedOn(r) ? 'Each Walls account pays on its own dates: until it starts the balance grows, while it pays the yield above the payout is reinvested. The Walls are spent down last, after the Roof.' : 'Walls income starts ' + (A.wStart != null ? mon(wallsStartYm()) : 'at the first retirement') + '. The balance grows at ' + pc1(A.gPre) + ' until then and ' + pc1(A.gPost) + ' after; the Walls are spent down last, after the Roof.'), {sz:16});
     })();
 
     /* 18. what's in the Roof */

@@ -587,6 +587,16 @@
           drive the projection chart there &mdash; Walls income rising with the Walls, and the Roof
           balance column.</dd>
 
+        <dt>Walls income start, growth before income starts, and the tax-free line</dt>
+        <dd><span class="ui">Walls income starts</span> is the month the Walls begin paying (blank: the first
+          retirement). <span class="ui">Walls growth before income starts</span> (5.0% by default) is the Walls
+          growth until then; the Walls growth rate above applies once they pay. The tax-free line applies to
+          Walls money in AUM - Tax Free (municipal bonds), whose yield is federally tax-free:
+          <span class="ui">Tax-free Walls yield</span>, <span class="ui">Tax-free growth before income
+          starts</span> and <span class="ui">after</span>, each following the Walls figure while blank. These
+          are plan assumptions for every scenario; the Walls income by account table in section&nbsp;14
+          overrides them account by account.</dd>
+
         <dt><span class="ui">Inflation</span></dt>
         <dd>What Needs and Wants grow at in the projection. Defaults to 3.0%. The tax projection in
           section&nbsp;17 indexes the brackets and deductions at the same rate.</dd>
@@ -885,8 +895,8 @@
           residence, vacation home, rental property, land, a business interest, vehicles or other
           real assets &mdash; each with a value and an assumed appreciation rate. They do not enter
           the levels or the projections (nothing in them is invested), but they complete the balance
-          sheet: the <b>Net worth</b> readout is the accounts plus these, less the debts in
-          section&nbsp;07, and both print in the worksheet. Rent from a rental property belongs in
+          sheet: the <b>Net worth</b> readout, in section&nbsp;07 under the debts, is the accounts plus
+          these, less the debts, and both print in the worksheet. Rent from a rental property belongs in
           Non-guaranteed income in section&nbsp;04, and the mortgage on a home in section&nbsp;07.</dd>
 
         <dt>Projected assets before the Fortress</dt>
@@ -952,6 +962,13 @@
           <em>not</em> added to the expense budget in section&nbsp;05 &mdash; the budget is your own
           worksheet, so enter them there if it should carry them. Debts travel with the case and
           print in the worksheet under <em>Debts</em>.</p>
+      <p>Beneath the debts, the <b>Net worth</b> readout totals the balance sheet today: the accounts in
+        section&nbsp;06, plus the other assets, less every debt above. The <b>Net worth over time</b>
+        chart follows it a year at a time to the end of plan: the accounts as the plan projects them
+        for the scenario on view (the same run as sections&nbsp;17 and 18), the other assets at their
+        growth rates, and the debts, shown below the line, as their payments amortize them; the line
+        is net worth at the end of each year, and the note gives the first and last years and when the
+        debts are paid off.</p>
       </div>
     </div>
   </section>
@@ -1334,19 +1351,15 @@
           scenario showing claims at a different age. Section&nbsp;04 keeps the base assumption and
           the claiming optimizer still writes there. Baseline always claims at the section&nbsp;04 ages.</dd>
         <dt>Walls income assumptions</dt>
-        <dd>Four fields for the Walls as adjusted: the <span class="ui">Walls yield</span>, when
-          <span class="ui">Walls income starts</span>, and the Walls growth rate <span class="ui">before
-          income starts</span> and <span class="ui">after</span>. Every field is blank by default
-          and then follows section&nbsp;03 and the first retirement date &mdash; the plan figure is
-          shown under each label. Type a value and the projections in sections&nbsp;15, 17 and 17,
-          the worksheet and the Retirement Fortress Plan report follow it; the sizing in section&nbsp;13
-          keeps the plan assumptions, so a lower yield here shows up as a Needs or Wants shortfall
-          in the projections rather than a bigger target. A line beneath states the result in words,
-          <span class="ui">Follow the plan assumptions</span> clears the annuity table and these
-          four fields, and everything saves with the case. Every date in the projections &mdash;
-          these, the retirement dates and each benefit's start and end &mdash; lands in the calendar
-          year it names: a July 2030 start pays half a year in the 2030 row and the full amount
-          from 2031.</dd>
+        <dd>The Walls yield, when Walls income starts, the growth before and after, and the tax-free line
+          for AUM - Tax Free money are Plan Assumptions in section&nbsp;03, shared by every scenario. This
+          subsection holds only the <b>Walls income by account</b> table below, which overrides them
+          account by account for the scenario on view, its blank cells following section&nbsp;03. A case
+          saved by an earlier version may carry Walls overrides that were made here; they show in this
+          subsection with a note, still apply to their scenario, and <span class="ui">Clear them</span>
+          returns that scenario to section&nbsp;03 and the table. Every date in the projections lands in
+          the calendar year it names: a July 2030 start pays half a year in the 2030 row and the full
+          amount from 2031.</dd>
         <dt>Walls income by account</dt>
         <dd>A table under the two lines above with one row for every Walls line in the transfer list
           &mdash; the account, its destination and product, and the amount &mdash; so each account's Walls
@@ -1359,11 +1372,11 @@
           above the total yield is paid from the balance, which then falls. <span class="ui">+ Add restart</span>
           adds a line beneath for a later period when the account pays again: it needs a start on or after the
           stop above it, and the balance grows at the rate after stop in between. Every cell is blank by default
-          and follows the line above for its kind of account (the taxable line, or the tax-free line for an AUM -
-          Tax Free product): the start follows <span class="ui">Walls income starts</span>, the distribution the
+          and follows the section&nbsp;03 Walls assumptions for its kind of account (the Walls line, or the
+          tax-free line for an AUM - Tax Free product): the start follows <span class="ui">Walls income starts</span>, the distribution the
           Walls yield, the total yield the yield plus the growth after income starts, and the growth rates the
-          growth before and after. While the whole table is blank the two lines run the Walls as one pool and
-          nothing changes; fill any cell and every Walls account runs on this schedule. The Walls income, its tax
+          growth before and after. While the whole table is blank the section&nbsp;03 assumptions run the Walls as one
+          pool; fill any cell and every Walls account runs on this schedule. The Walls income, its tax
           (by each account's tax type and owner), the asset projections, the stress tests and the scenario cards
           then follow each account. A line beneath gives the first year's Walls income and names any restart left
           out (no start date, no stop above it, or a start before that stop). The table belongs to the scenario
@@ -1474,7 +1487,8 @@
 
         <dt>Roth conversion analysis</dt>
         <dd>Builds a conversion schedule: each year from the <span class="ui">start year</span> until
-          the year before RMDs begin, it converts as much qualified money in the Walls and Roof as
+          the <span class="ui">last year</span> &mdash; on Auto, the year before RMDs begin; pick an earlier
+          year to stop conversions sooner (they still stop when RMDs begin) &mdash; it converts as much qualified money in the Walls and Roof as
           fits under the top of the <span class="ui">target tax bracket</span> &mdash; by default the
           bracket the household sits in during its first full retirement year &mdash; without pushing
           modified AGI over an IRMAA threshold once either person is within two years of Medicare
