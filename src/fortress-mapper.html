@@ -385,7 +385,7 @@
   /* ---------- tables ---------- */
   .tbl-scroll{overflow-x:auto}
   table{border-collapse:collapse;width:100%;min-width:874px}
-  #acctTable{min-width:1180px}
+  #acctTable{min-width:1300px}
   #acctTable td input.pcola{min-width:84px;max-width:96px}
   table.oa td input.pname{min-width:200px}
   table.anx{min-width:1560px}
@@ -1830,6 +1830,16 @@
         shown with a dashed outline as the default; a household with no Cash account banks nothing
         until one is picked (spare RMD money is still reinvested in the after-tax Roof account).</p>
 
+      <p>The <span class="ui">Cost basis</span> column takes what was paid into each taxable account
+        (non-qualified, not an annuity; other accounts show a dash, as their money is taxed on
+        withdrawal). Left blank everywhere, half of each taxable-account withdrawal is taken as
+        long-term gain, as before. Enter a basis on any taxable account and the taxable accounts carry
+        their cost basis together, on average cost: a withdrawal's gain is its share of their value
+        above basis, so the gain share rises as they grow; contributions, banked cash flow and
+        reinvested RMD money add basis dollar for dollar. A taxable account still blank then starts at
+        half its value (a Cash position at all of it, no gain); a basis above the value is treated as
+        no gain. The gains feed the federal tax, the net investment income tax and the state model,
+        and section&nbsp;17's Capital gains column. The basis saves with the case.</p>
       <p>The <span class="ui">Growth</span> column is <b>required</b>: the annual rate each account
         earns where it sits. It is what the projected assets before the Fortress (section&nbsp;15)
         grow the account at, and what anything marked <em>Stay as is</em> keeps earning in the plan;
@@ -1942,7 +1952,7 @@
             <thead>
               <tr>
                 <th>Account</th><th>Owner</th><th>Custodian / carrier</th><th>Tax type</th>
-                <th>Current position</th><th class="num">Value</th><th>Growth<small>Required · annual, as held</small></th><th>Transfer?</th><th></th>
+                <th>Current position</th><th class="num">Value</th><th class="num">Cost basis<small>Taxable accounts</small></th><th>Growth<small>Required · annual, as held</small></th><th>Transfer?</th><th></th>
               </tr>
             </thead>
             <tbody id="acctBody"></tbody>
@@ -3199,7 +3209,7 @@
           &mdash; and their sum. <b>AGI</b> shows what the federal tax counts: the ordinary income (the
           taxable part of wages, pensions, annuities, the Walls yield and IRA money), any income from
           earlier in the first calendar year, a Roth conversion, capital gains (the Walls yield in
-          half of each taxable-account withdrawal) and the taxable Social
+          the gain on taxable-account withdrawals) and the taxable Social
           Security &mdash; and their sum; the Walls yield in taxable accounts is ordinary income.
           <b>Medicare and Social Security tests</b> give MAGI for IRMAA
           (AGI plus tax-exempt interest, which sets Medicare premiums two years later) and provisional
@@ -3234,7 +3244,7 @@
           non-qualified contract half; a Roth contract not at all; a MYGA's interest fully unless the
           contract is Roth. The non-qualified share of the Walls yield is ordinary income (interest),
           unless the Walls yield is marked federally tax-free in section&nbsp;14, and half of each
-          taxable-account withdrawal is a long-term gain. The 3.8% net investment income tax applies to
+          taxable-account withdrawal is a long-term gain (or, with a cost basis entered in section&nbsp;06, its share of the value above basis). The 3.8% net investment income tax applies to
           the lesser of net investment income &mdash; that Walls yield, the taxable part of non-qualified
           annuity income and those gains &mdash; and AGI over $250,000 joint or $200,000 single (not
           indexed); it is part of the federal tax and has its own column when any year owes it. RMDs follow the Uniform Lifetime Table from 73 or 75 by birth
@@ -4036,6 +4046,8 @@
       part: o.part != null ? num(o.part) : 0,          // Transfer part: the amount that enters the plan; the rest stays as held
       /* assumed annual growth; null = the plan rate for the level the money lands in */
       growth: (o.growth == null || o.growth === '') ? null : +o.growth,
+      /* cost basis of a taxable account (section 06); null = not entered: 50% of the value is assumed gain */
+      basis: (o.basis == null || o.basis === '') ? null : num(o.basis),
       /* annuity contract details, kept for the annuity positions (section 06, Annuities) */
       ann: annFrom(o.ann)
     };
@@ -5660,10 +5672,15 @@
     var t = accounts.reduce(function(s,a){ return s+a.val; },0), m = growthMissing().length;
     $('acctTotal').textContent = accounts.length + ' account' + (accounts.length===1?'':'s') + ' · ' + money(t) + ' total' + (m ? ' · growth rate missing on ' + m : '');
   }
+  /* section 06: the cost basis cell — an input on a taxable account (non-qualified, not an annuity), a dash elsewhere */
+  function basisCell(a){
+    if(wdTierOf(a) !== 'taxable') return '<small class="sub" style="margin:0" title="Cost basis applies to taxable accounts: qualified, Roth and annuity money is taxed on withdrawal">\u2014</small>';
+    return '<input class="num" inputmode="numeric" data-k="basis" value="' + (a.basis != null ? fmtN.format(Math.round(a.basis)) : '') + '" placeholder="' + (a.pos === 'Cash' ? 'the value' : '50% gain') + '" title="What was paid in: the gain on a withdrawal is its share of value above basis. Blank: ' + (a.pos === 'Cash' ? 'no gain' : 'half the value is assumed gain') + '.">';
+  }
   function renderAccounts(){
     var body = $('acctBody');
     if(!accounts.length){
-      body.innerHTML = '<tr><td colspan="9"><div class="empty-state">No accounts yet — upload the template below, or add a row by hand.</div></td></tr>';
+      body.innerHTML = '<tr><td colspan="10"><div class="empty-state">No accounts yet — upload the template below, or add a row by hand.</div></td></tr>';
     } else {
       body.innerHTML = accounts.map(function(a){
         return '<tr data-id="'+a.id+'">'
@@ -5673,6 +5690,7 @@
           + '<td><select data-k="tax">'+opts(TAXTYPES,a.tax)+'</select></td>'
           + '<td><select data-k="pos">'+opts(POSITIONS,a.pos)+'</select></td>'
           + '<td class="num"><input class="num" data-k="val" value="'+fmtN.format(a.val)+'"></td>'
+          + '<td class="num" data-basis>' + basisCell(a) + '</td>'
           + '<td><input class="pcola' + (a.growth == null && a.val > 0.5 ? ' missing' : '') + '" inputmode="decimal" data-k="growth" value="'+(a.growth != null ? (a.growth * 100).toFixed(1) + '%' : '')+'" placeholder="required" title="How this account grows where it sits, before the plan and for anything that stays as is. Required: the asset projections wait until every account has one. Money the plan moves grows at its level\u2019s rate from section 03."></td>'
           + '<td><select data-k="move" class="move'+(a.move === 'no' ? ' held' : a.move === 'part' ? ' part' : '')+'">'
           +   '<option value="yes"'+(a.move === 'yes' || !a.move ? ' selected' : '')+'>Transfer</option>'
@@ -8303,7 +8321,7 @@
     });
     xrows.push({cells:['Total', '', money(TX.lifetimeGross), '', '', '', '', '', '', money(TX.lifetime), money(TX.lifetimeState), pc(TX.avgTotalEffective)], bold:true, rule:true});
     table(xcols, xrows, {rowH:12});
-    para('2026 federal law (OBBBA): standard deduction ' + money(TAX_2026[TX.status].std) + (TX.status === 'mfj' ? ' plus $1,650 per spouse 65+' : ' plus $2,050 at 65') + ', the $6,000 senior deduction for 2025-2028, brackets and thresholds indexed at ' + pc(i.inflation || 0) + '; up to 85% of Social Security taxable by the provisional-income formula. Ordinary income: wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs (a 10% penalty on tax-deferred withdrawals before 59\u00bd' + (TX.lifetimePenalty > 0.5 ? ', ' + money(TX.lifetimePenalty) + ' over the plan' : '') + '); the Foundation annuity ' + Math.round(TX.foundTaxShare * 100) + '% taxable, annuity income in force by the account that pays it (Roth tax-free); the non-qualified share of the Walls yield' + (TX.wallsTaxFree > 0.001 ? ' (the tax-free income accounts, ' + Math.round(TX.wallsTaxFree * 100) + '% of the Walls in AUM - Tax Free, federally tax-free)' : '') + ' taxed as ordinary income, half of each taxable-account withdrawal as long-term gains, and the 3.8% net investment income tax over ' + money(NIIT_THRESHOLD[TX.status]) + ' of AGI. Effective rates are tax \u00f7 (all income + Roth conversions). Withdrawals follow the order above and are grossed up for the tax they cause; RMDs use the Uniform Lifetime Table on tax-deferred market balances. Both spouses assumed living to the end of plan; no itemising, credits or IRMAA. State tax follows a planning model of the state\'s 2025 rates, brackets, deductions or exemptions and retirement-income exclusions, Social Security exempt unless the state taxes it, local taxes excluded. A planning estimate, not tax advice.');
+    para('2026 federal law (OBBBA): standard deduction ' + money(TAX_2026[TX.status].std) + (TX.status === 'mfj' ? ' plus $1,650 per spouse 65+' : ' plus $2,050 at 65') + ', the $6,000 senior deduction for 2025-2028, brackets and thresholds indexed at ' + pc(i.inflation || 0) + '; up to 85% of Social Security taxable by the provisional-income formula. Ordinary income: wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs (a 10% penalty on tax-deferred withdrawals before 59\u00bd' + (TX.lifetimePenalty > 0.5 ? ', ' + money(TX.lifetimePenalty) + ' over the plan' : '') + '); the Foundation annuity ' + Math.round(TX.foundTaxShare * 100) + '% taxable, annuity income in force by the account that pays it (Roth tax-free); the non-qualified share of the Walls yield' + (TX.wallsTaxFree > 0.001 ? ' (the tax-free income accounts, ' + Math.round(TX.wallsTaxFree * 100) + '% of the Walls in AUM - Tax Free, federally tax-free)' : '') + ' taxed as ordinary income, ' + (basisOn() ? 'the gain above cost basis on taxable-account withdrawals' : 'half of each taxable-account withdrawal') + ' as long-term gains, and the 3.8% net investment income tax over ' + money(NIIT_THRESHOLD[TX.status]) + ' of AGI. Effective rates are tax \u00f7 (all income + Roth conversions). Withdrawals follow the order above and are grossed up for the tax they cause; RMDs use the Uniform Lifetime Table on tax-deferred market balances. Both spouses assumed living to the end of plan; no itemising, credits or IRMAA. State tax follows a planning model of the state\'s 2025 rates, brackets, deductions or exemptions and retirement-income exclusions, Social Security exempt unless the state taxes it, local taxes excluded. A planning estimate, not tax advice.');
 
     /* ---------- estate plan ---------- */
     var EF = estateFacts();
@@ -9200,6 +9218,7 @@
               minors:dependents.minor.filter(function(d){ return d.name || d.age; })},
       accounts:accounts.map(function(a){
         var o = {name:a.name,owner:a.owner,cust:a.cust,tax:a.tax,pos:a.pos,val:a.val,move:a.move,growth:a.growth};
+        if(a.basis != null) o.basis = a.basis;
         if(a.move === 'part') o.part = a.part;
         if(annAny(a.ann)) o.ann = a.ann;
         return o;
@@ -9859,7 +9878,15 @@
              std:16100, extra65:2050, cg:[49450, 545500], ssBase:25000, ssTop:34000, seniorPhase:75000}
   };
   var SENIOR_BONUS = 6000;            // OBBBA senior deduction, 2025-2028, per person 65+
-  var TAXABLE_GAIN_SHARE = 0.5;       // share of a taxable-account withdrawal assumed to be gain
+  var TAXABLE_GAIN_SHARE = 0.5;       // share of a taxable-account withdrawal assumed to be gain, while no cost basis is entered
+  /* Cost basis (section 06). With a basis entered on any taxable account, the taxable tier carries its basis (average cost):
+     a withdrawal's gain is its share of the tier's unrealized gain, and contributions, banked cash and reinvested RMD money
+     add basis dollar for dollar. A taxable account left blank starts at half its value (all of it for a Cash position). */
+  function basisOn(){ return accounts.some(function(a){ return wdTierOf(a) === 'taxable' && a.basis != null; }); }
+  function basisFrac(a){
+    if(a.basis != null) return a.val > 0.5 ? Math.max(0, Math.min(1, a.basis / a.val)) : 1;
+    return a.pos === 'Cash' ? 1 : 1 - TAXABLE_GAIN_SHARE;
+  }
   var NQ_ANNUITY_TAXABLE = 0.5;       // share of a non-qualified annuity payout assumed taxable
   var EARLY_WD_PENALTY = 0.10;        // the additional federal tax on a tax-deferred withdrawal before 59½
   var ULT = {72:27.4,73:26.5,74:25.5,75:24.6,76:23.7,77:22.9,78:22.0,79:21.1,80:20.2,81:19.4,82:18.5,83:17.7,84:16.8,85:16.0,86:15.2,87:14.4,88:13.7,89:12.9,90:12.2,91:11.5,92:10.8,93:10.1,94:9.5,95:8.9,96:8.4,97:7.8,98:7.3,99:6.8,100:6.4,101:6.0,102:5.6,103:5.2,104:4.9,105:4.6,106:4.3,107:4.1,108:3.9,109:3.7,110:3.5,111:3.4,112:3.3,113:3.1,114:3.0,115:2.9,116:2.8,117:2.7,118:2.5,119:2.3,120:2.0};
@@ -10057,6 +10084,8 @@
       if(tier === 'deferred'){ var o = personOwner(a.owner, i); bal.deferred[o][key] += m.amt; if(m.bucket === 'walls') wallsQ[o] += m.amt; }
       else bal[tier][key] += m.amt;
     });
+    var BASIS = basisOn(), basisT = 0;
+    if(BASIS) (r.moves || []).forEach(function(m){ var a = m.acct; if(wdTierOf(a) === 'taxable' && m.bucket !== 'foundation' && m.bucket !== 'moat') basisT += m.amt * basisFrac(a); });
     /* section 04 contributions and banked cash flow land in their destination account: its tax tier, in the level that holds
        most of the account's money (Walls, Roof, the buffer, or as held); an account entirely in the Foundation or Moat takes them as Roof money */
     var depKey = {};
@@ -10132,7 +10161,7 @@
         ['client','spouse'].forEach(function(o){ bal.deferred[o].w *= 1 + wsG('def:' + o); bal.deferred[o].r *= 1 + gRy; bal.deferred[o].i *= 1 + gIy; });
       }
       if(row.dep && !(endT != null && t >= endT)){   // this year's retirement-plan contributions, into their destination accounts
-        Object.keys(row.dep).forEach(function(id){ var D = depKey[id]; if(!D) return; var amt = row.dep[id]; depositTotal += amt;
+        Object.keys(row.dep).forEach(function(id){ var D = depKey[id]; if(!D) return; var amt = row.dep[id]; depositTotal += amt; if(D.tier === 'taxable') basisT += amt;
           if(D.tier === 'deferred') bal.deferred[D.owner][D.key] += amt; else bal[D.tier][D.key] += amt; });
       }
       var g = Math.pow(1 + infl, t), calYear = row.year;
@@ -10237,6 +10266,7 @@
       var freedCash = (QC && QC.mode === 'qcd' && QC.inBudget) ? qcd : 0;
       var extraCash = (QC && QC.mode === 'cash' && !QC.inBudget) ? gift : 0;
       var snap = JSON.parse(JSON.stringify(bal));
+      var txBal0 = sum3(snap.taxable), gainFrac = !BASIS ? TAXABLE_GAIN_SHARE : (txBal0 > 0.5 ? Math.max(0, Math.min(1, 1 - basisT / txBal0)) : 0);   // the share of a taxable withdrawal that is gain this year
       /* One year with a Roth conversion of C: convert first (Roof then Walls, or
          Walls then Roof), then draw whatever Needs, Wants and the tax need in the
          withdrawal order, iterating until the tax settles. */
@@ -10252,7 +10282,7 @@
             });
           });
         }
-        var wd0 = {taxable:0, deferred:0, roth:0}, unf = 0, tx0 = null, tax0 = 0, bb = null, wdDef0 = {client:0, spouse:0};
+        var wd0 = {taxable:0, deferred:0, roth:0}, unf = 0, tx0 = null, tax0 = 0, bb = null, wdDef0 = {client:0, spouse:0}, spare0 = 0;
         for(var pass = 0; pass < 8; pass++){
           bb = JSON.parse(JSON.stringify(b));
           wd0 = {taxable:0, deferred:0, roth:0}; unf = 0; wdDef0 = {client:0, spouse:0};
@@ -10268,19 +10298,19 @@
           unf = need;
           /* RMD money not needed for spending and tax is reinvested, after tax, in the after-tax Roof account */
           var rmdSpare = Math.max(0, rmdExcess + freedCash - Math.max(0, spend + tax0 + pay - (income - rmdExcess)));
-          bb.taxable.r += rmdSpare;
-          tx0 = fedT(ordBase + wd0.deferred + cv.amt, wd0.taxable * TAXABLE_GAIN_SHARE, row.ss, cv.amt, niiBase + wd0.taxable * TAXABLE_GAIN_SHARE);
+          bb.taxable.r += rmdSpare; spare0 = rmdSpare;
+          tx0 = fedT(ordBase + wd0.deferred + cv.amt, wd0.taxable * gainFrac, row.ss, cv.amt, niiBase + wd0.taxable * gainFrac);
           var pen0 = 0; ['client','spouse'].forEach(function(o){ if(wdDef0[o] > 0.5 && t595[o] != null) pen0 += wdDef0[o] * penShare(o, t) * EARLY_WD_PENALTY; });   // the early-withdrawal penalty, part of the tax the draw covers
           if(pen0 > 0.005){ tx0 = cpObj(tx0); tx0.penalty = pen0; tx0.tax += pen0; } else { tx0 = cpObj(tx0); tx0.penalty = 0; }
           /* the draw covers state income tax as well as federal, so the year's cash flow closes */
-          var st0 = stT({wages:row.emp - seDed + (row.rothWages || 0) + row.ng, gains:wallsNQy + wd0.taxable * TAXABLE_GAIN_SHARE, pension:row.pen,
+          var st0 = stT({wages:row.emp - seDed + (row.rothWages || 0) + row.ng, gains:wallsNQy + wd0.taxable * gainFrac, pension:row.pen,
                      retirement:row.pen + annOrd + sleeveOrd + wallsOrd + rmdExcess + wd0.deferred + cv.amt, ssFederal:tx0.ssTaxable,
                      gross:income + wd0.taxable + wd0.deferred + wd0.roth}, cv.amt);
           var tot0 = tx0.tax + st0.tax;
           if(Math.abs(tot0 - tax0) < 0.05){ tax0 = tot0; break; }
           tax0 = tot0;
         }
-        return {bal:bb, wd:wd0, unfunded:unf, tx:tx0, cv:cv};
+        return {bal:bb, wd:wd0, unfunded:unf, tx:tx0, cv:cv, spare:spare0};
       };
       var base = runYear(0), res = base, cvInfo = null;
       if(conv && calYear >= conv.startYear && (rmdStartYear == null || calYear < rmdStartYear) && !ended(t)){
@@ -10314,13 +10344,14 @@
         convTotal += res.cv.amt;
       }
       bal = res.bal; var wd = res.wd, unfunded = res.unfunded, tx = res.tx, tax = tx.tax;
+      if(BASIS){ if(txBal0 > 0.5) basisT -= Math.min(basisT, wd.taxable * basisT / txBal0); basisT += res.spare || 0; }
       var gross = income + wd.taxable + wd.deferred + wd.roth;
       var allB = [bal.taxable, bal.roth, bal.deferred.client, bal.deferred.spouse];
       var layer = function(k){ return allB.reduce(function(a, b){ return a + b[k]; }, 0); };
       var moatLeft = (ltcPool && ltcPool0 > 0.5) ? Math.max(0, Math.min(1, ltcPoolLeft() / ltcPool0)) : 1;
       var layers = {buffer:layer('f'), sleeve:(row.sleeveBal != null ? row.sleeveBal : r.funded.foundation), walls:layer('w'), roof:layer('r'), moat:r.funded.moat * Math.pow(1 + moatG, t) * moatLeft, outside:layer('i') + lifeHeld};
       layers.total = layers.buffer + layers.sleeve + layers.walls + layers.roof + layers.moat + layers.outside;
-      var stParts = {wages:row.emp - seDed + (row.rothWages || 0) + row.ng, gains:wallsNQy + wd.taxable * TAXABLE_GAIN_SHARE, pension:row.pen,
+      var stParts = {wages:row.emp - seDed + (row.rothWages || 0) + row.ng, gains:wallsNQy + wd.taxable * gainFrac, pension:row.pen,
                      retirement:row.pen + annOrd + sleeveOrd + wallsOrd + rmdExcess + wd.deferred + (cvInfo ? cvInfo.amt : 0), ssFederal:tx.ssTaxable, gross:gross};
       var st = stT(stParts, cvInfo ? cvInfo.amt : 0);
       /* the year's excess cash flow — regular income after spending, tax and any cash gift (spare RMD money is banked above) — into the section 06 accounts */
@@ -10329,14 +10360,14 @@
         var surplus = Math.max(0, (income - rmdExcess) - spend - (tx.tax + st.tax + pay) - extraCash);
         if(surplus > 0.5){
           var each = surplus / CASH_DEST.length;
-          CASH_DEST.forEach(function(D){ if(D.tier === 'deferred') bal.deferred[D.owner][D.key] += each; else bal[D.tier][D.key] += each; });
+          CASH_DEST.forEach(function(D){ if(D.tier === 'deferred') bal.deferred[D.owner][D.key] += each; else { bal[D.tier][D.key] += each; if(D.tier === 'taxable') basisT += each; } });
           banked = surplus; bankedTotal += surplus;
           layers.buffer = layer('f'); layers.walls = layer('w'); layers.roof = layer('r'); layers.outside = layer('i') + lifeHeld;
           layers.total = layers.buffer + layers.sleeve + layers.walls + layers.roof + layers.moat + layers.outside;
         }
       }
       if(cvInfo && cvInfo.amt > 0.5){
-        var stB = stT({wages:stParts.wages, gains:wallsNQy + base.wd.taxable * TAXABLE_GAIN_SHARE, pension:row.pen,
+        var stB = stT({wages:stParts.wages, gains:wallsNQy + base.wd.taxable * gainFrac, pension:row.pen,
           retirement:row.pen + annOrd + sleeveOrd + wallsOrd + rmdExcess + base.wd.deferred, ssFederal:base.tx.ssTaxable, gross:income + base.wd.taxable + base.wd.deferred + base.wd.roth});
         cvInfo.stateTax = st.tax - stB.tax; cvInfo.tax = cvInfo.fedTax + cvInfo.stateTax; convTax += cvInfo.tax;
       }
@@ -10345,11 +10376,11 @@
       /* section 17's breakdown. All income: what the year paid in, cash. AGI: the ordinary income the tax counted (the year's
          plan income, IRA draws and any pre-plan income of the first calendar year), the conversion, gains and taxable Social Security.
          MAGI for IRMAA adds tax-exempt interest; provisional income for Social Security is AGI before benefits + exempt + half. */
-      var cvAmt = cvInfo ? cvInfo.amt : 0, agiCG = wd.taxable * TAXABLE_GAIN_SHARE, effBase = gross + cvAmt;   // the effective rates: tax over all income plus the year's Roth conversion
+      var cvAmt = cvInfo ? cvInfo.amt : 0, agiCG = wd.taxable * gainFrac, effBase = gross + cvAmt;   // the effective rates: tax over all income plus the year's Roth conversion
       var incParts = {emp:row.emp, ss:row.ss, pen:row.pen, ann:row.ann + row.sleeve, walls:row.wallsYield, ng:row.ng, rmd:rmdExcess, wdTaxable:wd.taxable, wdDeferred:wd.deferred, wdRoth:wd.roth};
       var agiParts = {ord:ordBase + wd.deferred, pre:preOrd, conv:cvAmt, cg:agiCG, ss:tx.ssTaxable};
       out.push({t:t, year:calYear, ages:row.ages, gross:gross, ss:row.ss, ssTaxable:tx.ssTaxable, agi:tx.agi, deductions:tx.deductions, senior:tx.senior,
-                incParts:incParts, agiParts:agiParts, exempt:wallsExempt, magi:tx.agi + wallsExempt, prov:tx.prov, preSS:preSS,
+                incParts:incParts, agiParts:agiParts, gainFrac:gainFrac, basis:BASIS ? basisT : null, exempt:wallsExempt, magi:tx.agi + wallsExempt, prov:tx.prov, preSS:preSS,
                 taxable:tx.taxable, ordTaxable:tx.ordTaxable, cgTaxable:tx.cgTaxable, tax:tx.tax, penalty:tx.penalty || 0, marginal:tx.marginal,
                 effective: effBase > 0.5 ? tx.tax / effBase : 0, effBase:effBase, nii:tx.nii || 0, niit:tx.niit || 0, rmd:rmd, rmdExcess:rmdExcess, qcd:qcd, qcdBy:qcdBy, gift:gift, wd:wd, unfunded:unfunded, ages65:ages65,
                 stateTax:st.tax, stateTaxable:st.taxable, stateRate:st.rate, stateEffective: effBase > 0.5 ? st.tax / effBase : 0,
@@ -11294,7 +11325,7 @@
       C('agi', 'Ordinary income', 'taxable wages, pensions, annuities, Walls yield and IRA money', money0(AP('ord')), sumT(AP('ord')), {sep:true}),
       C('agi', 'Earlier this year', 'before the plan date', money0(AP('pre')), sumT(AP('pre')), {show:any(AP('pre'))}),
       C('agi', 'Roth conversion', '', money0(AP('conv')), sumT(AP('conv')), {show:any(AP('conv'))}),
-      C('agi', 'Capital gains', Math.round(TAXABLE_GAIN_SHARE * 100) + '% of taxable withdrawals, long-term', money0(AP('cg')), sumT(AP('cg')), {show:any(AP('cg'))}),
+      C('agi', 'Capital gains', basisOn() ? 'taxable withdrawals above cost basis, long-term' : Math.round(TAXABLE_GAIN_SHARE * 100) + '% of taxable withdrawals, long-term', money0(AP('cg')), sumT(AP('cg')), {show:any(AP('cg'))}),
       C('agi', 'Taxable SS', '', function(x){ return hasSS(x) ? money(x.ssTaxable) : '—'; }, sumT(AP('ss')), {show:rows.some(hasSS)}),
       C('agi', 'AGI', 'the sum', function(x){ return money(x.agi); }, sumT(function(x){ return x.agi; }), {bold:true}),
       C('tst', 'Tax-exempt interest', 'AUM - Tax Free Walls yield', money0(function(x){ return x.exempt; }), sumT(function(x){ return x.exempt; }), {show:any(function(x){ return x.exempt; }), sep:true}),
@@ -11326,7 +11357,7 @@
         }).join('')
       + '</tbody><tfoot><tr>' + cols.map(function(c){ return '<td' + (c.g ? ' class="num"' : '') + (c.sep ? sepS : '') + '>' + (c.tot ? (c.bold ? '<b>' + c.tot() + '</b>' : c.tot()) : '') + '</td>'; }).join('') + '</tr></tfoot>';
 
-    $('taxAssume').innerHTML = (X0.lifetimePayroll > 0.5 ? '<b>Payroll tax.</b> ' + money(X0.lifetimePayroll) + ' of Social Security and Medicare tax on wages over the plan (6.2% to the indexed wage base, 1.45% on all wages, 0.9% Additional Medicare over the household threshold; self-employment tax on lines marked self-employed, half deducted above the line) is in the All tax column and the cash flow, separate from the income tax below. ' : '') + '<b>Assumptions.</b> 2026 federal law: standard deduction ' + money(TAX_2026[X0.status].std) + (X0.status === 'mfj' ? ' plus $1,650 for each spouse 65 or older' : ' plus $2,050 at 65') + ', brackets ' + T.brackets.map(function(b){ return Math.round(b[0] * 100) + '%'; }).join(' / ') + ', and the $6,000 senior deduction for 2025–2028 (phasing out above ' + money(T.seniorPhase) + ' of AGI); brackets, the standard deduction and the capital-gains thresholds are indexed at the ' + pct(i.inflation || 0) + ' inflation assumption, the Social Security thresholds are not. Up to 85% of Social Security is taxable by the provisional-income formula. Wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs are ordinary income; a tax-deferred withdrawal before 59\u00bd carries the 10% additional federal tax' + (X0.lifetimePenalty > 0.5 ? ' (' + money(X0.lifetimePenalty) + ' over the plan)' : '') + ', the birthday from the section 02 date of birth or, without one, taken as mid-year; the Foundation annuity is ' + Math.round(X0.foundTaxShare * 100) + '% taxable (qualified money fully, a non-qualified annuity half, Roth money not at all), and annuity income already in force the same way by the account that pays it; the Walls yield follows the Walls funding mix, with the non-qualified share taxed as ordinary income (interest)' + (X0.wallsTaxFree > 0.001 ? ' except the yield of the tax-free income accounts (the ' + Math.round(X0.wallsTaxFree * 100) + '% of the Walls in AUM - Tax Free, on their own yield and growth), which is federally tax-free (it still counts toward the taxation of Social Security and in the state model)' : '') + '; half of each taxable-account withdrawal is assumed to be long-term gain. The 3.8% net investment income tax is on the lesser of net investment income (the non-qualified Walls yield, the taxable part of non-qualified annuity income and those gains) and AGI over ' + money(NIIT_THRESHOLD[X0.status]) + ' (not indexed)' + (X0.rows.some(function(x){ return x.niit > 0.5; }) ? ', ' + money(X0.rows.reduce(function(a, x){ return a + x.niit; }, 0)) + ' over the plan, in the federal tax' : ', none in this plan') + '. Effective rates are tax \u00f7 (all income + the year\u2019s Roth conversion). RMDs use the Uniform Lifetime Table from age ' + rmdAge(X0.year0 - i.clientAge) + ' on the tax-deferred market balances (the Foundation annuity’s payments satisfy its own). Both spouses are assumed living to the end of plan; no itemising, credits or Medicare IRMAA. <b>State tax</b> uses a planning model of each state\u2019s 2025 rates, brackets, standard deduction or exemptions and retirement-income exclusions, indexed the same way, with Social Security exempt except where the state taxes it; local income taxes are left out. A planning estimate, not tax advice.';
+    $('taxAssume').innerHTML = (X0.lifetimePayroll > 0.5 ? '<b>Payroll tax.</b> ' + money(X0.lifetimePayroll) + ' of Social Security and Medicare tax on wages over the plan (6.2% to the indexed wage base, 1.45% on all wages, 0.9% Additional Medicare over the household threshold; self-employment tax on lines marked self-employed, half deducted above the line) is in the All tax column and the cash flow, separate from the income tax below. ' : '') + '<b>Assumptions.</b> 2026 federal law: standard deduction ' + money(TAX_2026[X0.status].std) + (X0.status === 'mfj' ? ' plus $1,650 for each spouse 65 or older' : ' plus $2,050 at 65') + ', brackets ' + T.brackets.map(function(b){ return Math.round(b[0] * 100) + '%'; }).join(' / ') + ', and the $6,000 senior deduction for 2025–2028 (phasing out above ' + money(T.seniorPhase) + ' of AGI); brackets, the standard deduction and the capital-gains thresholds are indexed at the ' + pct(i.inflation || 0) + ' inflation assumption, the Social Security thresholds are not. Up to 85% of Social Security is taxable by the provisional-income formula. Wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs are ordinary income; a tax-deferred withdrawal before 59\u00bd carries the 10% additional federal tax' + (X0.lifetimePenalty > 0.5 ? ' (' + money(X0.lifetimePenalty) + ' over the plan)' : '') + ', the birthday from the section 02 date of birth or, without one, taken as mid-year; the Foundation annuity is ' + Math.round(X0.foundTaxShare * 100) + '% taxable (qualified money fully, a non-qualified annuity half, Roth money not at all), and annuity income already in force the same way by the account that pays it; the Walls yield follows the Walls funding mix, with the non-qualified share taxed as ordinary income (interest)' + (X0.wallsTaxFree > 0.001 ? ' except the yield of the tax-free income accounts (the ' + Math.round(X0.wallsTaxFree * 100) + '% of the Walls in AUM - Tax Free, on their own yield and growth), which is federally tax-free (it still counts toward the taxation of Social Security and in the state model)' : '') + '; ' + (basisOn() ? 'the gain on a taxable-account withdrawal is its share of the taxable accounts\u2019 value above their cost basis (section 06; average cost, a blank account taken at half its value, a Cash account at all of it), long-term' : 'half of each taxable-account withdrawal is assumed to be long-term gain (enter cost basis in section 06 to use it instead)') + '. The 3.8% net investment income tax is on the lesser of net investment income (the non-qualified Walls yield, the taxable part of non-qualified annuity income and those gains) and AGI over ' + money(NIIT_THRESHOLD[X0.status]) + ' (not indexed)' + (X0.rows.some(function(x){ return x.niit > 0.5; }) ? ', ' + money(X0.rows.reduce(function(a, x){ return a + x.niit; }, 0)) + ' over the plan, in the federal tax' : ', none in this plan') + '. Effective rates are tax \u00f7 (all income + the year\u2019s Roth conversion). RMDs use the Uniform Lifetime Table from age ' + rmdAge(X0.year0 - i.clientAge) + ' on the tax-deferred market balances (the Foundation annuity’s payments satisfy its own). Both spouses are assumed living to the end of plan; no itemising, credits or Medicare IRMAA. <b>State tax</b> uses a planning model of each state\u2019s 2025 rates, brackets, standard deduction or exemptions and retirement-income exclusions, indexed the same way, with Social Security exempt except where the state taxes it; local income taxes are left out. A planning estimate, not tax advice.';
     return X0;
   }
 
@@ -15836,7 +15867,7 @@
     var tr = e.target.closest('tr');
     var a = accounts.find(function(x){ return x.id === +tr.getAttribute('data-id'); });
     if(!a) return;
-    a[k] = (k === 'val' || k === 'part') ? num(e.target.value) : (k === 'growth') ? (e.target.value.trim() === '' ? null : pctIn(e.target.value)) : e.target.value;
+    a[k] = (k === 'val' || k === 'part') ? num(e.target.value) : (k === 'basis') ? (e.target.value.trim() === '' ? null : num(e.target.value)) : (k === 'growth') ? (e.target.value.trim() === '' ? null : pctIn(e.target.value)) : e.target.value;
     if(k === 'growth' || k === 'val'){ var gi = tr.querySelector('input[data-k="growth"]'); if(gi) gi.classList.toggle('missing', a.growth == null && a.val > 0.5); }
     acctTotalLine();
     render();
@@ -15847,6 +15878,10 @@
       var tr0 = e.target.closest('tr'), a0 = accounts.find(function(x){ return x.id === +tr0.getAttribute('data-id'); }), mv0 = tr0.querySelector('select[data-k="move"]');
       if(a0 && a0.move !== 'no'){ a0.move = 'no'; if(mv0){ mv0.value = 'no'; mv0.classList.add('held'); } }
     }
+    if(e.target.getAttribute('data-k') === 'tax' || e.target.getAttribute('data-k') === 'pos'){
+      var trB = e.target.closest('tr'), aB = accounts.find(function(x){ return x.id === +trB.getAttribute('data-id'); }), cB = trB.querySelector('td[data-basis]');
+      if(aB){ aB[e.target.getAttribute('data-k')] = e.target.value; if(cB) cB.innerHTML = basisCell(aB); }
+    }
     if(e.target.getAttribute('data-k') === 'move'){
       e.target.classList.toggle('held', e.target.value === 'no'); e.target.classList.toggle('part', e.target.value === 'part');
       var pa = e.target.closest('td').querySelector('input[data-k="part"]'); if(pa){ pa.hidden = e.target.value !== 'part'; if(e.target.value === 'part' && !pa.value) pa.focus(); }
@@ -15854,8 +15889,8 @@
     render();
   });
   $('acctBody').addEventListener('blur', function(e){
-    if(e.target.getAttribute('data-k') === 'val' || e.target.getAttribute('data-k') === 'part'){
-      var vv = num(e.target.value); e.target.value = vv ? fmtN.format(Math.round(vv)) : '';
+    if(e.target.getAttribute('data-k') === 'val' || e.target.getAttribute('data-k') === 'part' || (e.target.getAttribute('data-k') === 'basis' && e.target.value.trim() !== '')){
+      var vv = num(e.target.value); e.target.value = (vv || e.target.getAttribute('data-k') === 'basis') ? fmtN.format(Math.round(vv)) : '';
     }
     if(e.target.getAttribute('data-k') === 'growth'){
       e.target.value = e.target.value.trim() === '' ? '' : (pctIn(e.target.value) * 100).toFixed(1) + '%';
