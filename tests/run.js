@@ -25,6 +25,8 @@ const SUITE = [
   't-tglbtn',    // Adjust Target Allocations button
   't-assetmap',  // the asset map (page and deck), the -8%/-16% sequence stress, the 3.26% inflation default, the protected-pieces continuation slide
   't-wallssched', // section 14 Walls income by account: start/stop dates, total yield vs distribution, restarts; blank = pooled, unchanged
+  't-taxcols',    // section 17 tax table: All income and AGI built up, MAGI for IRMAA, provisional income; senior deduction; IRMAA guard on MAGI
+  't-basis',      // section 06 cost basis on taxable accounts: average-cost gains on withdrawals; blank = the 50% assumption
 ];
 const only = process.argv.slice(2);
 let failed = 0;

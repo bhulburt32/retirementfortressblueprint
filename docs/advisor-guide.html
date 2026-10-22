@@ -862,6 +862,16 @@
         with a dashed outline as the default; a household with no Cash account banks nothing until one
         is picked (spare RMD money is still reinvested in the after-tax Roof account).</p>
 
+      <p>The <span class="ui">Cost basis</span> column takes what was paid into each taxable account
+        (non-qualified, not an annuity; other accounts show a dash, as their money is taxed on
+        withdrawal). Left blank everywhere, half of each taxable-account withdrawal is taken as
+        long-term gain, as before. Enter a basis on any taxable account and the taxable accounts carry
+        their cost basis together, on average cost: a withdrawal's gain is its share of their value
+        above basis, so the gain share rises as they grow; contributions, banked cash flow and
+        reinvested RMD money add basis dollar for dollar. A taxable account still blank then starts at
+        half its value (a Cash position at all of it, no gain); a basis above the value is treated as
+        no gain. The gains feed the federal tax, the net investment income tax and the state model,
+        and section&nbsp;17's Capital gains column. The basis saves with the case.</p>
       <p>The <span class="ui">Growth</span> column is each account's assumed annual growth. Leave it
         blank (<em>default</em>) and the account takes the plan rate from section&nbsp;03 for the
         level its money lands in &mdash; the Walls rate for the Walls and for anything that stays as
@@ -1522,14 +1532,27 @@
 
         <dt>Projected income tax</dt>
         <dd>Five tiles &mdash; lifetime federal tax, lifetime state tax, average effective rate (all
-          tax over all income), the highest federal bracket reached and when RMDs begin &mdash; then
+          tax over all income plus Roth conversions), the highest federal bracket reached and when RMDs begin &mdash; then
           three charts with a bar for every year: <b>taxable income</b>; the <b>effective federal
           rate</b>, each bar coloured by the highest federal bracket that year reaches (lighter to
           darker as the rate rises) with the rate written inside; and <b>federal and state tax</b>
           stacked. On all three the year RMDs begin is picked out with a tinted column and a dashed
-          marker. Beneath them a table for every year to the end of plan: all income, taxable
-          Social Security, withdrawals by tier, RMDs, AGI, deductions, taxable income, the bracket,
-          the federal tax and effective rate, the state tax, all tax and the combined effective rate. Income is the same projection the section&nbsp;13
+          marker. Beneath them a table for every year to the end of plan, in five groups. <b>All
+          income</b> shows what the year paid in &mdash; wages, Social Security, pensions, annuities, the
+          Walls yield, other income, any RMD drawn beyond the Walls yield and the withdrawals by tier
+          &mdash; and their sum. <b>AGI</b> shows what the federal tax counts: the ordinary income (the
+          taxable part of wages, pensions, annuities, the Walls yield and IRA money), any income from
+          earlier in the first calendar year, a Roth conversion, capital gains (the Walls yield in
+          the gain on taxable-account withdrawals) and the taxable Social
+          Security &mdash; and their sum; the Walls yield in taxable accounts is ordinary income.
+          <b>Medicare and Social Security tests</b> give MAGI for IRMAA
+          (AGI plus tax-exempt interest, which sets Medicare premiums two years later) and provisional
+          income (AGI before benefits, plus tax-exempt interest, plus half the benefits, against the
+          50% and 85% thresholds) and the net investment income. Then the required RMD, deductions,
+          taxable income, the bracket, the federal tax (with the net investment income tax broken out),
+          its effective rate, the state tax, all tax and the combined effective rate. Every effective
+          rate is the tax divided by all income plus that year's Roth conversion &mdash; a conversion is
+          income the tax counts though no cash is received. A column that is empty in every year is left out. Income is the same projection the section&nbsp;13
           chart uses &mdash; wages to each retirement date, Social Security, pensions, annuities,
           non-guaranteed income, the Foundation annuity and the Walls yield &mdash; plus required
           minimum distributions on the tax-deferred market balances and whatever has to be drawn, in
@@ -1546,8 +1569,12 @@
           Security thresholds are not indexed, so up to 85% of benefits becomes taxable over time.
           Wages, pensions, non-guaranteed income, tax-deferred withdrawals and RMDs are ordinary income;
           the Foundation annuity is taxed by its funding (qualified money fully, a non-qualified annuity
-          half); the non-qualified share of the Walls yield and half of each taxable-account
-          withdrawal are long-term gains. RMDs follow the Uniform Lifetime Table from 73 or 75 by birth
+          half); the non-qualified share of the Walls yield is ordinary income (interest) and half of
+          each taxable-account withdrawal is a long-term gain (or, with a cost basis entered in section&nbsp;06, its
+          share of the value above basis). The 3.8% net investment income tax applies
+          to the lesser of net investment income &mdash; that Walls yield, the taxable part of
+          non-qualified annuity income and those gains &mdash; and AGI over $250,000 joint or $200,000
+          single (not indexed). RMDs follow the Uniform Lifetime Table from 73 or 75 by birth
           year; an RMD larger than the plan's own tax-deferred draw is taxed, spent first and otherwise
           reinvested in the after-tax Roof account. Both spouses are assumed living to the end of plan; no itemising, credits or IRMAA.</p>
         <p><b>State tax</b> follows the state in section&nbsp;02 through a planning model of each
