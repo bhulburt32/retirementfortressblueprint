@@ -92,6 +92,28 @@ const path = require('path');
   const hasCol=await p.evaluate(()=>[...document.querySelectorAll('#taxTable thead tr:last-child th')].some(h=>/^Net investment income tax/.test(h.textContent.trim())));
   if(nt.length && !hasCol) out.push('the table should show a Net investment income tax column when any year owes it');
 
+  // 6. the Roth conversion's last year: conversions stop after it; Auto runs to the year before RMDs; it saves with the case
+  await p.selectOption('#rothTarget','auto'); await p.selectOption('#rothIrmaa','1'); await p.waitForTimeout(900);
+  R=await rowsOf();
+  const cy=R.filter(x=>x.conv>0.5).map(x=>x.year);
+  console.log('conversion years (auto):', cy.join(', '));
+  if(cy.length>=3){
+    const endY=cy[1];
+    const endOpts=await p.$eval('#rothEnd',s=>[...s.options].map(o=>o.value));
+    await p.selectOption('#rothEnd', String(endY)); await p.waitForTimeout(900);
+    const R2=await rowsOf(), cy2=R2.filter(x=>x.conv>0.5).map(x=>x.year);
+    const saved=await p.evaluate(()=>{ try { return JSON.parse(document.getElementById('caseJson').value).tax.roth.end; } catch(e){ return 'n/a'; } });
+    const note=(await p.$eval('#rothNote',e=>e.textContent)).replace(/\s+/g,' ');
+    console.log('last year '+endY+': conversion years', cy2.join(', '), '| saved end:', saved, '| options:', endOpts.slice(0,4).join(','), '... | note:', note.slice(0,140));
+    if(cy2.some(y=>y>endY)) out.push('no conversion should run after the last year picked ('+endY+')');
+    if(!cy2.includes(endY)) out.push('the last year picked should still convert');
+    if(String(saved)!==String(endY)) out.push('the last year should save with the case ('+saved+')');
+    if(!/stopping after \d{4}/.test(note)) out.push('the conversion note should say when conversions stop');
+    await p.selectOption('#rothEnd','auto'); await p.waitForTimeout(900);
+    const cy3=(await rowsOf()).filter(x=>x.conv>0.5).map(x=>x.year);
+    if(cy3.join()!==cy.join()) out.push('Auto should restore the conversion years ('+cy3.join()+' vs '+cy.join()+')');
+  } else out.push('the run should convert in at least three years to test the last year');
+
   console.log('ERRORS:', errs.length||out.length ? [...errs, ...out] : 'none');
   await b.close();
 })();

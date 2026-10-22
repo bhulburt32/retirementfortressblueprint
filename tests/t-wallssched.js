@@ -105,6 +105,25 @@ const path = require('path');
   console.log('cleared: Walls yield total', Math.round(sum(back.wy)), '| end of plan', back.end, '| hint:', (await hint()).slice(0,40));
   if(Math.round(sum(back.wy))!==Math.round(sum(base.wy)) || back.end!==base.end) errsOut.push('clearing the table should restore the pooled figures exactly');
 
+  // 10. typing: the cell under the cursor survives every keystroke (the table was rebuilt mid-typing: a decimal or a
+  // four-digit year could not be entered). A percentage typed key by key, and a month as Chrome reports it while the
+  // year is typed (0002, 0020, 0203, 2031).
+  const k0=keys[0], dSel=cell(k0,0,'dist'), sSel=cell(k0,0,'start');
+  await p.$eval(dSel,e=>{ window.__keep=e; }); await p.click(dSel);
+  for(const ch of '4.25'){ await p.keyboard.type(ch); await p.waitForTimeout(250); }
+  const tDist=await p.evaluate(s=>({same:document.querySelector(s)===window.__keep, focus:document.activeElement===window.__keep, val:window.__keep.value}), dSel);
+  console.log('typing 4.25 into Distribution:', JSON.stringify(tDist));
+  if(!tDist.same || !tDist.focus || tDist.val!=='4.25') errsOut.push('a decimal typed key by key should stay in the cell ('+JSON.stringify(tDist)+')');
+  await p.keyboard.press('Tab'); await p.waitForTimeout(400);
+  await p.$eval(sSel,e=>{ window.__keep=e; e.focus(); });
+  for(const v of ['0002-03','0020-03','0203-03','2031-03']){ await p.$eval(sSel,(e,v)=>{ e.value=v; e.dispatchEvent(new Event('input',{bubbles:true})); }, v); await p.waitForTimeout(300); }
+  const tStart=await p.evaluate(s=>({same:document.querySelector(s)===window.__keep, focus:document.activeElement===window.__keep, val:window.__keep.value}), sSel);
+  const savedStart=await p.evaluate(k=>{ try { const w=JSON.parse(document.getElementById('caseJson').value).wallsSchedule||{}; return (w[k]||[{}])[0].start; } catch(e){ return 'n/a'; } }, k0);
+  console.log('typing a year into Distributions start:', JSON.stringify(tStart), '| saved:', savedStart);
+  if(!tStart.same || !tStart.focus || tStart.val!=='2031-03') errsOut.push('a four-digit year typed into the start should stay in the cell ('+JSON.stringify(tStart)+')');
+  if(savedStart!=='2031-03') errsOut.push('the typed start should be saved ('+savedStart+')');
+  await clear(k0,0,'dist'); await clear(k0,0,'start');
+
   console.log('ERRORS:', errs.length||errsOut.length ? [...errs, ...errsOut] : 'none');
   await b.close();
 })();

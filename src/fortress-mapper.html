@@ -3140,7 +3140,8 @@
 
         <dt>Roth conversion analysis</dt>
         <dd>Builds a conversion schedule: each year from the <span class="ui">start year</span> until
-          the year before RMDs begin, it converts as much qualified money in the Walls and Roof as
+          the <span class="ui">last year</span> &mdash; on Auto, the year before RMDs begin; pick an earlier
+          year to stop conversions sooner (they still stop when RMDs begin) &mdash; it converts as much qualified money in the Walls and Roof as
           fits under the top of the <span class="ui">target tax bracket</span> &mdash; by default the
           bracket the household sits in during its first full retirement year &mdash; without pushing
           modified AGI over an IRMAA threshold once either person is within two years of Medicare
@@ -3280,12 +3281,12 @@
         <span class="hint" id="wdMsg"></span>
       </div>
 
-      <div class="inc-title gap">Roth conversion analysis<small>Qualified money in the Walls and Roof, converted a year at a time until RMDs begin</small></div>
+      <div class="inc-title gap">Roth conversion analysis<small>Qualified money in the Walls and Roof, converted a year at a time until RMDs begin or the last year picked</small></div>
       <div class="assump first" style="margin-top:14px">
         <label class="f"><span>Target tax bracket<small>Convert up to the top of this federal bracket</small></span><select id="rothTarget"></select></label>
         <label class="f"><span>Start year<small>First year of conversions</small></span><select id="rothStart"></select></label>
         <label class="f"><span>Convert from<small>Which level first</small></span><select id="rothOrder"><option value="roof" selected>Roof first, then Walls</option><option value="walls">Walls first, then Roof</option></select></label>
-        <label class="f"><span>Last year<small>Conversions stop before RMDs</small></span><input type="text" id="rothEnd" readonly></label>
+        <label class="f"><span>Last year<small>The last year to convert; auto stops before RMDs</small></span><select id="rothEnd"></select></label>
       </div>
       <div class="btn-row" style="margin-top:14px">
         <label class="chk"><input type="checkbox" id="rothApply" checked> Apply the conversion strategy to the plan projections</label>
@@ -8299,7 +8300,7 @@
       h2('Roth conversion strategy');
       var cRows = TX.rows.filter(function(x){ return x.conv && x.conv.amt > 0.5; });
       var lB = TXb.rows[TXb.rows.length - 1], lP = TX.rows[TX.rows.length - 1], sv = (TXb.lifetime + TXb.lifetimeState) - (TX.lifetime + TX.lifetimeState);
-      para('Convert qualified money in the Roof and Walls each year from ' + cfgR.startYear + (TX.rmdStartYear != null ? ' until RMDs begin in ' + TX.rmdStartYear : '') + ', up to the top of the ' + Math.round(cfgR.targetRate * 100) + '% federal bracket' + (cfgR.irmaa ? ' and under ' + (cfgR.irmaaTier > 1 ? 'the ' + ['', '1st', '2nd', '3rd', '4th', '5th'][cfgR.irmaaTier] + ' IRMAA threshold' : 'the first IRMAA threshold') + ' once Medicare is two years away' : '') + (cfgR.ssGuard && cfgR.ssGuard !== 'none' ? ', keeping provisional income under the ' + (cfgR.ssGuard === 'base' ? '50%' : '85%') + ' Social Security threshold' : '') + '. '
+      para('Convert qualified money in the Roof and Walls each year from ' + cfgR.startYear + (cfgR.endYear != null ? ' through ' + cfgR.endYear + (TX.rmdStartYear != null && TX.rmdStartYear <= cfgR.endYear ? ' (or until RMDs begin in ' + TX.rmdStartYear + ')' : '') : TX.rmdStartYear != null ? ' until RMDs begin in ' + TX.rmdStartYear : '') + ', up to the top of the ' + Math.round(cfgR.targetRate * 100) + '% federal bracket' + (cfgR.irmaa ? ' and under ' + (cfgR.irmaaTier > 1 ? 'the ' + ['', '1st', '2nd', '3rd', '4th', '5th'][cfgR.irmaaTier] + ' IRMAA threshold' : 'the first IRMAA threshold') + ' once Medicare is two years away' : '') + (cfgR.ssGuard && cfgR.ssGuard !== 'none' ? ', keeping provisional income under the ' + (cfgR.ssGuard === 'base' ? '50%' : '85%') + ' Social Security threshold' : '') + '. '
         + (cRows.length ? 'Total converted ' + money(TX.convTotal) + ' over ' + cRows.length + ' years (' + cRows[0].year + '-' + cRows[cRows.length - 1].year + '), tax on the conversions ' + money(TX.convTax) + '. Lifetime federal and state tax ' + money(TX.lifetime + TX.lifetimeState) + ' with the strategy against ' + money(TXb.lifetime + TXb.lifetimeState) + ' without (' + (sv >= 0 ? 'saving ' : 'adding ') + money(Math.abs(sv)) + '); Roth at the end of plan ' + money(lP.balances.roth) + ' against ' + money(lB.balances.roth) + ', tax-deferred ' + money(lP.balances.deferred) + ' against ' + money(lB.balances.deferred) + '; total assets ' + money(lP.layers.total) + ' against ' + money(lB.layers.total) + '.' : 'Nothing converts under these limits.'), {rgb:INK});
       if(cRows.length){
         var ccols = [{t:'Year', w:40, s:7.5}, {t:'Ages', w:50, s:7.5}, {t:'Converted', w:70, a:'r', f:'F3', s:7.5}, {t:'Roof / Walls', w:96, a:'r', f:'F3', s:7.5}, {t:'Taxable after', w:72, a:'r', f:'F3', s:7.5}, {t:'Bracket', w:44, a:'r', f:'F3', s:7.5}, {t:'MAGI', w:66, a:'r', f:'F3', s:7.5}, {t:'Tax on conv.', w:66, a:'r', f:'F3', s:7.5}];
@@ -9205,7 +9206,7 @@
       otherAssets:otherAssets.length ? otherAssets.map(function(x){ return {type:x.type, name:x.name, val:x.val, growth:x.growth, note:x.note}; }) : null,
       nitrogen:nitro ? {name:nitro.name, text:nitro.text, analysis:nitro.analysis, src:nitro.src, at:nitro.at} : null,
       risk:{score:$('riskScore').value.trim(), tolerance:$('riskTol').classList.contains('auto') ? '' : $('riskTol').value.trim(), questionnaire:{answers:rq.a, amount:rq.amt}, selected:Object.keys(risk.selected).filter(function(k){ return risk.selected[k]; }), custom:risk.custom.filter(function(c){ return c.text.trim(); })},
-      tax:{withdrawalOrder:wdOrder.slice(), roth:{apply:rothCfg.apply, target:rothCfg.target, start:rothCfg.start, order:rothCfg.order, irmaa:rothCfg.irmaa, irmaaTier:rothGuards(rothCfg).irmaaTier, ssGuard:rothGuards(rothCfg).ssGuard}, qcd:qcdFrom(qcdCfg)},
+      tax:{withdrawalOrder:wdOrder.slice(), roth:{apply:rothCfg.apply, target:rothCfg.target, start:rothCfg.start, end:rothCfg.end || 'auto', order:rothCfg.order, irmaa:rothCfg.irmaa, irmaaTier:rothGuards(rothCfg).irmaaTier, ssGuard:rothGuards(rothCfg).ssGuard}, qcd:qcdFrom(qcdCfg)},
       life:(function(){
         var per = function(P){ return {existing:num($('lifeExist' + P).value), relies:$('lifeRelies' + P).checked, years:$('lifeYears' + P).value.trim(),
                                         health:$('lifeHealth' + P).value, tobacco:$('lifeTob' + P).checked, group:$('lifeGroup' + P).checked}; };
@@ -9369,11 +9370,11 @@
       (Array.isArray(d.risk.selected) ? d.risk.selected : []).forEach(function(k){ risk.selected[k] = true; });
       (Array.isArray(d.risk.custom) ? d.risk.custom : []).forEach(function(c){ risk.custom.push({on:c.on !== false, text:String(c.text || '')}); });
     }
-    rothCfg = {apply:true, target:'auto', start:'auto', order:'roof', irmaa:true, irmaaTier:1, ssGuard:'none'};
+    rothCfg = {apply:true, target:'auto', start:'auto', end:'auto', order:'roof', irmaa:true, irmaaTier:1, ssGuard:'none'};
     if(d.tax && d.tax.roth){
       var RC = d.tax.roth;
       rothCfg = {apply:RC.apply !== false, target:(RC.target === 'auto' || RC.target == null) ? 'auto' : Number(RC.target),
-                 start:(RC.start === 'auto' || RC.start == null) ? 'auto' : Number(RC.start), order:RC.order === 'walls' ? 'walls' : 'roof', irmaa:rothGuards(RC).irmaaTier > 0, irmaaTier:rothGuards(RC).irmaaTier, ssGuard:rothGuards(RC).ssGuard};
+                 start:(RC.start === 'auto' || RC.start == null) ? 'auto' : Number(RC.start), end:(RC.end === 'auto' || RC.end == null) ? 'auto' : Number(RC.end), order:RC.order === 'walls' ? 'walls' : 'roof', irmaa:rothGuards(RC).irmaaTier > 0, irmaaTier:rothGuards(RC).irmaaTier, ssGuard:rothGuards(RC).ssGuard};
     }
     qcdCfg = (d.tax && d.tax.qcd) ? qcdFrom(d.tax.qcd) : qcdDefault();
     resetLifeInputs();
@@ -10313,7 +10314,7 @@
         return {bal:bb, wd:wd0, unfunded:unf, tx:tx0, cv:cv, spare:spare0};
       };
       var base = runYear(0), res = base, cvInfo = null;
-      if(conv && calYear >= conv.startYear && (rmdStartYear == null || calYear < rmdStartYear) && !ended(t)){
+      if(conv && calYear >= conv.startYear && (conv.endYear == null || calYear <= conv.endYear) && (rmdStartYear == null || calYear < rmdStartYear) && !ended(t)){
         var avail = ['client','spouse'].reduce(function(a, o){ return a + snap.deferred[o].w + snap.deferred[o].r; }, 0);
         var top = null; TAX_2026[status].brackets.forEach(function(b){ if(b[0] === conv.targetRate) top = b[1]; });
         if(top == null) top = Infinity;
@@ -10406,7 +10407,7 @@
      MAGI over the first IRMAA threshold (which would raise Medicare premiums
      two years later). The projection is run with and without the strategy.
      ============================================================ */
-  var rothCfg = {apply:true, target:'auto', start:'auto', order:'roof', irmaa:true, irmaaTier:1, ssGuard:'none'};
+  var rothCfg = {apply:true, target:'auto', start:'auto', end:'auto', order:'roof', irmaa:true, irmaaTier:1, ssGuard:'none'};
   var qcdCfg = {apply:true, client:'', spouse:'', startAge:71, mode:'budget'};
   function qcdDefault(){ return {apply:true, client:'', spouse:'', startAge:71, mode:'budget'}; }
   function qcdFrom(Q){ Q = Q || {}; return {apply:Q.apply !== false, client:Q.client == null ? '' : String(Q.client), spouse:Q.spouse == null ? '' : String(Q.spouse), startAge:Q.startAge ? Number(Q.startAge) : 71, mode:Q.mode === 'extra' ? 'extra' : 'budget'}; }
@@ -10416,8 +10417,9 @@
     var autoRate = rowRet.marginal || 0.12;
     var target = rothCfg.target === 'auto' ? autoRate : rothCfg.target;
     var startYear = rothCfg.start === 'auto' ? baseRun.year0 : rothCfg.start;
+    var endYear = (rothCfg.end == null || rothCfg.end === 'auto') ? null : rothCfg.end;   // the last year to convert; auto: until RMDs begin
     var GD = rothGuards(rothCfg);
-    return {apply:rothCfg.apply, targetRate:target, autoRate:autoRate, startYear:startYear, order:rothCfg.order, irmaa:GD.irmaaTier > 0, irmaaTier:GD.irmaaTier, ssGuard:GD.ssGuard};
+    return {apply:rothCfg.apply, targetRate:target, autoRate:autoRate, startYear:startYear, endYear:endYear, order:rothCfg.order, irmaa:GD.irmaaTier > 0, irmaaTier:GD.irmaaTier, ssGuard:GD.ssGuard};
   }
   function renderRoth(base, plan, cfg){
     var rows = (plan || base).rows, i = base.rows ? null : null;
@@ -10439,7 +10441,11 @@
       parts.push(GD.ssGuard !== 'none' ? 'Social Security: provisional income (AGI before benefits + tax-exempt interest + half the benefits) kept under ' + money(GD.ssGuard === 'base' ? Tq.ssBase : Tq.ssTop) + ', so no more than ' + (GD.ssGuard === 'base' ? '0%' : '50%') + ' of benefits is taxable in a conversion year. These thresholds are not indexed, so most retired households already sit above them \u2014 the tool then converts nothing and says so.' : 'Social Security: not limited \u2014 conversions may push more of the benefits into taxable income.');
       $('rothGuardNote').textContent = parts.join(' ');
     })();
-    $('rothEnd').value = base.rmdStartYear != null ? endYear + ' (RMDs begin ' + base.rmdStartYear + ')' : 'end of plan (no RMDs)';
+    var esel = $('rothEnd'), fromY = cfg.startYear || base.year0;
+    esel.innerHTML = '<option value="auto">Auto \u2014 ' + (base.rmdStartYear != null ? endYear + ' (RMDs begin ' + base.rmdStartYear + ')' : 'end of plan (no RMDs)') + '</option>'
+      + base.rows.filter(function(x){ return x.year >= fromY && x.year <= endYear; }).map(function(x){ return '<option value="' + x.year + '">' + x.year + ' \u00b7 age ' + x.ages.join(' / ') + '</option>'; }).join('');
+    if(rothCfg.end !== 'auto' && rothCfg.end != null && !esel.querySelector('option[value="' + rothCfg.end + '"]')) esel.insertAdjacentHTML('beforeend', '<option value="' + rothCfg.end + '">' + rothCfg.end + ' (outside the conversion years)</option>');
+    esel.value = (rothCfg.end == null || rothCfg.end === 'auto') ? 'auto' : String(rothCfg.end);
 
     var P = plan || base;
     var convRows = P.rows.filter(function(x){ return x.conv; });
@@ -10503,9 +10509,9 @@
     /* note + table */
     var firstC = convRows.filter(function(x){ return x.conv.amt > 0.5; })[0];
     var byIrmaa = convRows.filter(function(x){ return x.conv.limitedBy === 'IRMAA'; }).length, byBr = convRows.filter(function(x){ return x.conv.limitedBy === 'bracket'; }).length;
-    $('rothNote').innerHTML = !plan ? 'The strategy is switched off. Tick <b>Apply</b> to convert qualified money in the Walls and Roof up to the top of the ' + Math.round(cfg.targetRate * 100) + '% bracket each year from ' + cfg.startYear + (base.rmdStartYear != null ? ' until RMDs begin in ' + base.rmdStartYear : '') + '.'
+    $('rothNote').innerHTML = !plan ? 'The strategy is switched off. Tick <b>Apply</b> to convert qualified money in the Walls and Roof up to the top of the ' + Math.round(cfg.targetRate * 100) + '% bracket each year from ' + cfg.startYear + (cfg.endYear != null ? ' through ' + cfg.endYear : base.rmdStartYear != null ? ' until RMDs begin in ' + base.rmdStartYear : '') + '.'
       : (converted > 0.5
-        ? 'Converting <b>' + money(converted) + '</b> over ' + convRows.filter(function(x){ return x.conv.amt > 0.5; }).length + ' years' + (firstC ? ', starting ' + firstC.year : '') + ', filling the <b>' + Math.round(cfg.targetRate * 100) + '%</b> bracket' + (cfg.irmaa ? ' and staying under ' + (cfg.irmaaTier > 1 ? 'the ' + ['', '1st', '2nd', '3rd', '4th', '5th'][cfg.irmaaTier] + ' IRMAA threshold' : 'the first IRMAA threshold') + ' once Medicare is two years away' : '') + (cfg.ssGuard && cfg.ssGuard !== 'none' ? ' and under the ' + (cfg.ssGuard === 'base' ? '50%' : '85%') + ' Social Security threshold' : '') + '. '
+        ? 'Converting <b>' + money(converted) + '</b> over ' + convRows.filter(function(x){ return x.conv.amt > 0.5; }).length + ' years' + (firstC ? ', starting ' + firstC.year : '') + (cfg.endYear != null ? ' and stopping after ' + cfg.endYear : '') + ', filling the <b>' + Math.round(cfg.targetRate * 100) + '%</b> bracket' + (cfg.irmaa ? ' and staying under ' + (cfg.irmaaTier > 1 ? 'the ' + ['', '1st', '2nd', '3rd', '4th', '5th'][cfg.irmaaTier] + ' IRMAA threshold' : 'the first IRMAA threshold') + ' once Medicare is two years away' : '') + (cfg.ssGuard && cfg.ssGuard !== 'none' ? ' and under the ' + (cfg.ssGuard === 'base' ? '50%' : '85%') + ' Social Security threshold' : '') + '. '
           + (byBr ? byBr + (byBr === 1 ? ' year is' : ' years are') + ' limited by the bracket' : '') + (byBr && byIrmaa ? ', ' : '') + (byIrmaa ? byIrmaa + (byIrmaa === 1 ? ' year is' : ' years are') + ' limited by IRMAA' : '') + ((byBr || byIrmaa) ? '. ' : '')
           + 'The conversions cost <b>' + money(cTax) + '</b> in tax now and ' + (saved >= 0 ? 'save <b>' + money(saved) + '</b>' : 'add <b>' + money(-saved) + '</b>') + ' of lifetime tax by shrinking later RMDs; the Roth balance at the end of plan is <b>' + money(lastP.balances.roth) + '</b> against <b>' + money(lastB.balances.roth) + '</b> without converting.'
         : 'Nothing converts: ' + (convRows.length ? convRows[0].conv.limitedBy : 'no qualified money in the Walls or Roof, or the window has closed') + '. Raise the target bracket or move the start year to open room.');
@@ -12072,7 +12078,7 @@
     var body = $('wallsSBody'); if(!body) return;
     var lines = wallsLines(r), A = incomeAdj(r), pc1 = function(v){ return (v * 100).toFixed(1) + '%'; };
     var perOf = function(x){ var L = WALLS_SCHED[x.key]; return (L && L.length) ? L : [{}]; };
-    var sig = lines.map(function(x){ return x.key + '#' + perOf(x).length; }).join(';');
+    var sig = 'scn' + activeScn + ':' + lines.map(function(x){ return x.key + '#' + perOf(x).length; }).join(';');
     if(sig !== wallsSchedSig){
       wallsSchedSig = sig;
       var pctIn_ = function(f, title){ return '<td class="num"><input class="num" inputmode="decimal" data-wk="' + f + '" autocomplete="off" title="' + title + '"></td>'; };
@@ -14672,7 +14678,7 @@
   }
   function scnDefault(){
     return {adjMoves:null, INC_ADJ:{yF:'', fStart:'', yW:'', wStart:'', gPre:'', gPost:'', yWt:'', gPreT:'', gPostT:'', ssC:'', ssS:''}, ANN_INC:{}, LTC_BEN:{}, ROOF_G:{}, WALLS_SCHED:{},
-            wdOrder:WD_DEFAULT.slice(), rothCfg:{apply:true, target:'auto', start:'auto', order:'roof', irmaa:true, irmaaTier:1, ssGuard:'none'}, qcdCfg:qcdDefault()};
+            wdOrder:WD_DEFAULT.slice(), rothCfg:{apply:true, target:'auto', start:'auto', end:'auto', order:'roof', irmaa:true, irmaaTier:1, ssGuard:'none'}, qcdCfg:qcdDefault()};
   }
   function scnClone(v){ return v == null ? v : JSON.parse(JSON.stringify(v)); }
   /* the working variables, parked */
@@ -14686,7 +14692,7 @@
     adjMoves = S.adjMoves ? S.adjMoves.map(scnClone).filter(function(m){ return !!acctById(m.acctId); }) : null;
     if(adjMoves && !adjMoves.length) adjMoves = null;
     INC_ADJ = scnClone(S.INC_ADJ) || scnDefault().INC_ADJ;
-    ANN_INC = scnClone(S.ANN_INC) || {}; LTC_BEN = scnClone(S.LTC_BEN) || {}; ROOF_G = scnClone(S.ROOF_G) || {}; WALLS_SCHED = scnClone(S.WALLS_SCHED) || {}; wallsSchedSig = '';
+    ANN_INC = scnClone(S.ANN_INC) || {}; LTC_BEN = scnClone(S.LTC_BEN) || {}; ROOF_G = scnClone(S.ROOF_G) || {}; WALLS_SCHED = scnClone(S.WALLS_SCHED) || {};
     wdOrder = (S.wdOrder || WD_DEFAULT).slice(); rothCfg = scnClone(S.rothCfg) || scnDefault().rothCfg; qcdCfg = S.qcdCfg ? qcdFrom(S.qcdCfg) : qcdDefault();
   }
   /* …and the page's controls with it */
@@ -14902,7 +14908,7 @@
     if(d.roth && typeof d.roth === 'object'){
       var RC = d.roth;
       S.rothCfg = {apply:RC.apply !== false, target:(RC.target === 'auto' || RC.target == null) ? 'auto' : Number(RC.target),
-                   start:(RC.start === 'auto' || RC.start == null) ? 'auto' : Number(RC.start), order:RC.order === 'walls' ? 'walls' : 'roof', irmaa:rothGuards(RC).irmaaTier > 0, irmaaTier:rothGuards(RC).irmaaTier, ssGuard:rothGuards(RC).ssGuard};
+                   start:(RC.start === 'auto' || RC.start == null) ? 'auto' : Number(RC.start), end:(RC.end === 'auto' || RC.end == null) ? 'auto' : Number(RC.end), order:RC.order === 'walls' ? 'walls' : 'roof', irmaa:rothGuards(RC).irmaaTier > 0, irmaaTier:rothGuards(RC).irmaaTier, ssGuard:rothGuards(RC).ssGuard};
     }
     if(d.qcd && typeof d.qcd === 'object') S.qcdCfg = qcdFrom(d.qcd);
     return S;
@@ -15649,6 +15655,7 @@
   });
   $('rothTarget').addEventListener('change', function(){ var v = $('rothTarget').value; rothCfg.target = v === 'auto' ? 'auto' : Number(v); render(); });
   $('rothStart').addEventListener('change', function(){ var v = $('rothStart').value; rothCfg.start = v === 'auto' ? 'auto' : Number(v); render(); });
+  $('rothEnd').addEventListener('change', function(){ var v = $('rothEnd').value; rothCfg.end = v === 'auto' ? 'auto' : Number(v); render(); });
   $('rothOrder').addEventListener('change', function(){ rothCfg.order = $('rothOrder').value; render(); });
   $('rothApply').addEventListener('change', function(){ rothCfg.apply = $('rothApply').checked; render(); });
   $('rothIrmaa').addEventListener('change', function(){ rothCfg.irmaaTier = +$('rothIrmaa').value; rothCfg.irmaa = rothCfg.irmaaTier > 0; render(); });
@@ -15980,7 +15987,7 @@
     $('clientSex').value = 'male';
     $('spouseSex').value = 'female';
     ltcTouched.ltcClient = false; ltcTouched.ltcSpouse = false; $('ltcSelf').value = '0%';
-    resetLtcInputs(); resetLifeInputs(); wdOrder = WD_DEFAULT.slice(); rothCfg = {apply:true, target:'auto', start:'auto', order:'roof', irmaa:true, irmaaTier:1, ssGuard:'none'}; qcdCfg = qcdDefault();
+    resetLtcInputs(); resetLifeInputs(); wdOrder = WD_DEFAULT.slice(); rothCfg = {apply:true, target:'auto', start:'auto', end:'auto', order:'roof', irmaa:true, irmaaTier:1, ssGuard:'none'}; qcdCfg = qcdDefault();
     risk = {score:'', tol:'', selected:{}, custom:[]}; $('riskScore').value = ''; $('riskTol').value = ''; $('riskTol').classList.remove('auto'); rq = {a:{}, amt:''};
     nitro = null; $('nitroText').value = ''; $('nitroMsg').textContent = '';
     portfolio = null; $('pfText').value = ''; $('pfMsg').textContent = ''; renderPortfolio();
