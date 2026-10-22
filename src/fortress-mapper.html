@@ -1282,7 +1282,7 @@
   </section>
   <!-- 4. HOUSEHOLD -->
   <section>
-    <div class="sec-head"><span class="sec-num">04</span><h2>Income</h2></div>
+    <div class="sec-head" data-head="navy"><span class="sec-num">04</span><h2>Income</h2></div>
     <!-- guide-notes:04 -->
     <details class="guide-notes"><summary>User Guide Notes<small>how to use this section</small></summary>
       <div class="guide-body">
@@ -1469,7 +1469,7 @@
       <div class="btn-row" style="margin-top:10px">
         <button type="button" id="jobAdd">Add an employment income</button>
       </div>
-      <div class="inc-title gap">Social Security</div>
+      <div class="inc-title gap" data-head="navy">Social Security</div>
       <div class="tbl-scroll">
         <table id="ssTable" class="emp">
           <thead>
@@ -1621,7 +1621,7 @@
   </section>
   <!-- 5. MONTHLY BUDGET -->
   <section id="budgetSec">
-    <div class="sec-head"><span class="sec-num">05</span><h2>Expenses</h2></div>
+    <div class="sec-head" data-head="navy"><span class="sec-num">05</span><h2>Expenses</h2></div>
     <!-- guide-notes:05 -->
     <details class="guide-notes"><summary>User Guide Notes<small>how to use this section</small></summary>
       <div class="guide-body">
@@ -1790,7 +1790,7 @@
   </section>
   <!-- 6. ACCOUNTS -->
   <section id="acctSec">
-    <div class="sec-head"><span class="sec-num">06</span><h2>Assets</h2></div>
+    <div class="sec-head" data-head="navy"><span class="sec-num">06</span><h2>Assets</h2></div>
     <!-- guide-notes:06 -->
     <details class="guide-notes"><summary>User Guide Notes<small>how to use this section</small></summary>
       <div class="guide-body">
@@ -2093,7 +2093,7 @@
   </section>
   <!-- 7. DEBTS -->
   <section id="debtSec">
-    <div class="sec-head"><span class="sec-num">07</span><h2>Debts</h2></div>
+    <div class="sec-head" data-head="navy"><span class="sec-num">07</span><h2>Debts</h2></div>
     <!-- guide-notes:07 -->
     <details class="guide-notes"><summary>User Guide Notes<small>how to use this section</small></summary>
       <div class="guide-body">
@@ -3158,7 +3158,8 @@
           below: whatever Needs and Wants need beyond the plan's income is drawn tier by tier.</dd>
 
         <dt>Roth conversion analysis</dt>
-        <dd>Builds a conversion schedule: each year from the <span class="ui">start year</span> until
+        <dd>The settings below sit behind the green <span class="ui">Roth Conversion Inputs</span> button;
+          press it to show or hide them. Builds a conversion schedule: each year from the <span class="ui">start year</span> until
           the <span class="ui">last year</span> &mdash; on Auto, the year before RMDs begin; pick an earlier
           year to stop conversions sooner (they still stop when RMDs begin) &mdash; it converts as much qualified money in the Walls and Roof as
           fits under the top of the <span class="ui">target tax bracket</span> &mdash; by default the
@@ -3195,7 +3196,8 @@
           income.</dd>
 
         <dt>Qualified charitable distributions</dt>
-        <dd>Gifts to charity paid straight from an IRA from age 70&frac12;. Enter each person's
+        <dd>Gifts to charity paid straight from an IRA from age 70&frac12;. The settings sit behind the green
+          <span class="ui">QCD Inputs</span> button; press it to show or hide them. Enter each person's
           <span class="ui">annual gift</span> in today's dollars (it grows with inflation and is capped
           at the IRS limit &mdash; $111,000 a person in 2026, indexed &mdash; and at the balance), the
           <span class="ui">from age</span> (71 by default, the first full year after 70&frac12;) and
@@ -3301,6 +3303,7 @@
       </div>
 
       <div class="inc-title gap">Roth conversion analysis<small>Qualified money in the Walls and Roof, converted a year at a time until RMDs begin or the last year picked</small></div>
+      <div data-tgl="<small>Target bracket, years, order, and the IRMAA and Social Security limits</small>" data-tgl-btn="Roth Conversion Inputs">
       <div class="assump first" style="margin-top:14px">
         <label class="f"><span>Target tax bracket<small>Convert up to the top of this federal bracket</small></span><select id="rothTarget"></select></label>
         <label class="f"><span>Start year<small>First year of conversions</small></span><select id="rothStart"></select></label>
@@ -3325,6 +3328,7 @@
           <option value="top">Stay under the 85% threshold</option></select></label>
       </div>
       <p class="hint" id="rothGuardNote" style="margin:8px 0 0"></p>
+      </div>
       <div class="tax-tiles" id="rothTiles"></div>
       <div class="pj-legend" id="rothLegend"></div>
       <div class="pj-wrap">
@@ -3342,6 +3346,7 @@
       <p class="hint" id="rmdNote" style="margin-top:10px"></p>
 
       <div class="inc-title gap">Qualified charitable distributions<small>Gifts to charity paid straight from an IRA from age 70&frac12; &mdash; they count toward the RMD and never enter income</small></div>
+      <div data-tgl="<small>Annual gifts, starting age and how they relate to the budget</small>" data-tgl-btn="QCD Inputs">
       <div class="assump first" style="margin-top:14px">
         <label class="f"><span id="qcdCLbl">Client's annual gift<small>Today's dollars, growing with inflation; capped at the IRS limit</small></span><input type="text" id="qcdC" class="num" inputmode="numeric" placeholder="0" autocomplete="off"></label>
         <label class="f" id="qcdSWrap"><span id="qcdSLbl">Spouse's annual gift<small>Each person has their own limit</small></span><input type="text" id="qcdS" class="num" inputmode="numeric" placeholder="0" autocomplete="off"></label>
@@ -3351,6 +3356,7 @@
       <div class="btn-row" style="margin-top:14px">
         <label class="chk"><input type="checkbox" id="qcdApply" checked> Apply the QCDs to the plan projections</label>
         <span class="hint" id="qcdMsg"></span>
+      </div>
       </div>
       <div class="tax-tiles" id="qcdTiles"></div>
       <div class="pj-legend" id="qcdLegend"></div>
@@ -3467,7 +3473,7 @@
   </section>
   <!-- 19. SENSITIVITY ANALYSIS -->
   <section id="sensSec">
-    <div class="sec-head"><span class="sec-num">19</span><h2>Sensitivity Analysis</h2></div>
+    <div class="sec-head" data-head="gold"><span class="sec-num">19</span><h2>Sensitivity Analysis</h2></div>
     <!-- guide-notes:19 -->
     <details class="guide-notes"><summary>User Guide Notes<small>how to use this section</small></summary>
       <div class="guide-body">
@@ -3518,7 +3524,7 @@
   </section>
   <!-- 20. TRANSFER SEQUENCE -->
   <section id="seqSec">
-    <div class="sec-head"><span class="sec-num">20</span><h2>Transfer sequence</h2></div>
+    <div class="sec-head" data-head="gold"><span class="sec-num">20</span><h2>Transfer sequence</h2></div>
     <!-- guide-notes:20 -->
     <details class="guide-notes"><summary>User Guide Notes<small>how to use this section</small></summary>
       <div class="guide-body">
@@ -15028,15 +15034,17 @@
     $('caseJson').value = caseData();
   }
   /* Headers over an output graphic are gold: a section that holds a chart, the fortress graphic, the asset donuts or
-     the asset map; a subsection title (and its body) or a panel title (and its panel) holding one. */
+     the asset map; a subsection title (and its body) or a panel title (and its panel) holding one. A header's
+     data-head="navy" or "gold" fixes its colour whatever it holds. */
   var GRAPHIC_SEL = '.pj-wrap, svg.pj, .fort, .pies, .asset-map';
   function markGraphicHeads(){
-    document.querySelectorAll('section').forEach(function(sec){ var h = sec.querySelector('.sec-head'); if(h) h.classList.toggle('gold', !!sec.querySelector(GRAPHIC_SEL)); });
+    function fixed(h, has){ var f = h.getAttribute('data-head'); return f ? f === 'gold' : has; }
+    document.querySelectorAll('section').forEach(function(sec){ var h = sec.querySelector('.sec-head'); if(h) h.classList.toggle('gold', fixed(h, !!sec.querySelector(GRAPHIC_SEL))); });
     document.querySelectorAll('.inc-title').forEach(function(t){
       var has = false, n = t.nextElementSibling;
       if(n && n.classList.contains('tgl-body')) has = !!n.querySelector(GRAPHIC_SEL);
       else for(; n && !n.classList.contains('inc-title'); n = n.nextElementSibling){ if(n.matches(GRAPHIC_SEL) || n.querySelector(GRAPHIC_SEL)){ has = true; break; } }
-      t.classList.toggle('gold', has);
+      t.classList.toggle('gold', fixed(t, has));
     });
     document.querySelectorAll('.bkt-head').forEach(function(h){ var pn = h.closest('.panel'); h.classList.toggle('gold', !!(pn && pn.querySelector(GRAPHIC_SEL))); });
   }

@@ -1,4 +1,5 @@
-/* Layout and the balance sheet: headers over an output graphic are gold; every section header starts at the same
+/* Layout and the balance sheet: headers over an output graphic are gold (sections 04-07 and the Social Security
+   subsection fixed navy, 19 and 20 fixed gold); the Roth and QCD inputs fold behind green buttons; every section header starts at the same
    left edge (scenario sections no longer indented); the Net worth readout sits in section 07 with the debts subtracted,
    under it a gold "Net worth over time" chart; the Walls plan assumptions (start, growth before income starts, the
    tax-free line) live in section 03, and section 14 keeps only the by-account table, an earlier case's section 14
@@ -14,17 +15,33 @@ const path = require('path');
   const out=[];
   const num=s=>+String(s).replace(/[^0-9.\-]/g,'');
 
-  // 1. gold headers: sections and subsections that hold a chart; none on sections without one
+  // 1. gold headers: sections and subsections that hold a chart, with fixed exceptions (04–07 and the Social
+  //    Security subsection navy; 19 and 20 gold); none on sections without one
   const G=await p.evaluate(()=>{ const sec=n=>[...document.querySelectorAll('section')].find(s=>{ const x=s.querySelector('.sec-num'); return x && x.textContent.trim()===n; });
     const gold=n=>{ const s=sec(n); return !!(s && s.querySelector('.sec-head').classList.contains('gold')); };
     const sub=t=>{ const h=[...document.querySelectorAll('.inc-title')].find(x=>x.textContent.includes(t)); return h ? h.classList.contains('gold') : null; };
-    return {s01:gold('01'), s03:gold('03'), s14:gold('14'), s17:gold('17'), s18:gold('18'), s07:gold('07'), nwSub:sub('Net worth over time'), roth:sub('Roth conversion analysis'), wd:sub('Withdrawal order'),
-      bg:getComputedStyle(sec('17').querySelector('.sec-head')).backgroundColor}; });
+    const r={nwSub:sub('Net worth over time'), roth:sub('Roth conversion analysis'), wd:sub('Withdrawal order'), ss:sub('Social Security'),
+      bg:getComputedStyle(sec('17').querySelector('.sec-head')).backgroundColor};
+    ['01','03','04','05','06','07','14','17','18','19','20'].forEach(n=>{ r['s'+n]=gold(n); }); return r; });
   console.log('gold headers:', JSON.stringify(G));
   if(G.s01 || G.s03 || G.s14) out.push('sections without a graphic should keep the navy header');
-  if(!G.s17 || !G.s18 || !G.s07) out.push('sections 07, 17 and 18 hold charts and should be gold');
+  if(G.s04 || G.s05 || G.s06 || G.s07 || G.ss) out.push('sections 04-07 and the Social Security subsection should be navy');
+  if(!G.s17 || !G.s18 || !G.s19 || !G.s20) out.push('sections 17-20 should be gold');
   if(!G.nwSub || !G.roth) out.push('the chart subsections should be gold');
   if(G.wd) out.push('Withdrawal order has no chart and should not be gold');
+
+  // 1b. the Roth and QCD inputs fold behind green buttons, closed until pressed
+  for(const [btn,id] of [['Roth Conversion Inputs','rothTarget'],['QCD Inputs','qcdC']]){
+    await p.click('#collapseAll'); await p.waitForTimeout(300);
+    await p.evaluate(()=>{ const s=[...document.querySelectorAll('section')].find(s=>s.querySelector('.sec-num').textContent.trim()==='17'); s.querySelector('.sec-head').click();
+      [...s.querySelectorAll('.inc-title')].forEach(h=>{ if(h.classList.contains('closed')) h.click(); }); });
+    await p.waitForTimeout(300);
+    const st=await p.evaluate(([btn,id])=>{ const b=[...document.querySelectorAll('button.tgl-cta')].find(x=>x.textContent===btn); const vis=()=>!!document.getElementById(id).offsetParent;
+      if(!b) return {found:false}; const bg=getComputedStyle(b).backgroundColor, closed=vis(); b.click(); const open=vis(); b.click(); return {found:true, bg, hiddenBefore:!closed, shownAfter:open, hiddenAgain:!vis()}; },[btn,id]);
+    console.log(btn+':', JSON.stringify(st));
+    if(!st.found || st.bg!=='rgb(46, 125, 50)' || !st.hiddenBefore || !st.shownAfter || !st.hiddenAgain) out.push('the '+btn+' should be a green button that shows and hides the inputs');
+  }
+  await p.click('#expandAll'); await p.waitForTimeout(400);
 
   // 2. no section is indented
   const lefts=await p.$$eval('section .sec-head',hs=>[...new Set(hs.map(h=>Math.round(h.getBoundingClientRect().left)))]);
