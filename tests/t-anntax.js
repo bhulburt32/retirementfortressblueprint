@@ -89,7 +89,8 @@ const path = require('path');
   const tfNq=await figs(); console.log('After Tax in the Walls, AUM - Tax Free:', JSON.stringify(tfNq));
   if(!(tfNq.fed<txNq.fed-100)) errs.push('AUM - Tax Free on non-qualified Walls money should cut the federal tax ('+tfNq.fed+' vs '+txNq.fed+')');
   if(!(tfNq.end>txNq.end)) errs.push('less tax should leave more at the end of plan');
-  if(Math.abs(tfNq.state-txNq.state)>1) errs.push('the state model should be unchanged by the federal exemption ('+tfNq.state+' vs '+txNq.state+')');
+  // the state still taxes the yield; only the second-order effect of a smaller federal tax on the withdrawals (and their gains) may move it
+  if(Math.abs(tfNq.state-txNq.state)>50) errs.push('the state model should be unchanged by the federal exemption, bar the smaller draw ('+tfNq.state+' vs '+txNq.state+')');
   if(!/AUM - Tax Free/.test(await txt('#taxAssume'))) errs.push('the section 16 assumptions should name the tax-free share');
   // saved and reloaded with the case
   const json=await p.$eval('#caseJson',e=>e.value); console.log('product saved with the case:', /AUM - Tax Free/.test(json));
