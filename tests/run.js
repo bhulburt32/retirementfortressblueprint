@@ -27,6 +27,7 @@ const SUITE = [
   't-wallssched', // section 14 Walls income by account: start/stop dates, total yield vs distribution, restarts; blank = pooled, unchanged
   't-taxcols',    // section 17 tax table: All income and AGI built up, MAGI for IRMAA, provisional income; senior deduction; IRMAA guard on MAGI
   't-basis',      // section 06 cost basis on taxable accounts: average-cost gains on withdrawals; blank = the 50% assumption
+  't-sqsens',     // status-quo stress charts; the findings report lists only the risks checked or typed in the Risk section
   't-networth',   // gold headers over graphics, no indented sections, net worth in section 07 (debts subtracted) and over time, Walls plan assumptions in section 03
 ];
 const only = process.argv.slice(2);
