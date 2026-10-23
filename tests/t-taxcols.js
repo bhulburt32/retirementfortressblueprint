@@ -113,6 +113,22 @@ const path = require('path');
     const cy3=(await rowsOf()).filter(x=>x.conv>0.5).map(x=>x.year);
     if(cy3.join()!==cy.join()) out.push('Auto should restore the conversion years ('+cy3.join()+' vs '+cy.join()+')');
   } else out.push('the run should convert in at least three years to test the last year');
+  // 6b. the last year can be any plan year: the list runs to the end of plan, and a year past the RMD start keeps converting after RMDs begin
+  {
+    const Rall=await rowsOf(), planEnd=Rall[Rall.length-1].year;
+    const info=await p.$eval('#rothEnd',s=>({opts:[...s.options].map(o=>o.value).filter(v=>v!=='auto').map(Number), auto:s.options[0].textContent}));
+    const rmdStart=+((/RMDs begin (\d{4})/.exec(info.auto)||[])[1]||0);
+    console.log('last-year options:', info.opts[0]+'..'+info.opts[info.opts.length-1], '| plan end:', planEnd, '| RMDs begin:', rmdStart||'never');
+    if(info.opts[info.opts.length-1]!==planEnd) out.push('the Last year list should run to the end of plan ('+planEnd+'), not '+info.opts[info.opts.length-1]);
+    await p.selectOption('#rothEnd', String(planEnd)); await p.waitForTimeout(900);
+    const cyEnd=(await rowsOf()).filter(x=>x.conv>0.5).map(x=>x.year), noteEnd=(await p.$eval('#rothNote',e=>e.textContent)).replace(/\s+/g,' ');
+    console.log('last year = plan end: conversion years', cyEnd.join(', '), '| note:', noteEnd.slice(0,120));
+    if(rmdStart && !cyEnd.some(y=>y>=rmdStart)) out.push('with the last year at the end of plan, conversions should continue after RMDs begin in '+rmdStart);
+    if(cyEnd.some(y=>y>planEnd)) out.push('no conversion should run past the end of plan');
+    await p.selectOption('#rothEnd','auto'); await p.waitForTimeout(900);
+    const cyAuto=(await rowsOf()).filter(x=>x.conv>0.5).map(x=>x.year);
+    if(rmdStart && cyAuto.some(y=>y>=rmdStart)) out.push('on Auto the conversions should stop before RMDs begin');
+  }
 
   console.log('ERRORS:', errs.length||out.length ? [...errs, ...out] : 'none');
   await b.close();
