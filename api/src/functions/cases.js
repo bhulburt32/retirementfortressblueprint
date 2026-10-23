@@ -39,7 +39,10 @@ app.http('casesExport', {
   handler: guard(async (request, context) => {
     const me = principal(request); if (!me) return text(401, 'Sign in required.');
     const container = await cases();
-    const { resources } = await container.items.query({ query: 'SELECT * FROM c WHERE c.advisorId = @me AND NOT IS_DEFINED(c.deletedAt) ORDER BY c.updatedAt DESC', parameters: [{ name: '@me', value: me.id }] }).fetchAll();
+    const all = me.isOwner && request.query.get('all') === '1';   // an administrator exports every advisor's cases with ?all=1
+    const { resources } = await container.items.query(all
+      ? { query: 'SELECT * FROM c WHERE NOT IS_DEFINED(c.deletedAt) ORDER BY c.updatedAt DESC' }
+      : { query: 'SELECT * FROM c WHERE c.advisorId = @me AND NOT IS_DEFINED(c.deletedAt) ORDER BY c.updatedAt DESC', parameters: [{ name: '@me', value: me.id }] }).fetchAll();
     const out = resources.map(({ _rid, _self, _etag, _attachments, _ts, ...keep }) => keep);
     context.log(`cases.export ${me.id} ${out.length}`);
     return { status: 200, body: JSON.stringify(out, null, 1), headers: { 'content-type': 'application/json', 'content-disposition': `attachment; filename="fortress-cases-${new Date().toISOString().slice(0, 10)}.json"` } };

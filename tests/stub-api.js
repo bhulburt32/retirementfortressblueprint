@@ -11,7 +11,7 @@ http.createServer((req, res) => {
     if (u.pathname === '/.auth/me') return send(res, 200, {clientPrincipal: {identityProvider: 'aad', userId: 'u-ben', userDetails: 'ben@example.test', userRoles: ['anonymous', 'authenticated'], claims: [{typ: 'name', val: 'Ben Hulburt'}]}});
     if (u.pathname === '/api/summary' && req.method === 'POST') return send(res, 200, {json: {holdings: 'stub', risk: 'stub'}});
     if (u.pathname === '/api/cases/export') return send(res, 200, Object.values(docs));
-    if (u.pathname === '/api/cases' && req.method === 'GET') return send(res, 200, Object.values(docs).filter(d => !d.deletedAt).map(d => ({id: d.id, clientLabel: d.clientLabel, advisorName: d.advisorName, updatedAt: d.updatedAt, planStatus: d.case && d.case.planStatus})));
+    if (u.pathname === '/api/cases' && req.method === 'GET') return send(res, 200, Object.values(docs).filter(d => !d.deletedAt).map(d => ({id: d.id, advisorId: d.advisorId, clientLabel: d.clientLabel, advisorName: d.advisorName, updatedAt: d.updatedAt, planStatus: d.case && d.case.planStatus})));
     const mm = /^\/api\/cases\/([A-Za-z0-9_-]+)$/.exec(u.pathname);
     if (mm) {
       const id = mm[1];
