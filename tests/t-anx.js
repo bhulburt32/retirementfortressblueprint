@@ -77,5 +77,16 @@ const path = require('path');
   const m=await p.$$eval('#acctBody tr[data-id] select[data-k="pos"]',ss=>ss.map(s=>s.value)); const added=m.slice(before); console.log('pasted positions:', JSON.stringify(added));
   if(JSON.stringify(added)!==JSON.stringify(['MYGA Annuity','Variable Annuity','Income Annuity (FIA)','Growth Annuity (FIA)','Income Annuity (FIA)','Market'])) errs.push('pasted positions resolved wrongly');
   console.log('annuity rows now:', (await rows()).length);
+  // the weighted average fee is measured against every account, the ones marked Stay as is or held back from a partial transfer included
+  const fee=await p.evaluate(()=>{ const num=s=>+String(s).replace(/[^0-9.]/g,''); const vals=[...document.querySelectorAll('#acctBody tr[data-id] input[data-k="val"]')].map(i=>num(i.value));
+    const tiles=[...document.querySelectorAll('#feePanel .strip div')].map(d=>d.textContent.replace(/\s+/g,' '));
+    const w=tiles.find(t=>/Weighted average/.test(t))||'', m=/across \$([0-9,]+)/.exec(w), pct=/([0-9.]+)%/.exec(w);
+    const managed=num((tiles.find(t=>/Assets under management/.test(t))||'').match(/\$[0-9,]+/)[0]), rate=+/([0-9.]+)%/.exec(tiles.find(t=>/Advisory fee/.test(t))||'0%')[1]/100;
+    const held=[...document.querySelectorAll('#acctBody tr[data-id]')].filter(r=>r.querySelector('select[data-k="move"]').value!=='yes').length;
+    return {sumAll:Math.round(vals.reduce((a,v)=>a+v,0)), base:m?num(m[1]):null, weighted:pct?+pct[1]:null, expect:+((managed*rate)/vals.reduce((a,v)=>a+v,0)*100).toFixed(2), heldRows:held}; });
+  console.log('fee denominator:', JSON.stringify(fee));
+  if(!fee.heldRows) errs.push('the default case should carry an account held out of the plan for this check');
+  if(fee.base!==fee.sumAll) errs.push('the weighted average fee should be measured against all accounts ('+fee.sumAll+'), not '+fee.base);
+  if(fee.weighted!==fee.expect) errs.push('the weighted average should be the fee over all accounts: '+fee.expect+'%, not '+fee.weighted+'%');
   console.log('ERRORS:', errs.length?errs:'none'); await b.close();
 })();
