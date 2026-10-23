@@ -1051,7 +1051,7 @@
     <div class="head-actions">
       <button class="theme-btn" id="makeEdu" type="button" title="Alto’s Protecting Your Retirement Income slides, the same for every client — opens in a new tab">Educational slides</button>
       <button class="theme-btn" id="dlWorksheet" type="button" title="Alto’s Monthly Budget Worksheet, a fillable PDF for the client to complete — upload it in section 05 when it comes back">Budget worksheet</button>
-      <button class="theme-btn" id="dlSimplify" type="button" title="Alto’s New Client Data Worksheet — the Simplify worksheet, a fillable PDF the client completes for the Simplify meeting; it is not to be emailed back, the client uploads it to the secure link">Simplify worksheet</button>
+      <button class="theme-btn" id="dlSimplify" type="button" title="Alto’s New Client Data Worksheet — a fillable PDF the client completes for the Simplify meeting; it is not to be emailed back, the client uploads it to the secure link">Client Data Worksheet</button>
       <button class="theme-btn" id="dlManual" type="button" title="The advisor guide to this application — Running a Fortress Blueprint, section by section — as a PDF for internal use">App manual</button>
       <a class="theme-btn app-btn" href="https://app.crmworkspace.com/login" target="_blank" rel="noopener" title="Wealthbox CRM — opens in a new tab">Open Wealthbox</a>
       <a class="theme-btn app-btn" href="https://altofinancialgroup.account.box.com/login" target="_blank" rel="noopener" title="Alto’s Box — opens in a new tab">Open Box</a>
@@ -18540,7 +18540,7 @@
     savePdf($('dlManual'), manualBlob, 'Retirement Fortress Blueprint - Advisor Guide.pdf', 'app manual', 'application/pdf', 'Advisor guide saved \u2014 the manual to this application, for internal use.', {standalone:true});
   });
   $('dlSimplify').addEventListener('click', function(){
-    savePdf($('dlSimplify'), simplifyBlob, 'Alto New Client Data Worksheet.pdf', 'Simplify worksheet', 'application/pdf', 'New Client Data Worksheet saved \u2014 the client completes it before the Simplify meeting and uploads it to the secure link; it must not be emailed back.', {standalone:true});
+    savePdf($('dlSimplify'), simplifyBlob, 'Alto New Client Data Worksheet.pdf', 'Client Data Worksheet', 'application/pdf', 'New Client Data Worksheet saved \u2014 the client completes it before the Simplify meeting and uploads it to the secure link; it must not be emailed back.', {standalone:true});
   });
   $('dlWorksheet').addEventListener('click', function(){
     savePdf($('dlWorksheet'), worksheetBlob, 'Alto Monthly Budget Worksheet.pdf', 'budget worksheet', 'application/pdf', 'Monthly Budget Worksheet saved \u2014 send it to the client to fill in, then upload the completed PDF in section 05.', {standalone:true});
