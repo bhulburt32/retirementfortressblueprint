@@ -2066,13 +2066,21 @@
         leaves the open case as it was.</p>
       <p>Do this before every meeting where you might change something, and again at the end. It
         takes five seconds and it is the only backup that exists.</p>
-      <p>On Alto's own site (signed in with your Microsoft account) a <b>Saved cases</b> panel sits above
-        this box. <span class="ui">Save</span> keeps the open case on Alto's server under the client's
-        name and your sign-in; <span class="ui">Save as new</span> makes a second copy (a what-if, or a
-        case you took over); <span class="ui">Open</span> brings one back; <span class="ui">Delete</span>
-        removes it from the list (an administrator can restore it for 30 days);
-        <span class="ui">Export all</span> downloads every case you can see as one JSON file. Only you
-        and the firm's administrators see your cases. The paste box still works alongside it.</p>
+      <h3>Saved cases on Alto's site</h3>
+      <p>When the Blueprint runs on Alto's own site rather than as the claude.ai demo, you sign in with
+        your Microsoft account and a <b>Saved cases</b> panel appears above the paste box. <span
+        class="ui">Save</span> keeps the open case on Alto's server under the client's name and your
+        sign-in, and saving again updates the same record; <span class="ui">Save as new</span> makes a
+        second copy; <span class="ui">Open</span> brings one back; <span class="ui">Delete</span> removes
+        it from the list (an administrator can restore it for 30 days); <span class="ui">Export
+        all</span> downloads every case you can see as one JSON file. Advisors see their own cases;
+        the firm's administrators (the sign-ins listed in the server's <span class="ui">OWNER_IDS</span>
+        setting) see every advisor's, with the saver's name on each row and a <span class="ui">Show</span>
+        control to narrow the list to their own; Open works on any of them, and a save is always recorded
+        under the signed-in advisor. The written summaries in sections 12 and 16 run
+        there too, through Alto's server, so nothing but the figures on the page is sent to Claude.
+        The paste box keeps working alongside the panel, and the signed-in name fills the
+        <span class="ui">Advisor</span> field on a new case.</p>
     </div>
   </section>
 
@@ -2113,3 +2121,4 @@
   </footer>
 
 </div>
+
