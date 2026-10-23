@@ -1,5 +1,5 @@
-/* Layout and the balance sheet: headers over an output graphic are gold (sections 04-07 and the Social Security
-   subsection fixed navy, 19 and 20 fixed gold); the Roth and QCD inputs fold behind green buttons; every section header starts at the same
+/* Layout and the balance sheet: subsection titles over an output graphic are gold (the Social Security
+   subsection fixed navy); the numbered section headers are always navy; the Roth and QCD inputs fold behind green buttons; every section header starts at the same
    left edge (scenario sections no longer indented); the Net worth readout sits in section 07 with the debts subtracted,
    under it a gold "Net worth over time" chart; the Walls plan assumptions (start, growth before income starts, the
    tax-free line) live in section 03, and section 14 keeps only the by-account table, an earlier case's section 14
@@ -15,8 +15,8 @@ const path = require('path');
   const out=[];
   const num=s=>+String(s).replace(/[^0-9.\-]/g,'');
 
-  // 1. gold headers: sections and subsections that hold a chart, with fixed exceptions (04–07 and the Social
-  //    Security subsection navy; 19 and 20 gold); none on sections without one
+  // 1. gold headers: subsections that hold a chart (the Social Security subsection fixed navy); the numbered
+  //    section headers are never gold
   const G=await p.evaluate(()=>{ const sec=n=>[...document.querySelectorAll('section')].find(s=>{ const x=s.querySelector('.sec-num'); return x && x.textContent.trim()===n; });
     const gold=n=>{ const s=sec(n); return !!(s && s.querySelector('.sec-head').classList.contains('gold')); };
     const sub=t=>{ const h=[...document.querySelectorAll('.inc-title')].find(x=>x.textContent.includes(t)); return h ? h.classList.contains('gold') : null; };
@@ -24,9 +24,8 @@ const path = require('path');
       bg:getComputedStyle(sec('17').querySelector('.sec-head')).backgroundColor};
     ['01','03','04','05','06','07','14','17','18','19','20'].forEach(n=>{ r['s'+n]=gold(n); }); return r; });
   console.log('gold headers:', JSON.stringify(G));
-  if(G.s01 || G.s03 || G.s14) out.push('sections without a graphic should keep the navy header');
-  if(G.s04 || G.s05 || G.s06 || G.s07 || G.ss) out.push('sections 04-07 and the Social Security subsection should be navy');
-  if(!G.s17 || !G.s18 || !G.s19 || !G.s20) out.push('sections 17-20 should be gold');
+  if(G.s01 || G.s03 || G.s04 || G.s05 || G.s06 || G.s07 || G.s14 || G.s17 || G.s18 || G.s19 || G.s20 || G.bg!=='rgb(31, 49, 98)') out.push('every section header should be navy');
+  if(G.ss) out.push('the Social Security subsection should be navy');
   if(!G.nwSub || !G.roth) out.push('the chart subsections should be gold');
   if(G.wd) out.push('Withdrawal order has no chart and should not be gold');
 
