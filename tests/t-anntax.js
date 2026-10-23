@@ -72,8 +72,8 @@ const path = require('path');
   const added=penRows[penRows.length-1]; if(penRows.length!==penRows0+1 || !added || Math.abs(+added.amt.replace(/,/g,'')-monthly)>1 || added.start!=='2027-06' || added.surv!=='50') errs.push('Add to pension income should add the line with the monthly benefit, the retirement month and the survivor share');
   const lastPen=await p.$$eval('#penBody tr[data-pen]',rs=>rs[rs.length-1].dataset.pen); await p.click(`#penBody tr[data-pen="${lastPen}"] [data-pdel]`); await p.waitForTimeout(400);
   if((await p.$$eval('#penBody tr[data-pen]',rs=>rs.length))!==penRows0) errs.push('removing the added pension should restore the list');
-  console.log('video link:', await p.$eval('#roadVideo',a=>a.href+' '+a.target), '|', await p.$eval('.masthead #roadVideo',e=>e.textContent.trim()));
-  if(!(await p.$eval('.masthead #roadVideo',a=>/claude\.ai\/artifact\/4betJJT5zWc21C6KhEAQN5/.test(a.href) && a.target==='_blank'))) errs.push('the header should link to The Road to Retirement Fortress video');
+  console.log('video link in header:', await p.$$eval('.masthead #roadVideo, .masthead .video-btn',a=>a.length));
+  if(await p.$$eval('.masthead #roadVideo, .masthead .video-btn',a=>a.length)) errs.push('the header should no longer carry The Road to Retirement Fortress video button');
   console.log('header background image:', (await p.$eval('.masthead',e=>getComputedStyle(e).backgroundImage)).slice(0,60)); if(!/url\("data:image\/jpeg/.test(await p.$eval('.masthead',e=>getComputedStyle(e).backgroundImage))) errs.push('the header should carry the Fortress graphic as its background');
   // 2. AUM - Tax Free: a Walls line in that product pays a federally tax-free yield; no change while the Walls hold only IRA money
   // (at the 3.26% default the Smith plan spends the small After Tax account in its first years, so the comparison runs at 2.5%)
