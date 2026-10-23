@@ -18192,10 +18192,9 @@
     var agesShort = function(row){ return 'ages ' + row.ages.join(' / '); };
     /* the application's section numbers mean nothing to a client */
     var noSec = function(t){ t = String(t || '').replace(/\s*\((?:answer |years )?in section\s*\d+\)/gi, '').replace(/\s*\(section\s*\d+\)/gi, '').replace(/\s+in section\s*\d+\b/gi, '').replace(/^Section\s*\d+\s+(holds|sets)\b/i, 'The plan $1').replace(/^Section\s*\d+:\s*/i, '').replace(/\bsection\s*\d+\b/gi, 'the plan'); return t.charAt(0).toUpperCase() + t.slice(1); };
-    /* the risks and the stress tests */
-    var items = RS.items.slice(0, 6), tmp = document.createElement('div');
-    if(!items.length) RISK_ITEMS.forEach(function(it){ if(it.sug && it.sug(RF)){ tmp.innerHTML = it.text(RF); items.push({text:tmp.textContent, sub:it.sub(RF)}); } });
-    items = items.slice(0, 6).map(function(it){ return {text:noSec(it.text), sub:noSec(it.sub)}; });
+    /* the risks and the stress tests: only the risks the advisor checked in the Risk section, or typed there,
+       go to the client; a risk the plan data merely points to stays off the page until it is checked */
+    var items = RS.items.slice(0, 6).map(function(it){ return {text:noSec(it.text), sub:noSec(it.sub)}; });
     var sens = sensDefs(r, P).map(function(d){ return {d:d, R:sensRun(r, d, TX)}; });
     var sqSens = growthMissing().length ? [] : sensDefs(r, SQ.income || P).map(function(d){ return {d:d, R:sensRun(r, d, SQ, 'sq')}; });
     /* a small chart: the accounts as they stand under one stress (solid) against the projection without it (dashed) */
