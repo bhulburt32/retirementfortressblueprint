@@ -3857,7 +3857,9 @@
         the firm's administrators (the sign-ins listed in the server's <span class="ui">OWNER_IDS</span>
         setting) see every advisor's, with the saver's name on each row and a <span class="ui">Show</span>
         control to narrow the list to their own; Open works on any of them, and a save is always recorded
-        under the signed-in advisor. The written summaries in sections 12 and 16 run
+        under the signed-in advisor. The <span class="ui">Find</span> box narrows the list as you type
+        &mdash; any words from the client's name or the saver's, in any order &mdash; and a search that
+        matches nothing says so; clear it to see every case again. The written summaries in sections 12 and 16 run
         there too, through Alto's server, so nothing but the figures on the page is sent to Claude.
         The paste box keeps working alongside the panel, and the signed-in name fills the
         <span class="ui">Advisor</span> field on a new case.</p>
@@ -3871,6 +3873,7 @@
         <button type="button" id="caseSaveAs">Save as new</button>
         <button type="button" id="caseExport">Export all</button>
         <label class="hint" id="casesViewWrap" hidden>Show <select id="casesView"><option value="all">every case I can see</option><option value="mine">my cases only</option></select></label>
+        <label class="hint" id="casesFindWrap">Find <input type="search" id="casesFind" placeholder="client or advisor name" autocomplete="off" style="width:220px;display:inline-block;font-family:'Public Sans',sans-serif;font-size:14px;padding:5px 8px"></label>
         <span class="hint" id="casesMsg"></span>
       </div>
       <div class="tbl-wrap" style="margin-top:12px"><table class="pj-table" id="casesTable" style="min-width:640px"><thead><tr><th>Client</th><th>Saved by</th><th>Last saved</th><th></th></tr></thead><tbody id="casesBody"></tbody></table></div>
@@ -15851,7 +15854,7 @@
   $('scnGrid').addEventListener('change', function(e){ if(e.target.name === 'scnReport'){ reportScn = +e.target.value; scnChrome(); $('caseJson').value = caseData(); } });
   $('reportScn').addEventListener('change', function(){ reportScn = +this.value; scnChrome(); render(); });
   /* ---- the Azure site: who is signed in, and saved cases through /api/cases ---- */
-  var currentCaseId = null, casesCache = [], myUserId = null, casesView = 'all';
+  var currentCaseId = null, casesCache = [], myUserId = null, casesView = 'all', casesFind = '';
   function apiFetch(path, opts){
     return fetch(RFB_API + path, Object.assign({headers:{'Content-Type':'application/json'}}, opts || {})).then(function(r){
       if(r.status === 401 || r.status === 403) throw new Error('Your sign-in has expired \u2014 reload the page.');
@@ -15869,6 +15872,11 @@
     $('casesViewWrap').hidden = !others;
     if($('casesSub')) $('casesSub').textContent = others ? 'Every advisor\u2019s cases on Alto\u2019s server \u00b7 you are an administrator; saves are recorded as the signed-in advisor' : 'Your cases on Alto\u2019s server \u00b7 saved as the signed-in advisor';
     var list = (others && casesView === 'mine') ? casesCache.filter(function(c){ return c.advisorId === myUserId; }) : casesCache;
+    /* the Find box narrows the list to cases whose client or saver matches, word by word, in any order */
+    var words = casesFind.toLowerCase().split(/\s+/).filter(Boolean), before = list.length;
+    if(words.length) list = list.filter(function(c){ var hay = ((c.clientLabel || '') + ' ' + (c.advisorName || '')).toLowerCase(); return words.every(function(w){ return hay.indexOf(w) >= 0; }); });
+    if($('casesFindWrap')) $('casesFindWrap').hidden = !casesCache.length;
+    if(words.length && !list.length){ body.innerHTML = '<tr><td colspan="4" class="hint">No saved case matches \u201c' + esc(casesFind.trim()) + '\u201d' + (before ? ' \u2014 ' + before + ' to choose from; clear the box to see them all.' : '.') + '</td></tr>'; return; }
     body.innerHTML = list.length ? list.map(function(c){
       return '<tr' + (c.id === currentCaseId ? ' class="grp"' : '') + '><td>' + esc(c.clientLabel || 'Unnamed') + (c.id === currentCaseId ? ' <small>(open)</small>' : '') + '</td><td>' + esc(c.advisorName || '') + '</td><td>' + esc(fmtWhen(c.updatedAt)) + '</td>'
         + '<td class="num"><button type="button" data-case-open="' + esc(c.id) + '">Open</button> <button type="button" data-case-del="' + esc(c.id) + '">Delete</button></td></tr>';
@@ -15911,6 +15919,7 @@
     $('caseSaveAs').addEventListener('click', function(){ saveCase(true); });
     $('caseExport').addEventListener('click', function(){ window.location.href = RFB_API + '/cases/export?all=1'; });   // every case the server lets this advisor see
     $('casesView').addEventListener('change', function(){ casesView = $('casesView').value; renderCases(); });
+    $('casesFind').addEventListener('input', function(){ casesFind = $('casesFind').value; renderCases(); });
     $('casesBody').addEventListener('click', function(e){ var o = e.target.getAttribute && e.target.getAttribute('data-case-open'), d = e.target.getAttribute && e.target.getAttribute('data-case-del'); if(o) openCase(o); else if(d) deleteCase(d); });
   }
   initAzure();

@@ -20,6 +20,17 @@ const { chromium } = require('playwright');
   // save as new
   await p.fill('#clientFirst', 'Second'); await p.waitForTimeout(400); await p.click('#caseSaveAs'); await p.waitForTimeout(800);
   console.log('after save-as rows:', await p.evaluate(() => document.querySelectorAll('#casesBody tr').length));
+  // the Find box narrows the list by client or saver, any words in any order; a miss says so; clearing restores the list
+  const rowsNow = () => p.evaluate(() => [...document.querySelectorAll('#casesBody tr')].map(r => r.querySelector('td').textContent.trim()));
+  await p.fill('#casesFind', 'second'); await p.waitForTimeout(200); const f1 = await rowsNow();
+  await p.fill('#casesFind', 'household2 ben'); await p.waitForTimeout(200); const f2 = await rowsNow();
+  await p.fill('#casesFind', 'nobody'); await p.waitForTimeout(200); const f3 = await rowsNow();
+  await p.fill('#casesFind', ''); await p.waitForTimeout(200); const f4 = await rowsNow();
+  console.log('find "second":', JSON.stringify(f1), '| "household2 ben":', f2.length, '| "nobody":', JSON.stringify(f3), '| cleared:', f4.length);
+  if(f1.length !== 1 || !/Second/.test(f1[0])) errs.push('Find "second" should leave the one matching case');
+  if(f2.length !== 2) errs.push('Find by a word from the client and a word from the saver should match both cases');
+  if(f3.length !== 1 || !/No saved case matches/.test(f3[0])) errs.push('a search that matches nothing should say so');
+  if(f4.length !== 2) errs.push('clearing the Find box should restore the list');
   // new case resets, then open the first
   await p.click('#newCase'); await p.waitForTimeout(800);
   console.log('after new case:', await p.evaluate(() => document.getElementById('clientFirst').value || '(empty)'), '| marked open:', await p.evaluate(() => document.querySelectorAll('#casesBody tr.grp').length));
