@@ -3303,7 +3303,7 @@
         <label class="f"><span>Target tax bracket<small>Convert up to the top of this federal bracket</small></span><select id="rothTarget"></select></label>
         <label class="f"><span>Start year<small>First year of conversions</small></span><select id="rothStart"></select></label>
         <label class="f"><span>Convert from<small>Which level first</small></span><select id="rothOrder"><option value="roof" selected>Roof first, then Walls</option><option value="walls">Walls first, then Roof</option></select></label>
-        <label class="f"><span>Last year<small>The last year to convert; auto stops before RMDs</small></span><select id="rothEnd"></select></label>
+        <label class="f"><span>Last year<small>The last year to convert, any year to the end of plan; auto stops before RMDs</small></span><select id="rothEnd"></select></label>
       </div>
       <div class="btn-row" style="margin-top:14px">
         <label class="chk"><input type="checkbox" id="rothApply" checked> Apply the conversion strategy to the plan projections</label>
@@ -8327,7 +8327,7 @@
       h2('Roth conversion strategy');
       var cRows = TX.rows.filter(function(x){ return x.conv && x.conv.amt > 0.5; });
       var lB = TXb.rows[TXb.rows.length - 1], lP = TX.rows[TX.rows.length - 1], sv = (TXb.lifetime + TXb.lifetimeState) - (TX.lifetime + TX.lifetimeState);
-      para('Convert qualified money in the Roof and Walls each year from ' + cfgR.startYear + (cfgR.endYear != null ? ' through ' + cfgR.endYear + (TX.rmdStartYear != null && TX.rmdStartYear <= cfgR.endYear ? ' (or until RMDs begin in ' + TX.rmdStartYear + ')' : '') : TX.rmdStartYear != null ? ' until RMDs begin in ' + TX.rmdStartYear : '') + ', up to the top of the ' + Math.round(cfgR.targetRate * 100) + '% federal bracket' + (cfgR.irmaa ? ' and under ' + (cfgR.irmaaTier > 1 ? 'the ' + ['', '1st', '2nd', '3rd', '4th', '5th'][cfgR.irmaaTier] + ' IRMAA threshold' : 'the first IRMAA threshold') + ' once Medicare is two years away' : '') + (cfgR.ssGuard && cfgR.ssGuard !== 'none' ? ', keeping provisional income under the ' + (cfgR.ssGuard === 'base' ? '50%' : '85%') + ' Social Security threshold' : '') + '. '
+      para('Convert qualified money in the Roof and Walls each year from ' + cfgR.startYear + (cfgR.endYear != null ? ' through ' + cfgR.endYear + (TX.rmdStartYear != null && TX.rmdStartYear <= cfgR.endYear ? ' (continuing after RMDs begin in ' + TX.rmdStartYear + ', each year\u2019s RMD taken first)' : '') : TX.rmdStartYear != null ? ' until RMDs begin in ' + TX.rmdStartYear : '') + ', up to the top of the ' + Math.round(cfgR.targetRate * 100) + '% federal bracket' + (cfgR.irmaa ? ' and under ' + (cfgR.irmaaTier > 1 ? 'the ' + ['', '1st', '2nd', '3rd', '4th', '5th'][cfgR.irmaaTier] + ' IRMAA threshold' : 'the first IRMAA threshold') + ' once Medicare is two years away' : '') + (cfgR.ssGuard && cfgR.ssGuard !== 'none' ? ', keeping provisional income under the ' + (cfgR.ssGuard === 'base' ? '50%' : '85%') + ' Social Security threshold' : '') + '. '
         + (cRows.length ? 'Total converted ' + money(TX.convTotal) + ' over ' + cRows.length + ' years (' + cRows[0].year + '-' + cRows[cRows.length - 1].year + '), tax on the conversions ' + money(TX.convTax) + '. Lifetime federal and state tax ' + money(TX.lifetime + TX.lifetimeState) + ' with the strategy against ' + money(TXb.lifetime + TXb.lifetimeState) + ' without (' + (sv >= 0 ? 'saving ' : 'adding ') + money(Math.abs(sv)) + '); Roth at the end of plan ' + money(lP.balances.roth) + ' against ' + money(lB.balances.roth) + ', tax-deferred ' + money(lP.balances.deferred) + ' against ' + money(lB.balances.deferred) + '; total assets ' + money(lP.layers.total) + ' against ' + money(lB.layers.total) + '.' : 'Nothing converts under these limits.'), {rgb:INK});
       if(cRows.length){
         var ccols = [{t:'Year', w:40, s:7.5}, {t:'Ages', w:50, s:7.5}, {t:'Converted', w:70, a:'r', f:'F3', s:7.5}, {t:'Roof / Walls', w:96, a:'r', f:'F3', s:7.5}, {t:'Taxable after', w:72, a:'r', f:'F3', s:7.5}, {t:'Bracket', w:44, a:'r', f:'F3', s:7.5}, {t:'MAGI', w:66, a:'r', f:'F3', s:7.5}, {t:'Tax on conv.', w:66, a:'r', f:'F3', s:7.5}];
@@ -10344,7 +10344,9 @@
         return {bal:bb, wd:wd0, unfunded:unf, tx:tx0, cv:cv, spare:spare0};
       };
       var base = runYear(0), res = base, cvInfo = null;
-      if(conv && calYear >= conv.startYear && (conv.endYear == null || calYear <= conv.endYear) && (rmdStartYear == null || calYear < rmdStartYear) && !ended(t)){
+      /* a last year the advisor picked runs through that year even after RMDs begin (the RMD has already left the balances above,
+         so only what remains is converted); on Auto the conversions stop the year before RMDs */
+      if(conv && calYear >= conv.startYear && (conv.endYear != null ? calYear <= conv.endYear : (rmdStartYear == null || calYear < rmdStartYear)) && !ended(t)){
         var avail = ['client','spouse'].reduce(function(a, o){ return a + snap.deferred[o].w + snap.deferred[o].r; }, 0);
         var top = null; TAX_2026[status].brackets.forEach(function(b){ if(b[0] === conv.targetRate) top = b[1]; });
         if(top == null) top = Infinity;
@@ -10473,7 +10475,7 @@
     })();
     var esel = $('rothEnd'), fromY = cfg.startYear || base.year0;
     esel.innerHTML = '<option value="auto">Auto \u2014 ' + (base.rmdStartYear != null ? endYear + ' (RMDs begin ' + base.rmdStartYear + ')' : 'end of plan (no RMDs)') + '</option>'
-      + base.rows.filter(function(x){ return x.year >= fromY && x.year <= endYear; }).map(function(x){ return '<option value="' + x.year + '">' + x.year + ' \u00b7 age ' + x.ages.join(' / ') + '</option>'; }).join('');
+      + base.rows.filter(function(x){ return x.year >= fromY; }).map(function(x){ return '<option value="' + x.year + '">' + x.year + ' \u00b7 age ' + x.ages.join(' / ') + (base.rmdStartYear != null && x.year >= base.rmdStartYear ? ' \u00b7 after RMDs begin' : '') + '</option>'; }).join('');
     if(rothCfg.end !== 'auto' && rothCfg.end != null && !esel.querySelector('option[value="' + rothCfg.end + '"]')) esel.insertAdjacentHTML('beforeend', '<option value="' + rothCfg.end + '">' + rothCfg.end + ' (outside the conversion years)</option>');
     esel.value = (rothCfg.end == null || rothCfg.end === 'auto') ? 'auto' : String(rothCfg.end);
 
