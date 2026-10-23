@@ -7086,15 +7086,16 @@
     var band = feeBandFor(managed);
     var annual = managed * band.pct;
     /* The band rate applies to the managed portfolios only. Spread that same
-       cost across every asset in the plan and you get the rate actually paid
-       on the whole picture — always lower than the band rate whenever any
-       money sits in insurance or in cash.
+       cost across every account the client holds and you get the rate actually
+       paid on the whole picture — always lower than the band rate whenever any
+       money sits in insurance, in cash or outside the plan.
 
-       Accounts the advisor marked "Stay as is" are held out of the plan
-       entirely, so they are out of this denominator too: leaving them in
-       would understate the fee by counting assets the plan does not touch. */
+       The denominator is every account in section 06, including the ones the
+       advisor marked "Stay as is" or "Transfer part": they are outside the
+       billable base, but they are still the client's assets, and the weighted
+       average is the fee measured against all of them. */
     var total = r.total || 0;
-    var base = Math.max(0, total - held);
+    var base = Math.max(0, total);
     return {
       managed:managed, current:current, total:total, feeBase:base,
       band:band, pct:band.pct, annual:annual,
@@ -7123,8 +7124,7 @@
       + '<dl class="strip" style="margin-top:0">'
       +   tile('Assets under management', money(f.managed), 'Excludes savings, annuity and life')
       +   tile('Advisory fee', pctText(f.pct), f.band.label + ' band, on managed assets')
-      +   tile('Weighted average', pctText(f.weighted), 'Same fee across ' + money(f.feeBase)
-            + (f.held > 0.5 ? ' in the plan' : ' of total assets'))
+      +   tile('Weighted average', pctText(f.weighted), 'Same fee across ' + money(f.feeBase) + ' of total assets')
       + '</dl>'
       + '<div class="step-body"><div class="tbl-scroll"><table id="feeTable"><thead><tr>'
       +   '<th>Total assets managed</th><th class="num">Client fee</th><th></th>'
@@ -7133,10 +7133,10 @@
       +   'the whole balance. Billable assets are the managed portfolios only: the '
       +   money(r.funded.reserve) + ' liquidity buffer, the ' + money(r.funded.foundation)
       +   ' Foundation annuity and the ' + money(r.funded.moat) + ' Moat contract are excluded. '
-      +   (f.held > 0.5 ? money(f.held) + ' marked <b>Stay as is</b> is also outside the billable base. ' : '')
-      +   'The <b>weighted average</b> spreads that same cost across every asset in the plan — '
-      +   money(f.managed) + ' at ' + pctText(f.pct) + ' over ' + money(f.feeBase)
-      +   (f.held > 0.5 ? ' (total assets less the ' + money(f.held) + ' held out)' : ' of total assets')
+      +   (f.held > 0.5 ? money(f.held) + ' marked <b>Stay as is</b> or held back from a partial transfer is also outside the billable base. ' : '')
+      +   'The <b>weighted average</b> spreads that same cost across every account the client holds — '
+      +   money(f.managed) + ' at ' + pctText(f.pct) + ' over ' + money(f.feeBase) + ' of total assets'
+      +   (f.held > 0.5 ? ', the ' + money(f.held) + ' held out included' : '')
       +   ' — so it is the rate paid on the whole picture rather than on the billable slice. '
       +   'For comparison, the accounts <b>as they stand today</b> hold ' + money(f.current)
       +   ' outside savings, annuities and life policies, which would bill at <b>' + pctText(f.currentBand.pct)
@@ -8479,8 +8479,8 @@
     doc.text('Advisory fee (' + fee.band.label.replace('–','-') + ')', M, y, {font:'F2', size:8.5, rgb:INK});
     doc.text(pctText(fee.pct), RIGHT - PDF.width(pctText(fee.pct), 8.5, 'F4'), y, {font:'F4', size:8.5, rgb:INK});
     y -= 13;
-    doc.text('Weighted average across ' + money(fee.feeBase)
-      + (fee.held > 0.5 ? ' in the plan (total less ' + money(fee.held) + ' held out)' : ' of total assets'),
+    doc.text('Weighted average across ' + money(fee.feeBase) + ' of total assets'
+      + (fee.held > 0.5 ? ' (the ' + money(fee.held) + ' held out included)' : ''),
       M, y, {font:'F2', size:8.5, rgb:INK});
     doc.text(pctText(fee.weighted), RIGHT - PDF.width(pctText(fee.weighted), 8.5, 'F4'), y,
       {font:'F4', size:8.5, rgb:INK});
@@ -17860,9 +17860,9 @@
       s.text(1.2, 2.5, 5, 1.0, [{runs:[{t:pctText(fee.pct), sz:44, color:DECK_C.navy, font:'Georgia'}]}]);
       dkBody(s, 1.2, 3.55, 8.2, 1.7, 'One fee covers the whole relationship: the planning, the investment management, the quarterly reviews and the plan updates in between.', {sz:16});
       s.rect(10.3, 1.95, 8.8, 3.4, DECK_C.navy);
-      s.text(10.6, 2.1, 8.2, 0.4, [{runs:[{t:'Weighted across ' + money(fee.feeBase) + ' of total plan assets', sz:16, b:true, color:DECK_C.gold}]}]);
+      s.text(10.6, 2.1, 8.2, 0.4, [{runs:[{t:'Weighted across ' + money(fee.feeBase) + ' of total assets', sz:16, b:true, color:DECK_C.gold}]}]);
       s.text(10.6, 2.5, 5, 1.0, [{runs:[{t:pctText(fee.weighted), sz:44, color:DECK_C.white, font:'Georgia'}]}]);
-      dkBody(s, 10.6, 3.55, 8.2, 1.7, 'The same fee measured across everything in the plan. It is lower because the protected pieces — the buffer, the Foundation annuity and the Moat contracts — carry no advisory fee.', {dark:true, sz:16});
+      dkBody(s, 10.6, 3.55, 8.2, 1.7, 'The same fee measured across everything you hold. It is lower because the protected pieces — the buffer, the Foundation annuity and the Moat contracts — and any account left where it is carry no advisory fee.', {dark:true, sz:16});
       dkLabel(s, 0.9, 5.65, 9, 'Our advisory fee schedule');
       var frows = FEE_SCHEDULE.map(function(b){ var on = b === fee.band; return {cls:on ? 'tot' : '', cells:[{t:b.label + (on ? '  — your band today' : '')}, {t:pctText(b.pct)}]}; });
       dkHtmlTable(s, 0.9, 6.05, 8.8, 3.85, [{t:'Total assets managed'}, {t:'Annual fee', align:'r'}], frows);
@@ -18392,7 +18392,7 @@
       + '</tbody></table></div>'
       + '<div><div class="tiles" style="grid-template-columns:1fr;margin-top:0">'
       + tile('As an example: the draft Fortress implemented', pctText(fee.pct), 'On ' + money(fee.managed) + ' of managed investments, about ' + money(Math.round(fee.annual)) + ' a year')
-      + tile('Weighted across everything in the plan', pctText(fee.weighted), 'The same fee measured against ' + money(fee.feeBase) + ' of total plan assets — lower because the protected pieces carry none')
+      + tile('Weighted across everything you hold', pctText(fee.weighted), 'The same fee measured against ' + money(fee.feeBase) + ' of total assets — lower because the protected pieces, and any account left where it is, carry none')
       + '</div></div></div>'
       + '<p style="margin-top:6px">The example is the starting point on page 3, not a quote: the amount managed, and with it your rate, will change as the plan is finalized at the Recommendation Meeting. The rate schedule will not. Fund-level expenses inside the managed portfolios are in addition to the advisory fee. Estate documents are a separate flat cost. The Foundation annuity, the LTC contracts and any life policies carry no advisory fee but may pay commissions to Alto Financial Group through AFG II, LLC, disclosed before any contract is entered into.</p></section>'
       + foot + '</div>';
