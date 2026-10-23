@@ -41,7 +41,14 @@ for (const name of SUITE) {
   const overflow = /overflowing text boxes: (\d+)/.exec(out);
   const ok = r.status === 0 && errs.length === 0 && (!overflow || overflow[1] === '0');
   console.log((ok ? 'PASS ' : 'FAIL ') + name.padEnd(12) + ((Date.now() - t0) / 1000).toFixed(1) + 's' + (overflow ? '  overflow=' + overflow[1] : ''));
-  if (!ok) { failed++; console.log(out.split('\n').slice(-25).join('\n')); }
+  if (!ok) {
+    failed++; console.log(out.split('\n').slice(-25).join('\n'));
+    /* on GitHub Actions, surface the failure as a check annotation too: the run's own log is not always reachable */
+    if (process.env.GITHUB_ACTIONS) {
+      const tail = out.split('\n').filter(l => l.trim() && !/ERR_TUNNEL_CONNECTION_FAILED|fonts.googleapis/.test(l)).slice(-14).join('\n').replace(/\r/g, '');
+      console.log('::error title=' + name + ' failed::' + tail.replace(/%/g, '%25').replace(/\n/g, '%0A').slice(0, 3800));
+    }
+  }
 }
 console.log(failed ? `\n${failed} failing` : '\nall passing');
 process.exit(failed ? 1 : 0);
