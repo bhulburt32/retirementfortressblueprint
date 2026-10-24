@@ -562,6 +562,14 @@
     font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.06em;
     text-transform:uppercase;color:var(--accent);margin-left:4px;
   }
+  /* sharing a saved case (section 23): the editor row under a case, its chips and the picker */
+  #casesBody tr.share-row td{background:var(--surface-2);padding:10px 14px 12px}
+  .share-box{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;font-size:14px}
+  .share-box .chip{font-weight:500;padding:3px 6px 3px 9px} .share-box .chip button.row-x{font-size:15px;padding:0 2px;margin-left:2px;color:inherit}
+  .share-box input{width:240px;display:inline-block;font-family:"Public Sans",sans-serif;font-size:14px;padding:5px 8px}
+  .share-box .share-none{color:var(--muted)}
+  #casesBody small.shared-tag{display:inline-block;margin-left:6px;font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--c-moat);font-weight:600}
+  #casesBody small.shared-n{color:var(--muted);margin-left:6px}
   .flaglist{display:flex;flex-direction:column;gap:4px;min-width:287.5px}
   /* block, not flex: a <b> in the middle of a sentence must stay in the
      sentence rather than becoming its own column */
@@ -1067,6 +1075,7 @@
       <a class="theme-btn app-btn" href="https://app.crmworkspace.com/login" target="_blank" rel="noopener" title="Wealthbox CRM — opens in a new tab">Open Wealthbox</a>
       <a class="theme-btn app-btn" href="https://altofinancialgroup.account.box.com/login" target="_blank" rel="noopener" title="Alto’s Box — opens in a new tab">Open Box</a>
       <a class="theme-btn app-btn" href="https://pro.riskalyze.com/auth/login/" target="_blank" rel="noopener" title="Nitrogen — opens in a new tab">Open Nitrogen</a>
+      <button class="theme-btn" id="loadSaved" type="button" hidden title="Go to the Saved cases list in section 23 to find and open a case saved on Alto’s server">Load saved case</button>
       <button class="theme-btn" id="newCase" type="button">Start new case</button>
       <button class="theme-btn" id="themeBtn" type="button">Switch theme</button>
     </div>
@@ -3859,7 +3868,13 @@
         control to narrow the list to their own; Open works on any of them, and a save is always recorded
         under the signed-in advisor. The <span class="ui">Find</span> box narrows the list as you type
         &mdash; any words from the client's name or the saver's, in any order &mdash; and a search that
-        matches nothing says so; clear it to see every case again. The written summaries in sections 12 and 16 run
+        matches nothing says so; clear it to see every case again. <span class="ui">Load saved case</span>
+        in the top right of the page jumps straight to this list with the Find box ready. <span class="ui">Share</span>
+        on one of your own cases opens a line beneath it: add a colleague's work email (the picker offers
+        everyone who has saved a case) and they see the case in their own list marked <em>shared with
+        you</em>; they can open it and <span class="ui">Save as new</span> to keep their own copy, but
+        only you, or an administrator, can change, re-share or delete it. The &times; on a name stops
+        sharing with them. The written summaries in sections 12 and 16 run
         there too, through Alto's server, so nothing but the figures on the page is sent to Claude.
         The paste box keeps working alongside the panel, and the signed-in name fills the
         <span class="ui">Advisor</span> field on a new case.</p>
@@ -3876,6 +3891,7 @@
         <label class="hint" id="casesFindWrap">Find <input type="search" id="casesFind" placeholder="client or advisor name" autocomplete="off" style="width:220px;display:inline-block;font-family:'Public Sans',sans-serif;font-size:14px;padding:5px 8px"></label>
         <span class="hint" id="casesMsg"></span>
       </div>
+      <datalist id="advisorList"></datalist>
       <div class="tbl-wrap" style="margin-top:12px"><table class="pj-table" id="casesTable" style="min-width:640px"><thead><tr><th>Client</th><th>Saved by</th><th>Last saved</th><th></th></tr></thead><tbody id="casesBody"></tbody></table></div>
     </div>
     <div class="panel panel-pad">
@@ -15854,7 +15870,10 @@
   $('scnGrid').addEventListener('change', function(e){ if(e.target.name === 'scnReport'){ reportScn = +e.target.value; scnChrome(); $('caseJson').value = caseData(); } });
   $('reportScn').addEventListener('change', function(){ reportScn = +this.value; scnChrome(); render(); });
   /* ---- the Azure site: who is signed in, and saved cases through /api/cases ---- */
-  var currentCaseId = null, casesCache = [], myUserId = null, casesView = 'all', casesFind = '';
+  var currentCaseId = null, casesCache = [], myUserId = null, myEmail = '', casesView = 'all', casesFind = '', shareOpen = null, isAdmin = false;
+  function caseById(id){ return casesCache.filter(function(x){ return x.id === id; })[0] || null; }
+  function isMine(c){ return !!(c && myUserId && c.advisorId === myUserId); }
+  function sharedWithMe(c){ var sw = (c && c.sharedWith) || []; return !isMine(c) && (sw.indexOf(myUserId) >= 0 || (myEmail && sw.indexOf(myEmail) >= 0)); }
   function apiFetch(path, opts){
     return fetch(RFB_API + path, Object.assign({headers:{'Content-Type':'application/json'}}, opts || {})).then(function(r){
       if(r.status === 401 || r.status === 403) throw new Error('Your sign-in has expired \u2014 reload the page.');
@@ -15868,7 +15887,9 @@
   function renderCases(){
     var body = $('casesBody'); if(!body) return;
     /* an administrator (OWNER_IDS on the server) gets every advisor's cases back; the Show control appears for them */
-    var others = casesCache.some(function(c){ return myUserId && c.advisorId && c.advisorId !== myUserId; });
+    /* cases that are not mine and not shared with me can only have come back because I am an administrator */
+    var others = casesCache.some(function(c){ return myUserId && c.advisorId && c.advisorId !== myUserId && !sharedWithMe(c); });
+    isAdmin = others;
     $('casesViewWrap').hidden = !others;
     if($('casesSub')) $('casesSub').textContent = others ? 'Every advisor\u2019s cases on Alto\u2019s server \u00b7 you are an administrator; saves are recorded as the signed-in advisor' : 'Your cases on Alto\u2019s server \u00b7 saved as the signed-in advisor';
     var list = (others && casesView === 'mine') ? casesCache.filter(function(c){ return c.advisorId === myUserId; }) : casesCache;
@@ -15878,14 +15899,53 @@
     if($('casesFindWrap')) $('casesFindWrap').hidden = !casesCache.length;
     if(words.length && !list.length){ body.innerHTML = '<tr><td colspan="4" class="hint">No saved case matches \u201c' + esc(casesFind.trim()) + '\u201d' + (before ? ' \u2014 ' + before + ' to choose from; clear the box to see them all.' : '.') + '</td></tr>'; return; }
     body.innerHTML = list.length ? list.map(function(c){
-      return '<tr' + (c.id === currentCaseId ? ' class="grp"' : '') + '><td>' + esc(c.clientLabel || 'Unnamed') + (c.id === currentCaseId ? ' <small>(open)</small>' : '') + '</td><td>' + esc(c.advisorName || '') + '</td><td>' + esc(fmtWhen(c.updatedAt)) + '</td>'
-        + '<td class="num"><button type="button" data-case-open="' + esc(c.id) + '">Open</button> <button type="button" data-case-del="' + esc(c.id) + '">Delete</button></td></tr>';
+      var own = isMine(c) || isAdmin, sw = c.sharedWith || [];
+      var html = '<tr' + (c.id === currentCaseId ? ' class="grp"' : '') + '><td>' + esc(c.clientLabel || 'Unnamed') + (c.id === currentCaseId ? ' <small>(open)</small>' : '')
+        + (sharedWithMe(c) ? '<small class="shared-tag">shared with you</small>' : (own && sw.length ? '<small class="shared-n">shared with ' + sw.length + '</small>' : ''))
+        + '</td><td>' + esc(c.advisorName || '') + '</td><td>' + esc(fmtWhen(c.updatedAt)) + '</td>'
+        + '<td class="num"><button type="button" data-case-open="' + esc(c.id) + '">Open</button>'
+        + (own ? ' <button type="button" data-case-share="' + esc(c.id) + '"' + (shareOpen === c.id ? ' class="primary"' : '') + '>Share</button> <button type="button" data-case-del="' + esc(c.id) + '">Delete</button>' : '') + '</td></tr>';
+      if(own && shareOpen === c.id){
+        html += '<tr class="share-row" data-share-row="' + esc(c.id) + '"><td colspan="4"><div class="share-box"><b>Shared with</b> '
+          + (sw.length ? sw.map(function(e){ return '<span class="chip plain">' + esc(e) + '<button type="button" class="row-x" data-unshare="' + esc(e) + '" aria-label="Stop sharing with ' + esc(e) + '">&times;</button></span>'; }).join('') : '<span class="share-none">no one yet</span>')
+          + '<input type="email" id="shareEmail" list="advisorList" placeholder="colleague\u2019s work email" autocomplete="off"> <button type="button" id="shareAdd">Add</button> <button type="button" id="shareDone">Done</button>'
+          + '<span class="hint">They can open the case and save their own copy; only you can change or delete it.</span></div></td></tr>';
+      }
+      return html;
     }).join('') : '<tr><td colspan="4" class="hint">' + (casesCache.length ? 'None of your own cases yet \u2014 press Save to keep the case on this page.' : 'No saved cases yet \u2014 press Save to keep the case on this page.') + '</td></tr>';
   }
   function loadCases(){
     return apiFetch('/cases?all=1').then(function(list){ casesCache = Array.isArray(list) ? list : []; renderCases(); }).catch(function(e){ $('casesMsg').textContent = e.message; });
   }
+  function loadAdvisors(){   // the colleagues who have saved a case, for the share picker; nothing to show is not an error
+    return apiFetch('/cases/advisors').then(function(list){
+      $('advisorList').innerHTML = (Array.isArray(list) ? list : []).filter(function(a){ return a.email && a.email !== myEmail; }).map(function(a){ return '<option value="' + esc(a.email) + '">' + esc(a.name || a.email) + '</option>'; }).join('');
+    }).catch(function(){});
+  }
+  function shareCase(id, list){
+    $('casesMsg').textContent = 'Sharing\u2026';
+    return apiFetch('/cases/' + encodeURIComponent(id) + '/share', {method:'PUT', body:JSON.stringify({sharedWith:list})}).then(function(r){
+      var c = caseById(id); if(c) c.sharedWith = (r && r.sharedWith) || list;
+      $('casesMsg').textContent = c && c.sharedWith.length ? 'Shared with ' + c.sharedWith.join(', ') + '.' : 'Not shared with anyone.';
+      renderCases(); var inp = $('shareEmail'); if(inp) inp.focus();
+    }).catch(function(e){ $('casesMsg').textContent = 'Not shared: ' + e.message; });
+  }
+  function shareAddFromBox(){
+    var inp = $('shareEmail'), c = caseById(shareOpen); if(!inp || !c) return;
+    var e = inp.value.trim().toLowerCase(); if(!e) return;
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){ $('casesMsg').textContent = 'Enter a work email address.'; inp.focus(); return; }
+    if(e === myEmail){ $('casesMsg').textContent = 'That is you.'; inp.value = ''; return; }
+    var list = (c.sharedWith || []).slice(); if(list.indexOf(e) < 0) list.push(e);
+    shareCase(c.id, list);
+  }
+  function goToSavedCases(){   // the header button: open section 23 and the Saved cases list, ready to search
+    var sec = $('dataSec'); if(sec && sec.classList.contains('closed')) secOpen(sec, true);
+    var head = $('casesTitle'); if(head && head.classList.contains('closed')) headOpen(head, true);
+    var panel = $('casesPanel'); if(panel) panel.scrollIntoView({behavior:'smooth', block:'start'});
+    var find = $('casesFind'); if(find && !$('casesFindWrap').hidden) setTimeout(function(){ find.focus(); }, 350);
+  }
   function saveCase(asNew){
+    if(!asNew && currentCaseId && sharedWithMe(caseById(currentCaseId))){ $('casesMsg').textContent = 'This case was shared with you \u2014 press Save as new to keep your own copy.'; return; }
     var id = (!asNew && currentCaseId) || (window.crypto && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
     var payload = {clientLabel:caseLabel(), case:JSON.parse(caseData())};
     $('casesMsg').textContent = 'Saving\u2026';
@@ -15905,10 +15965,11 @@
   }
   function initAzure(){
     if(!RFB_API) return;
-    $('casesPanel').hidden = false;
+    $('casesPanel').hidden = false; $('loadSaved').hidden = false;
+    $('loadSaved').addEventListener('click', goToSavedCases);
     fetch('/.auth/me').then(function(r){ return r.ok ? r.json() : null; }).then(function(me){
       var cp = me && me.clientPrincipal; if(!cp) return;
-      myUserId = cp.userId || null; renderCases();
+      myUserId = cp.userId || null; myEmail = String(cp.userDetails || '').trim().toLowerCase(); renderCases(); loadAdvisors();
       var nm = ((cp.claims || []).filter(function(c){ return c.typ === 'name'; })[0] || {}).val || '';
       var who = $('whoami'); who.hidden = false;
       who.innerHTML = '<span>Signed in as</span> ' + esc(nm || cp.userDetails || '') + (nm && cp.userDetails ? ' (' + esc(cp.userDetails) + ')' : '') + ' \u00b7 <a href="/.auth/logout" style="color:inherit">Sign out</a>';
@@ -15920,7 +15981,17 @@
     $('caseExport').addEventListener('click', function(){ window.location.href = RFB_API + '/cases/export?all=1'; });   // every case the server lets this advisor see
     $('casesView').addEventListener('change', function(){ casesView = $('casesView').value; renderCases(); });
     $('casesFind').addEventListener('input', function(){ casesFind = $('casesFind').value; renderCases(); });
-    $('casesBody').addEventListener('click', function(e){ var o = e.target.getAttribute && e.target.getAttribute('data-case-open'), d = e.target.getAttribute && e.target.getAttribute('data-case-del'); if(o) openCase(o); else if(d) deleteCase(d); });
+    $('casesBody').addEventListener('click', function(e){
+      var t = e.target, g = function(k){ return t.getAttribute && t.getAttribute(k); };
+      var o = g('data-case-open'), d = g('data-case-del'), sh = g('data-case-share'), un = g('data-unshare');
+      if(o) openCase(o);
+      else if(d) deleteCase(d);
+      else if(sh){ shareOpen = shareOpen === sh ? null : sh; renderCases(); var inp = $('shareEmail'); if(inp) inp.focus(); }
+      else if(un){ var c = caseById(shareOpen); if(c) shareCase(c.id, (c.sharedWith || []).filter(function(x){ return x !== un; })); }
+      else if(t.id === 'shareAdd') shareAddFromBox();
+      else if(t.id === 'shareDone'){ shareOpen = null; renderCases(); }
+    });
+    $('casesBody').addEventListener('keydown', function(e){ if(e.target.id === 'shareEmail' && e.key === 'Enter'){ e.preventDefault(); shareAddFromBox(); } });
   }
   initAzure();
   ['deckDraft', 'deckFinal'].forEach(function(id){ $(id).addEventListener('click', function(){ deckStatus = this.getAttribute('data-status'); deckStatusChrome(); $('caseJson').value = caseData(); }); });
