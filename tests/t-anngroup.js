@@ -34,7 +34,7 @@ const path = require('path');
     console.log('CLEARED:', JSON.stringify(await annRows()));
   } else console.log('monthly disabled (GLI off) — toggling gli');
   // save/reload
-  const json=await p.$eval('#caseJson',e=>e.value); await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(800);
+  const json=await p.$eval('#caseJson',e=>e.value); await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(800);
   console.log('RELOADED:', JSON.stringify(await annRows()));
   console.log('ERRORS:', errs.length?errs:'none'); await b.close();
 })();

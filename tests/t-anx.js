@@ -61,7 +61,7 @@ const path = require('path');
   // 4. saved with the case and reloaded
   const json=await p.$eval('#caseJson',e=>e.value), d=JSON.parse(json); const saved=d.accounts.find(a=>a.pos==='Income Annuity (FIA)'); console.log('saved:', JSON.stringify(saved));
   if(!saved || !saved.ann || saved.ann.fees!==0.005 || saved.ann.monthly!==1250 || saved.ann.cap!==0.08 || saved.ann.part!==1 || saved.ann.maturity!=='2031-06' || saved.ann.company!=='Athene') errs.push('contract details not saved');
-  await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(900);
+  await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(900);
   R=await rows(); console.log('after reload:', JSON.stringify(R.map(r=>r.type+' '+r.company+(r.companyAuto?' (auto)':''))));
   const re=await p.$eval('#anxBody tr[data-anx] [data-ax="monthly"]:not([disabled])',e=>e.value); console.log('monthly after reload:', re); if(re!=='1,250') errs.push('reload lost the contract details');
   // 5. the worksheet and the deck still build (the deck shows the short label)

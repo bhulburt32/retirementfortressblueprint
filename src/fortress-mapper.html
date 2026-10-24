@@ -3845,10 +3845,8 @@
         today's date saves to your computer, carrying the household, every account, the budget, the
         three scenarios and any transfers you adjusted by hand. File it with the client's records (Box,
         the CRM). To pick it back up, press <span class="ui">Upload case file</span> and choose it.</p>
-      <p><span class="ui">Copy case data</span> still copies the same block to the clipboard for a CRM
-        note or an email, and <span class="ui">Load pasted case</span> reads a pasted block back.</p>
       <p><span class="ui">Upload case file</span> opens a case saved in a file &mdash; the download
-        above, or a block pasted into a document: a Word document (.docx), a plain text file (.txt) or a .json file. The file can hold
+        above, or its case block kept in a document: a Word document (.docx), a plain text file (.txt) or a .json file. The file can hold
         other text around the block, such as a heading or the date, and the curly quotes Word
         substitutes as you type are straightened before the case is read. An older Word .doc, a PDF
         or a Pages file won't open; save it as .docx or .txt first. A file without case data
@@ -3857,7 +3855,7 @@
         takes five seconds and it is the only backup that exists.</p>
       <h3>Saved cases on Alto's site</h3>
       <p>When the Blueprint runs on Alto's own site rather than as the claude.ai demo, you sign in with
-        your Microsoft account and a <b>Saved cases</b> panel appears above the paste box. <span
+        your Microsoft account and a <b>Saved cases</b> panel appears above the file buttons. <span
         class="ui">Save</span> keeps the open case on Alto's server under the client's name and your
         sign-in, and saving again updates the same record; <span class="ui">Save as new</span> makes a
         second copy; <span class="ui">Open</span> brings one back; <span class="ui">Delete</span> removes
@@ -3876,8 +3874,8 @@
         only you, or an administrator, can change, re-share or delete it. The &times; on a name stops
         sharing with them. The written summaries in sections 12 and 16 run
         there too, through Alto's server, so nothing but the figures on the page is sent to Claude.
-        The paste box keeps working alongside the panel, and the signed-in name fills the
-        <span class="ui">Advisor</span> field on a new case.</p>
+        <span class="ui">Download case file</span> and <span class="ui">Upload case file</span> keep working
+        alongside the panel, and the signed-in name fills the <span class="ui">Advisor</span> field on a new case.</p>
       </div>
     </details>
     <!-- /guide-notes:23 -->
@@ -3895,12 +3893,11 @@
       <div class="tbl-wrap" style="margin-top:12px"><table class="pj-table" id="casesTable" style="min-width:640px"><thead><tr><th>Client</th><th>Saved by</th><th>Last saved</th><th></th></tr></thead><tbody id="casesBody"></tbody></table></div>
     </div>
     <div class="panel panel-pad">
-      <textarea id="caseJson" rows="4" spellcheck="false"></textarea>
-      <div class="btn-row" style="margin-top:10px">
+      <!-- the serialised case, refreshed on every change: read by Download case file and by the checks; no longer shown -->
+      <textarea id="caseJson" rows="4" spellcheck="false" hidden aria-hidden="true" tabindex="-1"></textarea>
+      <div class="btn-row">
         <button type="button" class="primary" id="dlCase">Download case file</button>
         <button type="button" id="caseFilePick">Upload case file</button>
-        <button type="button" id="copyCase">Copy case data</button>
-        <button type="button" id="loadCase">Load pasted case</button>
         <input type="file" id="caseFile" accept=".json,.txt,.docx,application/json,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
         <span class="hint" id="caseMsg"></span>
       </div>
@@ -16450,15 +16447,7 @@
   $('dlCase').addEventListener('click', function(){
     var txt = 'Retirement Fortress Blueprint \u2014 case file for ' + caseLabel() + ', saved ' + new Date().toLocaleString() + '\nUpload this file in section 23 (Upload case file) to reopen the case. Do not edit the block below.\n\n' + caseData() + '\n';
     saveFile(caseFileName(), new Blob([txt], {type:'text/plain'})).then(function(r){ $('caseMsg').textContent = r && r.status === 'declined' ? 'Not saved.' : 'Saved as ' + caseFileName() + '.'; },
-      function(e){ $('caseMsg').textContent = e && e.code === 'connecting' ? 'Still connecting \u2014 try again in a moment.' : 'This view cannot save files \u2014 use Copy case data instead.'; });
-  });
-  $('copyCase').addEventListener('click', function(){
-    var ta = $('caseJson');
-    ta.select();
-    var done = function(ok){ $('caseMsg').textContent = ok ? 'Copied.' : 'Press Ctrl/Cmd-C to copy.'; };
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(ta.value).then(function(){ done(true); }, function(){ done(false); });
-    } else { done(false); }
+      function(e){ $('caseMsg').textContent = e && e.code === 'connecting' ? 'Still connecting \u2014 try again in a moment.' : 'This view cannot save files.'; });
   });
   /* Case data saved into a Word or text file. Word turns straight quotes
      into curly ones and may wrap the block in other text, so take the
@@ -16485,7 +16474,7 @@
     (/\.docx$/.test(name) ? docxText(file) : file.text()).then(function(txt){
       var json;
       try{ json = caseFromText(txt); loadCase(json); }
-      catch(err){ $('caseMsg').textContent = label + " doesn't hold readable case data \u2014 it needs the full block from Copy case data, braces included."; return; }
+      catch(err){ $('caseMsg').textContent = label + " doesn't hold readable case data \u2014 it needs the case block from Download case file, braces included."; return; }
       $('caseJson').value = json;
       if($('sampleBanner')) $('sampleBanner').hidden = true;
       renderAll();
@@ -16495,16 +16484,14 @@
   $('caseFilePick').addEventListener('click', function(){ $('caseFile').click(); });
   $('caseFile').addEventListener('change', function(e){ readCaseFile(e.target.files[0]); e.target.value = ''; });
 
-  $('loadCase').addEventListener('click', function(){
-    try{
-      loadCase($('caseJson').value);
-      if($('sampleBanner')) $('sampleBanner').hidden = true;
-      renderAll();
-      $('caseMsg').textContent = 'Case loaded.';
-    }catch(err){
-      $('caseMsg').textContent = "That doesn't parse as case data — paste the full block, braces included.";
-    }
-  });
+  /* Load a serialised case (the block Download case file writes): the checks use it to round-trip a case. */
+  function loadCaseJson(json){
+    loadCase(json);
+    if($('sampleBanner')) $('sampleBanner').hidden = true;
+    renderAll();
+    $('caseMsg').textContent = 'Case loaded.';
+  }
+  window.__rfb = Object.assign(window.__rfb || {}, {loadCaseJson:loadCaseJson});
 
   /* ============================================================
      File export.

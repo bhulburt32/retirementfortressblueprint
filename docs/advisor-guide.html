@@ -410,11 +410,10 @@
       <div class="note stop">
         <h3>Nothing is saved by itself</h3>
         <p>The tool has no autosave. Close the tab or hit refresh and the case is gone. On the claude.ai
-          demo there is no account either: before you walk away, go to section&nbsp;23, press
-          <span class="ui">Copy case data</span>, and paste the block into your CRM note &mdash; that
-          block is the only way back. On Alto's own site you sign in and press
-          <span class="ui">Save</span> in section&nbsp;23 instead; the case is kept on Alto's server
-          under your name.</p>
+          demo there is no account either: before you walk away, go to section&nbsp;23 and press
+          <span class="ui">Download case file</span>; that file is the only way back. On Alto's own
+          site you sign in and press <span class="ui">Save</span> in section&nbsp;23 instead; the case
+          is kept on Alto's server under your name.</p>
       </div>
 
       <div class="note">
@@ -432,7 +431,7 @@
       <p>The page opens empty — a new case, every field blank, today's date in section&nbsp;01. To pick up
         a household, press <span class="ui">Upload case file</span> in section&nbsp;23 and open its case file (the
         .json or .txt from <span class="ui">Download case file</span>, or a Word .docx of the household),
-        or paste its block from section&nbsp;23 into <span class="ui">Load pasted case</span>.
+        or on Alto's site press <span class="ui">Load saved case</span> in the top right.
         <span class="ui">Start new case</span> in the top right — twice, it asks you to confirm — empties
         every field again; your name and the date carry over, the client's details do not. There is no
         sample household in the page; a training copy can be opened with one by defining
@@ -2056,10 +2055,8 @@
         today's date saves to your computer, carrying the household, every account, the budget, the
         three scenarios and any transfers you adjusted by hand. File it with the client's records (Box,
         the CRM). To pick it back up, press <span class="ui">Upload case file</span> and choose it.</p>
-      <p><span class="ui">Copy case data</span> still copies the same block to the clipboard for a CRM
-        note or an email, and <span class="ui">Load pasted case</span> reads a pasted block back.</p>
       <p><span class="ui">Upload case file</span> opens a case saved in a file &mdash; the download
-        above, or a block pasted into a document: a Word document (.docx), a plain text file (.txt) or a .json file. The file can hold
+        above, or its case block kept in a document: a Word document (.docx), a plain text file (.txt) or a .json file. The file can hold
         other text around the block, such as a heading or the date, and the curly quotes Word
         substitutes as you type are straightened before the case is read. An older Word .doc, a PDF
         or a Pages file won't open; save it as .docx or .txt first. A file without case data
@@ -2068,7 +2065,7 @@
         takes five seconds and it is the only backup that exists.</p>
       <h3>Saved cases on Alto's site</h3>
       <p>When the Blueprint runs on Alto's own site rather than as the claude.ai demo, you sign in with
-        your Microsoft account and a <b>Saved cases</b> panel appears above the paste box. <span
+        your Microsoft account and a <b>Saved cases</b> panel appears above the file buttons. <span
         class="ui">Save</span> keeps the open case on Alto's server under the client's name and your
         sign-in, and saving again updates the same record; <span class="ui">Save as new</span> makes a
         second copy; <span class="ui">Open</span> brings one back; <span class="ui">Delete</span> removes
@@ -2087,8 +2084,8 @@
         only you, or an administrator, can change, re-share or delete it. The &times; on a name stops
         sharing with them. The written summaries in sections 12 and 16 run
         there too, through Alto's server, so nothing but the figures on the page is sent to Claude.
-        The paste box keeps working alongside the panel, and the signed-in name fills the
-        <span class="ui">Advisor</span> field on a new case.</p>
+        <span class="ui">Download case file</span> and <span class="ui">Upload case file</span> keep working
+        alongside the panel, and the signed-in name fills the <span class="ui">Advisor</span> field on a new case.</p>
     </div>
   </section>
 

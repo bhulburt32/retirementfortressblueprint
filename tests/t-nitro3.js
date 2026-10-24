@@ -7,7 +7,7 @@ const path = require('path');
   await p.goto('file://'+path.resolve(__dirname,'../dist/preview.html'),{waitUntil:'load'}); await p.waitForTimeout(900);
   await p.click('#expandAll'); await p.waitForTimeout(300);
   await p.setInputFiles('#nitroFile', 'nitro-sample.pdf'); await p.waitForTimeout(1500);
-  const json=await p.$eval('#caseJson',e=>e.value); await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(800);
+  const json=await p.$eval('#caseJson',e=>e.value); await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(800);
   console.log('after reload out:', (await p.$eval('#nitroOut',e=>e.textContent)).replace(/\s+/g,' ').slice(0,80));
   const [pop]=await Promise.all([ctx.waitForEvent('page',{timeout:30000}), p.click('#makeDeck')]);
   await pop.waitForLoadState('load'); await pop.waitForTimeout(600);

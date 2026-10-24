@@ -15,11 +15,11 @@ const path = require('path');
   const tr=(await p.$$('#ltcBenBody tr[data-ltc]'))[1]; const inp=await tr.$('[data-lk=monthly]'); await inp.click({clickCount:3}); await inp.type('9000'); await p.keyboard.press('Tab'); await p.waitForTimeout(600);
   console.log('after edit:', JSON.stringify((await rows())[1]));
   const json=await p.$eval('#caseJson',e=>e.value); console.log('saved ltcBenefits:', JSON.stringify(JSON.parse(json).ltcBenefits));
-  await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(900);
+  await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(900);
   console.log('reloaded:', JSON.stringify((await rows())[1]));
   // legacy key fallback: load a case with old per-line key
   const d=JSON.parse(json); d.ltcBenefits={"12:moat:spouse":{monthly:"7,500"}}; d.scenarios[0].ltcBenefits=d.ltcBenefits;
-  await p.fill('#caseJson', JSON.stringify(d)); await p.click('#loadCase'); await p.waitForTimeout(900);
+  await p.evaluate(j => window.__rfb.loadCaseJson(j), JSON.stringify(d)); await p.waitForTimeout(900);
   console.log('legacy:', JSON.stringify((await rows())[1]));
   console.log('ERRORS:', errs.length?errs:'none'); await b.close();
 })();

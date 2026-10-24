@@ -31,7 +31,7 @@ const path = require('path');
   const json=await p.$eval('#caseJson',e=>e.value); console.log('saved:', JSON.stringify(JSON.parse(json).annuityIncome));
   await p.click('#newCase'); await p.waitForTimeout(100); await p.click('#newCase'); await p.waitForTimeout(300);
   console.log('after new rows:', await p.$$eval('#annIncBody tr', r=>r.length), (await txt('#annIncHint')).slice(0,80));
-  await p.$eval('#caseJson',(e,v)=>{e.value=v;},json); await p.click('#loadCase'); await p.waitForTimeout(600);
+  await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(600);
   console.log('after reload:', await p.$eval('#annIncBody tr [data-ak="wd"]',e=>e.value), await p.$eval('#annIncBody tr [data-ak="gli"]',e=>e.value));
   await p.click('#adjIncReset'); await p.waitForTimeout(300); console.log('after reset:', await p.$eval('#annIncBody tr [data-ak="wd"]',e=>e.value)||'(blank)');
   // report builds

@@ -10,7 +10,7 @@ const { chromium } = require('playwright-core'); const fs = require('fs');
   // reload in a fresh page from the saved case
   const p2 = await ctx.newPage({ viewport: { width: 1500, height: 1000 } }); p2.on('pageerror', e => errs.push('p2 ' + String(e)));
   await p2.goto('file://' + process.cwd() + '/preview-smith.html',{waitUntil:'load'}); await p2.waitForTimeout(500); await p2.click('#expandAll'); await p2.waitForTimeout(300);
-  await p2.$eval('#caseJson', (e, v) => { e.value = v; }, json); await p2.click('#loadCase'); await p2.waitForTimeout(1000);
+  await p2.evaluate(j => window.__rfb.loadCaseJson(j), json); await p2.waitForTimeout(1000);
   console.log('reloaded tiles:', await p2.$eval('#pfOut', e => e.querySelectorAll('.tax-tiles dd').length), 'rows:', await p2.$eval('#pfOut', e => e.querySelectorAll('.pf-hold tbody tr').length), 'clear visible:', await p2.$eval('#pfClear', e => !e.hidden));
   await p2.click('#pfClear'); await p2.waitForTimeout(300);
   console.log('after clear:', await p2.$eval('#pfOut', e => e.innerHTML.length), JSON.parse(await p2.$eval('#caseJson', e => e.value)).portfolio);

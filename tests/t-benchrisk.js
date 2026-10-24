@@ -12,7 +12,7 @@ const { chromium } = require('playwright');
   console.log('no report:', JSON.stringify(await item()));
   const perf = (pTot, bTot, trailP, trailB) => ({ name: 'Sample report', text: 'x', src: 'text', at: new Date().toISOString(), analysis: { riskNumber: 70, clientRiskNumber: 73, perf: { period: 'Jan 1, 2020 – Dec 31, 2025', benchmark: { name: 'Sample 60/40 Index', riskNumber: 68 },
     stats: { totalReturn: { p: pTot, b: bTot }, stdev: { p: 12.1, b: 11.8 } }, trailing: { periods: ['3 MONTHS', '1 YEAR', '3 YEARS', '5 YEARS'], portfolio: { values: trailP }, benchmark: { values: trailB } } } } });
-  const load = async (n) => { const json = await p.evaluate(() => document.getElementById('caseJson').value); const c = JSON.parse(json); c.nitrogen = n; await p.fill('#caseJson', JSON.stringify(c)); await p.click('#loadCase'); await p.waitForTimeout(1200); };
+  const load = async (n) => { const json = await p.evaluate(() => document.getElementById('caseJson').value); const c = JSON.parse(json); c.nitrogen = n; await p.evaluate(j => window.__rfb.loadCaseJson(j), JSON.stringify(c)); await p.waitForTimeout(1200); };
   await load(perf(54.3, 83.4, [1.2, 8.1, 20.2, 45.1], [2.0, 11.4, 30.3, 70.2]));
   const lag = await item(); console.log('lagging:', JSON.stringify(lag));
   await load(perf(90.0, 83.4, [2.5, 12.0, 33.0, 80.0], [2.0, 11.4, 30.3, 70.2]));

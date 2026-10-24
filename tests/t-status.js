@@ -18,7 +18,7 @@ const { chromium } = require('playwright-core');
   const sl = await pop.$$('.sl'); await sl[0].screenshot({ path: 'final-cover.png' }); await sl[5].screenshot({ path: 'final-6.png' });
   // reload from the saved case: status should come back final
   const cont = await ctx.newPage(); await cont.goto('file://' + process.cwd() + '/preview-smith.html',{waitUntil:'load'}); await cont.waitForTimeout(500); await cont.click('#expandAll'); await cont.waitForTimeout(300);
-  await cont.$eval('#caseJson', (e, v) => { e.value = v; }, json); await cont.click('#loadCase'); await cont.waitForTimeout(800);
+  await cont.evaluate(j => window.__rfb.loadCaseJson(j), json); await cont.waitForTimeout(800);
   const reloaded = await cont.$eval('#deckFinal', b => b.classList.contains('on')).catch(()=>'n/a');
   console.log({ st0, saved, msg, title, cover, stamps, total, reloaded }); console.log('ERRORS:', errs.length ? errs : 'none');
   await b.close();

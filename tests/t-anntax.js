@@ -99,7 +99,7 @@ const path = require('path');
   // saved and reloaded with the case
   const json=await p.$eval('#caseJson',e=>e.value); console.log('product saved with the case:', /AUM - Tax Free/.test(json));
   if(!/AUM - Tax Free/.test(json)) errs.push('the product should save with the case');
-  await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(900); await p.click('#expandAll'); await p.waitForTimeout(300);
+  await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(900); await p.click('#expandAll'); await p.waitForTimeout(300);
   console.log('after reload: federal:', (await figs()).fed);
   if(Math.abs((await figs()).fed-tfNq.fed)>1) errs.push('reload changed the federal tax ('+(await figs()).fed+' vs '+tfNq.fed+')');
   const line2=await p.$$eval('#adjBody tr[data-adj]',(rs,id)=>{ const r=rs.find(x=>x.querySelector('select[data-ak=acctId]').value===String(id)); return r? r.dataset.adj : null; }, await acct('After Tax'));

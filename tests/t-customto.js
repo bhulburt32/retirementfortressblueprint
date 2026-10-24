@@ -23,7 +23,7 @@ const path = require('path');
   console.log('roof rows:', await p.$$eval('#roofGBody tr[data-roof]',rs=>rs.map(r=>r.dataset.roof)));
   // steps / report still OK
   console.log('steps has:', (await txt('#steps')).includes('Schwab Growth Account'));
-  const json=await p.$eval('#caseJson',e=>e.value); await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(800);
+  const json=await p.$eval('#caseJson',e=>e.value); await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(800);
   console.log('after reload holdings:', (await txt('#holdings')).includes('Schwab Growth Account'));
   console.log('ERRORS:', errs.length?errs:'none'); await b.close();
 })();
