@@ -15,7 +15,7 @@ const { chromium } = require('playwright');
   console.log('saved:', JSON.stringify(o.tax.roth), '| scn:', JSON.stringify(o.scenarios.map(s => [s.roth.irmaaTier, s.roth.ssGuard])));
   await p.click('#newCase'); await p.waitForTimeout(200); await p.click('#newCase'); await p.waitForTimeout(500);
   console.log('after new:', await p.evaluate(() => document.getElementById('rothIrmaa').value + '/' + document.getElementById('rothSsGuard').value));
-  await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(1200);
+  await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(1200);
   console.log('after reload:', await p.evaluate(() => document.getElementById('rothIrmaa').value + '/' + document.getElementById('rothSsGuard').value), JSON.stringify((await st()).conv));
   console.log('ERRORS:', errs.length ? errs : 'none'); await b.close();
 })();

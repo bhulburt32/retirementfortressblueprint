@@ -81,7 +81,7 @@ const path = require('path');
   const cj=JSON.parse(await p.$eval('#caseJson',e=>e.value));
   (cj.scenarios||[]).forEach((S,k)=>{ if(S && k===0){ S.incomeAdj=Object.assign({}, S.incomeAdj||{}, {yW:'4.0%'}); } });
   cj.incomeAdj=Object.assign({}, cj.incomeAdj||{}, {yW:'4.0%'});
-  await p.$eval('#caseJson',(e,v)=>{ e.value=v; },JSON.stringify(cj)); await p.click('#loadCase'); await p.waitForTimeout(1500);
+  await p.evaluate(j => window.__rfb.loadCaseJson(j), JSON.stringify(cj)); await p.waitForTimeout(1500);
   await p.click('#scnTabs [data-scn="0"]').catch(()=>{}); await p.waitForTimeout(700);
   const leg=await p.evaluate(()=>({hidden:document.getElementById('adjWLegacy').hidden, yw:document.getElementById('adjYW').value}));
   console.log('earlier case with a section 14 Walls yield of 4%:', JSON.stringify(leg));

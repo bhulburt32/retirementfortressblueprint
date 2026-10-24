@@ -23,7 +23,7 @@ const { chromium } = require('playwright');
   console.log('moves table mention:', await p.evaluate(() => (document.body.textContent.match(/held[^.]{0,60}/i) || [''])[0].slice(0, 80)));
   const json = await p.evaluate(() => document.getElementById('caseJson').value); const o = JSON.parse(json);
   console.log('saved cashFlowTo:', JSON.stringify(o.cashFlowTo), 'part acct:', JSON.stringify(o.accounts.find(a => a.move === 'part')));
-  await p.click('#newCase'); await p.waitForTimeout(500); await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(1200);
+  await p.click('#newCase'); await p.waitForTimeout(500); await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(1200);
   console.log('after reload      ', JSON.stringify(await st()), 'chips on:', await p.evaluate(() => document.querySelectorAll('#cashDestList label.on').length), 'part sel:', await p.evaluate(() => [...document.querySelectorAll('#acctBody select[data-k="move"]')].filter(s => s.value === 'part').length));
   console.log('ERRORS:', errs.length ? errs : 'none'); await b.close();
 })();

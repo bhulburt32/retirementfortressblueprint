@@ -24,7 +24,7 @@ const path = require('path');
   console.log(rowTxt.join('\n'));
   // save/reload
   const json=await p.$eval('#caseJson',e=>e.value); console.log('saved extra:', JSON.stringify(JSON.parse(json).household.employment.extra));
-  await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(900);
+  await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(900);
   console.log('reloaded rows:', await p.$$eval('#jobBody tr[data-job]',rs=>rs.length), '| name:', await p.$eval('#jobBody [data-jk=name]',e=>e.value));
   // deck slide 6
   const [pop]=await Promise.all([p.waitForEvent('popup'),p.click('#makeDeck')]); await pop.waitForLoadState(); await pop.waitForTimeout(1500);

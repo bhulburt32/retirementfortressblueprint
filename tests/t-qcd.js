@@ -30,7 +30,7 @@ const path = require('path');
   await p.click('#qcdApply'); await p.waitForTimeout(500);
   // save / reload
   const json=await p.$eval('#caseJson',e=>e.value); console.log('saved qcd:', JSON.stringify(JSON.parse(json).tax.qcd), '| scnA qcd:', JSON.stringify(JSON.parse(json).scenarios[0].qcd));
-  await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(1000);
+  await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(1000);
   console.log('RELOADED input:', await p.$eval('#qcdC',e=>e.value), '| tiles:', (await txt('#qcdTiles')).slice(0,80));
   // scenario B should have no QCD
   await p.click('#scnTabs button:nth-child(2)'); await p.waitForTimeout(800);

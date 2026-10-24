@@ -13,7 +13,7 @@ const path = require('path');
   console.log('avg:', await note());
   console.log('tile:', (await txt('#incSumTiles')).match(/Annual Needs income gap\$[\d,]+[^$]*/)?.[0].slice(0,160));
   const json=await p.$eval('#caseJson',e=>e.value); console.log('saved sizeMode:', JSON.parse(json).household.sizeMode);
-  await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(700);
+  await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(700);
   console.log('after reload mode:', await p.$eval('#sizeMode',e=>e.value), '|', (await note()).slice(0,120));
   console.log('ERRORS:', errs.length?errs:'none'); await b.close();
 })();

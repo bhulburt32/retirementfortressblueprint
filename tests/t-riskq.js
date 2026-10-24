@@ -63,7 +63,7 @@ const path = require('path');
   if(dd.risk.tolerance!=='') errs.push('an auto tolerance must save blank');
   await p.click('#rqClear'); await p.waitForTimeout(400); console.log('after clear:', JSON.stringify(await v('riskTol')), '|', await txt('#rqPanel .rq-band'), '| checked', await p.$$eval('#rqForm input:checked',o=>o.length), '| prog:', await txt('#rqPanel .rq-prog'));
   if((await p.$$eval('#rqForm input:checked',o=>o.length))!==2) errs.push('clear should leave the two plan answers');
-  await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(900);
+  await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(900);
   console.log('after reload:', await v('riskTol'), 'auto', await isAuto('riskTol'), '| answered', await p.$$eval('#rqForm input:checked',o=>o.length), '| amount', await v('rqAmt'));
   if(await v('riskTol')!=='46' || (await p.$$eval('#rqForm input:checked',o=>o.length))!==11) errs.push('reload lost the questionnaire');
   // theme: the page palette is the questionnaire's

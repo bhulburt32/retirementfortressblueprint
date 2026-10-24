@@ -24,7 +24,7 @@ const { chromium } = require('playwright');
   const o = JSON.parse(json); console.log('saved scenarios ssC/ssS:', (o.scenarios || []).map(s => s && s.incomeAdj ? [s.incomeAdj.ssC, s.incomeAdj.ssS] : null), 'top incomeAdj', o.incomeAdj && [o.incomeAdj.ssC, o.incomeAdj.ssS]);
   await p.click('#newCase'); await p.waitForTimeout(600);
   console.log('after new case control:', await p.evaluate(() => document.getElementById('adjSsC').value || '(blank)'));
-  await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(1000);
+  await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(1000);
   console.log('after reload:', await row(), 'control', await p.evaluate(() => document.getElementById('adjSsC').value));
   // deck still builds
   const [pop] = await Promise.all([p.waitForEvent('popup'), p.click('#makeDeck')]); await pop.waitForLoadState(); await pop.waitForTimeout(2500);

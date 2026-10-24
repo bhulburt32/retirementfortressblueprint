@@ -18,7 +18,7 @@ const { chromium } = require('playwright');
   console.log('saved custom:', JSON.stringify(o.budget.custom), 'lines with labels:', Object.entries(o.budget.lines).filter(([k, v]) => v.label).map(([k, v]) => k + '=' + v.label + ':' + v.amt).join(', '));
   await p.click('#newCase'); await p.waitForTimeout(200); await p.click('#newCase'); await p.waitForTimeout(600);
   console.log('after new case rows:', await p.evaluate(() => document.querySelectorAll('#budBody tr[data-bud]').length));
-  await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(1200);
+  await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(1200);
   console.log('after reload:', await tot(), '| custom rows:', await p.evaluate(() => [...document.querySelectorAll('#budBody [data-budx]')].map(b => { const tr = b.closest('tr'); return tr.getAttribute('data-bud') + '=' + tr.querySelector('[data-bk="label"]').value + ':' + tr.querySelector('[data-bk="amt"]').value; }).join(', ')));
   await p.click(`#budBody [data-budx="${id}"]`); await p.waitForTimeout(400);
   console.log('after remove first:', await tot(), '| custom rows:', await p.evaluate(() => [...document.querySelectorAll('#budBody [data-budx]')].map(b => b.closest('tr').querySelector('[data-bk="label"]').value).join(', ')));

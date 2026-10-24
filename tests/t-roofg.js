@@ -21,7 +21,7 @@ const path = require('path');
   await p.click('#scnTabs [data-scn="0"]'); await p.waitForTimeout(500);
   console.log('scn A first input:', await p.$eval('#roofGBody tr[data-roof] input',e=>e.value));
   const json=await p.$eval('#caseJson',e=>e.value); const d=JSON.parse(json); console.log('saved roofGrowth:', JSON.stringify(d.roofGrowth), '| scnA:', JSON.stringify(d.scenarios[0].roofGrowth));
-  await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(800);
+  await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(800);
   console.log('after reload:', await p.$eval('#roofGBody tr[data-roof] input',e=>e.value), '|', (await txt('#roofGHint')).slice(0,60));
   console.log('ERRORS:', errs.length?errs:'none'); await b.close();
 })();

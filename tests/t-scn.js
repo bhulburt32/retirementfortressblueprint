@@ -33,7 +33,7 @@ const path = require('path');
   console.log('after report body:', await p.$eval('body',b=>b.className), '| A first amt:', await p.$eval('#adjBody input[data-ak="amt"]',e=>e.value));
   // save & reload round trip
   const json=await p.$eval('#caseJson',e=>e.value); const d=JSON.parse(json); console.log('saved scenarios:', d.scenarios.map(s=>s.name+':'+(s.adjMoves?s.adjMoves.length:'auto')+':roth='+s.roth.apply), 'active', d.activeScenario, 'report', d.reportScenario);
-  await p.fill('#caseJson', json); await p.click('#loadCase'); await p.waitForTimeout(800);
+  await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(800);
   console.log('after reload cards:', (await cards()).map(c=>c.slice(0,60)));
   console.log('ERRORS:', errs.length?errs:'none'); process.exit(0);
 })();
