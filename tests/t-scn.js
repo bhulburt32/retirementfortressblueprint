@@ -35,5 +35,10 @@ const path = require('path');
   const json=await p.$eval('#caseJson',e=>e.value); const d=JSON.parse(json); console.log('saved scenarios:', d.scenarios.map(s=>s.name+':'+(s.adjMoves?s.adjMoves.length:'auto')+':roth='+s.roth.apply), 'active', d.activeScenario, 'report', d.reportScenario);
   await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(800);
   console.log('after reload cards:', (await cards()).map(c=>c.slice(0,60)));
+  // a depleted run in the side-by-side strip names the year and each person's age that year
+  const depCells=await p.$$eval('#scnGrid dd',ds=>ds.map(d=>d.textContent.replace(/\s+/g,' ').trim()).filter(t=>/run out/.test(t)));
+  console.log('depleted cells:', depCells.length, JSON.stringify(depCells.slice(0,3)));
+  if(!depCells.length) errs.push('the Smith baseline should show at least one depleted run in the strip');
+  depCells.forEach(t=>{ if(!/run out \d{4} Jeff \d{2,3} · Jane \d{2,3}$/.test(t)) errs.push('a depleted cell should carry the year and both ages: '+t); });
   console.log('ERRORS:', errs.length?errs:'none'); process.exit(0);
 })();

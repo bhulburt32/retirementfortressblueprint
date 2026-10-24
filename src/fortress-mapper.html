@@ -2752,7 +2752,7 @@
         noted), annuity income, LTC benefit, Roth conversions, withdrawal order, lifetime tax
         and assets at the end of plan, then the assets at the end of plan under each of the three
         section&nbsp;19 stress tests and under each section&nbsp;18 care-event projection (one spouse
-        needs care, the other, both), or the year they run out &mdash; each with a <span class="ui">View</span> button and a
+        needs care, the other, both), or the year they run out with each person's age that year &mdash; each with a <span class="ui">View</span> button and a
         <span class="ui">Use for reports</span> pick. A fourth column on the left, <b>Baseline</b> in slate, is the client's accounts as
         they stand today with no plan applied &mdash; the status quo of section&nbsp;06 &mdash; run
         through the same stress tests and care events, so every scenario is measured against where
@@ -14910,7 +14910,15 @@
     var parts = (sp ? ['client', 'spouse'] : ['client']).filter(function(w){ return b[w].pia > 0.5; }).map(function(w){ return esc((w === 'client' ? i.clientFirst : i.spouseFirst) || (w === 'client' ? 'Client' : 'Spouse')) + ' ' + b[w].age + (b[w].scnAge ? '<small>*</small>' : ''); });
     return parts.length ? parts.join(' \u00b7 ') : '\u2014';
   }
-  function scnStressCell(x){ return !x ? '\u2014' : x.dep ? '<span style="color:var(--st-alert)">run out ' + x.dep.year + '</span>' : money(x.end) + ' <small>' + x.endYear + '</small>'; }
+  /* a run that depletes the accounts: the year, with each person's age that year ("Jeff 90 · Jane 88", or "age 90" alone) */
+  function depAges(dep, r){
+    var i = r.inputs, ages = (dep && dep.ages) || [];
+    if(!ages.length) return '';
+    if(!hasSpouse(i) || ages.length < 2) return 'age ' + ages[0];
+    return esc(i.clientFirst || 'Client') + ' ' + ages[0] + ' \u00b7 ' + esc(i.spouseFirst || 'Spouse') + ' ' + ages[1];
+  }
+  function depCell(dep, r){ var a = depAges(dep, r); return '<span style="color:var(--st-alert)">run out ' + dep.year + '</span>' + (a ? ' <small style="display:block;white-space:nowrap">' + a + '</small>' : ''); }
+  function scnStressCell(x, m){ return !x ? '\u2014' : x.dep ? depCell(x.dep, m.r) : money(x.end) + ' <small>' + x.endYear + '</small>'; }
   function renderScenarioBar(){
     scnChrome();
     var grid = $('scnGrid'); if(!grid) return;
@@ -14930,16 +14938,16 @@
       ['Roth conversions', function(m){ return m.base ? 'none' : m.rothOn ? (m.converted > 0.5 ? money(m.converted) : 'none fit') : 'off'; }],
       ['Withdrawal order', function(m){ return m.wd; }],
       ['Lifetime income tax', function(m){ return money(m.tax); }],
-      ['Assets at end of plan', function(m){ return m.dep ? '<span style="color:var(--st-alert)">run out ' + m.dep.year + '</span>' : money(m.end) + ' <small>' + m.endYear + '</small>'; }],
+      ['Assets at end of plan', function(m){ return m.dep ? depCell(m.dep, m.r) : money(m.end) + ' <small>' + m.endYear + '</small>'; }],
       {head:'Stress tests, assets at end of plan'},
-      ['Sequence of returns', function(m){ return scnStressCell(m.stress[0]); }],
-      ['Social Security cut', function(m){ return scnStressCell(m.stress[1]); }],
-      ['Higher inflation', function(m){ return scnStressCell(m.stress[2]); }]
+      ['Sequence of returns', function(m){ return scnStressCell(m.stress[0], m); }],
+      ['Social Security cut', function(m){ return scnStressCell(m.stress[1], m); }],
+      ['Higher inflation', function(m){ return scnStressCell(m.stress[2], m); }]
     ];
     var care = M[0].care || [];
     if(care.length){
       rows.push({head:'If long term care is needed, assets at end of plan'});
-      care.forEach(function(c, j){ rows.push([esc(c.title), function(m){ return scnStressCell(m.care[j]); }]); });
+      care.forEach(function(c, j){ rows.push([esc(c.title), function(m){ return scnStressCell(m.care[j], m); }]); });
     }
     var dl = function(){ return '<dl>' + rows.map(function(row){ return row.head ? '<div class="scn-sub">' + row.head + '</div>' : '<div><dt>' + row[0] + '</dt><dd></dd></div>'; }).join('') + '</dl>'; };
     if(grid.children.length !== 4 || grid.getAttribute('data-rows') !== String(rows.length)){
