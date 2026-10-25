@@ -16729,7 +16729,7 @@
   }
   var RFB_DISC_CSS = '.rfb-disc{font-size:11px;line-height:1.5;color:#3b4252}.rfb-disc .rfb-disc-title{font-size:13px;letter-spacing:.04em;margin:0 0 10px;color:#1F3162}.rfb-disc h3{font-size:11.5px;margin:10px 0 3px;color:#1F3162}.rfb-disc p{margin:0 0 6px;max-width:none}.rfb-disc .rfb-disc-copy{margin-top:12px;color:#5A6276}';
   if($('rfbDiscBody')) $('rfbDiscBody').innerHTML = rfbDiscHtml({title:true, mc:true});   // the gold block at the foot of the page
-  var DECK_DISC = 'Illustrative only \u2014 hypothetical projections from information you supplied, not a guarantee of results. See Important Disclosures, pages 3\u20134.';
+  var DECK_DISC = 'Illustrative only \u2014 hypothetical projections from information you supplied, not a guarantee of results. See Important Disclosures, {DISC_PAGES}.';   // the page range is filled in once the deck is assembled (buildDeck)
   var DECK_MIN = 16;
   function dkSm(v){ return v < -0.5 ? '\u2212' + money(-v) : money(Math.abs(v) < 0.5 ? 0 : v); }                            // no text on a page smaller than this, in points
 
@@ -16851,7 +16851,7 @@
     dkFooter(s, pageNo, dark, o.noDisc);
   }
   function dkFooter(s, pageNo, dark, noDisc){
-    if(!noDisc) s.text(0.9, 10.1, 15.5, 0.4, [{runs:[{t:DECK_DISC, sz:16, color:dark ? DECK_C.dkMuted : DECK_C.muted}]}], {valign:'middle'});
+    if(!noDisc) s.text(0.9, 10.1, 18.2, 0.4, [{runs:[{t:DECK_DISC, sz:16, color:dark ? DECK_C.dkMuted : DECK_C.muted}]}], {valign:'middle'});
     s.hline(0.9, 10.62, 18.2, dark ? '2E4788' : DECK_C.panel, 0.5);
     dkStamp(s, dark);
     s.text(11.1, 10.7, 8, 0.4, [{runs:[{t:'altofinancialgrp.com', sz:16, color:dark ? DECK_C.dkMuted : DECK_C.muted}, {t:'      ' + String(pageNo), sz:16, color:dark ? DECK_C.dkMuted : DECK_C.muted}], align:'r'}], {valign:'middle'});
@@ -17461,6 +17461,7 @@
     page++; var tocPage = page;
 
     /* 3–4. disclosures */
+    var discPages = 'pages ' + (page + 1) + '\u2013' + (page + 2);   // the footer's reference: these two pages and the firm's at the end (filled in below)
     (function(){
       var paras = [
         'Your Retirement Fortress Plan is a condensed presentation derived from the Retirement Fortress Blueprint prepared by Alto Financial Group, together with the account statements and information you supplied. It is intended to be read together with the full Blueprint worksheet and does not replace it. Where figures differ between this summary and the worksheet, the worksheet controls.',
@@ -18454,7 +18455,8 @@
 
     /* 31. the firm's Important Disclosures, the last pages */
     (function(){
-      var chunks = [RFB_DISC.slice(0, 3), RFB_DISC.slice(3)]; if(MCR) chunks.push([MC_DISC]);
+      var chunks = [RFB_DISC.slice(0, 3), RFB_DISC.slice(3)], first = page + 1; if(MCR) chunks.push([MC_DISC]);
+      discPages += ' and ' + first + '\u2013' + (first + chunks.length - 1);
       chunks.forEach(function(chunk, k){
         var s = doc.slide(); page++;
         frame(s, '', 'Important Disclosures \u2013 Retirement Fortress Blueprint\u2122' + (k ? ' (continued)' : ''), false, {noDisc:true});
@@ -18493,7 +18495,7 @@
     var appxEntries = toc.filter(function(e){ return e.n > appxPage && isAppx(e); }).concat(toc.filter(function(e){ return e.n > appxPage && !isAppx(e); }).map(function(e){ return {n:e.n, t:e.t, ey:'Appendix \u00b7 disclosures'}; }));
     doc.slides.splice(appxPage - 2, 0, contentsSlide(appxPage, 'Appendix Contents', 'Appendix', appxEntries, true));
     doc.slides.splice(tocPage - 1, 0, contentsSlide(tocPage, 'Contents', '', mainEntries));
-    return doc.build();
+    return doc.build().replace(/\{DISC_PAGES\}/g, discPages);   // every footer names the disclosure pages
   }
 
   $('makePdf').addEventListener('click', function(){
