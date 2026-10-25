@@ -80,13 +80,12 @@
 
   /* ---------- header ---------- */
   .masthead{
-    padding:34px 30px 26px;
+    padding:30px 30px 26px;
     margin-bottom:32px;
     display:flex;
-    flex-wrap:wrap;
-    align-items:flex-end;
-    justify-content:space-between;
-    gap:20px;
+    flex-direction:column;
+    align-items:stretch;
+    gap:18px;
     border-radius:var(--radius);
     background-color:#001F5B;
     background-size:cover;
@@ -98,7 +97,8 @@
   .masthead .eyebrow{color:#D9A93C}
   .masthead .motto{margin:8px 0 0;font-family:Bitter,Georgia,serif;font-size:19px;font-weight:600;color:#fff;letter-spacing:.01em}
   .masthead .motto .tg{color:#E6C25A;font-weight:700;text-decoration:underline;text-underline-offset:3px}
-  .masthead .prepared{color:rgba(255,255,255,.88)} .masthead .prepared span{color:rgba(255,255,255,.65)}
+  .masthead .prepared{color:rgba(255,255,255,.88);margin:0} .masthead .prepared span{color:rgba(255,255,255,.65)}
+  .masthead .prepared + .prepared{margin-top:-10px}
   .masthead .theme-btn{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.45);color:#fff}
   .masthead .theme-btn:hover{background:rgba(255,255,255,.26);border-color:#fff;color:#fff}
   tr.sso-fixed td{background:var(--surface-2)}
@@ -122,7 +122,9 @@
     margin:0;
     text-wrap:balance;
   }
-  .masthead > div:first-child{flex:1 1 520px;min-width:0}
+  /* the top row: the Retirement Fortress mark beside the title on the left, Alto's logo on the right, both 136px tall */
+  .mast-top{display:flex;align-items:center;justify-content:space-between;gap:24px 40px;flex-wrap:wrap;min-width:0}
+  .mast-top .title-row{flex:1 1 520px}
   .lede{margin:10px 0 0;color:var(--muted);max-width:60ch;font-size:16.5px}
   .theme-btn{
     background:var(--btn);border:1px solid var(--btn);color:#fff;
@@ -131,12 +133,13 @@
   }
   .theme-btn:hover{background:var(--btn-dk);border-color:var(--btn-dk);color:#fff}
   .head-actions{display:flex;gap:8px;flex-wrap:wrap}
-  .brand{display:block;height:64px;width:auto;margin:0 0 18px}
+  .brand{display:block;height:136px;width:auto;margin:0;flex:none}
   /* the software's own mark, beside the title */
   .title-row{display:flex;align-items:center;gap:20px;min-width:0}
   .title-text{min-width:0}
-  .rfb-mark{width:92px;height:92px;flex:none;border-radius:19px;box-shadow:0 6px 18px rgba(0,0,0,.35)}
-  @media (max-width:600px){ .rfb-mark{width:64px;height:64px;border-radius:13px} .title-row{gap:14px} }
+  .rfb-mark{width:136px;height:136px;flex:none;border-radius:28px;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+  @media (max-width:900px){ .rfb-mark{width:96px;height:96px;border-radius:20px} .brand{height:96px} }
+  @media (max-width:600px){ .rfb-mark{width:72px;height:72px;border-radius:15px} .brand{height:72px} .title-row{gap:14px} .mast-top{gap:16px 24px} }
   @media print{ .rfb-mark{box-shadow:none} }
   .confidential{
     margin:0 0 18px;padding:9px 14px;border-radius:var(--radius);
@@ -1054,8 +1057,7 @@
 <div class="wrap">
 
   <header class="masthead">
-    <div>
-      <img class="brand" id="brandImg" alt="Alto Financial Group" width="220" height="120">
+    <div class="mast-top">
       <div class="title-row">
         <svg class="rfb-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Retirement Fortress Blueprint"><rect width="240" height="240" rx="48" fill="#001F5B"/><path d="M24 0V240M0 24H240" stroke="#FFFFFF" stroke-opacity=".08" stroke-width="1"/><path d="M48 0V240M0 48H240" stroke="#FFFFFF" stroke-opacity=".08" stroke-width="1"/><path d="M72 0V240M0 72H240" stroke="#FFFFFF" stroke-opacity=".08" stroke-width="1"/><path d="M96 0V240M0 96H240" stroke="#FFFFFF" stroke-opacity=".08" stroke-width="1"/><path d="M120 0V240M0 120H240" stroke="#FFFFFF" stroke-opacity=".08" stroke-width="1"/><path d="M144 0V240M0 144H240" stroke="#FFFFFF" stroke-opacity=".08" stroke-width="1"/><path d="M168 0V240M0 168H240" stroke="#FFFFFF" stroke-opacity=".08" stroke-width="1"/><path d="M192 0V240M0 192H240" stroke="#FFFFFF" stroke-opacity=".08" stroke-width="1"/><path d="M216 0V240M0 216H240" stroke="#FFFFFF" stroke-opacity=".08" stroke-width="1"/><path d="M30 198 q10 -8 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0" fill="none" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="4" stroke-linecap="round"/><path d="M30 212 q10 -8 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0" fill="none" stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="3" stroke-linecap="round"/><rect x="54" y="156" width="132" height="28" rx="3" fill="#D9A93C" stroke="#001F5B" stroke-width="3" stroke-linejoin="round"/><path d="M58 160V104h8v-10h8v10h8v-10h8v10h8v-10h8v10h8v56z" fill="#FFFFFF" stroke="#001F5B" stroke-width="3" stroke-linejoin="round"/><path d="M150 160V104h8v-10h8v10h8v-10h8v10h8v-10h8v10h8v56z" fill="#FFFFFF" stroke="#001F5B" stroke-width="3" stroke-linejoin="round"/><path d="M90 160V122h6v-8h8v8h8v-8h8v8h8v-8h8v8h8v-8h8v8h6v38z" fill="#FFFFFF" stroke="#001F5B" stroke-width="3" stroke-linejoin="round"/><rect x="104" y="80" width="32" height="46" fill="#FFFFFF" stroke="#001F5B" stroke-width="3" stroke-linejoin="round"/><path d="M98 82L120 50l22 32z" fill="#FFFFFF" stroke="#001F5B" stroke-width="3" stroke-linejoin="round"/><path d="M120 50V22" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/><path d="M120 22l26 8-26 9z" fill="#E70000"/><path d="M112 160v-18a8 8 0 0 1 16 0v18z" fill="#001F5B"/><rect x="72" y="124" width="4" height="12" rx="1" fill="#001F5B"/><rect x="164" y="124" width="4" height="12" rx="1" fill="#001F5B"/><rect x="118" y="94" width="4" height="12" rx="1" fill="#001F5B"/></svg>
         <div class="title-text">
@@ -1064,9 +1066,10 @@
           <p class="motto" id="motto">Your Goals. Our Guidance. <span class="tg">Together.</span></p>
         </div>
       </div>
-      <p class="prepared" id="preparedFor" hidden></p>
-      <p class="prepared" id="whoami" hidden></p>
+      <img class="brand" id="brandImg" alt="Alto Financial Group" width="220" height="120">
     </div>
+    <p class="prepared" id="preparedFor" hidden></p>
+    <p class="prepared" id="whoami" hidden></p>
     <div class="head-actions">
       <button class="theme-btn" id="makeEdu" type="button" title="Alto’s Protecting Your Retirement Income slides, the same for every client — opens in a new tab">Educational slides</button>
       <button class="theme-btn" id="dlWorksheet" type="button" title="Alto’s Monthly Budget Worksheet, a fillable PDF for the client to complete — upload it in section 05 when it comes back">Budget worksheet</button>
