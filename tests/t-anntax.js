@@ -74,10 +74,13 @@ const path = require('path');
   if((await p.$$eval('#penBody tr[data-pen]',rs=>rs.length))!==penRows0) errs.push('removing the added pension should restore the list');
   console.log('video link in header:', await p.$$eval('.masthead #roadVideo, .masthead .video-btn',a=>a.length));
   if(await p.$$eval('.masthead #roadVideo, .masthead .video-btn',a=>a.length)) errs.push('the header should no longer carry The Road to Retirement Fortress video button');
-  const hd=await p.evaluate(()=>{ const m=document.querySelector('.masthead .rfb-mark'), r=m&&m.getBoundingClientRect(); return {loadCase:document.querySelectorAll('.masthead #loadCaseTop').length, mark:!!m, markW:r?Math.round(r.width):0, besideTitle:!!(m&&m.parentElement.querySelector('h1'))}; });
-  console.log('header mark:', JSON.stringify(hd));
+  const hd=await p.evaluate(()=>{ const m=document.querySelector('.masthead .rfb-mark'), r=m&&m.getBoundingClientRect(), b=document.querySelector('.masthead .brand'), rb=b&&b.getBoundingClientRect(), hr=document.querySelector('.masthead').getBoundingClientRect();
+    return {loadCase:document.querySelectorAll('.masthead #loadCaseTop').length, mark:!!m, markW:r?Math.round(r.width):0, markH:r?Math.round(r.height):0, besideTitle:!!(m&&m.parentElement.querySelector('h1')), brandH:rb?Math.round(rb.height):0, markLeft:r?Math.round(r.left-hr.left):0, brandRight:rb?Math.round(hr.right-rb.right):0, brandAfterTitle:!!(rb&&r&&rb.left>r.right+200)}; });
+  console.log('header logos:', JSON.stringify(hd));
   if(hd.loadCase) errs.push('the header should no longer carry the Load case button');
-  if(!hd.mark || hd.markW<60 || !hd.besideTitle) errs.push('the header should show the Retirement Fortress Blueprint mark beside the title');
+  if(!hd.mark || hd.markW<120 || !hd.besideTitle) errs.push('the header should show the Retirement Fortress Blueprint mark, at least 120px, beside the title');
+  if(Math.abs(hd.brandH-hd.markH)>1) errs.push('Alto\u2019s logo should be the same height as the mark ('+hd.brandH+' vs '+hd.markH+')');
+  if(!hd.brandAfterTitle || hd.brandRight>60 || hd.markLeft>60) errs.push('the mark should sit at the left edge and Alto\u2019s logo at the right edge of the header');
   console.log('header background image:', (await p.$eval('.masthead',e=>getComputedStyle(e).backgroundImage)).slice(0,60)); if(!/url\("data:image\/jpeg/.test(await p.$eval('.masthead',e=>getComputedStyle(e).backgroundImage))) errs.push('the header should carry the Fortress graphic as its background');
   // 2. AUM - Tax Free: a Walls line in that product pays a federally tax-free yield; no change while the Walls hold only IRA money
   // (at the 3.26% default the Smith plan spends the small After Tax account in its first years, so the comparison runs at 2.5%)
