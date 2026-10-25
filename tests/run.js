@@ -28,6 +28,7 @@ const SUITE = [
   't-taxcols',    // section 17 tax table: All income and AGI built up, MAGI for IRMAA, provisional income; senior deduction; IRMAA guard on MAGI
   't-basis',      // section 06 cost basis on taxable accounts: average-cost gains on withdrawals; blank = the 50% assumption
   't-sqsens',     // status-quo stress charts; the findings report lists only the risks checked or typed in the Risk section
+  't-mc',         // section 19 Monte Carlo: a seeded run, the tiles, the fan chart, the strip row, staleness, the saved settings
   't-networth',   // gold headers over graphics, no indented sections, net worth in section 07 (debts subtracted) and over time, Walls plan assumptions in section 03
 ];
 const only = process.argv.slice(2);
