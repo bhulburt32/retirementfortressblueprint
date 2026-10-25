@@ -1840,6 +1840,27 @@
         strategy, so each scenario has its own set; the scenario cards at the top of section&nbsp;14
         show each scenario's end-of-plan assets under all three, side by side. The report carries them
         after the projected assets, a full page for each.</p>
+      <dl class="fields">
+        <dt>Monte Carlo analysis</dt>
+        <dd>Beneath the three stresses, the same projection run many times with a random return for
+          the Walls and the Roof every year, drawn around the plan's own growth assumptions with the
+          <span class="ui">Walls volatility</span> and <span class="ui">Roof volatility</span> you set
+          (standard deviations of the yearly return; 7% and 13% by default, the two levels 60%
+          correlated) &mdash; everything else as the plan has it: income, expenses, taxes, RMDs, the
+          withdrawal order, the Moat, and each product's rules (a MYGA earns its rate, a growth annuity
+          its own crediting, a RILA no worse than its floor). Pick the number of
+          <span class="ui">Trials</span> (1,000 by default; a thousand takes about ten seconds and the
+          page stays usable) and press <span class="ui">Run the analysis</span>; the same
+          <span class="ui">Seed</span> repeats the same draws, so a result can be reproduced. Tiles give
+          the <b>probability of success</b> (the share of trials in which the accounts last to the end
+          of plan), the median and the 10th and 90th percentile assets at the end, and how often the
+          accounts run out with the typical year and the ages then; the chart draws the 10th&ndash;90th
+          and 25th&ndash;75th percentile bands and the median against the plan as projected. The result
+          is kept for each scenario and shown in the side-by-side strip as <b>Monte Carlo success</b>;
+          change the case or the settings and it is marked stale until you run it again. The settings
+          save with the case; the result does not. A planning illustration, not a forecast: the
+          probability depends on the volatility assumed.</dd>
+      </dl>
 
       <h3 style="margin-top:18px">If a long term care event occurs</h3>
       <p>Under the three stress tests, the same three care-event projections as section&nbsp;06 &mdash; male, female,
