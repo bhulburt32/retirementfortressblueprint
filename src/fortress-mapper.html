@@ -3539,16 +3539,23 @@
           the <b>probability of success</b> (the share of trials in which the accounts last to the end
           of plan), the median and the 10th and 90th percentile assets at the end, and how often the
           accounts run out with the typical year and the ages then; the chart draws the 10th&ndash;90th
-          and 25th&ndash;75th percentile bands and the median against the plan as projected. The result
-          is kept for each scenario and shown in the side-by-side strip as <b>Monte Carlo success</b>;
+          and 25th&ndash;75th percentile bands and the median against the plan as projected. Every trial
+          also runs the <b>current course</b> &mdash; the accounts as held today, no changes &mdash; on
+          the same market draw each year, with the Roof volatility on the money it holds in the market
+          around each account's own growth rate (a protected position earns its rate, as in the plan),
+          so the two can be compared fairly: a table sets the current course beside the scenario on
+          each measure and the chart adds its median trial as a dotted line. The result
+          is kept for each scenario and shown in the side-by-side strip as <b>Monte Carlo success</b>
+          (the Baseline column shows the current course from the same draws);
           change the case or the settings and it is marked stale until you run it again. The settings
           save with the case; the result does not. A planning illustration, not a forecast: the
           probability depends on the volatility assumed, and the Monte Carlo disclosure beneath the chart
           (also in the Important Disclosures at the foot of the page) says so in the words compliance
           reviews. When the report scenario has a current result, the Retirement Fortress Plan gains a
-          <i>Many Possible Markets</i> page after the stress tests and the initial observations and
-          findings add a row to its stress table, and both reports carry the Monte Carlo paragraph in
-          their Important Disclosures; with no result, the reports are as before. The status line under
+          <i>Many Possible Markets</i> page after the stress tests (its tiles and chart carry the
+          current course too) and a third Important Disclosures page with the Monte Carlo paragraph,
+          and the initial observations and findings add a row to its stress table, with the paragraph
+          in its Important Disclosures; with no result, the reports are as before. The status line under
           the Run button says when the reports build from a different scenario than the one shown, so
           you know to run the analysis there if the reports are to carry it.</dd>
       </dl>
@@ -15000,7 +15007,7 @@
       ['Withdrawal order', function(m){ return m.wd; }],
       ['Lifetime income tax', function(m){ return money(m.tax); }],
       ['Assets at end of plan', function(m){ return m.dep ? depCell(m.dep, m.r) : money(m.end) + ' <small>' + m.endYear + '</small>'; }],
-      ['Monte Carlo success', function(m){ return m.base ? '\u2014' : mcStripCell(m.scn, mcSigNow); }],
+      ['Monte Carlo success', function(m){ return m.base ? mcStripBase(mcSigNow) : mcStripCell(m.scn, mcSigNow); }],
       {head:'Stress tests, assets at end of plan'},
       ['Sequence of returns', function(m){ return scnStressCell(m.stress[0], m); }],
       ['Social Security cut', function(m){ return scnStressCell(m.stress[1], m); }],
@@ -16702,9 +16709,9 @@
      application and added to the Important Disclosures of any report that carries its results. */
   var MC_DISC = ['Monte Carlo Analysis',
     'The Monte Carlo analysis is a hypothetical illustration and is not a forecast, a prediction, or a guarantee of future results. '
-    + 'It runs the plan\u2019s projection many times, each time applying a different sequence of randomly generated annual returns to the Walls and Roof investments, '
+    + 'It runs the plan\u2019s projection many times, each time applying a different sequence of randomly generated annual returns to the Walls and Roof investments (and, for the current course shown alongside it, to the accounts as they are held today), '
     + 'drawn from a statistical (lognormal) distribution around the growth rates assumed in this plan and the volatility assumptions shown. '
-    + 'The \u201cprobability of success\u201d is the percentage of those trials in which the plan\u2019s assets lasted to the end of the planning period. '
+    + 'The \u201cprobability of success\u201d is the percentage of those trials in which the assets lasted to the end of the planning period. '
     + 'It is not the likelihood that any particular outcome will occur, and a high probability does not mean the plan cannot fail. '
     + 'The results depend heavily on the assumptions used \u2014 expected returns, volatility, the correlation between investments, inflation, taxes, spending, life expectancy and the planning horizon \u2014 '
     + 'any of which may differ materially from actual experience, and small changes in the inputs can produce large changes in the results. '
@@ -17152,6 +17159,16 @@
   }
   function mcStatus(t){ if($('mcStatus')) $('mcStatus').innerHTML = t; }
   function mcProgress(done, total){ var w = $('mcProgWrap'); if(!w) return; w.hidden = done >= total; $('mcProg').style.width = Math.round(100 * done / Math.max(1, total)) + '%'; }
+  /* the blended growth rate of the money the current course holds in the market: the accounts that take a trial year's return (a protected position earns its own rate) */
+  function mcSqMean(rSQ, t){
+    var probe = -0.987654321, sum = 0, amt = 0;
+    (rSQ.moves || []).forEach(function(m){
+      if(m.bucket !== 'inplace' || !(m.amt > 0.5) || isLifePos(m.acct.pos)) return;
+      if(acctStressReturn(m.acct, probe, sqDefaultGrowth(), t, true) !== probe) return;
+      sum += m.amt * acctGrowth(m.acct, sqDefaultGrowth(), t); amt += m.amt;
+    });
+    return amt > 0.5 ? sum / amt : 0;
+  }
   function mcPct(sorted, q){ if(!sorted.length) return 0; var pos = (sorted.length - 1) * q, lo = Math.floor(pos), hi = Math.min(sorted.length - 1, lo + 1); return sorted[lo] + (sorted[hi] - sorted[lo]) * (pos - lo); }
   function mcStart(){
     if(mcJob) mcJob.cancel = true;
@@ -17161,42 +17178,53 @@
       if(!accounts.length || growthMissing().length) return null;
       var r = compute();
       var TXb = projectTax(r, {convert:null}), rc = rothOptions(TXb), TX = rc.apply ? projectTax(r, {convert:rc}) : TXb;
-      var P = TX.income || projectIncome(r), N = P.N, means = [];
-      for(var t = 0; t <= N; t++){ var G = effGrowth(r, t); means.push({w:(t + 1 <= P.wStart) ? G.wPre : G.w, r:G.r}); }
-      return {r:r, conv:rc.apply ? rc : null, P:P, N:N, means:means, base:TX.rows.map(function(x){ return x.layers.total; }), baseDep:TX.rows.filter(function(x){ return x.unfunded > 0.5; })[0] || null};
+      var P = TX.income || projectIncome(r), N = P.N, means = [], SQX = statusQuoRun(r), sqMeans = [];
+      for(var t = 0; t <= N; t++){ var G = effGrowth(r, t); means.push({w:(t + 1 <= P.wStart) ? G.wPre : G.w, r:G.r}); sqMeans.push(mcSqMean(SQX.rSQ, t)); }
+      var totals = function(X){ return X.rows.map(function(x){ return x.layers.total; }); }, firstDep = function(X){ return X.rows.filter(function(x){ return x.unfunded > 0.5; })[0] || null; };
+      return {r:r, conv:rc.apply ? rc : null, P:P, N:N, means:means, base:totals(TX), baseDep:firstDep(TX), sqMeans:sqMeans, sqBase:totals(SQX), sqBaseDep:firstDep(SQX)};
     });
     if(!setup){ mcJob = null; mcStatus(growthMissing().length ? esc(growthGateNote()) : 'Add the client’s accounts in section 06 first.'); return; }
-    var rng = mcRng(cfg.seed), N = setup.N, totals = [], ends = [], deps = [], t0 = Date.now(), c = Math.sqrt(1 - MC_RHO * MC_RHO);
+    var rng = mcRng(cfg.seed), N = setup.N, S = {totals:[], ends:[], deps:[], sqTotals:[], sqEnds:[], sqDeps:[]}, t0 = Date.now(), c = Math.sqrt(1 - MC_RHO * MC_RHO);
+    var collect = function(X, keyT, keyE, keyD){ var rows = X.rows, depT = -1; for(var q = 0; q < rows.length; q++){ if(rows[q].unfunded > 0.5){ depT = q; break; } } S[keyT].push(rows.map(function(x){ return x.layers.total; })); S[keyE].push(rows[rows.length - 1].layers.total); S[keyD].push(depT); };
     mcProgress(0, cfg.trials); mcStatus('Running ' + cfg.trials + ' trials for ' + esc(scnNames[k]) + '…'); $('mcRun').disabled = true;
     var step = function(){
       if(job.cancel){ $('mcRun').disabled = false; return; }
       withScnGlobals(k, function(){
         for(var n = 0; n < MC_CHUNK && job.done < cfg.trials; n++, job.done++){
-          var rates = [];
-          for(var t = 0; t <= N; t++){ var z1 = mcNormal(rng), z2 = mcNormal(rng); rates.push({walls:mcReturn(setup.means[t].w, cfg.volW, MC_RHO * z1 + c * z2), roof:mcReturn(setup.means[t].r, cfg.volR, z1)}); }
-          var rS = sensStressed(setup.r, {stress:{seq:{from:0, years:N + 1, rates:rates}}});
-          var X = projectTax(rS, {convert:setup.conv}), rows = X.rows, depT = -1;
-          for(var q = 0; q < rows.length; q++){ if(rows[q].unfunded > 0.5){ depT = q; break; } }
-          totals.push(rows.map(function(x){ return x.layers.total; })); ends.push(rows[rows.length - 1].layers.total); deps.push(depT);
+          var rates = [], sqRates = [];   // the current course takes the same market draw each year, around the rate of the money it holds in the market
+          for(var t = 0; t <= N; t++){ var z1 = mcNormal(rng), z2 = mcNormal(rng); rates.push({walls:mcReturn(setup.means[t].w, cfg.volW, MC_RHO * z1 + c * z2), roof:mcReturn(setup.means[t].r, cfg.volR, z1)}); sqRates.push({walls:rates[t].walls, roof:mcReturn(setup.sqMeans[t], cfg.volR, z1)}); }
+          collect(projectTax(sensStressed(setup.r, {stress:{seq:{from:0, years:N + 1, rates:rates}}}), {convert:setup.conv}), 'totals', 'ends', 'deps');
+          collect(statusQuoRun(sensStressed(setup.r, {stress:{seq:{from:0, years:N + 1, rates:sqRates}}})), 'sqTotals', 'sqEnds', 'sqDeps');
         }
       });
       mcProgress(job.done, cfg.trials);
       if(job.done < cfg.trials){ setTimeout(step, 0); return; }
-      MC_RESULTS[k] = mcSummarise(setup, cfg, sig, totals, ends, deps, Date.now() - t0);
+      MC_RESULTS[k] = mcSummarise(setup, cfg, sig, S, Date.now() - t0);
       mcJob = null; $('mcRun').disabled = false;
       renderMonteCarlo(); renderScenarioBar();
     };
     setTimeout(step, 0);
   }
-  function mcSummarise(setup, cfg, sig, totals, ends, deps, ms){
+  function mcStats(setup, totals, ends, deps){
     var N = setup.N, T = totals.length, bands = [];
     for(var t = 0; t <= N; t++){ var col = totals.map(function(x){ return x[t]; }).sort(function(a, b){ return a - b; }); bands.push({p10:mcPct(col, .1), p25:mcPct(col, .25), p50:mcPct(col, .5), p75:mcPct(col, .75), p90:mcPct(col, .9)}); }
     var es = ends.slice().sort(function(a, b){ return a - b; }), depYears = deps.filter(function(d){ return d >= 0; }).sort(function(a, b){ return a - b; });
     var ok = deps.filter(function(d){ return d < 0; }).length;
     var rowAt = function(t){ return setup.P.rows[Math.min(setup.P.rows.length - 1, Math.max(0, Math.round(t)))]; };
-    return {sig:sig, trials:T, volW:cfg.volW, volR:cfg.volR, seed:cfg.seed, ms:ms, years:setup.P.rows.map(function(x){ return x.year; }), base:setup.base, baseDep:setup.baseDep,
-            success:ok / T, bands:bands, endP10:mcPct(es, .1), endP50:mcPct(es, .5), endP90:mcPct(es, .9),
+    return {trials:T, success:ok / T, bands:bands, endP10:mcPct(es, .1), endP50:mcPct(es, .5), endP90:mcPct(es, .9),
             depShare:depYears.length / T, depMedian:depYears.length ? rowAt(mcPct(depYears, .5)) : null, depEarly:depYears.length ? rowAt(mcPct(depYears, .1)) : null};
+  }
+  function mcSummarise(setup, cfg, sig, S, ms){
+    var R = mcStats(setup, S.totals, S.ends, S.deps), sq = mcStats(setup, S.sqTotals, S.sqEnds, S.sqDeps);
+    sq.base = setup.sqBase; sq.baseDep = setup.sqBaseDep;
+    R.sig = sig; R.volW = cfg.volW; R.volR = cfg.volR; R.seed = cfg.seed; R.ms = ms; R.years = setup.P.rows.map(function(x){ return x.year; }); R.base = setup.base; R.baseDep = setup.baseDep;
+    R.sq = sq;   // the current course on the same draws
+    return R;
+  }
+  function mcStripBase(sig){   // the current course: the same draws as whichever scenario has a current result
+    var all = Object.keys(MC_RESULTS).map(function(k){ return MC_RESULTS[k]; }).filter(function(R){ return R.sq; }); if(!all.length) return '<small>not run</small>';
+    var fresh = all.filter(function(R){ return R.sig === sig; })[0]; if(!fresh) return '<small><span class="mc-stale">case changed \u2014 run again</span></small>';
+    return Math.round(fresh.sq.success * 100) + '%<small style="display:block">' + fresh.trials + ' trials, same draws</small>';
   }
   function mcStripCell(k, sig){
     var R = MC_RESULTS[k]; if(!R) return '<small>not run</small>';
@@ -17205,7 +17233,7 @@
   function mcChart(R){
     var W = 1000, H = 330, L = 64, Rm = 16, Tp = 18, B = 40, pw = W - L - Rm, ph = H - Tp - B, N = R.years.length - 1;
     var Xc = function(t){ return L + pw * t / Math.max(1, N); };
-    var ymax = Math.max.apply(null, R.bands.map(function(b){ return b.p90; }).concat(R.base)) * 1.08 || 100000;
+    var ymax = Math.max.apply(null, R.bands.map(function(b){ return b.p90; }).concat(R.base, R.sq ? R.sq.bands.map(function(b){ return b.p50; }) : [])) * 1.08 || 100000;
     var step = Math.pow(10, Math.floor(Math.log(ymax) / Math.LN10)); if(ymax / step < 3) step /= 2; if(ymax / step > 7) step *= 2;
     var Yf = function(v){ return Tp + ph - ph * Math.min(Math.max(0, v), ymax) / ymax; };
     var pts = function(key){ return R.bands.map(function(b, t){ return Xc(t).toFixed(1) + ',' + Yf(b[key]).toFixed(1); }); };
@@ -17215,7 +17243,8 @@
     for(var t = 0; t <= N; t += 5) out += '<text x="' + Xc(t) + '" y="' + (Tp + ph + 16) + '" text-anchor="middle" font-size="11" fill="var(--muted)">' + R.years[t] + '</text>';
     out += band('p10', 'p90', '#1F6FB2', 0.16) + band('p25', 'p75', '#1F6FB2', 0.22)
       + '<polyline fill="none" stroke="#1F6FB2" stroke-width="2.5" stroke-linejoin="round" points="' + pts('p50').join(' ') + '"/>'
-      + '<polyline fill="none" stroke="var(--ink)" stroke-width="2" stroke-dasharray="5 4" stroke-linejoin="round" points="' + R.base.map(function(v, t){ return Xc(t).toFixed(1) + ',' + Yf(v).toFixed(1); }).join(' ') + '"/>';
+      + '<polyline fill="none" stroke="var(--ink)" stroke-width="2" stroke-dasharray="5 4" stroke-linejoin="round" points="' + R.base.map(function(v, t){ return Xc(t).toFixed(1) + ',' + Yf(v).toFixed(1); }).join(' ') + '"/>'
+      + (R.sq ? '<polyline fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="2 4" stroke-linejoin="round" points="' + R.sq.bands.map(function(b, t){ return Xc(t).toFixed(1) + ',' + Yf(b.p50).toFixed(1); }).join(' ') + '"/>' : '');
     return '<svg id="mcSvg" class="pj" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Projected assets across the Monte Carlo trials: the 10th to 90th and 25th to 75th percentile bands, the median, and the plan as projected">' + out + '</svg>';
   }
   function renderMonteCarlo(){
@@ -17231,6 +17260,20 @@
     var agesOf = function(row){ return row ? (sp ? esc(i.clientFirst || 'Client') + ' ' + row.ages[0] + ' · ' + esc(i.spouseFirst || 'Spouse') + ' ' + row.ages[1] : 'age ' + row.ages[0]) : ''; };
     var forReports = reportScn === activeScn ? '' : (mcFresh(reportScn) ? ' The reports build from ' + esc(scnNames[reportScn]) + ', which has its own current result.' : ' <span class="mc-stale">The reports build from ' + esc(scnNames[reportScn]) + ' \u2014 run the analysis there for them to carry it.</span>');
     if(!mcJob) mcStatus((stale ? '<span class="mc-stale">The case or the settings have changed since this run — run it again.</span> ' : '') + R.trials + ' trials for ' + esc(scnNames[activeScn]) + ' in ' + (R.ms / 1000).toFixed(1) + 's, seed ' + R.seed + '.' + forReports);
+    var pct = function(v){ return Math.round(v * 100) + '%'; };
+    var mcCompareHtml = function(R){
+      if(!R.sq) return '';
+      var row = function(l, a, b){ return '<tr><td>' + l + '</td><td class="num">' + a + '</td><td class="num"><b>' + b + '</b></td></tr>'; };
+      var runOut = function(Q){ return pct(Q.depShare) + (Q.depMedian ? ' <small>typically ' + Q.depMedian.year + '</small>' : ''); };
+      return '<p class="hint">The current course \u2014 the accounts as held today, no changes \u2014 run on the same random draws, with the Roof volatility on the money it holds in the market:</p>'
+        + '<div class="tbl-wrap" style="margin:6px 0 14px"><table class="pj-table" id="mcCompare" style="min-width:520px"><thead><tr><th></th><th class="num">Current course</th><th class="num">' + esc(scnNames[activeScn]) + '</th></tr></thead><tbody>'
+        + row('Probability of success', pct(R.sq.success), pct(R.success))
+        + row('Median at end of plan', money(R.sq.endP50), money(R.endP50))
+        + row('Poor outcome (10th pct)', money(R.sq.endP10), money(R.endP10))
+        + row('Strong outcome (90th pct)', money(R.sq.endP90), money(R.endP90))
+        + row('Accounts run out', runOut(R.sq), runOut(R))
+        + '</tbody></table></div>';
+    };
     out.innerHTML = '<div class="tax-tiles" id="mcTiles">'
       + '<div><dt>Probability of success</dt><dd>' + Math.round(R.success * 100) + '%</dd><small>trials in which the accounts last to the end of plan</small></div>'
       + '<div><dt>Median at end of plan</dt><dd>' + money(R.endP50) + '</dd><small>' + (R.depShare > 0.5 ? 'the median trial runs out \u2014 what is left is the protected pieces' : 'plan as projected: ' + (R.baseDep ? 'run out ' + R.baseDep.year : money(R.base[R.base.length - 1]))) + '</small></div>'
@@ -17238,9 +17281,10 @@
       + '<div><dt>Strong outcome (90th pct)</dt><dd>' + money(R.endP90) + '</dd><small>one trial in ten ends with more</small></div>'
       + '<div><dt>Accounts run out</dt><dd>' + Math.round(R.depShare * 100) + '%</dd><small>' + (R.depMedian ? 'of trials; typically ' + R.depMedian.year + ', ' + agesOf(R.depMedian) + (R.depEarly && R.depEarly.year !== R.depMedian.year ? '; the earliest tenth by ' + R.depEarly.year + ', ' + agesOf(R.depEarly) : '') : 'of trials') + '</small></div>'
       + '</div>'
-      + '<div class="pj-legend" id="mcLegend"><span class="pj-key"><i style="border-color:#1F6FB2"></i>Median trial</span><span class="pj-key"><i style="border-color:rgba(31,111,178,.5);border-top-width:8px"></i>25th–75th percentile</span><span class="pj-key"><i style="border-color:rgba(31,111,178,.25);border-top-width:8px"></i>10th–90th percentile</span><span class="pj-key"><i style="border-color:var(--ink);border-top-style:dashed"></i>Plan as projected</span></div>'
+      + mcCompareHtml(R)
+      + '<div class="pj-legend" id="mcLegend"><span class="pj-key"><i style="border-color:#1F6FB2"></i>Median trial</span><span class="pj-key"><i style="border-color:rgba(31,111,178,.5);border-top-width:8px"></i>25th–75th percentile</span><span class="pj-key"><i style="border-color:rgba(31,111,178,.25);border-top-width:8px"></i>10th–90th percentile</span><span class="pj-key"><i style="border-color:var(--ink);border-top-style:dashed"></i>Plan as projected</span><span class="pj-key"><i style="border-color:var(--muted);border-top-style:dotted"></i>Current course, median trial</span></div>'
       + '<div class="pj-wrap">' + mcChart(R) + '</div>'
-      + '<p class="hint" style="margin-top:10px">Walls volatility ' + (R.volW * 100).toFixed(1) + '%, Roof volatility ' + (R.volR * 100).toFixed(1) + '%, around the plan\u2019s growth assumptions.</p>'
+      + '<p class="hint" style="margin-top:10px">Walls volatility ' + (R.volW * 100).toFixed(1) + '%, Roof volatility ' + (R.volR * 100).toFixed(1) + '%, around the plan\u2019s growth assumptions; the current course takes the Roof volatility on the accounts it holds in the market, around their own growth rates, with the same draw each year.</p>'
       + '<div class="mc-disc"><b>' + esc(MC_DISC[0]) + '.</b> ' + esc(MC_DISC[1]) + '</div>';
   }
   (function(){
@@ -17280,12 +17324,12 @@
     frame(s, '', 'Many Possible Markets: A Monte Carlo Analysis');
     dkBody(s, 0.9, 1.95, 18.2, 1.3, 'The projection with the Fortress in place, run ' + R.trials.toLocaleString() + ' times with a different sequence of random yearly returns for the Walls and the Roof each time \u2014 '
       + 'drawn around the plan\u2019s growth assumptions with ' + (R.volW * 100).toFixed(0) + '% and ' + (R.volR * 100).toFixed(0) + '% volatility \u2014 and everything else unchanged. '
-      + 'The shaded bands hold the middle 80% and the middle half of the trials; the dashed line is the plan as projected. '
+      + 'The shaded bands hold the middle 80% and the middle half of the trials; the dashed line is the plan as projected' + (R.sq ? ', the dotted line the current course\u2019s median trial' : '') + '. '
       + 'A hypothetical illustration, not a forecast; see Important Disclosures.', {sz:16});
     dkAppLegend(s, 1.0, 3.35, 12.6, 'mcLegend');
     if(!dkSvg(s, 0.9, 4.15, 12.7, 5.75, 'mcSvg')) dkBody(s, 0.9, 3.9, 12.6, 1, 'The chart is not available for this case.', {sz:16, i:true});
-    dkTile(s, 14.0, 3.15, 5.1, 1.6, 'Probability of success', Math.round(R.success * 100) + '%', 'Accounts last to the end of plan', {big:22, valueColor:R.success >= 0.75 ? DECK_C.navy : DECK_C.red});
-    dkTile(s, 14.0, 4.85, 5.1, 1.6, 'Median trial at the end of plan', money(R.endP50), R.depShare > 0.5 ? 'The median trial runs out early' : 'Plan as projected: ' + (R.baseDep ? 'runs out ' + R.baseDep.year : money(R.base[R.base.length - 1])), {big:22});
+    dkTile(s, 14.0, 3.15, 5.1, 1.6, 'Probability of success', Math.round(R.success * 100) + '%', R.sq ? 'Current course: ' + Math.round(R.sq.success * 100) + '% of trials' : 'Accounts last to the end of plan', {big:22, valueColor:R.success >= 0.75 ? DECK_C.navy : DECK_C.red});
+    dkTile(s, 14.0, 4.85, 5.1, 1.6, 'Median trial at the end of plan', money(R.endP50), R.sq ? 'Current course median: ' + money(R.sq.endP50) : R.depShare > 0.5 ? 'The median trial runs out early' : 'Plan as projected: ' + (R.baseDep ? 'runs out ' + R.baseDep.year : money(R.base[R.base.length - 1])), {big:22});
     dkTile(s, 14.0, 6.55, 5.1, 1.6, 'One trial in ten ends with less than', money(R.endP10), 'One in ten ends above ' + money(R.endP90), {big:22});
     dkTile(s, 14.0, 8.25, 5.1, 1.65, 'Accounts run out', Math.round(R.depShare * 100) + '% of trials', R.depMedian ? 'Typically ' + R.depMedian.year + ' \u00b7 ' + agesOf(R.depMedian) : 'In none of the trials', {big:22, valueColor:R.depShare > 0.25 ? DECK_C.red : DECK_C.navy});
   }
@@ -18410,7 +18454,7 @@
 
     /* 31. the firm's Important Disclosures, the last pages */
     (function(){
-      var chunks = [RFB_DISC.slice(0, 3), RFB_DISC.slice(3)];
+      var chunks = [RFB_DISC.slice(0, 3), RFB_DISC.slice(3)]; if(MCR) chunks.push([MC_DISC]);
       chunks.forEach(function(chunk, k){
         var s = doc.slide(); page++;
         frame(s, '', 'Important Disclosures \u2013 Retirement Fortress Blueprint\u2122' + (k ? ' (continued)' : ''), false, {noDisc:true});
@@ -18687,7 +18731,7 @@
       + '<section><h2>How the plan holds up under stress</h2><p>The plan itself against three things outside anyone’s control; its base case is ' + E(faDep ? 'accounts running out ' + atAges(faDep) : money(faLast.layers.total) + ' at the end of plan') + '.</p>'
       + '<table><thead><tr><th>Stress</th><th>What we assumed</th><th class="n">Where you end up</th></tr></thead><tbody>'
       + sens.map(function(x){ var R = x.R, d = x.d, short = d.key === 'seq' ? 'Walls ' + (SENS_SEQ.walls * 100).toFixed(0) + '% and Roof ' + (SENS_SEQ.roof * 100).toFixed(0) + '% a year for three years (' + d.range + ')' : d.key === 'ss' ? 'Benefits ' + Math.round(SENS_SS.pct * 100) + '% lower from ' + SENS_SS.year : 'Inflation ' + Math.round((SENS_INFL - 1) * 100) + '% above the plan assumption, ' + ((i.inflation || 0) * SENS_INFL * 100).toFixed(2) + '% a year'; return '<tr><td class="lv">' + E(d.title) + '</td><td>' + E(short) + '</td><td class="n' + (R.dep ? ' hi' : '') + '">' + E(R.dep ? 'Run out at ' + agesShort(R.dep) : money(R.last.layers.total) + (R.diff < 0 ? ' (' + fmtKM(-R.diff) + ' less)' : '')) + '</td></tr>'; }).join('')
-      + (MCR ? '<tr><td>Many possible markets (Monte Carlo)</td><td>' + MCR.trials.toLocaleString() + ' trials, each with a different sequence of random yearly returns (' + (MCR.volW * 100).toFixed(0) + '% Walls and ' + (MCR.volR * 100).toFixed(0) + '% Roof volatility)' + (MCR.depMedian ? '; the trials that fail typically run out in ' + MCR.depMedian.year : '') + '</td><td class="n' + (MCR.success < 0.75 ? ' hi' : '') + '">' + Math.round(MCR.success * 100) + '% of trials reach ' + faLast.year + '</td></tr>' : '')
+      + (MCR ? '<tr><td>Many possible markets (Monte Carlo)</td><td>' + MCR.trials.toLocaleString() + ' trials, each with a different sequence of random yearly returns (' + (MCR.volW * 100).toFixed(0) + '% Walls and ' + (MCR.volR * 100).toFixed(0) + '% Roof volatility)' + (MCR.depMedian ? '; the trials that fail typically run out in ' + MCR.depMedian.year : '') + (MCR.sq ? '. Run the same way, the current course reaches ' + faLast.year + ' in ' + Math.round(MCR.sq.success * 100) + '% of trials' : '') + '</td><td class="n' + (MCR.success < 0.75 ? ' hi' : '') + '">' + Math.round(MCR.success * 100) + '% of trials reach ' + faLast.year + '</td></tr>' : '')
       + '</tbody></table></section>'
       + '<section><h2>Current course versus the plan</h2>'
       + '<table><thead><tr><th></th><th class="n">Current course</th><th class="n">With the plan</th></tr></thead><tbody>'
