@@ -874,6 +874,7 @@
   .mc-prog{height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden;margin:12px 0 0;max-width:520px}
   .mc-prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .15s}
   .mc-stale{color:var(--st-caution)}
+  .mc-disc{font-size:12.5px;line-height:1.55;color:var(--muted);margin-top:12px;padding-top:10px;border-top:1px solid var(--line);max-width:110ch}
   .ltc-lead{margin-top:26px;padding-top:18px;border-top:2px solid var(--line-strong)}
   .ltc-lead h3{margin:0 0 4px;font-size:17px}
 
@@ -3542,7 +3543,14 @@
           is kept for each scenario and shown in the side-by-side strip as <b>Monte Carlo success</b>;
           change the case or the settings and it is marked stale until you run it again. The settings
           save with the case; the result does not. A planning illustration, not a forecast: the
-          probability depends on the volatility assumed.</dd>
+          probability depends on the volatility assumed, and the Monte Carlo disclosure beneath the chart
+          (also in the Important Disclosures at the foot of the page) says so in the words compliance
+          reviews. When the report scenario has a current result, the Retirement Fortress Plan gains a
+          <i>Many Possible Markets</i> page after the stress tests and the initial observations and
+          findings add a row to its stress table, and both reports carry the Monte Carlo paragraph in
+          their Important Disclosures; with no result, the reports are as before. The status line under
+          the Run button says when the reports build from a different scenario than the one shown, so
+          you know to run the analysis there if the reports are to carry it.</dd>
       </dl>
 
       <h3 style="margin-top:18px">If a long term care event occurs</h3>
@@ -16690,15 +16698,30 @@
     ['Advisory and Insurance Services', 'Advisory services are offered through AE Wealth Management, LLC. Insurance products are offered through AFG II, LLC and/or Alto Financial Group, LLC. Guarantees of insurance products depend on the claims-paying ability of the issuing insurance company.']
   ];
   var RFB_DISC_COPY = '© 2026 AFG II, LLC. All rights reserved.';
-  function rfbDiscHtml(opts){   // opts.page: a page-break before it (the reports); opts.title: show the title
+  /* Monte Carlo analysis (section 19): drafted October 2026 for compliance review; shown beneath the analysis in the
+     application and added to the Important Disclosures of any report that carries its results. */
+  var MC_DISC = ['Monte Carlo Analysis',
+    'The Monte Carlo analysis is a hypothetical illustration and is not a forecast, a prediction, or a guarantee of future results. '
+    + 'It runs the plan\u2019s projection many times, each time applying a different sequence of randomly generated annual returns to the Walls and Roof investments, '
+    + 'drawn from a statistical (lognormal) distribution around the growth rates assumed in this plan and the volatility assumptions shown. '
+    + 'The \u201cprobability of success\u201d is the percentage of those trials in which the plan\u2019s assets lasted to the end of the planning period. '
+    + 'It is not the likelihood that any particular outcome will occur, and a high probability does not mean the plan cannot fail. '
+    + 'The results depend heavily on the assumptions used \u2014 expected returns, volatility, the correlation between investments, inflation, taxes, spending, life expectancy and the planning horizon \u2014 '
+    + 'any of which may differ materially from actual experience, and small changes in the inputs can produce large changes in the results. '
+    + 'Annual returns are assumed to be independent from year to year and normally distributed in logarithmic terms; actual markets do not behave this way and may produce losses that are larger, more frequent or more prolonged than the trials assume. '
+    + 'Results will also vary with the number of trials and the random draws used. '
+    + 'The analysis does not reflect the fees and expenses of specific investments unless they are included in the growth rates assumed, future changes in tax law, or the possibility that an insurance company fails to meet its obligations. '
+    + 'It is one input among many, should be reviewed regularly as circumstances change, and is not investment, tax or legal advice.'];
+  function rfbDiscHtml(opts){   // opts.page: a page-break before it (the reports); opts.title: show the title; opts.mc: the Monte Carlo paragraph too
     opts = opts || {};
+    var blocks = opts.mc ? RFB_DISC.concat([MC_DISC]) : RFB_DISC;
     return '<div class="rfb-disc"' + (opts.page ? ' style="page-break-before:always;break-before:page;padding-top:.2in"' : '') + '>'
       + (opts.title === false ? '' : '<h2 class="rfb-disc-title">' + esc(RFB_DISC_TITLE) + '</h2>')
-      + RFB_DISC.map(function(b){ return '<h3>' + esc(b[0]) + '</h3><p>' + esc(b[1]) + '</p>'; }).join('')
+      + blocks.map(function(b){ return '<h3>' + esc(b[0]) + '</h3><p>' + esc(b[1]) + '</p>'; }).join('')
       + '<p class="rfb-disc-copy">' + esc(RFB_DISC_COPY) + '</p></div>';
   }
   var RFB_DISC_CSS = '.rfb-disc{font-size:11px;line-height:1.5;color:#3b4252}.rfb-disc .rfb-disc-title{font-size:13px;letter-spacing:.04em;margin:0 0 10px;color:#1F3162}.rfb-disc h3{font-size:11.5px;margin:10px 0 3px;color:#1F3162}.rfb-disc p{margin:0 0 6px;max-width:none}.rfb-disc .rfb-disc-copy{margin-top:12px;color:#5A6276}';
-  if($('rfbDiscBody')) $('rfbDiscBody').innerHTML = rfbDiscHtml({title:true});   // the gold block at the foot of the page
+  if($('rfbDiscBody')) $('rfbDiscBody').innerHTML = rfbDiscHtml({title:true, mc:true});   // the gold block at the foot of the page
   var DECK_DISC = 'Illustrative only \u2014 hypothetical projections from information you supplied, not a guarantee of results. See Important Disclosures, pages 3\u20134.';
   var DECK_MIN = 16;
   function dkSm(v){ return v < -0.5 ? '\u2212' + money(-v) : money(Math.abs(v) < 0.5 ? 0 : v); }                            // no text on a page smaller than this, in points
@@ -17111,7 +17134,12 @@
   var MC_RESULTS = {}, mcJob = null;
   function mcReset(){ mcCfg = {trials:MC_DEF.trials, volW:MC_DEF.volW, volR:MC_DEF.volR, seed:MC_DEF.seed}; MC_RESULTS = {}; if(mcJob){ mcJob.cancel = true; mcJob = null; } }
   /* the case and the settings a result belongs to: when either changes the result is marked stale */
-  function mcSig(){ var str = caseData() + '|' + mcCfg.trials + '|' + mcCfg.volW + '|' + mcCfg.volR + '|' + mcCfg.seed, h = 5381; for(var k = 0; k < str.length; k++) h = ((h << 5) + h + str.charCodeAt(k)) | 0; return h; }
+  function mcSig(){
+    var str = caseData().replace(/"activeScenario":\d+,"reportScenario":\d+,"planStatus":"[a-z]*",/, '') + '|' + mcCfg.trials + '|' + mcCfg.volW + '|' + mcCfg.volR + '|' + mcCfg.seed, h = 5381;   // which scenario shows, or is reported, is not a change to the case
+    for(var k = 0; k < str.length; k++) h = ((h << 5) + h + str.charCodeAt(k)) | 0;
+    return h;
+  }
+  function mcFresh(k){ var R = MC_RESULTS[k]; return R && R.sig === mcSig() ? R : null; }   // a result that still matches the case and the settings
   function mcRng(seed){ var a = (seed >>> 0) || 1; return function(){ a = (a + 0x6D2B79F5) | 0; var t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
   function mcNormal(rng){ var u = 0, v = 0; while(u === 0) u = rng(); while(v === 0) v = rng(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
   function mcReturn(mean, vol, z){ if(!(vol > 0)) return mean; var mu = Math.log(1 + mean) - vol * vol / 2; return Math.exp(mu + vol * z) - 1; }   // lognormal, expected return = the plan's rate
@@ -17201,7 +17229,8 @@
     if(!R){ out.innerHTML = ''; if(!mcJob) mcStatus(gate || 'Not run yet for ' + esc(scnNames[activeScn]) + ' — set the volatility assumptions and press Run. ' + mcCfg.trials + ' trials take a little while; the page stays usable.'); return; }
     var stale = R.sig !== mcSig(), i = readInputs(), sp = hasSpouse(i);
     var agesOf = function(row){ return row ? (sp ? esc(i.clientFirst || 'Client') + ' ' + row.ages[0] + ' · ' + esc(i.spouseFirst || 'Spouse') + ' ' + row.ages[1] : 'age ' + row.ages[0]) : ''; };
-    if(!mcJob) mcStatus((stale ? '<span class="mc-stale">The case or the settings have changed since this run — run it again.</span> ' : '') + R.trials + ' trials for ' + esc(scnNames[activeScn]) + ' in ' + (R.ms / 1000).toFixed(1) + 's, seed ' + R.seed + '.');
+    var forReports = reportScn === activeScn ? '' : (mcFresh(reportScn) ? ' The reports build from ' + esc(scnNames[reportScn]) + ', which has its own current result.' : ' <span class="mc-stale">The reports build from ' + esc(scnNames[reportScn]) + ' \u2014 run the analysis there for them to carry it.</span>');
+    if(!mcJob) mcStatus((stale ? '<span class="mc-stale">The case or the settings have changed since this run — run it again.</span> ' : '') + R.trials + ' trials for ' + esc(scnNames[activeScn]) + ' in ' + (R.ms / 1000).toFixed(1) + 's, seed ' + R.seed + '.' + forReports);
     out.innerHTML = '<div class="tax-tiles" id="mcTiles">'
       + '<div><dt>Probability of success</dt><dd>' + Math.round(R.success * 100) + '%</dd><small>trials in which the accounts last to the end of plan</small></div>'
       + '<div><dt>Median at end of plan</dt><dd>' + money(R.endP50) + '</dd><small>' + (R.depShare > 0.5 ? 'the median trial runs out \u2014 what is left is the protected pieces' : 'plan as projected: ' + (R.baseDep ? 'run out ' + R.baseDep.year : money(R.base[R.base.length - 1]))) + '</small></div>'
@@ -17209,9 +17238,10 @@
       + '<div><dt>Strong outcome (90th pct)</dt><dd>' + money(R.endP90) + '</dd><small>one trial in ten ends with more</small></div>'
       + '<div><dt>Accounts run out</dt><dd>' + Math.round(R.depShare * 100) + '%</dd><small>' + (R.depMedian ? 'of trials; typically ' + R.depMedian.year + ', ' + agesOf(R.depMedian) + (R.depEarly && R.depEarly.year !== R.depMedian.year ? '; the earliest tenth by ' + R.depEarly.year + ', ' + agesOf(R.depEarly) : '') : 'of trials') + '</small></div>'
       + '</div>'
-      + '<div class="pj-legend"><span class="pj-key"><i style="border-color:#1F6FB2"></i>Median trial</span><span class="pj-key"><i style="border-color:rgba(31,111,178,.5);border-top-width:8px"></i>25th–75th percentile</span><span class="pj-key"><i style="border-color:rgba(31,111,178,.25);border-top-width:8px"></i>10th–90th percentile</span><span class="pj-key"><i style="border-color:var(--ink);border-top-style:dashed"></i>Plan as projected</span></div>'
+      + '<div class="pj-legend" id="mcLegend"><span class="pj-key"><i style="border-color:#1F6FB2"></i>Median trial</span><span class="pj-key"><i style="border-color:rgba(31,111,178,.5);border-top-width:8px"></i>25th–75th percentile</span><span class="pj-key"><i style="border-color:rgba(31,111,178,.25);border-top-width:8px"></i>10th–90th percentile</span><span class="pj-key"><i style="border-color:var(--ink);border-top-style:dashed"></i>Plan as projected</span></div>'
       + '<div class="pj-wrap">' + mcChart(R) + '</div>'
-      + '<p class="hint" style="margin-top:10px">Walls volatility ' + (R.volW * 100).toFixed(1) + '%, Roof volatility ' + (R.volR * 100).toFixed(1) + '%, around the plan’s growth assumptions. A planning illustration, not a forecast: the probability depends on the volatility assumed, and the trials know nothing about valuations, interest rates or the order in which real markets will deliver their returns.</p>';
+      + '<p class="hint" style="margin-top:10px">Walls volatility ' + (R.volW * 100).toFixed(1) + '%, Roof volatility ' + (R.volR * 100).toFixed(1) + '%, around the plan\u2019s growth assumptions.</p>'
+      + '<div class="mc-disc"><b>' + esc(MC_DISC[0]) + '.</b> ' + esc(MC_DISC[1]) + '</div>';
   }
   (function(){
     if(!$('mcRun')) return;
@@ -17243,6 +17273,21 @@
     dkTile(s, 14.0, 4.85, 5.1, 1.6, 'Withdrawn from the accounts', money(RUN.wd), (RUN.wd >= RUN.baseWd ? '+' : '\u2212') + money(Math.abs(RUN.wd - RUN.baseWd)) + ' vs the base case', {big:22});
     dkTile(s, 14.0, 6.55, 5.1, 1.6, 'Lowest point', money(RUN.low.layers.total), 'In ' + RUN.low.year + ' \u00b7 ages ' + ages(RUN.low), {big:22});
     dkTile(s, 14.0, 8.25, 5.1, 1.65, dep ? 'Accounts run out' : 'At the end of plan (' + RUN.last.year + ')', dep ? String(dep.year) : money(RUN.last.layers.total), dep ? 'Ages ' + ages(dep) + (RUN.baseDep ? ' \u00b7 base case ' + RUN.baseDep.year : ' \u00b7 base case lasts to ' + RUN.baseLast.year) : (diff >= 0 ? '+' : '\u2212') + money(Math.abs(diff)) + ' vs ' + fmtKM(RUN.baseLast.layers.total) + ' in the base case', {big:22, valueColor:dep ? DECK_C.red : DECK_C.navy});
+  }
+  /* report page: the Monte Carlo analysis, laid out like a stress test page; the chart is cloned from the page */
+  function mcDeckSlide(s, frame, r, R){
+    var i = r.inputs, sp = hasSpouse(i), agesOf = function(row){ return sp ? (i.clientFirst || 'Client') + ' ' + row.ages[0] + ' \u00b7 ' + (i.spouseFirst || 'Spouse') + ' ' + row.ages[1] : 'age ' + row.ages[0]; };
+    frame(s, '', 'Many Possible Markets: A Monte Carlo Analysis');
+    dkBody(s, 0.9, 1.95, 18.2, 1.3, 'The projection with the Fortress in place, run ' + R.trials.toLocaleString() + ' times with a different sequence of random yearly returns for the Walls and the Roof each time \u2014 '
+      + 'drawn around the plan\u2019s growth assumptions with ' + (R.volW * 100).toFixed(0) + '% and ' + (R.volR * 100).toFixed(0) + '% volatility \u2014 and everything else unchanged. '
+      + 'The shaded bands hold the middle 80% and the middle half of the trials; the dashed line is the plan as projected. '
+      + 'A hypothetical illustration, not a forecast; see Important Disclosures.', {sz:16});
+    dkAppLegend(s, 1.0, 3.35, 12.6, 'mcLegend');
+    if(!dkSvg(s, 0.9, 4.15, 12.7, 5.75, 'mcSvg')) dkBody(s, 0.9, 3.9, 12.6, 1, 'The chart is not available for this case.', {sz:16, i:true});
+    dkTile(s, 14.0, 3.15, 5.1, 1.6, 'Probability of success', Math.round(R.success * 100) + '%', 'Accounts last to the end of plan', {big:22, valueColor:R.success >= 0.75 ? DECK_C.navy : DECK_C.red});
+    dkTile(s, 14.0, 4.85, 5.1, 1.6, 'Median trial at the end of plan', money(R.endP50), R.depShare > 0.5 ? 'The median trial runs out early' : 'Plan as projected: ' + (R.baseDep ? 'runs out ' + R.baseDep.year : money(R.base[R.base.length - 1])), {big:22});
+    dkTile(s, 14.0, 6.55, 5.1, 1.6, 'One trial in ten ends with less than', money(R.endP10), 'One in ten ends above ' + money(R.endP90), {big:22});
+    dkTile(s, 14.0, 8.25, 5.1, 1.65, 'Accounts run out', Math.round(R.depShare * 100) + '% of trials', R.depMedian ? 'Typically ' + R.depMedian.year + ' \u00b7 ' + agesOf(R.depMedian) : 'In none of the trials', {big:22, valueColor:R.depShare > 0.25 ? DECK_C.red : DECK_C.navy});
   }
   /* report page: the three stress tests side by side */
   function sensDeckPage(s, frame, r, TX, mode, title){
@@ -17975,6 +18020,8 @@
     /* 23b. projected assets with the Fortress and a long term care event */
     if(ltcScenarios(r).scenarios.length){ page++; ltcDeckPage(doc.slide(), frame, r, 'plan', TX, 'With the Fortress in Place, If Long Term Care Is Needed'); }
     sensDefs(r, TX.income || projectIncome(r)).forEach(function(d){ page++; sensDeckSlide(doc.slide(), frame, r, TX, d); });
+    var MCR = mcFresh(activeScn);   // the page shows the report scenario while the deck builds
+    if(MCR){ page++; mcDeckSlide(doc.slide(), frame, r, MCR); }
 
     /* 24. transfer sequence — both parts print in the appendix (transferSlides('consolidate') and ('protect')):
        the consolidation line by line, then the protected pieces in detail — each Foundation annuity contract and each LTC contract — each Foundation annuity contract and each LTC contract
@@ -18438,7 +18485,7 @@
     var r = activeRun(), i = r.inputs, spouse = hasSpouse(i), E = esc, today = new Date();
     var TXb = projectTax(r, {convert:null}), cfg = rothOptions(TXb), TXp = cfg.apply ? projectTax(r, {convert:cfg}) : null, TX = TXp || TXb;
     var SQ = statusQuoRun(r), P = projectIncome(r), life = lifeEstimate(), ltc = ltcEstimate(), DT = debtTotals(), OA = oaTotals(), fee = aumPlan(r);
-    var RS = riskSummary(r), RF = RS.facts, contracts = moatContracts(r);
+    var RS = riskSummary(r), RF = RS.facts, contracts = moatContracts(r), MCR = mcFresh(activeScn);   // the page shows the report scenario while the report builds
     var cName = (i.clientFirst || 'Client').trim(), sName = spouse ? (i.spouseFirst || 'Spouse').trim() : '';
     var names = spouse ? cName + ' and ' + sName + (i.clientLast ? ' ' + i.clientLast : '') : cName + (i.clientLast ? ' ' + i.clientLast : '');
     var ppl = spouse ? ['client', 'spouse'] : ['client'], pName = function(w){ return w === 'client' ? cName : sName; };
@@ -18640,6 +18687,7 @@
       + '<section><h2>How the plan holds up under stress</h2><p>The plan itself against three things outside anyone’s control; its base case is ' + E(faDep ? 'accounts running out ' + atAges(faDep) : money(faLast.layers.total) + ' at the end of plan') + '.</p>'
       + '<table><thead><tr><th>Stress</th><th>What we assumed</th><th class="n">Where you end up</th></tr></thead><tbody>'
       + sens.map(function(x){ var R = x.R, d = x.d, short = d.key === 'seq' ? 'Walls ' + (SENS_SEQ.walls * 100).toFixed(0) + '% and Roof ' + (SENS_SEQ.roof * 100).toFixed(0) + '% a year for three years (' + d.range + ')' : d.key === 'ss' ? 'Benefits ' + Math.round(SENS_SS.pct * 100) + '% lower from ' + SENS_SS.year : 'Inflation ' + Math.round((SENS_INFL - 1) * 100) + '% above the plan assumption, ' + ((i.inflation || 0) * SENS_INFL * 100).toFixed(2) + '% a year'; return '<tr><td class="lv">' + E(d.title) + '</td><td>' + E(short) + '</td><td class="n' + (R.dep ? ' hi' : '') + '">' + E(R.dep ? 'Run out at ' + agesShort(R.dep) : money(R.last.layers.total) + (R.diff < 0 ? ' (' + fmtKM(-R.diff) + ' less)' : '')) + '</td></tr>'; }).join('')
+      + (MCR ? '<tr><td>Many possible markets (Monte Carlo)</td><td>' + MCR.trials.toLocaleString() + ' trials, each with a different sequence of random yearly returns (' + (MCR.volW * 100).toFixed(0) + '% Walls and ' + (MCR.volR * 100).toFixed(0) + '% Roof volatility)' + (MCR.depMedian ? '; the trials that fail typically run out in ' + MCR.depMedian.year : '') + '</td><td class="n' + (MCR.success < 0.75 ? ' hi' : '') + '">' + Math.round(MCR.success * 100) + '% of trials reach ' + faLast.year + '</td></tr>' : '')
       + '</tbody></table></section>'
       + '<section><h2>Current course versus the plan</h2>'
       + '<table><thead><tr><th></th><th class="n">Current course</th><th class="n">With the plan</th></tr></thead><tbody>'
@@ -18695,7 +18743,7 @@
       + '<p class="tag">Your Goals. Our Guidance. <span class="tg">Together.</span></p>'
       + '<p class="contact">' + E(contact) + '</p></div>'
       + foot + '</div>'
-      + rfbDiscHtml({page:true})
+      + rfbDiscHtml({page:true, mc:!!MCR})
       + '</body></html>';
     return html;
   }
