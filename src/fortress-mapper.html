@@ -1424,14 +1424,13 @@
         disclaimer: verify with the plan administrator before recommending an option.</p>
 
       <p>The section closes with <b>Your income today and in retirement</b>, the same summary the
-        Retirement Fortress Plan report carries: four tiles &mdash; household income today, guaranteed
-        income in retirement, the share of Needs it covers and the <b>Annual Needs income gap</b>
-        the Foundation annuity is sized to close &mdash; a table setting Social Security, pensions
-        and annuity income against Annual Needs, and a <b>Sources of income</b> chart stacking
-        salaries, Social Security, pensions, annuity and non-guaranteed income year by year as the
-        plan stands today, before the Fortress is built. The note beneath gives the first full
-        retirement year's figures; the shortfall against expenses is the Income Gap chart in
-        section&nbsp;05.</p>
+        Retirement Fortress Plan report carries: three tiles &mdash; household income today, guaranteed
+        income in retirement and the share of Needs it covers &mdash; a table setting Social Security,
+        pensions and annuity income against Annual Needs, and a <b>Sources of income</b> chart
+        stacking salaries, Social Security, pensions, annuity and non-guaranteed income year by year
+        as the plan stands today, before the Fortress is built. The note beneath gives the first full
+        retirement year's figures. The Needs income gap the Foundation annuity is sized to close is
+        shown in section&nbsp;13, not here.</p>
 
       <dl class="fields">
         <dt>Carriers</dt>
@@ -14949,16 +14948,13 @@
     $('incSumTiles').innerHTML =
         '<div><dt>Household income today</dt><dd>' + money(netSal + ng) + '</dd><small>take-home pay' + (ng > 0.5 ? ' plus ' + money(ng) + ' of other income' : '') + '</small></div>'
       + '<div><dt>Guaranteed income in retirement</dt><dd>' + money(guaranteed) + '</dd><small>Social Security, pensions and annuity income, today\u2019s dollars</small></div>'
-      + '<div><dt>Needs covered</dt><dd>' + Math.round(needsCover * 100) + '%</dd><small>' + money(guaranteed) + ' against Needs of ' + money(i.needs) + '</small></div>'
-      + '<div><dt>Annual Needs income gap</dt><dd' + (r.incomeGap > 0.5 ? ' style="color:var(--st-alert)"' : '') + '>' + money(r.incomeGap) + '</dd><small>' + (r.incomeGap > 0.5 ? (r.sizing && r.sizing.mode === 'avg' ? 'average over the first ' + r.sizing.years + ' years of retirement' + (r.sizing.from ? ' (' + r.sizing.from + '\u2013' + r.sizing.to + ')' : '') : 'highest monthly gap in the first ' + (r.sizing ? r.sizing.years : i.sizeYears) + ' years of retirement' + (r.sizing && r.sizing.peakYear ? ' (' + money(r.incomeGap / 12) + ' a month in ' + r.sizing.peakYear + ')' : '')) + ' \u2014 what the Foundation annuity is sized to close' : 'guaranteed income covers Needs through the first ' + (r.sizing ? r.sizing.years : i.sizeYears) + ' years of retirement') + '</small></div>';
+      + '<div><dt>Needs covered</dt><dd>' + Math.round(needsCover * 100) + '%</dd><small>' + money(guaranteed) + ' against Needs of ' + money(i.needs) + '</small></div>';
     var rows = [['Social Security', i.ss], ['Pensions', i.pension], ['Annuity income in place', i.otherInc]];
     if(ng > 0.5) rows.push(['Non-guaranteed income (counts toward Wants, never Needs)', ng]);
     $('incSumTable').innerHTML = '<thead><tr><th>Today\u2019s dollars</th><th class="num">A year</th></tr></thead><tbody>'
       + rows.map(function(x){ return '<tr><td>' + x[0] + '</td><td class="num">' + money(x[1]) + '</td></tr>'; }).join('')
       + '<tr><td><b>Guaranteed income</b></td><td class="num"><b>' + money(guaranteed) + '</b></td></tr>'
-      + '<tr><td>Annual Needs (section 05)</td><td class="num">' + money(i.needs) + '</td></tr>'
-      + '<tr><td>Needs income gap today</td><td class="num">' + money(r.incomeGapToday) + '</td></tr>'
-      + '<tr><td><b style="color:var(--st-alert)">Needs income gap, ' + (r.sizing && r.sizing.mode === 'avg' ? 'average of' : 'highest month in') + ' the first ' + (r.sizing ? r.sizing.years : i.sizeYears) + ' years of retirement' + (r.sizing && r.sizing.from ? ' (' + r.sizing.from + '\u2013' + r.sizing.to + ')' : '') + '</b><small style="display:block;color:var(--muted)">' + (r.sizing && r.sizing.peakYear ? (r.sizing.mode === 'avg' ? 'The window peaks at ' + money(r.sizing.peak) + ' in ' + r.sizing.peakYear + '. ' : money(r.incomeGap / 12) + ' a month in ' + r.sizing.peakYear + ', as a year; the window averages ' + money(r.sizing.avg) + '. ') : '') + 'Needs growing with inflation against Social Security with its COLA, pensions and annuity income on their dates \u2014 the figure the Foundation is sized on</small></td><td class="num"><b style="color:var(--st-alert)">' + money(r.incomeGap) + '</b></td></tr></tbody>';
+      + '<tr><td>Annual Needs (section 05)</td><td class="num">' + money(i.needs) + '</td></tr>';
     /* the chart */
     var X = statusQuoRun(r), P = X.income, prow = P.rows, N = P.N;
     var W = 1000, H = 360, L = 80, R = 24, Tp = 26, B = 56, pw = W - L - R, ph = H - Tp - B;
@@ -14994,7 +14990,7 @@
     $('srcLegend').innerHTML = used.map(function(sv){ return '<span class="pj-key"><i class="sw" style="background:' + sv.color + '"></i>' + sv.name + '</span>'; }).join('') + '<span class="pj-key"><small>totals every fifth year</small></span>';
     var ri = Math.min(N, Math.ceil(P.lastRet)), rr = prow[ri];
     $('srcNote').innerHTML = 'Salaries run to each retirement date; Social Security starts at each claiming age with its COLA; pensions, annuity and other income on their own dates. In <b>' + rr.year + '</b>' + (P.lastRet > 0 ? ', the first full year with ' + (spouse ? 'both' : 'the client') + ' retired,' : ',')
-      + ' income is <b>' + money(tot[ri]) + '</b>' + (rr.ss + rr.pen + rr.ann > 0.5 ? ' \u2014 Social Security ' + money(rr.ss) + ', pensions ' + money(rr.pen) + ', annuity income ' + money(rr.ann) + (rr.ng > 0.5 ? ', other income ' + money(rr.ng) : '') : '') + ' \u2014 against expenses of <b>' + money(rr.needs + rr.wants) + '</b>. The Income Gap chart in section 05 shows the shortfall year by year.';
+      + ' income is <b>' + money(tot[ri]) + '</b>' + (rr.ss + rr.pen + rr.ann > 0.5 ? ' \u2014 Social Security ' + money(rr.ss) + ', pensions ' + money(rr.pen) + ', annuity income ' + money(rr.ann) + (rr.ng > 0.5 ? ', other income ' + money(rr.ng) : '') : '') + ' \u2014 against expenses of <b>' + money(rr.needs + rr.wants) + '</b>.';
   }
   function renderMoat(r){
     var m = r.moat, i = r.inputs;
@@ -17762,8 +17758,8 @@
       if(prows.length > maxP){ var rest = prows.slice(maxP - 1); prows = prows.slice(0, maxP - 1).concat([[rest.length + ' more sources', '', '', money(rest.reduce(function(a, q){ return a + num(String(q[3]).replace(/[^0-9.]/g, '')); }, 0))]]); }
       dkHtmlTable(s, 0.9, y3 + 0.4, 10.6, 9.9 - (y3 + 0.4), [{t:'Source'}, {t:'Name'}, {t:'Terms'}, {t:'Annual', align:'r'}], prows);
       dkLabel(s, 12.0, 1.95, 7, 'Guaranteed income against Needs');
-      var grows = [['Social Security', money(i.ss)], ['Pensions', money(i.pension)], ['Annuity income in place', money(i.otherInc)], {cls:'tot', cells:['Guaranteed income', money(guaranteed)]}, ['Annual Needs', money(i.needs)], ['Needs income gap today', money(r.incomeGapToday)], {cls:'tot', cells:[{t:'Needs income gap, ' + (r.sizing && r.sizing.mode === 'avg' ? 'average of the first ' + r.sizing.years + ' years of retirement' : 'highest month in the first ' + (r.sizing ? r.sizing.years : i.sizeYears) + ' years of retirement, as a year'), color:DECK_C.red}, {t:money(r.incomeGap), color:DECK_C.red}]}];
-      dkHtmlTable(s, 12.0, 2.35, 7.1, 4.0, [{t:'Today’s dollars'}, {t:'A year', align:'r'}], grows);   // the last row's label wraps to two lines, so the table gets the room for it
+      var grows = [['Social Security', money(i.ss)], ['Pensions', money(i.pension)], ['Annuity income in place', money(i.otherInc)], {cls:'tot', cells:['Guaranteed income', money(guaranteed)]}, ['Annual Needs', money(i.needs)]];
+      dkHtmlTable(s, 12.0, 2.35, 7.1, 3.0, [{t:'Today’s dollars'}, {t:'A year', align:'r'}], grows);
       dkTile(s, 12.0, 6.55, 3.4, 1.75, 'Needs covered', needsCover + '%', money(guaranteed) + ' of ' + money(i.needs));
       dkTile(s, 15.7, 6.55, 3.4, 1.75, 'Household income', money(netSal + ng), 'Take-home' + (ng > 0.5 ? ' + ' + money(ng) + ' other' : ''));
       dkBody(s, 12.0, 8.5, 7.1, 1.4, 'Guaranteed income is what arrives whatever the markets do. The next page shows how it, with your salaries and other income, compares with your expenses year by year.', {sz:16});

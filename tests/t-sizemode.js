@@ -11,7 +11,7 @@ const path = require('path');
   console.log('peak:', await note());
   await p.selectOption('#sizeMode','avg'); await p.waitForTimeout(500);
   console.log('avg:', await note());
-  console.log('tile:', (await txt('#incSumTiles')).match(/Annual Needs income gap\$[\d,]+[^$]*/)?.[0].slice(0,160));
+  console.log('tiles:', (await txt('#incSumTiles')).slice(0,160), '| gap tile gone:', !/income gap/i.test(await txt('#incSumTiles')));
   const json=await p.$eval('#caseJson',e=>e.value); console.log('saved sizeMode:', JSON.parse(json).household.sizeMode);
   await p.evaluate(j => window.__rfb.loadCaseJson(j), json); await p.waitForTimeout(700);
   console.log('after reload mode:', await p.$eval('#sizeMode',e=>e.value), '|', (await note()).slice(0,120));
