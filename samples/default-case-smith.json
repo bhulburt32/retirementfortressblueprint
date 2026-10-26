@@ -9,7 +9,7 @@
   "needs": 83709,
   "wants": 32544,
   "bufMonths": 6,
-  "sizeYears": 15,
+  "sizeYears": 10,
   "sizeMode": "peak",
   "yieldF": 0.065,
   "foundGLI": true,
