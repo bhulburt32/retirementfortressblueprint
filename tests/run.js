@@ -30,6 +30,7 @@ const SUITE = [
   't-sqsens',     // status-quo stress charts; the findings report lists only the risks checked or typed in the Risk section
   't-mc',         // section 19 Monte Carlo: a seeded run, the tiles, the fan chart, the strip row, staleness, the saved settings
   't-widow',      // section 17: before strategic tax planning first, the widow's or widower's curse, the after block set against before
+  't-ltcdoubler', // section 06: the LTC income doubler cells feed the section 09 coverage and the care-event projections
   't-networth',   // gold headers over graphics, no indented sections, net worth in section 07 (debts subtracted) and over time, Walls plan assumptions in section 03
 ];
 const only = process.argv.slice(2);

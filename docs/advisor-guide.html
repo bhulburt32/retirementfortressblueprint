@@ -559,7 +559,7 @@
         <dt><span class="ui">Foundation sizing method</span> and <span class="ui">window (N)</span></dt>
         <dd>How the Needs gap that sizes the Foundation annuity is measured, and over how many years
           of retirement: <em>Peak monthly Needs gap in the first N years</em> (the default) or
-          <em>Average Needs gap over N years</em>, with N 15 by default. The tool runs the status-quo projection &mdash; nothing moved, no
+          <em>Average Needs gap over N years</em>, with N 10 by default. The tool runs the status-quo projection &mdash; nothing moved, no
           annuity bought &mdash; and for each of the first N full calendar years with everyone
           retired takes that year's Needs (growing with inflation, dated budget lines honoured) less
           that year's Social Security with its COLA, pensions and annuity income already in place.
@@ -977,8 +977,20 @@
           joint) for an income annuity, <span class="ui">Fees</span> as a percent a year,
           <span class="ui">Cap rate</span> for the FIAs and a RILA, <span class="ui">Participation
           rate</span> for the FIAs and <span class="ui">Floor</span> (the most a bad year can lose) for
-          a RILA; cells that do not apply to the type are greyed out. The details save with the case
-          and print in the worksheet under <em>Annuity contracts</em>.
+          a RILA; cells that do not apply to the type are greyed out. Three cells describe an
+          <b>LTC income doubler</b> rider: <span class="ui">LTC income doubler</span> (Y/N),
+          <span class="ui">Continues after value is zero</span> (Y/N) and the
+          <span class="ui">LTC benefit length</span> in months (60 by default). With the doubler set
+          to Yes the contract's monthly income &mdash; the Monthly income cell, which opens for any
+          annuity type with the doubler, else a section&nbsp;04 annuity line linked to the account,
+          else the Foundation yield on an income annuity's value &mdash; is paid again as a long term
+          care benefit for its owner: it joins the <span class="ui">Existing LTC coverage</span> in
+          section&nbsp;09 (the field follows it, grey) and the care-event projections draw on it for up
+          to the benefit length, and, unless the benefit continues after the value is zero, only while
+          the contract's accumulation value lasts &mdash; the value grown at the contract's rate less
+          the income paid since the plan date and the care benefit paid so far. With Yes it pays until
+          the owner dies (the care scenarios assume death at the end of care). The details save with
+          the case and print in the worksheet under <em>Annuity contracts</em>.
           <p style="margin-top:8px">The projections follow these cells. An <b>income annuity</b> in
             force is always Foundation: it stays with its carrier and counts in the Foundation (it
             sits on its own Foundation line in section&nbsp;14 and under the Foundation in
@@ -1161,7 +1173,10 @@
         benefit (daily benefit &times; 365 &times; years) worked out per line. While any are listed,
         the daily benefits fill the <span class="ui">Existing LTC coverage</span> field for that person
         (daily benefit &times; 30, grey, read from the list) and the estimate caps what the policies pay
-        at their total benefit when the benefit term is shorter than the care; the premiums of all
+        at their total benefit when the benefit term is shorter than the care; an annuity with an
+        <b>LTC income doubler</b> in section&nbsp;06 adds its monthly income to the same field and is
+        paid on its own terms (its benefit length, and while its value lasts unless it continues after
+        the value is zero), with the footer saying how much of the coverage it provides; the premiums of all
         policies fill the <b>Long Term Care Insurance</b> line of the section&nbsp;05 budget until an
         amount is typed there. Everything saves with the case.</p>
       <p>After the policies come the two <span class="ui">LTC need to insure</span> fields that size the

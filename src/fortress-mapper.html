@@ -1206,7 +1206,7 @@
         <dt><span class="ui">Foundation sizing method</span> and <span class="ui">window (N)</span></dt>
         <dd>How the Needs gap that sizes the Foundation annuity is measured, and over how many years
           of retirement: <em>Peak monthly Needs gap in the first N years</em> (the default) or
-          <em>Average Needs gap over N years</em>, with N 15 by default. The tool runs the status-quo projection &mdash; nothing moved, no
+          <em>Average Needs gap over N years</em>, with N 10 by default. The tool runs the status-quo projection &mdash; nothing moved, no
           annuity bought &mdash; and for each of the first N full calendar years with everyone
           retired takes that year's Needs (growing with inflation, dated budget lines honoured) less
           that year's Social Security with its COLA, pensions and annuity income already in place.
@@ -1282,7 +1282,7 @@
       <div class="field-grid">
         <label class="f"><span>Liquidity buffer<small>Months of Needs held in cash</small></span><input type="text" inputmode="numeric" id="bufMonths" value="6"></label>
         <label class="f"><span>Foundation sizing method<small>How the Needs gap is measured over the window</small></span><select id="sizeMode"><option value="avg">Average Needs gap over N years</option><option value="peak" selected>Peak monthly Needs gap in the first N years</option></select></label>
-        <label class="f"><span>Foundation sizing window (N)<small>Years of retirement the gap is measured over</small></span><input type="text" inputmode="numeric" id="sizeYears" value="15"></label>
+        <label class="f"><span>Foundation sizing window (N)<small>Years of retirement the gap is measured over</small></span><input type="text" inputmode="numeric" id="sizeYears" value="10"></label>
         <label class="f"><span>Foundation yield<small>Income paid by the annuity</small></span><input type="text" inputmode="decimal" id="yieldF" value="6.5%"></label>
         <label class="f"><span>Guaranteed lifetime income<small>Does the Foundation annuity pay for life?</small></span><select id="foundGLI"><option value="yes" selected>Yes — income continues for life</option><option value="no">No — income stops when the value is gone</option></select></label>
         <label class="f"><span>Walls yield<small>Income drawn from the Walls</small></span><input type="text" inputmode="decimal" id="yieldW" value="6.5%"></label>
@@ -1912,8 +1912,20 @@
           joint) for an income annuity, <span class="ui">Fees</span> as a percent a year,
           <span class="ui">Cap rate</span> for the FIAs and a RILA, <span class="ui">Participation
           rate</span> for the FIAs and <span class="ui">Floor</span> (the most a bad year can lose) for
-          a RILA; cells that do not apply to the type are greyed out. The details save with the case
-          and print in the worksheet under <em>Annuity contracts</em>.
+          a RILA; cells that do not apply to the type are greyed out. Three cells describe an
+          <b>LTC income doubler</b> rider: <span class="ui">LTC income doubler</span> (Y/N),
+          <span class="ui">Continues after value is zero</span> (Y/N) and the
+          <span class="ui">LTC benefit length</span> in months (60 by default). With the doubler set
+          to Yes the contract's monthly income &mdash; the Monthly income cell, which opens for any
+          annuity type with the doubler, else a section&nbsp;04 annuity line linked to the account,
+          else the Foundation yield on an income annuity's value &mdash; is paid again as a long term
+          care benefit for its owner: it joins the <span class="ui">Existing LTC coverage</span> in
+          section&nbsp;09 (the field follows it, grey) and the care-event projections draw on it for up
+          to the benefit length, and, unless the benefit continues after the value is zero, only while
+          the contract's accumulation value lasts &mdash; the value grown at the contract's rate less
+          the income paid since the plan date and the care benefit paid so far. With Yes it pays until
+          the owner dies (the care scenarios assume death at the end of care). The details save with
+          the case and print in the worksheet under <em>Annuity contracts</em>.
           <p style="margin-top:8px">The projections follow these cells. An <b>income annuity</b> in
             force is always Foundation: it stays with its carrier and counts in the Foundation (it
             sits on its own Foundation line in section&nbsp;14 and under the Foundation in
@@ -2068,7 +2080,7 @@
       <div class="tbl-scroll">
         <table id="anxTable" class="emp pen anx">
           <thead>
-            <tr><th>Owner<small>And the account</small></th><th>Company</th><th>Product</th><th>Type</th><th>Rate<small>MYGA</small></th><th>Interest<small>MYGA</small></th><th>Maturity date</th><th class="num">Monthly income<small>Income annuity</small></th><th>Payout<small>Income annuity</small></th><th>Fees<small>% a year</small></th><th>Cap rate<small>FIA &middot; RILA</small></th><th>Participation rate<small>FIA</small></th><th>Floor<small>RILA &middot; most lost in a year</small></th></tr>
+            <tr><th>Owner<small>And the account</small></th><th>Company</th><th>Product</th><th>Type</th><th>Rate<small>MYGA</small></th><th>Interest<small>MYGA</small></th><th>Maturity date</th><th class="num">Monthly income<small>Income annuity &middot; any annuity with the doubler</small></th><th>Payout<small>Income annuity</small></th><th>Fees<small>% a year</small></th><th>Cap rate<small>FIA &middot; RILA</small></th><th>Participation rate<small>FIA</small></th><th>Floor<small>RILA &middot; most lost in a year</small></th><th>LTC income doubler<small>Y/N &middot; pays the monthly income again as a care benefit</small></th><th>Continues after value is zero<small>Y/N</small></th><th class="num">LTC benefit length<small>Months</small></th></tr>
           </thead>
           <tbody id="anxBody"></tbody>
         </table>
@@ -2326,7 +2338,10 @@
         benefit (daily benefit &times; 365 &times; years) worked out per line. While any are listed,
         the daily benefits fill the <span class="ui">Existing LTC coverage</span> field for that person
         (daily benefit &times; 30, grey, read from the list) and the estimate caps what the policies pay
-        at their total benefit when the benefit term is shorter than the care; the premiums of all
+        at their total benefit when the benefit term is shorter than the care; an annuity with an
+        <b>LTC income doubler</b> in section&nbsp;06 adds its monthly income to the same field and is
+        paid on its own terms (its benefit length, and while its value lasts unless it continues after
+        the value is zero), with the footer saying how much of the coverage it provides; the premiums of all
         policies fill the <b>Long Term Care Insurance</b> line of the section&nbsp;05 budget until an
         amount is typed there. Everything saves with the case.</p>
       <p>After the policies come the two <span class="ui">LTC need to insure</span> fields that size the
@@ -2450,7 +2465,7 @@
             <tr><td>Nursing home<small>Years</small></td>
               <td><input type="text" inputmode="decimal" id="ltcDNHC" class="auto" value=""></td>
               <td><input type="text" inputmode="decimal" id="ltcDNHS" class="auto" value=""></td></tr>
-            <tr><td>Existing LTC coverage<small>Monthly benefit, today's dollars &middot; follows the policies listed above when any are entered</small></td>
+            <tr><td>Existing LTC coverage<small>Monthly benefit, today's dollars &middot; follows the policies listed above and any annuity with an LTC income doubler (section 06) when either is entered</small></td>
               <td><input type="text" inputmode="numeric" id="ltcCovC" value="0"></td>
               <td><input type="text" inputmode="numeric" id="ltcCovS" value="0"></td></tr>
           </tbody>
@@ -4169,9 +4184,10 @@
     o = (o && typeof o === 'object') ? o : {};
     var pc = function(v){ return (v == null || v === '') ? null : +v; };
     return {company:String(o.company || ''), product:String(o.product || ''), rate:pc(o.rate), interest:o.interest === 'taken' ? 'taken' : 'deferred', maturity:String(o.maturity || ''),
-            monthly:pc(o.monthly), payout:o.payout === 'joint' ? 'joint' : 'single', fees:pc(o.fees), cap:pc(o.cap), part:pc(o.part), floor:pc(o.floor)};
+            monthly:pc(o.monthly), payout:o.payout === 'joint' ? 'joint' : 'single', fees:pc(o.fees), cap:pc(o.cap), part:pc(o.part), floor:pc(o.floor),
+            ltcDoubler:o.ltcDoubler === 'yes' ? 'yes' : 'no', ltcContinue:o.ltcContinue === 'yes' ? 'yes' : 'no', ltcMonths:(+o.ltcMonths > 0) ? Math.round(+o.ltcMonths) : 60};   // the LTC income doubler rider
   }
-  function annAny(x){ return !!(x && (x.company || x.product || x.rate != null || x.interest === 'taken' || x.maturity || x.monthly != null || x.payout === 'joint' || x.fees != null || x.cap != null || x.part != null || x.floor != null)); }
+  function annAny(x){ return !!(x && (x.company || x.product || x.rate != null || x.interest === 'taken' || x.maturity || x.monthly != null || x.payout === 'joint' || x.fees != null || x.cap != null || x.part != null || x.floor != null || x.ltcDoubler === 'yes')); }
   /* The growth an account earns, from its product rules, given the plan rate of the level its money
      lands in: a MYGA earns its rate (nothing while the interest is taken as income), a variable
      annuity the rate less its fees, a growth FIA or a RILA the rate up to its cap; a typed Growth
@@ -4293,7 +4309,7 @@
       needs:   num($('needs').value),
       wants:   num($('wants').value),
       bufMonths: Math.max(0, Math.min(120, Math.round(num($('bufMonths').value)))),
-      sizeYears: Math.max(1, Math.min(60, Math.round(num($('sizeYears').value)) || 15)),
+      sizeYears: Math.max(1, Math.min(60, Math.round(num($('sizeYears').value)) || 10)),
       sizeMode:  $('sizeMode').value === 'peak' ? 'peak' : 'avg',
       yieldF:  pct($('yieldF').value),
       foundGLI: $('foundGLI').value !== 'no',
@@ -5335,7 +5351,7 @@
     var stub = {inputs:i, yF:yF, yW:yW, total:0, adjusted:false, statusQuo:true,
                 funded:{reserve:0, foundation:incSum, walls:0, moat:0, roof:0, inplace:0},
                 targets:{reserve:0, foundation:incSum, walls:0, moat:0, roof:0, inplace:0}, moves:incMoves};
-    var P = projectIncome(stub), N = P.N, W = Math.max(1, i.sizeYears || 15);
+    var P = projectIncome(stub), N = P.N, W = Math.max(1, i.sizeYears || 10);
     var start = Math.min(N, Math.ceil(P.lastRet || 0)), end = Math.min(N, start + W - 1), rows = [], sum = 0;
     for(var t = start; t <= end; t++){
       var x = P.rows[t], f = (t === 0 && P.frac0) ? P.frac0 : 1;        // the prorated first year, back to a full year
@@ -9784,6 +9800,40 @@
   }
   function setIfIdle(id, v){ var el = $(id); if(document.activeElement !== el) el.value = v; }
 
+  /* LTC income doubler riders (section 06, Annuities): an annuity marked Yes pays its monthly income again as a
+     long term care benefit while its owner needs care — for the benefit length in months, and only while the
+     contract's accumulation value lasts unless it continues after the value is zero. The monthly income is the
+     contract's own (the cell in section 06, else a section 04 annuity line linked to the account, else the
+     Foundation yield on an income annuity's value). */
+  function annLtcDoublers(who){
+    var out = [], sp = hasSpouse(null), b = (typeof readBenefits === 'function') ? readBenefits() : {}, yF = pctIn($('yieldF').value) || 0;
+    accounts.forEach(function(a){
+      var x = a.ann || {}; if(!isAnnuityPos(a.pos) || x.ltcDoubler !== 'yes' || !(a.val > 0.5)) return;
+      var owner = (a.owner === 'spouse' && sp) ? 'spouse' : 'client'; if(owner !== who) return;
+      var linked = (b.annuities || []).filter(function(y){ return String(y.acctId) === String(a.id) && y.amt > 0.5; })[0];
+      var monthly = x.monthly != null ? x.monthly : (linked ? linked.amt : (isIncomeAnn(a) ? a.val * yF / 12 : 0));
+      if(!(monthly > 0.5)) return;
+      out.push({id:a.id, name:a.name || 'Annuity', monthly:monthly, months:x.ltcMonths > 0 ? x.ltcMonths : 60, cont:x.ltcContinue === 'yes', value:a.val, g:acctGrowth(a, 0, 0), paying:isIncomeAnn(a) || !!linked});
+    });
+    return out;
+  }
+  /* the doubler benefit paid in a slice of care [careT, careT + f) years after care begins: the monthly income
+     for the months the rider allows, and — unless it continues after the value is zero — only while the
+     accumulation value lasts: the value grown at the contract's rate, less the income paid since the plan date
+     and the benefit already paid in care */
+  function dblBenefit(p, careT, f){
+    var tot = 0;
+    (p.dbl || []).forEach(function(d){
+      var a = careT, b = Math.min(careT + f, d.months / 12); if(!(b > a)) return;
+      if(!d.cont){
+        var T = p.yrs + a, paid = (d.paying ? d.monthly * 12 * T : 0) + d.monthly * 12 * a, av = d.value * Math.pow(1 + d.g, T) - paid;
+        if(!(av > 0.5)) return;
+        b = Math.min(b, a + av / (d.monthly * 12 * (d.paying ? 2 : 1)));   // the years the value still covers at this pace
+      }
+      tot += d.monthly * 12 * Math.max(0, b - a);
+    });
+    return tot;
+  }
   function ltcPerson(who){
     if(who === 'spouse' && !hasSpouse(null)) return null;
     var P = ltcSuffix(who);
@@ -9804,12 +9854,17 @@
       total += seg; today += base[k] * n; t += n;
     });
     var totalYears = dur.home + dur.al + dur.nh;
-    var covM = Math.max(0, num($('ltcCov' + P).value)), covTotal = covM * 12 * totalYears;
-    var pol = ltcPolicyTotals(who); if(pol.n > 0) covTotal = Math.min(covTotal, pol.total);   // a benefit period shorter than the care caps what the policies pay
+    var dbl = annLtcDoublers(who), dblM = dbl.reduce(function(a, d){ return a + d.monthly; }, 0), pol = ltcPolicyTotals(who);
+    var covPol = (pol.n > 0 || dbl.length) ? pol.monthly : Math.max(0, num($('ltcCov' + P).value));   // the policies' level benefit; the doubler is paid on its own terms below
+    var covM = covPol + dblM, covTotal = covPol * 12 * totalYears;
+    if(pol.n > 0) covTotal = Math.min(covTotal, pol.total);   // a benefit period shorter than the care caps what the policies pay
+    var pStub = {yrs:yrs, dbl:dbl}, dblTotal = 0;
+    for(var ct = 0; ct < totalYears - 1e-9; ct++) dblTotal += dblBenefit(pStub, ct, Math.min(1, totalYears - ct));
+    covTotal += dblTotal;
     var first = rows.filter(function(r){ return r.years > 0; })[0];
     var peak = rows.filter(function(r){ return r.years > 0; }).reduce(function(m, r){ return Math.max(m, r.annualStart); }, 0);
     return {who:who, name:ownerLabel(who), age:age, start:start, yrs:yrs, noAge:noAge, cog:cog, rows:rows, total:total, today:today, infl:infl, base:base, dur:dur,
-            totalYears:totalYears, covM:covM, covTotal:Math.min(covTotal, total), gap:Math.max(0, total - covTotal),
+            totalYears:totalYears, covM:covM, covPol:covPol, dbl:dbl, dblM:dblM, dblTotal:dblTotal, covTotal:Math.min(covTotal, total), gap:Math.max(0, total - covTotal),
             firstMonthly:(first ? first.annualStart : base.home * g) / 12, peakMonthly:peak / 12};
   }
   function ltcEstimate(){
@@ -9849,7 +9904,7 @@
         foot('Years of care', 'Home, then assisted living, then nursing home', function(p){ return '<td><b>' + p.totalYears.toFixed(1) + ' years</b><small>from age ' + p.start + (p.noAge ? ' \u00b7 current age needed in section 02' : ', in ' + p.yrs + ' years') + '</small></td>'; })
       + foot('Monthly cost when care begins', 'Future dollars', function(p){ return '<td><b>' + money(p.firstMonthly) + '</b><small>rising to ' + money(p.peakMonthly) + ' in the costliest setting</small></td>'; })
       + foot('Projected cost of care', 'Future dollars, all settings', function(p){ return '<td><b>' + money(p.total) + '</b><small>' + money(p.today) + ' in today’s dollars</small></td>'; })
-      + foot('Covered by existing benefits', 'Level monthly benefit × years of care', function(p){ return '<td><b>' + money(p.covTotal) + '</b>' + (p.covM ? '<small>' + money(p.covM) + ' a month</small>' : '<small>none entered</small>') + '</td>'; })
+      + foot('Covered by existing benefits', 'Level monthly benefit × years of care; an annuity LTC income doubler on its own terms', function(p){ return '<td><b>' + money(p.covTotal) + '</b>' + (p.covM ? '<small>' + money(p.covM) + ' a month' + (p.dbl && p.dbl.length ? ', ' + money(p.dblM) + ' of it the income doubler on ' + p.dbl.map(function(d){ return d.name; }).join(' + ') + ' for up to ' + p.dbl.map(function(d){ return d.months; }).join(' / ') + ' months' + (p.dbl.some(function(d){ return !d.cont; }) ? ' while the value lasts' : '') + ' \u2014 ' + money(p.dblTotal) + ' over the care' : '') + '</small>' : '<small>none entered</small>') + '</td>'; })
       + foot('Uncovered need', 'The benefit to plan for', function(p){ return '<td><b style="color:var(--c-moat)">' + money(p.gap) + '</b><small>rounds to ' + money(ltcBenefitFor(p)) + '</small></td>'; });
 
     $('ltcBreakBody').innerHTML = est.people.map(function(p){
@@ -12275,12 +12330,12 @@
   function ltcCostSchedule(p, frac, N){
     var out = [], t; for(t = 0; t <= N; t++) out.push(0);
     if(!p || p.noAge || !(frac > 0)) return out;
-    var g = 1 + (p.infl || 0), t0 = p.yrs, tp = 0, covY = p.covM * 12;
+    var g = 1 + (p.infl || 0), t0 = p.yrs, tp = 0, covY = (p.covPol != null ? p.covPol : p.covM) * 12;
     p.rows.forEach(function(R){
       var k = R.key, rem = R.years, yr = 0;
       while(rem > 1e-6){
         var f = Math.min(1, rem), rate = p.base[k] * Math.pow(g, t0 + tp + yr);
-        var net = Math.max(0, rate * frac - covY);          // yearly rate net of the benefits already in force
+        var net = Math.max(0, rate * frac - covY - dblBenefit(p, tp + yr, f) / f);          // yearly rate net of the benefits already in force, the doubler on its own terms
         var a = t0 + tp + yr, b = a + f;                     // this slice of care, in plan years from today
         while(b - a > 1e-6){
           var n = Math.floor(a + 1e-9), e = Math.min(b, n + 1), share = e - a;
@@ -13322,7 +13377,7 @@
     });
   }
 
-  window.__rfb = Object.assign(window.__rfb || {}, {taxLast:function(){ return taxLast; }, fedTax:function(){ return fedTax.apply(null, arguments); }, pdfLayoutText:pdfLayoutText, propParse:function(p){ return propParse(p); }, propDerived:function(a){ return propDerived(a); }, propSummaries:function(a, d){ return propSummaries(a, d); }, canAskClaude:function(){ return canAskClaude(); }, nitroPerf:function(pg){ return nitroPerf(pg); }, askClaudeJson:function(q){ return askClaudeJson(q); }, compute:function(){ return compute(); }, projectTax:function(r, o){ return projectTax(r, o); }, accounts:function(){ return accounts; }});   // for the test scripts
+  window.__rfb = Object.assign(window.__rfb || {}, {taxLast:function(){ return taxLast; }, ltcEstimate:function(){ return ltcEstimate(); }, caseData:function(){ return caseData(); }, fedTax:function(){ return fedTax.apply(null, arguments); }, pdfLayoutText:pdfLayoutText, propParse:function(p){ return propParse(p); }, propDerived:function(a){ return propDerived(a); }, propSummaries:function(a, d){ return propSummaries(a, d); }, canAskClaude:function(){ return canAskClaude(); }, nitroPerf:function(pg){ return nitroPerf(pg); }, askClaudeJson:function(q){ return askClaudeJson(q); }, compute:function(){ return compute(); }, projectTax:function(r, o){ return projectTax(r, o); }, accounts:function(){ return accounts; }});   // for the test scripts
   /* ---- reading the figures out of the text ---- */
   function nitroNum(s){ var v = parseFloat(String(s).replace(/\u2212/g, '-').replace(/[^0-9.\-]/g, '')); return isFinite(v) ? v : null; }
   /* text out of a PDF carries kerning breaks ("V anguard", "GP A") and letter-spaced headings ("A l l o c a t i o n") */
@@ -14459,9 +14514,10 @@
       var lp = lifePolicyTotals(w[0]), el = $('lifeExist' + w[1]);
       el.readOnly = lp.n > 0; el.classList.toggle('auto', lp.n > 0);
       if(lp.n > 0) el.value = fmtN.format(Math.round(lp.benefit));
-      var tp = ltcPolicyTotals(w[0]), le = $('ltcCov' + w[1]);
-      le.readOnly = tp.n > 0; le.classList.toggle('auto', tp.n > 0);
-      if(tp.n > 0) le.value = fmtN.format(Math.round(tp.monthly));
+      var tp = ltcPolicyTotals(w[0]), le = $('ltcCov' + w[1]), dz = (typeof annLtcDoublers === 'function') ? annLtcDoublers(w[0]) : [], dm = dz.reduce(function(a, d){ return a + d.monthly; }, 0);
+      var wasRO = le.readOnly; le.readOnly = tp.n > 0 || dz.length > 0; le.classList.toggle('auto', le.readOnly);
+      if(le.readOnly) le.value = fmtN.format(Math.round(tp.monthly + dm));
+      else if(wasRO) le.value = '0';   // the field stops following: the figure it showed was the policies' or the rider's, not a typed one
     });
   }
   var DEBT_TYPES = [['mortgage','Mortgage'],['heloc','HELOC'],['card','Credit card'],['signature','Signature loan'],
@@ -14796,14 +14852,17 @@
           + '<td><input class="pct" inputmode="decimal" data-ax="rate" value="' + pc2(x.rate) + '" placeholder="0.00%"' + dis('rate') + '></td>'
           + '<td><select class="sm" data-ax="interest"' + dis('interest') + '><option value="deferred"' + (x.interest !== 'taken' ? ' selected' : '') + '>Deferred, accumulating</option><option value="taken"' + (x.interest === 'taken' ? ' selected' : '') + '>Taken as income</option></select></td>'
           + '<td><input class="mon" type="month" data-ax="maturity" value="' + esc(x.maturity) + '"></td>'
-          + '<td class="num"><input class="num" inputmode="numeric" data-ax="monthly" value="' + (x.monthly != null ? fmtN.format(Math.round(x.monthly)) : '') + '" placeholder="0"' + dis('monthly') + '></td>'
+          + '<td class="num"><input class="num" inputmode="numeric" data-ax="monthly" value="' + (x.monthly != null ? fmtN.format(Math.round(x.monthly)) : '') + '" placeholder="0"' + (anxOn('monthly', a.pos) || x.ltcDoubler === 'yes' ? '' : ' disabled') + '></td>'
           + '<td><select class="sm" data-ax="payout"' + dis('payout') + '><option value="single"' + (x.payout !== 'joint' ? ' selected' : '') + '>Single life</option><option value="joint"' + (x.payout === 'joint' ? ' selected' : '') + '>Joint</option></select></td>'
           + '<td><input class="pct" inputmode="decimal" data-ax="fees" value="' + pc2(x.fees) + '" placeholder="0.00%"></td>'
           + '<td><input class="pct" inputmode="decimal" data-ax="cap" value="' + pc2(x.cap) + '" placeholder="0.00%"' + dis('cap') + '></td>'
           + '<td><input class="pct" inputmode="decimal" data-ax="part" value="' + pc2(x.part) + '" placeholder="100%"' + dis('part') + '></td>'
           + '<td><input class="pct" inputmode="decimal" data-ax="floor" value="' + pc2(x.floor) + '" placeholder="0.00%"' + dis('floor') + '></td>'
+          + '<td><select class="sm" data-ax="ltcDoubler" title="The contract pays its monthly income again as a long term care benefit while the owner needs care"><option value="no"' + (x.ltcDoubler !== 'yes' ? ' selected' : '') + '>No</option><option value="yes"' + (x.ltcDoubler === 'yes' ? ' selected' : '') + '>Yes</option></select></td>'
+          + '<td><select class="sm" data-ax="ltcContinue"' + (x.ltcDoubler === 'yes' ? '' : ' disabled') + ' title="Whether the care benefit keeps paying after the accumulation value is used up"><option value="no"' + (x.ltcContinue !== 'yes' ? ' selected' : '') + '>No</option><option value="yes"' + (x.ltcContinue === 'yes' ? ' selected' : '') + '>Yes</option></select></td>'
+          + '<td class="num"><input class="num" inputmode="numeric" data-ax="ltcMonths" value="' + (x.ltcMonths > 0 ? x.ltcMonths : 60) + '" placeholder="60"' + (x.ltcDoubler === 'yes' ? '' : ' disabled') + ' title="How many months the care benefit can pay"></td>'
           + '</tr>';
-      }).join('') : '<tr><td colspan="13"><div class="empty-state">No annuity positions \u2014 set an account\u2019s current position to a MYGA, variable, income (FIA), growth (FIA) or RILA annuity in the account list and it appears here.</div></td></tr>';
+      }).join('') : '<tr><td colspan="16"><div class="empty-state">No annuity positions \u2014 set an account\u2019s current position to a MYGA, variable, income (FIA), growth (FIA) or RILA annuity in the account list and it appears here.</div></td></tr>';
     }
     rows.forEach(function(a){
       var tr = body.querySelector('tr[data-anx="' + a.id + '"]'); if(!tr) return;
@@ -14815,7 +14874,7 @@
     var n = rows.length, inc = rows.filter(isIncomeAnn).length;
     $('anxMsg').textContent = !n ? ''
       : n + ' annuity contract' + (n === 1 ? '' : 's') + (inc ? ' \u00b7 ' + inc + ' income annuit' + (inc === 1 ? 'y' : 'ies') + ' in force, counted in the Foundation and left with the carrier' : '') + '. Company follows the custodian until typed. '
-        + 'The projections follow these cells: an income annuity is always Foundation, paying its monthly income (for the owner\u2019s life, or to the end of plan when joint) while its value falls as it pays; a MYGA grows at its rate, or pays the rate as income with no growth when the interest is taken, until its maturity date, after which it is market money at its level\u2019s rate; a variable annuity grows at the plan rate less its fees; a growth FIA and a RILA grow at the plan rate up to the cap. In the bad-years stress test a MYGA, a growth FIA and an income annuity lose nothing and a RILA loses no more than its floor.';
+        + 'An annuity marked with the LTC income doubler pays its monthly income again as a care benefit in section 09 and the care-event projections, for the months set and, unless it continues after the value is zero, only while its accumulation value lasts. The projections follow these cells: an income annuity is always Foundation, paying its monthly income (for the owner\u2019s life, or to the end of plan when joint) while its value falls as it pays; a MYGA grows at its rate, or pays the rate as income with no growth when the interest is taken, until its maturity date, after which it is market money at its level\u2019s rate; a variable annuity grows at the plan rate less its fees; a growth FIA and a RILA grow at the plan rate up to the cap. In the bad-years stress test a MYGA, a growth FIA and an income annuity lose nothing and a RILA loses no more than its floor.';
   }
   function anxFor(el){
     var tr = el.closest('tr[data-anx]'); if(!tr) return null;
@@ -14827,6 +14886,7 @@
     if(k === 'company' || k === 'product' || k === 'maturity') a.ann[k] = v;
     else if(k === 'interest' || k === 'payout') a.ann[k] = v;
     else if(k === 'monthly') a.ann.monthly = v.trim() === '' ? null : num(v);
+    else if(k === 'ltcMonths'){ var mo = Math.round(num(v)); a.ann.ltcMonths = mo > 0 ? mo : 60; }
     else a.ann[k] = v.trim() === '' ? null : pctIn(v);
     if(k === 'company') e.target.classList.remove('auto');
     if(k === 'company' || k === 'product') $('caseJson').value = caseData(); else render();   // the figures follow every other cell
@@ -14840,10 +14900,12 @@
       anxSig = null; render();
     } else if(k === 'maturity'){ a.ann.maturity = e.target.value; render(); }
     else if(k === 'interest' || k === 'payout'){ a.ann[k] = e.target.value; render(); }
+    else if(k === 'ltcDoubler' || k === 'ltcContinue'){ a.ann[k] = e.target.value === 'yes' ? 'yes' : 'no'; if(k === 'ltcDoubler') anxSig = null; render(); }   // the doubler opens the monthly, continue and months cells
   });
   $('anxBody').addEventListener('blur', function(e){
     var k = e.target.getAttribute('data-ax'), a = anxFor(e.target); if(!k || !a) return;
     if(k === 'monthly') e.target.value = a.ann.monthly != null ? fmtN.format(Math.round(a.ann.monthly)) : '';
+    else if(k === 'ltcMonths') e.target.value = String(a.ann.ltcMonths > 0 ? a.ann.ltcMonths : 60);
     else if(k === 'rate' || k === 'fees' || k === 'cap' || k === 'part' || k === 'floor') e.target.value = pc2(a.ann[k]);
     else if(k === 'company' && e.target.value.trim() === ''){ a.ann.company = ''; e.target.value = a.cust || ''; e.target.classList.add('auto'); }
   }, true);
@@ -15912,7 +15974,7 @@
       if(isAge) applyLtcDefaults();
       if(id.indexOf('yield') === 0){ el.value = (pct(el.value)*100).toFixed(1) + '%'; }
       else if(id === 'bufMonths'){ el.value = String(Math.max(0, Math.min(120, Math.round(num(el.value))))); }
-      else if(id === 'sizeYears'){ el.value = String(Math.max(1, Math.min(60, Math.round(num(el.value)) || 15))); }
+      else if(id === 'sizeYears'){ el.value = String(Math.max(1, Math.min(60, Math.round(num(el.value)) || 10))); }
       else if(id === 'clientAge'){ el.value = String(Math.round(num(el.value))); }
       else if(id === 'spouseAge'){ el.value = el.value.trim() === '' ? '' : String(Math.round(num(el.value))); }
       else { el.value = fmtN.format(Math.round(num(el.value))); }
@@ -16442,7 +16504,7 @@
     adjMoves = null; resetIncomeAdj(); scnReset(); mcReset(); widowCfg = widowDefault();
     budget = {}; budgetLink = false; budResetCustom(); renderBudgetTable(); setBudgetOpen(false);
     ['needs','wants'].forEach(function(id){ $(id).value = '0'; });
-    $('bufMonths').value = '6'; $('sizeYears').value = '15'; $('sizeMode').value = 'peak';
+    $('bufMonths').value = '6'; $('sizeYears').value = '10'; $('sizeMode').value = 'peak';
     $('yieldF').value = '6.5%'; $('foundGLI').value = 'yes';
     $('yieldW').value = '6.5%';
     $('inflation').value = '3.26%';
