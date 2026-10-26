@@ -9,11 +9,11 @@
   "needs": 83709,
   "wants": 32544,
   "bufMonths": 6,
-  "sizeYears": 5,
-  "sizeMode": "avg",
-  "yieldF": 0.06,
+  "sizeYears": 15,
+  "sizeMode": "peak",
+  "yieldF": 0.065,
   "foundGLI": true,
-  "yieldW": 0.06,
+  "yieldW": 0.065,
   "inflation": 0.0326,
   "endAge": 100,
   "growthW": 0.015,
@@ -123,7 +123,8 @@
   },
   "ss": 56156.7,
   "pension": 21960,
-  "otherInc": 7188
+  "otherInc": 7188,
+  "yieldWt": 0.05
  },
  "goals": [
   {

@@ -86,6 +86,7 @@ const path = require('path');
   // (at the 3.26% default the Smith plan spends the small After Tax account in its first years, so the comparison runs at 2.5%)
   await p.fill('#inflation','2.5%'); await p.$eval('#inflation',e=>e.dispatchEvent(new Event('input',{bubbles:true}))); await p.waitForTimeout(700);
   await p.$eval('#rothApply',e=>{ e.checked=false; e.dispatchEvent(new Event('change',{bubbles:true})); }); await p.waitForTimeout(600);   // conversions re-size to federal headroom, so they are off while the state model is compared
+  await p.fill('#yieldWt',''); await p.$eval('#yieldWt',e=>e.dispatchEvent(new Event('input',{bubbles:true}))); await p.waitForTimeout(600);   // the tax-free yield follows the Walls yield here (its own default is lower), so only the federal exemption differs between the two runs
   const at=await acct('After Tax'); const line=await p.$$eval('#adjBody tr[data-adj]',(rs,id)=>{ const r=rs.find(x=>x.querySelector('select[data-ak=acctId]').value===String(id)); return r? r.dataset.adj : null; }, at);
   const prodOpts=await p.$eval(`#adjBody tr[data-adj="${line}"] select[data-ok="prod"]`,s=>[...s.options].map(o=>o.value)); console.log('product choices:', JSON.stringify(prodOpts.slice(0,8)));
   if(!prodOpts.includes('AUM - Tax Free')) errs.push('the product list should offer AUM - Tax Free');

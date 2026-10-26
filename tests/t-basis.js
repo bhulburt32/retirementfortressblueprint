@@ -12,7 +12,7 @@ const path = require('path');
   await p.click('#scnTabs [data-scn="1"]'); await p.waitForTimeout(700);   // No Moat without Roth: taxable money in the Walls and Roof
   const out=[];
   const run=async()=>p.evaluate(()=>{ const X=window.__rfb.taxLast();
-    const rows=X.rows.map(x=>({year:x.year, wdT:x.wd.taxable, cg:x.agiParts.cg, gf:x.gainFrac, basis:x.basis}));
+    const rows=X.rows.map(x=>({year:x.year, wdT:x.wd.taxable, cg:x.agiParts.cg, gf:x.gainFrac, basis:x.basis, bk:(x.banked||0)+(x.deposits||0)}));
     return {rows, fed:Math.round(X.lifetime), cg:Math.round(rows.reduce((a,x)=>a+x.cg,0)), wdT:Math.round(rows.reduce((a,x)=>a+x.wdT,0))}; });
   const accts=await p.$$eval('#acctBody tr[data-id]',rs=>rs.map(r=>({id:r.dataset.id, name:r.querySelector('input[data-k=name]').value, tax:r.querySelector('select[data-k=tax]').value,
     pos:r.querySelector('select[data-k=pos]').value, val:+r.querySelector('input[data-k=val]').value.replace(/[^0-9.]/g,''), hasBasis:!!r.querySelector('input[data-k=basis]')})));
@@ -34,13 +34,15 @@ const path = require('path');
   console.log('basis = value: gains', V.cg, '| federal', V.fed, '| gain share first draw', firstV?(firstV.year+' '+(firstV.gf*100).toFixed(1)+'%'):'-', '| last', lastV?(lastV.year+' '+(lastV.gf*100).toFixed(1)+'%'):'-');
   if(V.rows.some(x=>Math.abs(x.cg-x.wdT*x.gf)>0.5)) out.push('gains should be the withdrawal times the year\'s gain share');
   if(!(firstV && firstV.gf<0.1)) out.push('with basis = value the first draw should carry little gain');
-  if(!(V.cg<B.cg && V.fed<=B.fed)) out.push('basis = value should mean less gain and no more tax than the 50% assumption ('+V.cg+' vs '+B.cg+')');
+  if(!(V.cg<B.cg && V.fed<=B.fed+100)) out.push('basis = value should mean less gain and no more tax than the 50% assumption, bar the second-order effect of the smaller draw on later RMDs ('+V.cg+' vs '+B.cg+'; federal '+V.fed+' vs '+B.fed+')');
 
   // 3. basis 0: every dollar drawn is gain; more tax
   await setAll(0);
   const Z=await run();
   console.log('basis 0: gains', Z.cg, '| taxable withdrawals', Z.wdT, '| federal', Z.fed);
-  if(Z.rows.some(x=>x.wdT>0.5 && Math.abs(x.cg-x.wdT)>0.5)) out.push('with basis 0 every taxable withdrawal should be gain');
+  // money banked into the taxable account along the way (spare RMDs, surplus, deposits) carries its own basis, so the rule holds until the first banking
+  let bankedSoFar=0, firstBank=null; Z.rows.forEach(x=>{ if(bankedSoFar<0.5 && x.wdT>0.5 && Math.abs(x.cg-x.wdT)>0.5) out.push('with basis 0 every taxable withdrawal before anything is banked should be gain ('+x.year+')'); if(x.cg>x.wdT+0.5) out.push('gains cannot exceed the withdrawal ('+x.year+')'); if(bankedSoFar<0.5 && x.bk>0.5) firstBank=x.year; bankedSoFar+=x.bk; });
+  console.log('first banking into the taxable account:', firstBank || 'none');
   if(!(Z.fed>=B.fed)) out.push('basis 0 should mean no less tax than the 50% assumption');
 
   // 4. it saves with the case; a qualified account has no basis cell

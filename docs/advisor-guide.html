@@ -558,8 +558,8 @@
 
         <dt><span class="ui">Foundation sizing method</span> and <span class="ui">window (N)</span></dt>
         <dd>How the Needs gap that sizes the Foundation annuity is measured, and over how many years
-          of retirement: <em>Average Needs gap over N years</em> (the default) or
-          <em>Peak monthly Needs gap in the first N years</em>, with N 5 by default. The tool runs the status-quo projection &mdash; nothing moved, no
+          of retirement: <em>Peak monthly Needs gap in the first N years</em> (the default) or
+          <em>Average Needs gap over N years</em>, with N 15 by default. The tool runs the status-quo projection &mdash; nothing moved, no
           annuity bought &mdash; and for each of the first N full calendar years with everyone
           retired takes that year's Needs (growing with inflation, dated budget lines honoured) less
           that year's Social Security with its COLA, pensions and annuity income already in place.
@@ -574,7 +574,7 @@
 
         <dt>Yields</dt>
         <dd><span class="ui">Foundation yield</span> and <span class="ui">Walls yield</span>, both
-          6.0% by default. The Foundation yield turns the sizing Needs gap into a Foundation target; the
+          6.5% by default. The Foundation yield turns the sizing Needs gap into a Foundation target; the
           Walls yield turns Wants into a Walls target. Change them if the products you actually
           place justify it.</dd>
 
@@ -600,7 +600,7 @@
           retirement). <span class="ui">Walls growth before income starts</span> (5.0% by default) is the Walls
           growth until then; the Walls growth rate above applies once they pay. The tax-free line applies to
           Walls money in AUM - Tax Free (municipal bonds), whose yield is federally tax-free:
-          <span class="ui">Tax-free Walls yield</span>, <span class="ui">Tax-free growth before income
+          <span class="ui">Tax-free Walls yield</span> (5.0% by default), <span class="ui">Tax-free growth before income
           starts</span> and <span class="ui">after</span>, each following the Walls figure while blank. These
           are plan assumptions for every scenario; the Walls income by account table in section&nbsp;14
           overrides them account by account.</dd>
@@ -803,7 +803,10 @@
       <p>Under <em>Healthcare &amp; insurance</em> the worksheet carries six lines it fills for you.
         <b>Life Insurance</b> and <b>Long Term Care Insurance</b> take the monthly premiums of the
         policies listed in sections&nbsp;08 and 09 (grey) until you type an amount &mdash; do that when
-        the premiums are already in the budget. The other four:
+        the premiums are already in the budget. <b>Prescriptions &amp; Co-Pays</b> carries a planning
+        default in the same way: $600 a month for a couple, $300 for a single person, grey until you
+        type the client's own figure (it follows the household in section&nbsp;02, so it changes
+        when a spouse is added or removed). The other four:
         <b>Medicare Part B</b> and <b>Part D</b> for each person, at the premiums set in
         section&nbsp;03, with a start date of the month each person turns 65 worked out from the ages
         in section&nbsp;02 (blank once they are 65 already). They are shown in grey while they are
