@@ -559,7 +559,7 @@
         <dt><span class="ui">Foundation sizing method</span> and <span class="ui">window (N)</span></dt>
         <dd>How the Needs gap that sizes the Foundation annuity is measured, and over how many years
           of retirement: <em>Peak monthly Needs gap in the first N years</em> (the default) or
-          <em>Average Needs gap over N years</em>, with N 15 by default. The tool runs the status-quo projection &mdash; nothing moved, no
+          <em>Average Needs gap over N years</em>, with N 10 by default. The tool runs the status-quo projection &mdash; nothing moved, no
           annuity bought &mdash; and for each of the first N full calendar years with everyone
           retired takes that year's Needs (growing with inflation, dated budget lines honoured) less
           that year's Social Security with its COLA, pensions and annuity income already in place.
@@ -1494,7 +1494,17 @@
           Foundation yield, divided by twelve), shown in the muted &ldquo;following the plan&rdquo;
           style and recalculated as the transfers change. Type over it to set the carrier's quoted
           income; clear the cell and the calculated figure returns. Each annuity runs on its own in
-          the projections; the hint beneath the table says what they pay in total at the start.</dd>
+          the projections; the hint beneath the table says what they pay in total at the start.
+          Two more cells on every row, the in-force contracts included: <span class="ui">Payout</span>
+          &mdash; <em>Joint</em> (the default) continues the income until the other spouse dies,
+          <em>Single life</em> stops it when the owner dies, so the care scenarios and the widow's or
+          widower's curse in section&nbsp;17 lose it from that year (a single-life contract also stops
+          at the owner's end-of-plan age) &mdash; and <span class="ui">LTC income doubler</span>, a
+          tick that says the contract pays its monthly income again as a long term care benefit for
+          its owner. Ticked, the annuity appears in the <b>LTC benefits</b> table below with its own
+          two cells. For an income annuity in force these two settings are the contract's own (the
+          Payout cell mirrors section&nbsp;06) and apply in every scenario; for a Foundation annuity
+          they belong to the scenario.</dd>
         <dt>LTC benefits</dt>
         <dd>One row per insured &mdash; the client's LTC contract and the spouse's &mdash; with every
           Moat line for that person in the transfer list added up into it: the row lists the accounts
@@ -1510,7 +1520,17 @@
           the placeholders show those figures. Once a cell is set, the contract's benefit becomes monthly
           &times; 12 &times; years wherever the Moat's benefit is shown, and the care-event projections
           in sections&nbsp;06 and 18 pay from each contract at its own yearly maximum for its own
-          period before anything comes out of the accounts.</dd>
+          period before anything comes out of the accounts. An annuity ticked as an <b>LTC income
+          doubler</b> in the Annuity income table is listed here too, with its value, its monthly
+          income as the benefit, a <span class="ui">Benefit period</span> in months (60 by default)
+          and <span class="ui">Continues after value is zero</span>: <em>No</em> pays the benefit
+          only while the contract's accumulation value lasts &mdash; the value less the income drawn
+          since it started, then the income and the care benefit together once care begins &mdash;
+          and <em>Yes</em> pays until the owner dies, which the care scenarios place at the end of
+          care. The care-event projections draw on it like a Moat contract, and the tiles say
+          <em>Paid by the Moat and the annuity rider</em>; a rider on a contract already in force
+          also pays in the before-the-plan care scenarios. The rider's extra payments do not reduce
+          the contract's value in the asset projection itself.</dd>
         <dt>Roof growth</dt>
         <dd>One row for every account the Roof lines go <em>to</em> &mdash; the Roth IRA, the
           after-tax account and so on &mdash; with the from accounts noted beneath, the combined
