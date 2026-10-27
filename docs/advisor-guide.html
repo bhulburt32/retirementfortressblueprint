@@ -1645,14 +1645,23 @@
         plan as it stands after your transfers in section&nbsp;14, not the model's own in
         section&nbsp;13. Change a line there and the withdrawal draws, the Roth conversion schedule
         and the year-by-year table all re-run.</p>
-      <p>The section reads as a before-and-after. First the year-by-year <b>projection of federal and
-        state income tax before strategic tax planning</b>, then <b>the widow's or widower's curse</b>
-        &mdash; what the survivor's tax does when one spouse dies &mdash; then the strategies: the
-        <b>withdrawal order</b>, a <b>Roth conversion analysis</b> and <b>qualified charitable
-        distributions</b>; and finally the <b>projection after strategic tax planning</b>, set against
-        the before.</p>
+      <p>The section opens with the <b>withdrawal order</b> every projection in it draws in, then
+        reads as a before-and-after: the year-by-year <b>projection of federal and state income tax
+        before strategic tax planning</b>, then <b>the widow's or widower's curse</b> &mdash; what the
+        survivor's tax does when one spouse dies, its extra-tax tile in bold red &mdash; then the
+        strategies, a <b>Roth conversion analysis</b> and <b>qualified charitable distributions</b>;
+        and finally the <b>projection after strategic tax planning</b>, set against the before.</p>
 
       <dl class="fields">
+        <dt>Withdrawal order</dt>
+        <dd>Three tiers, spent from the top down: <b>taxable</b> accounts (non-qualified brokerage,
+          savings and cash), <b>tax-deferred</b> accounts (IRAs, 401(k)s, rollovers and deferred
+          annuities) and <b>Roth</b> accounts. That is the default order &mdash; it keeps tax-deferred
+          money compounding and leaves tax-free money for last &mdash; and the arrows on each tier
+          move it up or down; <span class="ui">Reset to default order</span> puts it back. Each tier
+          lists the accounts from section&nbsp;06 that fall into it, with balances and a subtotal, so
+          the order is read against the client's actual money. The order drives the tax projection
+          below: whatever Needs and Wants need beyond the plan's income is drawn tier by tier.</dd>
         <dt>Projected income tax &mdash; before strategic tax planning</dt>
         <dd>The plan's accounts and the withdrawal order below, with no Roth conversions and no QCDs:
           the same five tiles, three charts and year-by-year table as the after block at the foot of
@@ -1684,15 +1693,6 @@
           the point of the comparison. The settings save with the case and are shared by the
           scenarios. A single client sees a note instead.</dd>
 
-        <dt>Withdrawal order</dt>
-        <dd>Three tiers, spent from the top down: <b>taxable</b> accounts (non-qualified brokerage,
-          savings and cash), <b>tax-deferred</b> accounts (IRAs, 401(k)s, rollovers and deferred
-          annuities) and <b>Roth</b> accounts. That is the default order &mdash; it keeps tax-deferred
-          money compounding and leaves tax-free money for last &mdash; and the arrows on each tier
-          move it up or down; <span class="ui">Reset to default order</span> puts it back. Each tier
-          lists the accounts from section&nbsp;06 that fall into it, with balances and a subtotal, so
-          the order is read against the client's actual money. The order drives the tax projection
-          below: whatever Needs and Wants need beyond the plan's income is drawn tier by tier.</dd>
 
         <dt>Roth conversion analysis</dt>
         <dd>The settings below sit behind the green <span class="ui">Roth Conversion Inputs</span> button;
@@ -1888,7 +1888,11 @@
       <h2>Sensitivity Analysis</h2>
       <p>The section&nbsp;18 projection for the scenario being viewed, run again under three stresses
         one at a time with everything else unchanged, each with its own tiles, chart and note and the
-        base case drawn as a dashed line:</p>
+        base case drawn as a dashed line. Every run's tiles carry <b>Cost of this risk</b> in bold red:
+        what the stress leaves at the end of plan against the base case, or, when the accounts run out,
+        how many years earlier than the base case they do (green when a run ends ahead). The care-event
+        tiles in sections&nbsp;06 and&nbsp;19 carry the same tile against the projection without a care
+        event, and the section&nbsp;06 stress tests against the status quo.</p>
       <dl class="fields">
         <dt>Sequence of returns risk</dt>
         <dd>The Walls earn &minus;8% and the Roof &minus;16% a year in the first three years of full

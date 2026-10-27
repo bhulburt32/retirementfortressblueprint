@@ -860,6 +860,8 @@
   .tax-tiles dt{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0 0 4px}
   .tax-tiles dd{margin:0;font-family:"IBM Plex Mono",monospace;font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink)}
   .tax-tiles small{display:block;font-family:"Public Sans",sans-serif;font-size:12.5px;font-weight:400;color:var(--muted);margin-top:3px}
+  .tax-tiles div.cost dd{font-size:26px;font-weight:800;color:var(--st-alert)} .tax-tiles div.cost.gain dd{color:var(--st-ok)}   /* what a risk costs against the baseline */
+  .tax-tiles div.alert dd{font-weight:800;color:var(--st-alert)}   /* a figure to notice: the widow's curse's extra tax */
   .tax-h{margin:22px 0 8px;font-family:Bitter,Georgia,serif;font-size:16px;color:var(--ink)}
   svg.pj.pj-sm{min-width:640px}
   svg.pj .tx-eff{font-size:10.5px;font-weight:600;fill:#141D26;font-family:"IBM Plex Mono",monospace;paint-order:stroke;stroke:#fff;stroke-width:3px;stroke-linejoin:round}
@@ -3193,14 +3195,23 @@
         plan as it stands after your transfers in section&nbsp;14, not the model's own in
         section&nbsp;13. Change a line there and the withdrawal draws, the Roth conversion schedule
         and the year-by-year table all re-run.</p>
-      <p>The section reads as a before-and-after. First the year-by-year <b>projection of federal and
-        state income tax before strategic tax planning</b>, then <b>the widow's or widower's curse</b>
-        &mdash; what the survivor's tax does when one spouse dies &mdash; then the strategies: the
-        <b>withdrawal order</b>, a <b>Roth conversion analysis</b> and <b>qualified charitable
-        distributions</b>; and finally the <b>projection after strategic tax planning</b>, set against
-        the before.</p>
+      <p>The section opens with the <b>withdrawal order</b> every projection in it draws in, then
+        reads as a before-and-after: the year-by-year <b>projection of federal and state income tax
+        before strategic tax planning</b>, then <b>the widow's or widower's curse</b> &mdash; what the
+        survivor's tax does when one spouse dies, its extra-tax tile in bold red &mdash; then the
+        strategies, a <b>Roth conversion analysis</b> and <b>qualified charitable distributions</b>;
+        and finally the <b>projection after strategic tax planning</b>, set against the before.</p>
 
       <dl class="fields">
+        <dt>Withdrawal order</dt>
+        <dd>Three tiers, spent from the top down: <b>taxable</b> accounts (non-qualified brokerage,
+          savings and cash), <b>tax-deferred</b> accounts (IRAs, 401(k)s, rollovers and deferred
+          annuities) and <b>Roth</b> accounts. That is the default order &mdash; it keeps tax-deferred
+          money compounding and leaves tax-free money for last &mdash; and the arrows on each tier
+          move it up or down; <span class="ui">Reset to default order</span> puts it back. Each tier
+          lists the accounts from section&nbsp;06 that fall into it, with balances and a subtotal, so
+          the order is read against the client's actual money. The order drives the tax projection
+          below: whatever Needs and Wants need beyond the plan's income is drawn tier by tier.</dd>
         <dt>Projected income tax &mdash; before strategic tax planning</dt>
         <dd>The plan's accounts and the withdrawal order below, with no Roth conversions and no QCDs:
           the same five tiles, three charts and year-by-year table as the after block at the foot of
@@ -3232,15 +3243,6 @@
           the point of the comparison. The settings save with the case and are shared by the
           scenarios. A single client sees a note instead.</dd>
 
-        <dt>Withdrawal order</dt>
-        <dd>Three tiers, spent from the top down: <b>taxable</b> accounts (non-qualified brokerage,
-          savings and cash), <b>tax-deferred</b> accounts (IRAs, 401(k)s, rollovers and deferred
-          annuities) and <b>Roth</b> accounts. That is the default order &mdash; it keeps tax-deferred
-          money compounding and leaves tax-free money for last &mdash; and the arrows on each tier
-          move it up or down; <span class="ui">Reset to default order</span> puts it back. Each tier
-          lists the accounts from section&nbsp;06 that fall into it, with balances and a subtotal, so
-          the order is read against the client's actual money. The order drives the tax projection
-          below: whatever Needs and Wants need beyond the plan's income is drawn tier by tier.</dd>
 
         <dt>Roth conversion analysis</dt>
         <dd>The settings below sit behind the green <span class="ui">Roth Conversion Inputs</span> button;
@@ -3388,7 +3390,13 @@
     </details>
     <!-- /guide-notes:17 -->
     <div class="panel panel-pad">
-      <div class="inc-title">Projected income tax &mdash; before strategic tax planning<small>Federal and state &middot; the plan&rsquo;s accounts and withdrawal order with no Roth conversions and no QCDs &middot; through the end of plan</small></div>
+      <div class="inc-title">Withdrawal order<small>Spent from the top down &middot; the order every projection in this section draws in</small></div>
+      <ol class="wd-list" id="wdList"></ol>
+      <div class="btn-row" style="margin-top:14px">
+        <button type="button" id="wdReset">Reset to default order</button>
+        <span class="hint" id="wdMsg"></span>
+      </div>
+      <div class="inc-title gap">Projected income tax &mdash; before strategic tax planning<small>Federal and state &middot; the plan&rsquo;s accounts and withdrawal order with no Roth conversions and no QCDs &middot; through the end of plan</small></div>
       <div class="tax-tiles" id="taxBTiles"></div>
       <h4 class="tax-h">Taxable income</h4>
       <div class="pj-legend" id="taxBLegend1"></div>
@@ -3427,12 +3435,6 @@
       </div>
       <div class="tbl-scroll" style="margin-top:12px"><table id="widowTable" class="pj-table"></table></div>
       <p class="hint" id="widowAssume" style="margin-top:12px"></p>
-      <div class="inc-title gap">Withdrawal order<small>Spent from the top down</small></div>
-      <ol class="wd-list" id="wdList"></ol>
-      <div class="btn-row" style="margin-top:14px">
-        <button type="button" id="wdReset">Reset to default order</button>
-        <span class="hint" id="wdMsg"></span>
-      </div>
 
       <div class="inc-title gap">Roth conversion analysis<small>Qualified money in the Walls and Roof, converted a year at a time until RMDs begin or the last year picked</small></div>
       <div data-tgl="<small>Target bracket, years, order, and the IRMAA and Social Security limits</small>" data-tgl-btn="Roth Conversion Inputs">
@@ -3611,7 +3613,11 @@
       <div class="guide-body">
       <p>The section&nbsp;18 projection for the scenario being viewed, run again under three stresses
         one at a time with everything else unchanged, each with its own tiles, chart and note and the
-        base case drawn as a dashed line:</p>
+        base case drawn as a dashed line. Every run's tiles carry <b>Cost of this risk</b> in bold red:
+        what the stress leaves at the end of plan against the base case, or, when the accounts run out,
+        how many years earlier than the base case they do (green when a run ends ahead). The care-event
+        tiles in sections&nbsp;06 and&nbsp;19 carry the same tile against the projection without a care
+        event, and the section&nbsp;06 stress tests against the status quo.</p>
       <dl class="fields">
         <dt>Sequence of returns risk</dt>
         <dd>The Walls earn &minus;8% and the Roof &minus;16% a year in the first three years of full
@@ -11490,7 +11496,7 @@
       + '<div><dt>Federal and state tax, ' + y1.year + '</dt><dd>' + money(tt(y1)) + '</dd><small>' + money(tt(j1)) + ' with both living — <b>' + more(tt(y1), tt(j1)) + '</b>' + (inc(y1) < inc(j1) - 0.5 ? ' on less income' : '') + '</small></div>'
       + '<div><dt>Bracket and effective rate</dt><dd>' + br(y1) + ' · ' + pct(y1.totalEffective) + '</dd><small>' + br(j1) + ' · ' + pct(j1.totalEffective) + ' with both living</small></div>'
       + '<div><dt>Medicare premiums (IRMAA)</dt><dd>' + tierText(tierS) + '</dd><small>' + tierText(tierJ) + ' with both living — the single thresholds are half the joint ones</small></div>'
-      + '<div><dt>Extra tax over the survivor’s years</dt><dd>' + (Math.abs(extraB) > 0.5 ? (extraB < 0 ? '−' : '') + money(Math.abs(extraB)) : '—') + '</dd><small>' + y1.year + '–' + S[S.length - 1].year + ' before strategic tax planning; after it ' + (Math.abs(extraA) > 0.5 ? (extraA < 0 ? '−' : '') + money(Math.abs(extraA)) : 'none') + '</small></div>';
+      + '<div' + (extraB > 0.5 ? ' class="alert"' : '') + '><dt>Extra tax over the survivor’s years</dt><dd>' + (Math.abs(extraB) > 0.5 ? (extraB < 0 ? '−' : '') + money(Math.abs(extraB)) : '—') + '</dd><small>' + y1.year + '–' + S[S.length - 1].year + ' before strategic tax planning; after it ' + (Math.abs(extraA) > 0.5 ? (extraA < 0 ? '−' : '') + money(Math.abs(extraA)) : 'none') + '</small></div>';
     $('widowNote').innerHTML = '<b>The curse.</b> When one spouse dies the survivor files as a single taxpayer from the following year: the brackets, the standard deduction and the Medicare (IRMAA) thresholds are about half the joint ones, while most of the taxable income carries on — the deceased’s IRA passes to the survivor and its required distributions continue, and the larger Social Security benefit is kept. '
       + 'If <b>' + esc(who) + '</b> passes away at ' + W.age + ', in ' + deathYear + ', <b>' + esc(surv) + '</b> files single from ' + y1.year + ': income before withdrawals is ' + money(inc(y1)) + ' against ' + money(inc(j1)) + ' with both living, ' + (tt(y1) > tt(j1) + 0.5 ? 'yet' : 'and') + ' the federal and state tax is <b>' + money(tt(y1)) + '</b> against ' + money(tt(j1)) + ', in the ' + br(y1) + ' bracket' + (y1.marginal > j1.marginal ? ' instead of ' + br(j1) : '') + (tierS > tierJ ? ', with Medicare premiums stepping up to ' + tierText(tierS) : '') + '. '
       + 'Over the survivor’s years to the end of plan that is <b>' + money(Math.abs(extraB)) + (extraB < 0 ? ' less' : ' more') + '</b> tax than the couple would have paid. '
@@ -12726,7 +12732,8 @@
       var tiles = '<div><dt>Cost of care</dt><dd>' + money(T.cost) + '</dd><small>' + (beyond ? 'care begins after the end of plan' : 'future dollars, ' + RUN.span + (T.cost < RUN.gross - 1 ? ', after benefits in force' : '')) + '</small></div>';
       if(mode === 'plan' || poolTot > 0.5) tiles += '<div><dt>' + paidByLabel(pool, mode) + '</dt><dd>' + money(T.moat) + '</dd><small>' + (poolTot > 0.5 ? 'of ' + money(RUN.benefit) + ' of benefit for ' + (sc.people.length > 1 ? 'both' : esc(sc.people[0].name)) : 'no Moat funded') + '</small></div>';
       tiles += '<div><dt>From the accounts</dt><dd>' + money(T.oop) + '</dd><small>' + (T.oop > 0.5 ? 'withdrawn to pay for care, plus the tax on the draw' : 'nothing — the benefit covers the cost') + '</small></div>'
-        + '<div><dt>' + (dep ? 'Accounts run out' : (RUN.endT != null ? 'Estate from ' + RUN.endYear : 'At end of plan')) + '</dt><dd>' + (dep ? dep.year : money(last.layers.total)) + '</dd><small>' + (dep ? 'age ' + dep.ages.join(' / ') + (baseDep ? ' (vs ' + baseDep.year + ' without a care event)' : ' — the accounts last to ' + baseLast.year + ' without a care event') : nb((diff >= 0 ? '+' : '−') + money(Math.abs(diff))) + ' vs ' + money(baseLast.layers.total) + ' without a care event') + '</small></div>';
+        + (beyond ? '' : costTile(diff, dep, baseDep, baseLast, 'without a care event'))
+        + '<div><dt>' + (dep ? 'Accounts run out' : (RUN.endT != null ? 'Estate from ' + RUN.endYear : 'At end of plan')) + '</dt><dd>' + (dep ? dep.year : money(last.layers.total)) + '</dd><small>' + (dep ? 'age ' + dep.ages.join(' / ') + (baseDep ? ' (vs ' + baseDep.year + ' without a care event)' : ' — the accounts last to ' + baseLast.year + ' without a care event') : 'vs ' + money(baseLast.layers.total) + ' without a care event') + '</small></div>';
       $(id + 'Tiles').innerHTML = tiles;
       assetBarsChart({rows:rows, N:N, X:X, layers:LY, parts:parts, compare:compare, careStart:beyond ? null : careStart,
         svg:$(id + 'Svg'), tip:$(id + 'Tip'), legend:$(id + 'Legend'),
@@ -17375,15 +17382,33 @@
             ssLost:ssLost, extraSpend:extraSpend, tax:X.lifetime + X.lifetimeState, baseTax:baseX.lifetime + baseX.lifetimeState,
             wd:rows.reduce(function(a, x){ return a + x.withdrawn; }, 0), baseWd:baseX.rows.reduce(function(a, x){ return a + x.withdrawn; }, 0)};
   }
+  /* the tile that says what a risk costs against the baseline: the end-of-plan difference, bold red (green when the
+     run ends ahead); when the accounts run out, how many years earlier than the baseline they do */
+  function costTile(diff, dep, baseDep, baseLast, vsWhat){
+    var cls, amt, sub;
+    if(dep && baseDep){   // both runs run out: the cost is the years lost
+      var yrs = baseDep.year - dep.year;
+      cls = yrs > 0 ? 'cost' : ''; amt = yrs > 0 ? yrs + ' year' + (yrs === 1 ? '' : 's') + ' earlier' : 'the same year';
+      sub = 'the accounts run out in ' + dep.year + ', against ' + baseDep.year + ' ' + vsWhat;
+    } else if(dep){       // only the stressed run runs out
+      cls = 'cost'; amt = '\u2212' + money(Math.abs(diff));
+      sub = 'the accounts run out in ' + dep.year + ' \u2014 they last to ' + baseLast.year + ' with ' + money(baseLast.layers.total) + ' ' + vsWhat;
+    } else {
+      cls = diff >= -0.5 ? 'cost gain' : 'cost'; amt = (diff >= 0 ? '+' : '\u2212') + money(Math.abs(diff));
+      sub = 'at the end of plan, against ' + money(baseLast.layers.total) + ' ' + vsWhat;
+    }
+    return '<div' + (cls ? ' class="' + cls + '"' : '') + '><dt>Cost of this risk</dt><dd>' + amt + '</dd><small>' + sub + '</small></div>';
+  }
   function sensTiles(def, RUN, mode){
     var nb = function(t){ return '<span style="white-space:nowrap">' + t + '</span>'; };
     var dep = RUN.dep, diff = RUN.diff, tiles = '';
     if(def.key === 'seq') tiles += '<div><dt>Three bad years</dt><dd>' + (mode === 'sq' ? (SENS_SEQ.roof * 100).toFixed(0) + '%' : (SENS_SEQ.walls * 100).toFixed(0) + '% / ' + (SENS_SEQ.roof * 100).toFixed(0) + '%') + '</dd><small>' + (mode === 'sq' ? 'Market returns, ' : 'Walls / Roof returns, ') + esc(def.range || '') + '</small></div>';
     if(def.key === 'ss') tiles += '<div><dt>Social Security lost</dt><dd>' + money(RUN.ssLost) + '</dd><small>over the plan, from ' + SENS_SS.year + '</small></div>';
     if(def.key === 'infl') tiles += '<div><dt>Extra spending</dt><dd>' + money(RUN.extraSpend) + '</dd><small>Needs and Wants above the base case, over the plan</small></div>';
+    tiles += costTile(diff, dep, RUN.baseDep, RUN.baseLast, 'in the base case');
     tiles += '<div><dt>Withdrawn</dt><dd>' + money(RUN.wd) + '</dd><small>' + nb((RUN.wd >= RUN.baseWd ? '+' : '−') + money(Math.abs(RUN.wd - RUN.baseWd))) + ' vs the base case</small></div>'
       + '<div><dt>Lowest point</dt><dd>' + money(RUN.low.layers.total) + '</dd><small>in ' + RUN.low.year + '</small></div>'
-      + '<div><dt>' + (dep ? 'Accounts run out' : 'At end of plan') + '</dt><dd>' + (dep ? dep.year : money(RUN.last.layers.total)) + '</dd><small>' + (dep ? 'age ' + dep.ages.join(' / ') + (RUN.baseDep ? ' (vs ' + RUN.baseDep.year + ' in the base case)' : ' — the base case lasts to ' + RUN.baseLast.year) : nb((diff >= 0 ? '+' : '−') + money(Math.abs(diff))) + ' vs ' + money(RUN.baseLast.layers.total) + ' in the base case') + '</small></div>';
+      + '<div><dt>' + (dep ? 'Accounts run out' : 'At end of plan') + '</dt><dd>' + (dep ? dep.year : money(RUN.last.layers.total)) + '</dd><small>' + (dep ? 'age ' + dep.ages.join(' / ') + (RUN.baseDep ? ' (vs ' + RUN.baseDep.year + ' in the base case)' : ' — the base case lasts to ' + RUN.baseLast.year) : 'vs ' + money(RUN.baseLast.layers.total) + ' in the base case') + '</small></div>';
     return tiles;
   }
   function renderSensitivity(r, baseX, mode){
