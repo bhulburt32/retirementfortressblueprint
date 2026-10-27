@@ -32,6 +32,11 @@ const TEXT = [
   const jeff = rows.find(r => /Jeff/.test(r.name)), jane = rows.find(r => /Jane/.test(r.name));
   if(!jeff || jeff.yld !== '2.42%') errs.push('Jeff’s account yield should be 2.42% (120,000 at 1.30% and 80,000 at 4.10%): ' + (jeff && jeff.yld));
   if(!jane || !/^3\.50%\s*on 60% of the account$/.test(jane.yld)) errs.push('Jane’s account yield should be 3.50% on 60% of the account: ' + (jane && jane.yld));
+  const tot = rows.find(r => /Portfolio total/.test(r.name));
+  if(!tot || !/^2\.67%\s*on 87% of the portfolio$/.test(tot.yld) || tot.total !== '$300,000') errs.push('the Portfolio total row should read $300,000 and 2.67% on 87% of the portfolio: ' + JSON.stringify(tot));
+  const tile = await p.$eval('#pfOut .tax-tiles .pf-yield', e => e.textContent.replace(/\s+/g, ' ').trim());
+  console.log('yield tile:', tile);
+  if(!/^SEC yield ?2\.67% ?\$6,940 a year · every holding weighted by amount · on 87% of the portfolio, the rest quotes none$/.test(tile)) errs.push('the SEC yield tile should read 2.67%, $6,940 a year on 87% of the portfolio: ' + tile);
   const head = await p.$eval('#pfOut .pf-hold thead', e => e.textContent);
   if(!/SEC yield/.test(head)) errs.push('the yield column should be headed SEC yield');
   // collapse all closes them, expand all opens them

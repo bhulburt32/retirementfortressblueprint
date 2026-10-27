@@ -13927,7 +13927,7 @@
     if(!portfolio){ box.innerHTML = ''; $('pfClear').hidden = true; return; }
     $('pfClear').hidden = false;
     var A = portfolio.analysis, D = propDerived(A), S = A.summary || propSummaries(A, D);
-    var d = A.clientRiskNumber != null && A.riskNumber != null ? A.riskNumber - A.clientRiskNumber : null;
+    var d = A.clientRiskNumber != null && A.riskNumber != null ? A.riskNumber - A.clientRiskNumber : null, TY = pfTotalYield(A);
     var alignCls = d == null ? '' : Math.abs(d) <= 5 ? 'var(--st-ok)' : Math.abs(d) <= 15 ? 'var(--st-caution)' : 'var(--st-alert)';
     var tiles = '<div class="tax-tiles">'
       + '<div><dt>Household Risk Number</dt><dd>' + (A.clientRiskNumber != null ? A.clientRiskNumber : '—') + '</dd><small>' + (A.clientRange ? pfPct(A.clientRange.down, false, 2) + ' to ' + pfPct(A.clientRange.up, true, 2) + ' over six months' : A.questionnaireDate ? 'questionnaire ' + esc(A.questionnaireDate) : 'from the questionnaire') + '</small></div>'
@@ -13935,6 +13935,7 @@
       + '<div><dt>Portfolio value</dt><dd>' + (A.value ? money(A.value) : D.total ? money(D.total) : '—') + '</dd><small>' + (A.accountCount || D.accounts) + ' accounts · ' + D.holdings + ' holdings' + (A.date ? ' · ' + esc(A.date) : '') + '</small></div>'
       + '<div><dt>GPA</dt><dd>' + (A.gpa != null ? A.gpa.toFixed(1) : '—') + '</dd><small>' + (A.benchGpa != null && A.benchmark ? esc(A.benchmark.name) + ' benchmark ' + A.benchGpa.toFixed(1) : 'risk-adjusted return, 0 to 4.3') + '</small></div>'
       + '<div><dt>Cost</dt><dd>' + (A.costs ? pfPct(A.costs.totalPct, false, 2) : '—') + '</dd><small>' + (A.costs ? money(A.costs.total) + ' a year · expenses ' + pfPct(A.costs.expense, false, 2) + ', tax drag ' + pfPct(A.costs.taxDrag, false, 2) : 'total annual cost') + (A.dividend != null ? ' · dividend ' + pfPct(A.dividend, false, 2) : '') + '</small></div>'
+      + '<div class="pf-yield"><dt>SEC yield</dt><dd>' + (TY ? pfPct(TY.yield, false, 2) : '—') + '</dd><small>' + (TY ? money(TY.income) + ' a year · every holding weighted by amount' + (TY.cover < 0.995 ? ' · on ' + Math.round(TY.cover * 100) + '% of the portfolio, the rest quotes none' : '') : 'no holding quotes a yield') + '</small></div>'
       + '</div>';
     var reading = '<div class="pf-read"><div><h4>The holdings</h4><p>' + esc(S.holdings || '—') + '</p></div><div><h4>The risk assessment</h4><p>' + esc(S.risk || '—') + '</p></div></div>';
     var bar = A.allocation && A.allocation.length ? '<div class="inc-title gap">Asset classification<small>' + (A.benchAllocation ? 'the portfolio, with the ' + esc(A.benchmark ? A.benchmark.name : 'benchmark') + ' benchmark beneath' : 'as Nitrogen classifies the holdings') + '</small></div>'
@@ -13948,12 +13949,14 @@
       + D.largest.map(function(p){ return '<tr><td>' + esc(p.name) + (p.acct ? ' <small style="color:var(--muted)">' + esc(p.acct) + '</small>' : '') + '</td><td class="num">' + money(p.amount) + '</td><td class="num">' + pfPct(p.pct) + '</td><td class="num">' + (p.riskNumber != null ? p.riskNumber : '—') + '</td><td class="num">' + p.accounts + '</td></tr>'; }).join('') + '</tbody></table></div>' : '';
     var inter = A.intersection.length ? '<div class="inc-title gap">Single-stock exposure<small>Nitrogen’s stock intersection: held directly and through funds</small></div><div class="tbl-wrap" style="margin-top:8px"><table class="pj-table" style="min-width:520px"><thead><tr><th>Stock</th><th class="num">Risk Number</th><th class="num">Of equities</th><th class="num">Market value</th></tr></thead><tbody>'
       + A.intersection.map(function(x){ return '<tr><td>' + esc(x.ticker + ' · ' + x.name) + '</td><td class="num">' + x.riskNumber + '</td><td class="num">' + pfPct(x.pctEquities) + '</td><td class="num">' + money(x.value) + '</td></tr>'; }).join('') + '</tbody></table></div>' : '';
-    var accts = A.accounts.length ? '<div class="inc-title gap">Holdings by account<small>every account in the proposal, with its holdings</small></div><div class="tbl-scroll" style="margin-top:8px"><table class="pj-table pf-hold"><thead><tr><th>Account / holding</th><th>Type</th><th class="num">Amount</th><th class="num">Of account</th><th class="num">Of portfolio</th><th class="num">SEC yield<small>account: weighted by amount</small></th><th class="num">Risk</th><th class="num">GPA</th><th class="num">95% range, 6 months</th></tr></thead><tbody>'
+    var accts = A.accounts.length ? '<div class="inc-title gap">Holdings by account<small>every account in the proposal, with its holdings</small></div><div class="tbl-scroll" style="margin-top:8px"><table class="pj-table pf-hold"><thead><tr><th>Account / holding</th><th>Type</th><th class="num">Amount</th><th class="num">Of account</th><th class="num">Of portfolio</th><th class="num">SEC yield<small style="display:block;font-weight:normal;letter-spacing:0;text-transform:none">account and total: weighted by amount</small></th><th class="num">Risk</th><th class="num">GPA</th><th class="num">95% range, 6 months</th></tr></thead><tbody>'
       + A.accounts.map(function(a){
           var Y = pfAcctYield(a);
           return '<tr class="grp"><td><b>' + esc(a.name) + '</b></td><td></td><td class="num"><b>' + money(a.total) + '</b></td><td></td><td class="num">' + (A.value ? pfPct(a.total / A.value * 100) : '') + '</td><td class="num">' + (Y ? '<b>' + pfPct(Y.yield, false, 2) + '</b>' + (Y.cover < 0.995 ? '<small style="display:block;color:var(--muted)">on ' + Math.round(Y.cover * 100) + '% of the account</small>' : '') : '') + '</td><td class="num"><b>' + a.riskNumber + '</b></td><td class="num">' + (a.gpa != null ? a.gpa.toFixed(1) : '') + '</td><td></td></tr>'
             + a.holdings.map(function(h){ return '<tr><td class="pf-h">' + (h.ticker ? '<b>' + esc(h.ticker) + '</b> · ' : '') + esc(h.name) + (h.proxy ? ' <small>proxy ' + esc(h.proxy) + '</small>' : '') + '</td><td>' + esc(h.type || '') + '</td><td class="num">' + money(h.amount) + '</td><td class="num">' + pfPct(h.pctAccount) + '</td><td class="num">' + pfPct(h.pctPortfolio, false, 2) + '</td><td class="num">' + (h.yield != null ? pfPct(h.yield, false, 2) : '—') + '</td><td class="num">' + (h.riskNumber != null ? h.riskNumber : '—') + '</td><td class="num">' + (h.gpa != null ? h.gpa.toFixed(1) : '—') + '</td><td class="num">' + pfPct(h.range.down, true, 2) + ' | ' + pfPct(h.range.up, true, 2) + '</td></tr>'; }).join('');
-        }).join('') + '</tbody></table></div>' : '';
+        }).join('')
+      + '<tr class="grp pf-total"><td><b>Portfolio total</b></td><td></td><td class="num"><b>' + money(A.value || D.total) + '</b></td><td></td><td class="num">' + (A.value ? pfPct(D.total / A.value * 100) : '') + '</td><td class="num">' + (TY ? '<b>' + pfPct(TY.yield, false, 2) + '</b>' + (TY.cover < 0.995 ? '<small style="display:block;color:var(--muted)">on ' + Math.round(TY.cover * 100) + '% of the portfolio</small>' : '') : '') + '</td><td class="num"><b>' + (A.riskNumber != null ? A.riskNumber : '') + '</b></td><td class="num">' + (A.gpa != null ? A.gpa.toFixed(1) : '') + '</td><td></td></tr>'
+      + '</tbody></table></div>' : '';
     var stress = A.stress.length ? '<div class="inc-title gap">Stress tests<small>how the portfolio as held would have fared, against the index Nitrogen pairs with each event</small></div><div class="tbl-wrap" style="margin-top:8px"><table class="pj-table" style="min-width:620px"><thead><tr><th>If it happened again</th><th>Period</th><th class="num">Portfolio</th><th class="num">Dollars</th><th>Benchmark</th><th class="num">Benchmark</th></tr></thead><tbody>'
       + A.stress.map(function(t){ return '<tr><td>' + esc(t.name) + '</td><td>' + esc(t.period || '') + '</td><td class="num"' + (t.pct < 0 ? ' style="color:var(--st-alert)"' : '') + '>' + pfPct(t.pct, true, 2) + '</td><td class="num">' + pfMoneyS(t.dollars) + '</td><td>' + esc(t.benchmark || '') + (t.extra ? ' / ' + esc(t.extra.name) : '') + '</td><td class="num">' + pfPct(t.benchPct, true, 2) + (t.extra && t.extra.pct != null ? ' / ' + pfPct(t.extra.pct, true, 2) : '') + '</td></tr>'; }).join('') + '</tbody></table></div>' : '';
     var PERF = [['beta', 'Beta'], ['r2', 'R²'], ['sharpe', 'Sharpe ratio'], ['sortino', 'Sortino ratio'], ['stdev', 'Standard deviation', '%'], ['drawdown', 'Drawdown', '%'], ['totalReturn', 'Total return', '%'], ['modeled', 'Modeled performance', '%'], ['midpoint', 'Annual range midpoint', '%'], ['romad', 'Return over max drawdown'], ['gainToPain', 'Gain to pain'], ['illustrated', 'Illustrated', '%']];
@@ -13969,12 +13972,15 @@
     box.innerHTML = head + tiles + reading + bar + mix + largest + inter + accts + stress + perf + sect + div;
     initSubHeads(box);   // each block collapses on its bar, like the rest of the page
   }
-  /* an account's SEC yield: its holdings' yields weighted by amount, over the holdings that quote one; cover is the share of the account they make up */
-  function pfAcctYield(a){
+  /* the SEC yield of a set of holdings: their yields weighted by amount, over the holdings that quote one; cover is the share
+     of the set they make up, income the dollars a year at that yield. An account's yield and the portfolio's both come from here. */
+  function pfYieldOf(holdings){
     var sum = 0, amt = 0, tot = 0;
-    (a.holdings || []).forEach(function(h){ tot += h.amount || 0; if(h.yield != null && h.amount > 0.005){ sum += h.amount * h.yield; amt += h.amount; } });
-    return amt > 0.005 ? {yield:sum / amt, cover:tot > 0.005 ? amt / tot : 1} : null;
+    (holdings || []).forEach(function(h){ tot += h.amount || 0; if(h.yield != null && h.amount > 0.005){ sum += h.amount * h.yield; amt += h.amount; } });
+    return amt > 0.005 ? {yield:sum / amt, cover:tot > 0.005 ? amt / tot : 1, income:sum / 100, amount:amt} : null;
   }
+  function pfAcctYield(a){ return pfYieldOf(a.holdings); }
+  function pfTotalYield(A){ var all = []; (A.accounts || []).forEach(function(a){ all = all.concat(a.holdings || []); }); return pfYieldOf(all); }
 
   function renderRisk(r){
     var S = rqApply(r), f = riskFacts(r);
