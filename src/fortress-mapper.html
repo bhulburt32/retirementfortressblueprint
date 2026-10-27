@@ -333,6 +333,12 @@
   button.tgl-btn:hover{border-color:var(--accent);background:var(--surface);color:var(--ink)}
   .sec-head{cursor:pointer;user-select:none;align-items:center}
   .sec-head button.tgl-btn,.sec-head button.tgl-btn:hover{background:#fff;color:var(--navy);border-color:#fff}
+  /* Save on every section header: the case to Alto's server where the page runs there, otherwise the case file */
+  .sec-save{margin-left:auto;display:flex;align-items:center;gap:10px;flex:none;min-width:0}
+  .scn-tag ~ .sec-save{margin-left:0}
+  .sec-save button{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.55);color:#fff;font:inherit;font-size:13.5px;font-weight:600;padding:5px 12px;border-radius:var(--radius);cursor:pointer;white-space:nowrap}
+  .sec-save button:hover{background:#fff;color:var(--navy)}
+  .sec-save small{font-size:12.5px;color:#C9D3EC;white-space:nowrap;max-width:340px;overflow:hidden;text-overflow:ellipsis}
   section.closed>:not(.sec-head){display:none}
   section.closed{margin-bottom:14px}
   section.closed .sec-head{margin-bottom:0}
@@ -1096,7 +1102,7 @@
   <div class="tgl-top">
     <button type="button" id="expandAll">Expand all sections</button>
     <button type="button" id="collapseAll">Collapse all sections</button>
-    <span class="hint">Every section, subsection and table opens with its <b>+</b>; a section header opens on a click.</span>
+    <span class="hint">Every section, subsection and table opens with its <b>+</b>; a section header opens on a click. <b>Save</b> on any section header saves the case.</span>
   </div>
 
   <!-- 1. PREPARED BY -->
@@ -15204,7 +15210,7 @@
       sec.classList.add('scn');
       var head = sec.querySelector('.sec-head'); if(!head) return;
       var tag = head.querySelector('.scn-tag');
-      if(!tag){ tag = document.createElement('span'); tag.className = 'scn-tag'; head.appendChild(tag); }
+      if(!tag){ tag = document.createElement('span'); tag.className = 'scn-tag'; head.insertBefore(tag, head.querySelector('.sec-save')); }
       tag.textContent = scnNames[activeScn];
       tag.style.background = M.color;
     });
@@ -16837,11 +16843,25 @@
 
   /* the case as a text file: the same block as the box, with a heading line the upload ignores */
   function caseFileName(){ var d = new Date(), ymd = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); return 'Retirement Fortress case - ' + caseLabel().replace(/[\\/:*?"<>|]+/g, ' ') + ' - ' + ymd + '.txt'; }
-  $('dlCase').addEventListener('click', function(){
+  function downloadCase(say){   // say(text): where the outcome is reported
     var txt = 'Retirement Fortress Blueprint \u2014 case file for ' + caseLabel() + ', saved ' + new Date().toLocaleString() + '\nUpload this file in section 23 (Upload case file) to reopen the case. Do not edit the block below.\n\n' + caseData() + '\n';
-    saveFile(caseFileName(), new Blob([txt], {type:'text/plain'})).then(function(r){ $('caseMsg').textContent = r && r.status === 'declined' ? 'Not saved.' : 'Saved as ' + caseFileName() + '.'; },
-      function(e){ $('caseMsg').textContent = e && e.code === 'connecting' ? 'Still connecting \u2014 try again in a moment.' : 'This view cannot save files.'; });
-  });
+    return saveFile(caseFileName(), new Blob([txt], {type:'text/plain'})).then(function(r){ say(r && r.status === 'declined' ? 'Not saved.' : 'Saved as ' + caseFileName() + '.'); },
+      function(e){ say(e && e.code === 'connecting' ? 'Still connecting — try again in a moment.' : 'This view cannot save files.'); });
+  }
+  $('dlCase').addEventListener('click', function(){ downloadCase(function(t){ $('caseMsg').textContent = t; }); });
+  /* The Save button on every section header. Where the page runs on Alto's site it is the same save as section 23
+     (the case to the server under the signed-in advisor); on the demo and the desktop file it downloads the case file.
+     The outcome shows beside the button for a few seconds. */
+  function quickSave(msg){
+    var say = function(t){ msg.textContent = t; msg.title = t; clearTimeout(msg._t); if(t) msg._t = setTimeout(function(){ msg.textContent = ''; msg.title = ''; }, 8000); };
+    say('Saving…');
+    if(RFB_API){
+      var p = saveCase(false), done = function(){ say($('casesMsg').textContent); };
+      if(p && p.then) p.then(done, done); else done();
+      return;
+    }
+    downloadCase(say);
+  }
   /* Case data saved into a Word or text file. Word turns straight quotes
      into curly ones and may wrap the block in other text, so take the
      outermost braces, and straighten the quotes only if the block will not
@@ -19354,6 +19374,11 @@
       var head = sec.querySelector('.sec-head');
       if(!head) return;
       head.insertBefore(tglBtn(false), head.firstChild);
+      var sv = document.createElement('span'); sv.className = 'sec-save'; sv.setAttribute('data-tgl-skip', '');
+      sv.innerHTML = '<button type="button" class="sec-save-btn" title="Save this case \u2014 to Alto\u2019s server when the page runs there, otherwise as a case file download">Save</button><small></small>';
+      head.appendChild(sv);
+      sv.addEventListener('click', function(e){ e.stopPropagation(); });   // a save never opens or closes the section
+      sv.querySelector('button').addEventListener('click', function(){ quickSave(sv.querySelector('small')); });
       sec.classList.add('closed');
       head.addEventListener('click', function(){ secOpen(sec, sec.classList.contains('closed')); });
     });
