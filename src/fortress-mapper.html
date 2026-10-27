@@ -11886,6 +11886,7 @@
      retirement date, Social Security, pensions, annuity and other income),
      against total expenses, before the Fortress is built. Where expenses
      exceed income the shortfall is drawn in red on top of the income bar. */
+  var GAP_LAST = null;   // the section 05 income gap series, for the checks
   function renderIncomeGap(r){
     if(!$('gapSvg')) return;
     var X = statusQuoRun(r), P = X.income, rows = P.rows, N = P.N;
@@ -11926,7 +11927,8 @@
       + '<span class="pj-key"><i style="border-color:var(--ink)"></i>Total expenses</span>'
       + '<span class="pj-key"><small>gap labelled every fifth year</small></span>';
     var first = null, big = 0, tot = 0;
-    gaps.forEach(function(g, n){ if(g > 0.5 && first == null) first = n; if(g > big) big = n; tot += g; });
+    gaps.forEach(function(g, n){ if(g > 0.5 && first == null) first = n; if(g > gaps[big]) big = n; tot += g; });   // the largest gap: the year with the biggest shortfall
+    GAP_LAST = {years:rows.map(function(x){ return x.year; }), gaps:gaps, first:first, big:big, tot:tot};
     var retRow = rows[Math.min(N, Math.ceil(P.lastRet))];
     var retGap = gaps[Math.min(N, Math.ceil(P.lastRet))];
     $('gapTiles').innerHTML =
@@ -13393,7 +13395,7 @@
     });
   }
 
-  window.__rfb = Object.assign(window.__rfb || {}, {taxLast:function(){ return taxLast; }, caseData:function(){ return caseData(); }, ltcPools:function(mode){ return ltcPools(compute(), mode); }, acctGrowth:function(id, dflt, t){ return acctGrowth(acctById(id), dflt, t); }, acctStressReturn:function(id, loss, dflt, t){ return acctStressReturn(acctById(id), loss, dflt, t); }, sqTotals:function(){ var X = statusQuoRun(compute()); return X.rows.map(function(x){ return {year:x.year, total:x.layers.total}; }); }, fedTax:function(){ return fedTax.apply(null, arguments); }, pdfLayoutText:pdfLayoutText, propParse:function(p){ return propParse(p); }, propDerived:function(a){ return propDerived(a); }, propSummaries:function(a, d){ return propSummaries(a, d); }, canAskClaude:function(){ return canAskClaude(); }, nitroPerf:function(pg){ return nitroPerf(pg); }, askClaudeJson:function(q){ return askClaudeJson(q); }, compute:function(){ return compute(); }, projectTax:function(r, o){ return projectTax(r, o); }, accounts:function(){ return accounts; }});   // for the test scripts
+  window.__rfb = Object.assign(window.__rfb || {}, {taxLast:function(){ return taxLast; }, caseData:function(){ return caseData(); }, ltcPools:function(mode){ return ltcPools(compute(), mode); }, acctGrowth:function(id, dflt, t){ return acctGrowth(acctById(id), dflt, t); }, acctStressReturn:function(id, loss, dflt, t){ return acctStressReturn(acctById(id), loss, dflt, t); }, sqTotals:function(){ var X = statusQuoRun(compute()); return X.rows.map(function(x){ return {year:x.year, total:x.layers.total}; }); }, gapSeries:function(){ return GAP_LAST; }, fedTax:function(){ return fedTax.apply(null, arguments); }, pdfLayoutText:pdfLayoutText, propParse:function(p){ return propParse(p); }, propDerived:function(a){ return propDerived(a); }, propSummaries:function(a, d){ return propSummaries(a, d); }, canAskClaude:function(){ return canAskClaude(); }, nitroPerf:function(pg){ return nitroPerf(pg); }, askClaudeJson:function(q){ return askClaudeJson(q); }, compute:function(){ return compute(); }, projectTax:function(r, o){ return projectTax(r, o); }, accounts:function(){ return accounts; }});   // for the test scripts
   /* ---- reading the figures out of the text ---- */
   function nitroNum(s){ var v = parseFloat(String(s).replace(/\u2212/g, '-').replace(/[^0-9.\-]/g, '')); return isFinite(v) ? v : null; }
   /* text out of a PDF carries kerning breaks ("V anguard", "GP A") and letter-spaced headings ("A l l o c a t i o n") */

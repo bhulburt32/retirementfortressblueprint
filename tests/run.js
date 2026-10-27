@@ -17,6 +17,7 @@ const SUITE = [
   't-anx',       // section 06: account list opens with the section, annuity position types, the Annuities subsection
   't-annrules',  // the annuity product rules in the projections and the stress test
   't-mygaheld',  // a MYGA marked Stay as is renews at half its rate after maturity and stays clear of the bad years
+  't-gap',       // section 05 income gap: the Largest gap tile is the biggest shortfall in the series, and the deck page agrees
   't-anntax',    // tax: the federally tax-free Walls yield, Roth annuity income, the stress rows on the scenario cards
   't-ltcmerge',  // one LTC contract per insured
   't-ltcscn',    // care-event projections
