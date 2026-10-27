@@ -9,12 +9,15 @@ const { chromium } = require('playwright');
   await p.click('#expandAll'); await p.waitForTimeout(600);
   const tiles = async id => p.$$eval('#' + id + ' > div', ds => ds.map(d => d.querySelector('dt').textContent + ': ' + d.querySelector('dd').textContent));
   // order: before, the curse, the strategies, after
-  const order = await p.evaluate(() => ['taxBTiles', 'widowTiles', 'wdList', 'rothTiles', 'qcdTiles', 'taxTiles'].map(id => document.getElementById(id).getBoundingClientRect().top));
+  const order = await p.evaluate(() => ['wdList', 'taxBTiles', 'widowTiles', 'rothTiles', 'qcdTiles', 'taxTiles'].map(id => document.getElementById(id).getBoundingClientRect().top));
   console.log('block order (page y):', order.map(Math.round).join(' < '));
-  if(!order.every((y, k) => k === 0 || y > order[k - 1])) errs.push('section 17 should run before → the curse → withdrawal order → Roth → QCD → after');
+  if(!order.every((y, k) => k === 0 || y > order[k - 1])) errs.push('section 17 should run withdrawal order → before → the curse → Roth → QCD → after');
   const titles = await p.$$eval('#taxSec .inc-title', es => es.map(e => [...e.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join('').trim()));
   console.log('titles:', JSON.stringify(titles));
-  if(!/before strategic tax planning/.test(titles[0]) || !/curse/.test(titles[1]) || !/after strategic tax planning/.test(titles[titles.length - 1])) errs.push('the subsection titles should name before, the curse and after');
+  if(!/^Withdrawal order/.test(titles[0]) || !/before strategic tax planning/.test(titles[1]) || !/curse/.test(titles[2]) || !/after strategic tax planning/.test(titles[titles.length - 1])) errs.push('the subsection titles should run withdrawal order, before, the curse … after');
+  const extraTile = await p.$eval('#widowTiles > div:nth-child(6)', d => ({ cls: d.className, color: getComputedStyle(d.querySelector('dd')).color, weight: getComputedStyle(d.querySelector('dd')).fontWeight }));
+  console.log('extra-tax tile:', JSON.stringify(extraTile));
+  if(!/alert/.test(extraTile.cls) || +extraTile.weight < 700) errs.push('the extra-tax tile should be bold red');
   // before and after
   const before = await tiles('taxBTiles'), after = await tiles('taxTiles');
   console.log('before:', JSON.stringify(before)); console.log('after:', JSON.stringify(after));
