@@ -3164,7 +3164,13 @@
         size and style, and the diversification figures. Above the detail, two readings summarise it: <b>The
         holdings</b> (what the money is in, how concentrated, how much sits in cash, annuities and single
         stocks, and what it costs) and <b>The risk assessment</b> (whether the portfolio's risk matches the
-        household's comfort zone, what the stress tests show, and how it compares with the benchmark).</p>
+        household's comfort zone, what the stress tests show, and how it compares with the benchmark).
+        Each block beneath the readings &mdash; the asset classification, the holding-type and Risk Number
+        tables, the largest positions, single-stock exposure, holdings by account, stress tests, performance,
+        sectors and the rest &mdash; collapses on its bar like every other subsection, and opens and closes
+        with the page's expand and collapse buttons. In <b>Holdings by account</b> each account row carries the
+        account's <b>SEC yield</b>: its holdings' yields weighted by amount, over the holdings that quote one,
+        with a note of the share of the account they cover when some do not.</p>
 
       <p>The proposal and its reading are saved with the case. <span class="ui">Clear</span> removes them. The
         extracted text sits in the <i>Report text</i> box beneath for checking; <span class="ui">Read the text
@@ -13942,9 +13948,10 @@
       + D.largest.map(function(p){ return '<tr><td>' + esc(p.name) + (p.acct ? ' <small style="color:var(--muted)">' + esc(p.acct) + '</small>' : '') + '</td><td class="num">' + money(p.amount) + '</td><td class="num">' + pfPct(p.pct) + '</td><td class="num">' + (p.riskNumber != null ? p.riskNumber : '—') + '</td><td class="num">' + p.accounts + '</td></tr>'; }).join('') + '</tbody></table></div>' : '';
     var inter = A.intersection.length ? '<div class="inc-title gap">Single-stock exposure<small>Nitrogen’s stock intersection: held directly and through funds</small></div><div class="tbl-wrap" style="margin-top:8px"><table class="pj-table" style="min-width:520px"><thead><tr><th>Stock</th><th class="num">Risk Number</th><th class="num">Of equities</th><th class="num">Market value</th></tr></thead><tbody>'
       + A.intersection.map(function(x){ return '<tr><td>' + esc(x.ticker + ' · ' + x.name) + '</td><td class="num">' + x.riskNumber + '</td><td class="num">' + pfPct(x.pctEquities) + '</td><td class="num">' + money(x.value) + '</td></tr>'; }).join('') + '</tbody></table></div>' : '';
-    var accts = A.accounts.length ? '<div class="inc-title gap">Holdings by account<small>every account in the proposal, with its holdings</small></div><div class="tbl-scroll" style="margin-top:8px"><table class="pj-table pf-hold"><thead><tr><th>Account / holding</th><th>Type</th><th class="num">Amount</th><th class="num">Of account</th><th class="num">Of portfolio</th><th class="num">SEC yield</th><th class="num">Risk</th><th class="num">GPA</th><th class="num">95% range, 6 months</th></tr></thead><tbody>'
+    var accts = A.accounts.length ? '<div class="inc-title gap">Holdings by account<small>every account in the proposal, with its holdings</small></div><div class="tbl-scroll" style="margin-top:8px"><table class="pj-table pf-hold"><thead><tr><th>Account / holding</th><th>Type</th><th class="num">Amount</th><th class="num">Of account</th><th class="num">Of portfolio</th><th class="num">SEC yield<small>account: weighted by amount</small></th><th class="num">Risk</th><th class="num">GPA</th><th class="num">95% range, 6 months</th></tr></thead><tbody>'
       + A.accounts.map(function(a){
-          return '<tr class="grp"><td><b>' + esc(a.name) + '</b></td><td></td><td class="num"><b>' + money(a.total) + '</b></td><td></td><td class="num">' + (A.value ? pfPct(a.total / A.value * 100) : '') + '</td><td></td><td class="num"><b>' + a.riskNumber + '</b></td><td class="num">' + (a.gpa != null ? a.gpa.toFixed(1) : '') + '</td><td></td></tr>'
+          var Y = pfAcctYield(a);
+          return '<tr class="grp"><td><b>' + esc(a.name) + '</b></td><td></td><td class="num"><b>' + money(a.total) + '</b></td><td></td><td class="num">' + (A.value ? pfPct(a.total / A.value * 100) : '') + '</td><td class="num">' + (Y ? '<b>' + pfPct(Y.yield, false, 2) + '</b>' + (Y.cover < 0.995 ? '<small style="display:block;color:var(--muted)">on ' + Math.round(Y.cover * 100) + '% of the account</small>' : '') : '') + '</td><td class="num"><b>' + a.riskNumber + '</b></td><td class="num">' + (a.gpa != null ? a.gpa.toFixed(1) : '') + '</td><td></td></tr>'
             + a.holdings.map(function(h){ return '<tr><td class="pf-h">' + (h.ticker ? '<b>' + esc(h.ticker) + '</b> · ' : '') + esc(h.name) + (h.proxy ? ' <small>proxy ' + esc(h.proxy) + '</small>' : '') + '</td><td>' + esc(h.type || '') + '</td><td class="num">' + money(h.amount) + '</td><td class="num">' + pfPct(h.pctAccount) + '</td><td class="num">' + pfPct(h.pctPortfolio, false, 2) + '</td><td class="num">' + (h.yield != null ? pfPct(h.yield, false, 2) : '—') + '</td><td class="num">' + (h.riskNumber != null ? h.riskNumber : '—') + '</td><td class="num">' + (h.gpa != null ? h.gpa.toFixed(1) : '—') + '</td><td class="num">' + pfPct(h.range.down, true, 2) + ' | ' + pfPct(h.range.up, true, 2) + '</td></tr>'; }).join('');
         }).join('') + '</tbody></table></div>' : '';
     var stress = A.stress.length ? '<div class="inc-title gap">Stress tests<small>how the portfolio as held would have fared, against the index Nitrogen pairs with each event</small></div><div class="tbl-wrap" style="margin-top:8px"><table class="pj-table" style="min-width:620px"><thead><tr><th>If it happened again</th><th>Period</th><th class="num">Portfolio</th><th class="num">Dollars</th><th>Benchmark</th><th class="num">Benchmark</th></tr></thead><tbody>'
@@ -13960,6 +13967,13 @@
     var div = A.diversification || A.capture ? '<p class="hint" style="margin-top:12px">' + (A.diversification ? 'Diversification: the relationships between the holdings take <b>' + A.diversification.points + ' points</b> off the Risk Number, from ' + A.diversification.from + ' to ' + A.diversification.to + '. ' : '') + (A.capture ? 'Against the ' + esc(A.benchmark ? A.benchmark.name : 'benchmark') + ', the portfolio captures <b>' + pfPct(A.capture.up, false, 2) + '</b> of the upside and <b>' + pfPct(A.capture.down, false, 2) + '</b> of the downside.' : '') + '</p>' : '';
     var head = '<p class="hint" style="margin:0 0 6px"><b>' + esc(portfolio.name) + '</b>' + (A.preparedFor ? ' · prepared for ' + esc(A.preparedFor) : '') + (A.date ? ' on ' + esc(A.date) : '') + ' · ' + (portfolio.src === 'claude' ? 'figures read from the report, summaries written by Claude' : 'read from the report by its labels') + '</p>';
     box.innerHTML = head + tiles + reading + bar + mix + largest + inter + accts + stress + perf + sect + div;
+    initSubHeads(box);   // each block collapses on its bar, like the rest of the page
+  }
+  /* an account's SEC yield: its holdings' yields weighted by amount, over the holdings that quote one; cover is the share of the account they make up */
+  function pfAcctYield(a){
+    var sum = 0, amt = 0, tot = 0;
+    (a.holdings || []).forEach(function(h){ tot += h.amount || 0; if(h.yield != null && h.amount > 0.005){ sum += h.amount * h.yield; amt += h.amount; } });
+    return amt > 0.005 ? {yield:sum / amt, cover:tot > 0.005 ? amt / tot : 1} : null;
   }
 
   function renderRisk(r){
@@ -19337,6 +19351,24 @@
     if(open) window.dispatchEvent(new Event('resize'));
   }
   function isInteractive(t){ return !!(t.closest && t.closest('input,select,textarea,label,a,[data-tgl-skip]')); }
+  /* the subsection bars (.inc-title / .bkt-head) inside root that are not collapsible yet — the page at load, and
+     blocks rendered later, such as the Investment Portfolio proposal */
+  function initSubHeads(root){
+    root.querySelectorAll('.inc-title, .bkt-head').forEach(function(head){
+      if(head.classList.contains('tgl-head')) return;
+      /* a .sub title sits inside the preceding title's body — indented, with a body of its own that ends at the next title of any kind */
+      var sub = head.classList.contains('sub'), body = document.createElement('div'); body.className = 'tgl-body' + (sub ? ' sub' : '');
+      var n = head.nextSibling;
+      while(n){
+        if(n.nodeType === 1 && ((n.classList.contains('inc-title') && (sub || !n.classList.contains('sub'))) || n.classList.contains('bkt-head') || n.hasAttribute('data-tgl-stop'))) break;
+        var next = n.nextSibling; body.appendChild(n); n = next;
+      }
+      head.parentNode.insertBefore(body, head.nextSibling);
+      head.insertBefore(tglBtn(false), head.firstChild);
+      head.classList.add('tgl-head', 'closed');
+      head.addEventListener('click', function(e){ if(isInteractive(e.target)) return; headOpen(head, head.classList.contains('closed')); });
+    });
+  }
   function initCollapsibles(){
     document.querySelectorAll('section').forEach(function(sec){
       var head = sec.querySelector('.sec-head');
@@ -19350,19 +19382,7 @@
       sec.classList.add('closed');
       head.addEventListener('click', function(){ secOpen(sec, sec.classList.contains('closed')); });
     });
-    document.querySelectorAll('.inc-title, .bkt-head').forEach(function(head){
-      /* a .sub title sits inside the preceding title's body — indented, with a body of its own that ends at the next title of any kind */
-      var sub = head.classList.contains('sub'), body = document.createElement('div'); body.className = 'tgl-body' + (sub ? ' sub' : '');
-      var n = head.nextSibling;
-      while(n){
-        if(n.nodeType === 1 && ((n.classList.contains('inc-title') && (sub || !n.classList.contains('sub'))) || n.classList.contains('bkt-head') || n.hasAttribute('data-tgl-stop'))) break;
-        var next = n.nextSibling; body.appendChild(n); n = next;
-      }
-      head.parentNode.insertBefore(body, head.nextSibling);
-      head.insertBefore(tglBtn(false), head.firstChild);
-      head.classList.add('tgl-head', 'closed');
-      head.addEventListener('click', function(e){ if(isInteractive(e.target)) return; headOpen(head, head.classList.contains('closed')); });
-    });
+    initSubHeads(document);
     document.querySelectorAll('[data-tgl]').forEach(function(el){
       var head = document.createElement('div'); head.className = 'tgl-head tbl-head closed';
       var named = el.getAttribute('data-tgl-btn');
