@@ -1926,7 +1926,10 @@
             pays the rate on its value each year as annuity income and does not grow; at its maturity
             date the interest stops and the money is market money in its level from then on, at the
             level's rate and exposed to the stress test; before maturity it keeps earning its rate in
-            the bad years. A <b>variable
+            the bad years. A MYGA marked <b>Stay as is</b> is different after maturity: it renews with
+            its carrier at half its pre-maturity rate (half the typed rate, or half the plan rate when
+            none is typed), still a fixed product that takes no loss in the bad years &mdash; in the
+            status quo and the plan alike. A <b>variable
             annuity</b> is market money: it grows at the plan rate less its fees and takes the full
             stress loss. A <b>growth FIA</b> grows at the plan rate up to its cap, and sits at zero
             in a bad year. A <b>RILA</b> grows at the plan rate up to its cap, and in a bad year loses
@@ -4201,7 +4204,11 @@
   function mygaMatured(a, t){ var x = a.ann || {}; if(a.pos !== 'MYGA Annuity' || !x.maturity || t == null) return false; var m = planYears(x.maturity); return m != null && t >= m; }
   function acctGrowth(a, dflt, t){
     var x = a.ann || {}, g = (a.growth != null) ? a.growth : dflt;
-    if(a.pos === 'MYGA Annuity'){ if(mygaMatured(a, t)) return g; return x.interest === 'taken' ? 0 : (x.rate != null ? x.rate : g); }   // after maturity: market money at the level's rate
+    if(a.pos === 'MYGA Annuity'){
+      var pre = x.rate != null ? x.rate : g;
+      if(mygaMatured(a, t)) return a.move === 'no' ? pre * 0.5 : g;   // after maturity: a contract marked Stay as is renews at half its rate; one in the plan is market money at the level's rate
+      return x.interest === 'taken' ? 0 : pre;
+    }
     if(a.pos === 'Variable Annuity') return g - (x.fees || 0);
     if(a.pos === 'Growth Annuity (FIA)' || a.pos === 'RILA Annuity') return x.cap != null ? Math.min(g, x.cap) : g;
     return g;
@@ -4211,7 +4218,7 @@
      credits nothing and loses nothing; a RILA loses no more than its floor. */
   function acctStressReturn(a, loss, dflt, t, mc){
     var x = a.ann || {};
-    if(a.pos === 'MYGA Annuity') return mygaMatured(a, t) ? loss : acctGrowth(a, dflt, t);
+    if(a.pos === 'MYGA Annuity') return (mygaMatured(a, t) && a.move !== 'no') ? loss : acctGrowth(a, dflt, t);   // a held contract stays a fixed product after maturity
     if(a.pos === 'Growth Annuity (FIA)' || a.pos === 'Income Annuity (FIA)' || a.pos === 'Cash') return mc ? acctGrowth(a, dflt, t) : 0;   // in a Monte Carlo year a protected position earns its own rate
     if(a.pos === 'RILA Annuity') return x.floor != null ? Math.max(loss, -Math.abs(x.floor)) : loss;
     return loss;
@@ -13386,7 +13393,7 @@
     });
   }
 
-  window.__rfb = Object.assign(window.__rfb || {}, {taxLast:function(){ return taxLast; }, caseData:function(){ return caseData(); }, ltcPools:function(mode){ return ltcPools(compute(), mode); }, fedTax:function(){ return fedTax.apply(null, arguments); }, pdfLayoutText:pdfLayoutText, propParse:function(p){ return propParse(p); }, propDerived:function(a){ return propDerived(a); }, propSummaries:function(a, d){ return propSummaries(a, d); }, canAskClaude:function(){ return canAskClaude(); }, nitroPerf:function(pg){ return nitroPerf(pg); }, askClaudeJson:function(q){ return askClaudeJson(q); }, compute:function(){ return compute(); }, projectTax:function(r, o){ return projectTax(r, o); }, accounts:function(){ return accounts; }});   // for the test scripts
+  window.__rfb = Object.assign(window.__rfb || {}, {taxLast:function(){ return taxLast; }, caseData:function(){ return caseData(); }, ltcPools:function(mode){ return ltcPools(compute(), mode); }, acctGrowth:function(id, dflt, t){ return acctGrowth(acctById(id), dflt, t); }, acctStressReturn:function(id, loss, dflt, t){ return acctStressReturn(acctById(id), loss, dflt, t); }, sqTotals:function(){ var X = statusQuoRun(compute()); return X.rows.map(function(x){ return {year:x.year, total:x.layers.total}; }); }, fedTax:function(){ return fedTax.apply(null, arguments); }, pdfLayoutText:pdfLayoutText, propParse:function(p){ return propParse(p); }, propDerived:function(a){ return propDerived(a); }, propSummaries:function(a, d){ return propSummaries(a, d); }, canAskClaude:function(){ return canAskClaude(); }, nitroPerf:function(pg){ return nitroPerf(pg); }, askClaudeJson:function(q){ return askClaudeJson(q); }, compute:function(){ return compute(); }, projectTax:function(r, o){ return projectTax(r, o); }, accounts:function(){ return accounts; }});   // for the test scripts
   /* ---- reading the figures out of the text ---- */
   function nitroNum(s){ var v = parseFloat(String(s).replace(/\u2212/g, '-').replace(/[^0-9.\-]/g, '')); return isFinite(v) ? v : null; }
   /* text out of a PDF carries kerning breaks ("V anguard", "GP A") and letter-spaced headings ("A l l o c a t i o n") */
@@ -14879,7 +14886,7 @@
     var n = rows.length, inc = rows.filter(isIncomeAnn).length;
     $('anxMsg').textContent = !n ? ''
       : n + ' annuity contract' + (n === 1 ? '' : 's') + (inc ? ' \u00b7 ' + inc + ' income annuit' + (inc === 1 ? 'y' : 'ies') + ' in force, counted in the Foundation and left with the carrier' : '') + '. Company follows the custodian until typed. '
-        + 'The projections follow these cells: an income annuity is always Foundation, paying its monthly income (for the owner\u2019s life, or to the end of plan when joint) while its value falls as it pays; a MYGA grows at its rate, or pays the rate as income with no growth when the interest is taken, until its maturity date, after which it is market money at its level\u2019s rate; a variable annuity grows at the plan rate less its fees; a growth FIA and a RILA grow at the plan rate up to the cap. In the bad-years stress test a MYGA, a growth FIA and an income annuity lose nothing and a RILA loses no more than its floor.';
+        + 'The projections follow these cells: an income annuity is always Foundation, paying its monthly income (for the owner\u2019s life, or to the end of plan when joint) while its value falls as it pays; a MYGA grows at its rate, or pays the rate as income with no growth when the interest is taken, until its maturity date, after which it is market money at its level\u2019s rate \u2014 or, marked Stay as is, renews at half its rate and keeps clear of the bad years; a variable annuity grows at the plan rate less its fees; a growth FIA and a RILA grow at the plan rate up to the cap. In the bad-years stress test a MYGA, a growth FIA and an income annuity lose nothing and a RILA loses no more than its floor.';
   }
   function anxFor(el){
     var tr = el.closest('tr[data-anx]'); if(!tr) return null;
