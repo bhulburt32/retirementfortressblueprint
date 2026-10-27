@@ -3167,10 +3167,12 @@
         household's comfort zone, what the stress tests show, and how it compares with the benchmark).
         Each block beneath the readings &mdash; the asset classification, the holding-type and Risk Number
         tables, the largest positions, single-stock exposure, holdings by account, stress tests, performance,
-        sectors and the rest &mdash; collapses on its bar like every other subsection, and opens and closes
-        with the page's expand and collapse buttons. In <b>Holdings by account</b> each account row carries the
+        sectors and the rest &mdash; collapses on its gold bar like every other output subsection, and opens
+        and closes with the page's expand and collapse buttons. In <b>Holdings by account</b> each account row carries the
         account's <b>SEC yield</b>: its holdings' yields weighted by amount, over the holdings that quote one,
-        with a note of the share of the account they cover when some do not.</p>
+        with a note of the share of the account they cover when some do not. The <b>Portfolio total</b> row at
+        the foot of that table, and the <b>SEC yield</b> tile among the summary tiles, give the same figure for
+        the whole portfolio, with the income it means in dollars a year.</p>
 
       <p>The proposal and its reading are saved with the case. <span class="ui">Clear</span> removes them. The
         extracted text sits in the <i>Report text</i> box beneath for checking; <span class="ui">Read the text
@@ -3629,7 +3631,9 @@
         what the stress leaves at the end of plan against the base case, or, when the accounts run out,
         how many years earlier than the base case they do (green when a run ends ahead). The care-event
         tiles in sections&nbsp;06 and&nbsp;19 carry the same tile against the projection without a care
-        event, and the section&nbsp;06 stress tests against the status quo.</p>
+        event, and the section&nbsp;06 stress tests against the status quo. Each test sits under a gold bar
+        that collapses like any subsection &mdash; the Monte Carlo analysis and the care-event block too
+        &mdash; and whatever you open stays open as the page re-renders.</p>
       <dl class="fields">
         <dt>Sequence of returns risk</dt>
         <dd>The Walls earn &minus;8% and the Roof &minus;16% a year in the first three years of full
@@ -3701,8 +3705,7 @@
       <p class="hint" id="sensLead" style="margin:0"></p>
       <div id="sens"></div>
       <div class="ltc-scn" id="mcBox">
-        <h4>Monte Carlo analysis</h4>
-        <p class="scn-sub" id="mcSub">The section 18 projection run many times with random market returns each year, everything else unchanged.</p>
+        <div class="inc-title gold" data-head="gold">Monte Carlo analysis<small class="scn-sub" id="mcSub">The section 18 projection run many times with random market returns each year, everything else unchanged.</small></div>
         <div class="mc-ctrl">
           <label class="f"><span>Trials</span><select id="mcTrials"><option value="100">100</option><option value="250">250</option><option value="500">500</option><option value="1000">1,000</option><option value="2000">2,000</option></select></label>
           <label class="f"><span>Walls volatility<small>standard deviation of the yearly return</small></span><input id="mcVolW" inputmode="decimal" autocomplete="off"></label>
@@ -3715,7 +3718,7 @@
         <div id="mcOut"></div>
       </div>
       <div class="ltc-lead">
-        <h3>If a long term care event occurs</h3>
+        <div class="inc-title gold" data-head="gold">If a long term care event occurs<small>the care-event projections under the plan</small></div>
         <p class="hint" id="assetLtcLead" style="margin:0"></p>
         <div id="assetLtc"></div>
       </div>
@@ -3852,7 +3855,14 @@
             assets (and the same with a long term care event), the three stress tests &mdash; a full page each
             for the bad start to retirement, the Social Security cut and higher inflation &mdash; the
             ending positions (the transfer sequence itself prints in the appendix), the asset map (<i>Where Each
-            Account Ends Up</i>, at most seven accounts to a page), then how the picture improves, what it
+            Account Ends Up</i>, at most seven accounts to a page), then how the picture improves (<i>How Your
+            Situation Improves</i>, the current course against the Fortress line by line, including the
+            <b>Portfolio Risk Number</b>: before is the current portfolio's number as Nitrogen reports it
+            &mdash; the section&nbsp;16 proposal, else the section&nbsp;12 Wealth Report, else the risk score
+            typed in section&nbsp;12 &mdash; and after is an Alto approximation, each Fortress layer at a Risk
+            Number of its own weighted by the money it holds: the Roof at 75, the Walls at 35, the Foundation,
+            Moat and liquidity buffer at 1, accounts that stay as they are at the current number; confirm the
+            official figure in Nitrogen before the portfolio is built), what it
             costs, working with Alto and the moving parts. A <b>Contents</b> page with page numbers follows the cover, and an <b>Appendix Contents</b> page, grouped by part, opens the appendix &mdash; after the closing page &mdash; carrying the
             detailed monthly budget when one is completed, then the
             personal cash flow statement from section&nbsp;18 as printed tables: income by source, then the
@@ -4028,7 +4038,12 @@
       <p>Press <span class="ui">Download case file</span>: a text file named for the household and
         today's date saves to your computer, carrying the household, every account, the budget, the
         three scenarios and any transfers you adjusted by hand. File it with the client's records (Box,
-        the CRM). To pick it back up, press <span class="ui">Upload case file</span> and choose it.</p>
+        the CRM). To pick it back up, press <span class="ui">Upload case file</span> and choose it.
+        The <span class="ui">Save</span> button on every section header does the same without the trip
+        to this section: on Alto's site it saves the case to the server under your name (the first save
+        of a new case creates it, later saves update it; a case shared with you asks for
+        <span class="ui">Save as new</span> here instead), on the demo and the desktop file it downloads
+        the case file. A note beside the button says what happened and fades after a few seconds.</p>
       <p><span class="ui">Upload case file</span> opens a case saved in a file &mdash; the download
         above, or its case block kept in a document: a Word document (.docx), a plain text file (.txt) or a .json file. The file can hold
         other text around the block, such as a heading or the date, and the curly quotes Word
@@ -13938,18 +13953,18 @@
       + '<div class="pf-yield"><dt>SEC yield</dt><dd>' + (TY ? pfPct(TY.yield, false, 2) : '—') + '</dd><small>' + (TY ? money(TY.income) + ' a year · every holding weighted by amount' + (TY.cover < 0.995 ? ' · on ' + Math.round(TY.cover * 100) + '% of the portfolio, the rest quotes none' : '') : 'no holding quotes a yield') + '</small></div>'
       + '</div>';
     var reading = '<div class="pf-read"><div><h4>The holdings</h4><p>' + esc(S.holdings || '—') + '</p></div><div><h4>The risk assessment</h4><p>' + esc(S.risk || '—') + '</p></div></div>';
-    var bar = A.allocation && A.allocation.length ? '<div class="inc-title gap">Asset classification<small>' + (A.benchAllocation ? 'the portfolio, with the ' + esc(A.benchmark ? A.benchmark.name : 'benchmark') + ' benchmark beneath' : 'as Nitrogen classifies the holdings') + '</small></div>'
+    var bar = A.allocation && A.allocation.length ? '<div class="inc-title gap gold" data-head="gold">Asset classification<small>' + (A.benchAllocation ? 'the portfolio, with the ' + esc(A.benchmark ? A.benchmark.name : 'benchmark') + ' benchmark beneath' : 'as Nitrogen classifies the holdings') + '</small></div>'
       + '<div class="pf-bar">' + A.allocation.map(function(a){ return '<i class="c-' + a.cls.toLowerCase() + '" style="width:' + Math.max(0, a.pct) + '%" title="' + esc(a.cls) + ' ' + pfPct(a.pct) + '"></i>'; }).join('') + '</div>'
       + '<div class="pf-key">' + A.allocation.map(function(a){ var b = (A.benchAllocation || []).filter(function(x){ return x.cls === a.cls; })[0]; return '<span><i class="c-' + a.cls.toLowerCase() + '"></i>' + esc(a.cls) + ' <b>' + pfPct(a.pct) + '</b>' + (b ? ' <small>vs ' + pfPct(b.pct) + '</small>' : '') + '</span>'; }).join('') + '</div>' : '';
-    var mix = D.byType.length ? '<div class="pf-two"><div><div class="inc-title gap">By holding type</div><table class="pj-table" style="min-width:300px"><thead><tr><th>Type</th><th class="num">Amount</th><th class="num">Share</th></tr></thead><tbody>'
+    var mix = D.byType.length ? '<div class="pf-two"><div><div class="inc-title gap gold" data-head="gold">By holding type</div><table class="pj-table" style="min-width:300px"><thead><tr><th>Type</th><th class="num">Amount</th><th class="num">Share</th></tr></thead><tbody>'
       + D.byType.map(function(t){ return '<tr><td>' + esc(t.name) + '</td><td class="num">' + money(t.amount) + '</td><td class="num">' + pfPct(t.pct) + '</td></tr>'; }).join('') + '</tbody></table></div>'
-      + '<div><div class="inc-title gap">By Risk Number<small>of each holding</small></div><table class="pj-table" style="min-width:300px"><thead><tr><th>Risk Number</th><th class="num">Amount</th><th class="num">Share</th></tr></thead><tbody>'
+      + '<div><div class="inc-title gap gold" data-head="gold">By Risk Number<small>of each holding</small></div><table class="pj-table" style="min-width:300px"><thead><tr><th>Risk Number</th><th class="num">Amount</th><th class="num">Share</th></tr></thead><tbody>'
       + D.byRisk.map(function(t){ return '<tr><td>' + esc(t.band) + '</td><td class="num">' + money(t.amount) + '</td><td class="num">' + pfPct(t.pct) + '</td></tr>'; }).join('') + '</tbody></table></div></div>' : '';
-    var largest = D.largest.length ? '<div class="inc-title gap">Largest positions<small>combined across accounts, cash aside</small></div><div class="tbl-wrap" style="margin-top:8px"><table class="pj-table" style="min-width:560px"><thead><tr><th>Holding</th><th class="num">Amount</th><th class="num">Of portfolio</th><th class="num">Risk Number</th><th class="num">Accounts</th></tr></thead><tbody>'
+    var largest = D.largest.length ? '<div class="inc-title gap gold" data-head="gold">Largest positions<small>combined across accounts, cash aside</small></div><div class="tbl-wrap" style="margin-top:8px"><table class="pj-table" style="min-width:560px"><thead><tr><th>Holding</th><th class="num">Amount</th><th class="num">Of portfolio</th><th class="num">Risk Number</th><th class="num">Accounts</th></tr></thead><tbody>'
       + D.largest.map(function(p){ return '<tr><td>' + esc(p.name) + (p.acct ? ' <small style="color:var(--muted)">' + esc(p.acct) + '</small>' : '') + '</td><td class="num">' + money(p.amount) + '</td><td class="num">' + pfPct(p.pct) + '</td><td class="num">' + (p.riskNumber != null ? p.riskNumber : '—') + '</td><td class="num">' + p.accounts + '</td></tr>'; }).join('') + '</tbody></table></div>' : '';
-    var inter = A.intersection.length ? '<div class="inc-title gap">Single-stock exposure<small>Nitrogen’s stock intersection: held directly and through funds</small></div><div class="tbl-wrap" style="margin-top:8px"><table class="pj-table" style="min-width:520px"><thead><tr><th>Stock</th><th class="num">Risk Number</th><th class="num">Of equities</th><th class="num">Market value</th></tr></thead><tbody>'
+    var inter = A.intersection.length ? '<div class="inc-title gap gold" data-head="gold">Single-stock exposure<small>Nitrogen’s stock intersection: held directly and through funds</small></div><div class="tbl-wrap" style="margin-top:8px"><table class="pj-table" style="min-width:520px"><thead><tr><th>Stock</th><th class="num">Risk Number</th><th class="num">Of equities</th><th class="num">Market value</th></tr></thead><tbody>'
       + A.intersection.map(function(x){ return '<tr><td>' + esc(x.ticker + ' · ' + x.name) + '</td><td class="num">' + x.riskNumber + '</td><td class="num">' + pfPct(x.pctEquities) + '</td><td class="num">' + money(x.value) + '</td></tr>'; }).join('') + '</tbody></table></div>' : '';
-    var accts = A.accounts.length ? '<div class="inc-title gap">Holdings by account<small>every account in the proposal, with its holdings</small></div><div class="tbl-scroll" style="margin-top:8px"><table class="pj-table pf-hold"><thead><tr><th>Account / holding</th><th>Type</th><th class="num">Amount</th><th class="num">Of account</th><th class="num">Of portfolio</th><th class="num">SEC yield<small style="display:block;font-weight:normal;letter-spacing:0;text-transform:none">account and total: weighted by amount</small></th><th class="num">Risk</th><th class="num">GPA</th><th class="num">95% range, 6 months</th></tr></thead><tbody>'
+    var accts = A.accounts.length ? '<div class="inc-title gap gold" data-head="gold">Holdings by account<small>every account in the proposal, with its holdings</small></div><div class="tbl-scroll" style="margin-top:8px"><table class="pj-table pf-hold"><thead><tr><th>Account / holding</th><th>Type</th><th class="num">Amount</th><th class="num">Of account</th><th class="num">Of portfolio</th><th class="num">SEC yield<small style="display:block;font-weight:normal;letter-spacing:0;text-transform:none">account and total: weighted by amount</small></th><th class="num">Risk</th><th class="num">GPA</th><th class="num">95% range, 6 months</th></tr></thead><tbody>'
       + A.accounts.map(function(a){
           var Y = pfAcctYield(a);
           return '<tr class="grp"><td><b>' + esc(a.name) + '</b></td><td></td><td class="num"><b>' + money(a.total) + '</b></td><td></td><td class="num">' + (A.value ? pfPct(a.total / A.value * 100) : '') + '</td><td class="num">' + (Y ? '<b>' + pfPct(Y.yield, false, 2) + '</b>' + (Y.cover < 0.995 ? '<small style="display:block;color:var(--muted)">on ' + Math.round(Y.cover * 100) + '% of the account</small>' : '') : '') + '</td><td class="num"><b>' + a.riskNumber + '</b></td><td class="num">' + (a.gpa != null ? a.gpa.toFixed(1) : '') + '</td><td></td></tr>'
@@ -13957,15 +13972,15 @@
         }).join('')
       + '<tr class="grp pf-total"><td><b>Portfolio total</b></td><td></td><td class="num"><b>' + money(A.value || D.total) + '</b></td><td></td><td class="num">' + (A.value ? pfPct(D.total / A.value * 100) : '') + '</td><td class="num">' + (TY ? '<b>' + pfPct(TY.yield, false, 2) + '</b>' + (TY.cover < 0.995 ? '<small style="display:block;color:var(--muted)">on ' + Math.round(TY.cover * 100) + '% of the portfolio</small>' : '') : '') + '</td><td class="num"><b>' + (A.riskNumber != null ? A.riskNumber : '') + '</b></td><td class="num">' + (A.gpa != null ? A.gpa.toFixed(1) : '') + '</td><td></td></tr>'
       + '</tbody></table></div>' : '';
-    var stress = A.stress.length ? '<div class="inc-title gap">Stress tests<small>how the portfolio as held would have fared, against the index Nitrogen pairs with each event</small></div><div class="tbl-wrap" style="margin-top:8px"><table class="pj-table" style="min-width:620px"><thead><tr><th>If it happened again</th><th>Period</th><th class="num">Portfolio</th><th class="num">Dollars</th><th>Benchmark</th><th class="num">Benchmark</th></tr></thead><tbody>'
+    var stress = A.stress.length ? '<div class="inc-title gap gold" data-head="gold">Stress tests<small>how the portfolio as held would have fared, against the index Nitrogen pairs with each event</small></div><div class="tbl-wrap" style="margin-top:8px"><table class="pj-table" style="min-width:620px"><thead><tr><th>If it happened again</th><th>Period</th><th class="num">Portfolio</th><th class="num">Dollars</th><th>Benchmark</th><th class="num">Benchmark</th></tr></thead><tbody>'
       + A.stress.map(function(t){ return '<tr><td>' + esc(t.name) + '</td><td>' + esc(t.period || '') + '</td><td class="num"' + (t.pct < 0 ? ' style="color:var(--st-alert)"' : '') + '>' + pfPct(t.pct, true, 2) + '</td><td class="num">' + pfMoneyS(t.dollars) + '</td><td>' + esc(t.benchmark || '') + (t.extra ? ' / ' + esc(t.extra.name) : '') + '</td><td class="num">' + pfPct(t.benchPct, true, 2) + (t.extra && t.extra.pct != null ? ' / ' + pfPct(t.extra.pct, true, 2) : '') + '</td></tr>'; }).join('') + '</tbody></table></div>' : '';
     var PERF = [['beta', 'Beta'], ['r2', 'R²'], ['sharpe', 'Sharpe ratio'], ['sortino', 'Sortino ratio'], ['stdev', 'Standard deviation', '%'], ['drawdown', 'Drawdown', '%'], ['totalReturn', 'Total return', '%'], ['modeled', 'Modeled performance', '%'], ['midpoint', 'Annual range midpoint', '%'], ['romad', 'Return over max drawdown'], ['gainToPain', 'Gain to pain'], ['illustrated', 'Illustrated', '%']];
     var perfRows = PERF.filter(function(k){ return A.perf[k[0]]; });
-    var perf = perfRows.length || A.trailing ? '<div class="pf-two"><div><div class="inc-title gap">Performance statistics<small>' + esc(A.perfPeriod || 'three years') + (A.benchmark ? ' · benchmark ' + esc(A.benchmark.name) : '') + '</small></div><table class="pj-table" style="min-width:320px"><thead><tr><th>Statistic</th><th class="num">Portfolio</th><th class="num">Benchmark</th></tr></thead><tbody>'
+    var perf = perfRows.length || A.trailing ? '<div class="pf-two"><div><div class="inc-title gap gold" data-head="gold">Performance statistics<small>' + esc(A.perfPeriod || 'three years') + (A.benchmark ? ' · benchmark ' + esc(A.benchmark.name) : '') + '</small></div><table class="pj-table" style="min-width:320px"><thead><tr><th>Statistic</th><th class="num">Portfolio</th><th class="num">Benchmark</th></tr></thead><tbody>'
       + perfRows.map(function(k){ var v = A.perf[k[0]], f = function(x){ return x == null ? '—' : k[2] ? pfPct(x, false, 2) : String(x); }; return '<tr><td>' + k[1] + '</td><td class="num">' + f(v.p) + '</td><td class="num">' + f(v.b) + '</td></tr>'; }).join('') + '</tbody></table></div>'
-      + (A.trailing ? '<div><div class="inc-title gap">Trailing returns<small>portfolio ' + pfPct(A.trailing.portfolio.illustrated, false, 1) + ' illustrated</small></div><table class="pj-table" style="min-width:320px"><thead><tr><th>Period</th><th class="num">Portfolio</th><th class="num">Benchmark</th></tr></thead><tbody>'
+      + (A.trailing ? '<div><div class="inc-title gap gold" data-head="gold">Trailing returns<small>portfolio ' + pfPct(A.trailing.portfolio.illustrated, false, 1) + ' illustrated</small></div><table class="pj-table" style="min-width:320px"><thead><tr><th>Period</th><th class="num">Portfolio</th><th class="num">Benchmark</th></tr></thead><tbody>'
         + A.trailing.periods.map(function(p, k){ return '<tr><td>' + esc(p.replace(/\s+/g, ' ').toLowerCase()) + '</td><td class="num">' + pfPct(A.trailing.portfolio.values[k], true, 2) + '</td><td class="num">' + (A.trailing.benchmark ? pfPct(A.trailing.benchmark.values[k], true, 2) : '—') + '</td></tr>'; }).join('') + '</tbody></table></div>' : '<div></div>') + '</div>' : '';
-    var threeCol = function(title, sub, rows, nameHead){ return rows.length ? '<div><div class="inc-title gap">' + title + (sub ? '<small>' + sub + '</small>' : '') + '</div><table class="pj-table" style="min-width:260px"><thead><tr><th>' + nameHead + '</th><th class="num">Portfolio</th><th class="num">Benchmark</th></tr></thead><tbody>' + rows.map(function(r){ return '<tr><td' + (r.sub ? ' style="padding-left:22px;color:var(--muted)"' : '') + '>' + esc(r.name) + '</td><td class="num">' + pfPct(r.pct, false, 2) + '</td><td class="num">' + pfPct(r.bench, false, 2) + '</td></tr>'; }).join('') + '</tbody></table></div>' : ''; };
+    var threeCol = function(title, sub, rows, nameHead){ return rows.length ? '<div><div class="inc-title gap gold" data-head="gold">' + title + (sub ? '<small>' + sub + '</small>' : '') + '</div><table class="pj-table" style="min-width:260px"><thead><tr><th>' + nameHead + '</th><th class="num">Portfolio</th><th class="num">Benchmark</th></tr></thead><tbody>' + rows.map(function(r){ return '<tr><td' + (r.sub ? ' style="padding-left:22px;color:var(--muted)"' : '') + '>' + esc(r.name) + '</td><td class="num">' + pfPct(r.pct, false, 2) + '</td><td class="num">' + pfPct(r.bench, false, 2) + '</td></tr>'; }).join('') + '</tbody></table></div>' : ''; };
     var sect = (A.sectors.length || A.regions.length || A.cap.length) ? '<div class="pf-three">' + threeCol('Equity sectors', A.equityPct != null ? pfPct(A.equityPct) + ' of the portfolio in equities' : '', A.sectors, 'Sector') + threeCol('Regions', '', A.regions, 'Region') + threeCol('Size and style', A.duration ? 'bonds: duration ' + esc(A.duration) + ', maturity ' + esc(A.maturity || '') : '', A.cap.concat(A.style), 'Equities') + '</div>' : '';
     var div = A.diversification || A.capture ? '<p class="hint" style="margin-top:12px">' + (A.diversification ? 'Diversification: the relationships between the holdings take <b>' + A.diversification.points + ' points</b> off the Risk Number, from ' + A.diversification.from + ' to ' + A.diversification.to + '. ' : '') + (A.capture ? 'Against the ' + esc(A.benchmark ? A.benchmark.name : 'benchmark') + ', the portfolio captures <b>' + pfPct(A.capture.up, false, 2) + '</b> of the upside and <b>' + pfPct(A.capture.down, false, 2) + '</b> of the downside.' : '') + '</p>' : '';
     var head = '<p class="hint" style="margin:0 0 6px"><b>' + esc(portfolio.name) + '</b>' + (A.preparedFor ? ' · prepared for ' + esc(A.preparedFor) : '') + (A.date ? ' on ' + esc(A.date) : '') + ' · ' + (portfolio.src === 'claude' ? 'figures read from the report, summaries written by Claude' : 'read from the report by its labels') + '</p>';
@@ -14012,6 +14027,22 @@
         + '<input type="text" data-ck="text" value="' + esc(c.text) + '" placeholder="Describe the risk" autocomplete="off">'
         + '<button type="button" class="row-x" data-cdel aria-label="Remove">&times;</button></div>';
     }).join('') : '<div class="risk-empty">None added.</div>';
+  }
+  /* The portfolio's Risk Number before and after the plan, for the comparison slide. Before is the current portfolio's
+     number as Nitrogen reports it (the section 16 proposal, else the section 12 Wealth Report, else the typed risk score).
+     After is an Alto approximation: each Fortress layer at a Risk Number of its own, weighted by the money it holds —
+     the Roof at 75 (an equity sleeve), the Walls at 35 (income-paying investments), the Foundation, Moat and liquidity
+     buffer at 1 (annuities, care contracts and cash), accounts that stay as they are at the current number. Confirm the
+     official Risk Number in Nitrogen before building the portfolio. */
+  var PLAN_RN = {roof:75, walls:35, foundation:1, moat:1, reserve:1};
+  function planRiskNumbers(r, f){
+    var before = portfolio && portfolio.analysis && portfolio.analysis.riskNumber != null ? portfolio.analysis.riskNumber
+      : nitro && nitro.analysis && nitro.analysis.riskNumber != null ? nitro.analysis.riskNumber
+      : ($('riskScore').value.trim() !== '' && f.score > 0) ? f.score : null;
+    var F = r.funded || {}, sum = 0, amt = 0;
+    Object.keys(PLAN_RN).forEach(function(k){ var v = Math.max(0, F[k] || 0); sum += v * PLAN_RN[k]; amt += v; });
+    var stay = Math.max(0, F.inplace || 0); if(stay > 0.5 && before != null){ sum += stay * before; amt += stay; }
+    return {before:before, after:amt > 0.5 ? Math.max(1, Math.min(99, Math.round(sum / amt))) : null, tol:f.tol > 0 && $('riskTol').value.trim() !== '' ? f.tol : null};
   }
   function riskSummary(r){
     var f = riskFacts(r), tmp = document.createElement('div');
@@ -17453,6 +17484,7 @@
       + '<div><dt>' + (dep ? 'Accounts run out' : 'At end of plan') + '</dt><dd>' + (dep ? dep.year : money(RUN.last.layers.total)) + '</dd><small>' + (dep ? 'age ' + dep.ages.join(' / ') + (RUN.baseDep ? ' (vs ' + RUN.baseDep.year + ' in the base case)' : ' — the base case lasts to ' + RUN.baseLast.year) : 'vs ' + money(RUN.baseLast.layers.total) + ' in the base case') + '</small></div>';
     return tiles;
   }
+  var SENS_OPEN = {};   // section 19: which stress tests are open, by block id, across re-renders
   function renderSensitivity(r, baseX, mode){
     var sq = mode === 'sq', pfx = sq ? 'sqSens' : 'sens';
     var box = $(sq ? 'sqSens' : 'sens'), lead = $(sq ? 'sqSensLead' : 'sensLead'); if(!box) return;
@@ -17465,9 +17497,11 @@
     lead.innerHTML = sq
       ? 'The projection above \u2014 the accounts as they stand, no plan applied \u2014 run again under the same three stresses as section 19, one at a time: three bad market years at the start of retirement (the market money takes the Roof\u2019s bad years where it sits), a Social Security cut, and higher inflation. The dashed line in each chart is the projection above.'
       : 'The section 18 projection for <b>' + esc(scnNames[activeScn]) + '</b> run again under three stresses, one at a time, everything else unchanged. The dashed line in each chart is the base case above.';
+    if(!sq) box.querySelectorAll('.inc-title').forEach(function(h){ SENS_OPEN[h.getAttribute('data-key')] = !h.classList.contains('closed'); });   // remember what is open before the re-render
     box.innerHTML = defs.map(function(d){
       var id = pfx + d.key;
-      return '<div class="ltc-scn" id="' + id + 'Box"><h4>' + esc(d.title) + '</h4><p class="scn-sub">' + esc(d.sub) + '</p>'
+      return '<div class="ltc-scn" id="' + id + 'Box">' + (sq ? '<h4>' + esc(d.title) + '</h4><p class="scn-sub">' + esc(d.sub) + '</p>'
+          : '<div class="inc-title gold" data-head="gold" data-key="' + id + '">' + esc(d.title) + '<small class="scn-sub">' + esc(d.sub) + '</small></div>')
         + '<div class="tax-tiles" id="' + id + 'Tiles"></div><div class="pj-legend" id="' + id + 'Legend"></div>'
         + '<div class="pj-wrap"><svg id="' + id + 'Svg" class="pj" viewBox="0 0 1000 360" role="img" aria-label="Projected assets under the ' + esc(d.title.toLowerCase()) + ' stress"></svg><div id="' + id + 'Tip" class="pj-tip" hidden></div></div>'
         + '<p class="hint" id="' + id + 'Note" style="margin-top:10px"></p></div>';
@@ -17485,6 +17519,7 @@
         + (dep ? '<b>the accounts are exhausted in ' + dep.year + '</b>' + (RUN.baseDep ? ' (vs ' + RUN.baseDep.year + ' in the base case)' : ', where the base case lasts to the end of plan') + ', and Needs and Wants are unfunded from there.'
                : 'the plan ends ' + RUN.last.year + ' with <b>' + money(RUN.last.layers.total) + '</b>, ' + (diff >= 0 ? '+' : '−') + money(Math.abs(diff)) + ' against the base case' + (RUN.tax !== RUN.baseTax ? '; lifetime income tax ' + money(RUN.tax) + ' vs ' + money(RUN.baseTax) : '') + '.');
     });
+    if(!sq){ initSubHeads(box); box.querySelectorAll('.inc-title').forEach(function(h){ if(SENS_OPEN[h.getAttribute('data-key')]) headOpen(h, true); }); }   // each test collapses on its gold bar, as it was before the re-render
   }
   /* ============================================================
      Monte Carlo analysis (section 19). The section 18 projection for the scenario showing, run
@@ -18564,10 +18599,11 @@
     (function(){
       var s = doc.slide(DECK_C.navy); page++;
       frame(s, 'Current course versus your Retirement Fortress', 'How Your Situation Improves', true);
-      var dTot = faLast.layers.total - sqLast.layers.total, dTax = (SQ.lifetime + SQ.lifetimeState) - (TX.lifetime + TX.lifetimeState);
+      var dTot = faLast.layers.total - sqLast.layers.total, dTax = (SQ.lifetime + SQ.lifetimeState) - (TX.lifetime + TX.lifetimeState), RN = planRiskNumbers(r, RF);
       var rows = [
         ['Assets at the end of plan (' + endYear + ')', sqDep ? 'Exhausted ' + sqDep.year : money(sqLast.layers.total), faDep ? 'Exhausted ' + faDep.year : money(faLast.layers.total), (dTot >= 0 ? 'Up ' : 'Down ') + money(Math.abs(dTot))],
         ['Assets exposed to market volatility', marketPct + '%', exposurePlan + '%', fmtKM(protectedAmt) + ' moved to protected income and care contracts'],
+        ['Portfolio Risk Number', RN.before != null ? String(RN.before) : dash, RN.after != null ? String(RN.after) : dash, RN.tol != null ? 'Estimated by layer · your comfort level is ' + RN.tol : 'Estimated by layer, confirmed in Nitrogen'],
         ['Needs covered by income not tied to the market', needsCover + '%', r.funded.foundation + 0.5 >= r.targets.foundation ? '100%' : Math.round(Math.min(1, (guaranteed + r.funded.foundation * r.yF) / i.needs) * 100) + '%', 'The Foundation annuity closes the ' + fmtKM(r.incomeGap) + ' average Needs gap'],
         ['Long-term care benefit in force', money(ltc.people.reduce(function(a, p){ return a + p.covTotal; }, 0)), money(ltcTotalBenefit), contracts.map(function(c){ return ownerLabel(c.owner) + ' ' + fmtKM(c.benefit); }).join(' · ') + (contracts.length ? ', individually owned' : '')],
         ['Life insurance in force', money(life.people.reduce(function(a, p){ return a + p.existing; }, 0)), money(life.people.reduce(function(a, p){ return a + p.existing + p.gap; }, 0)), life.people.filter(function(p){ return p.gap > 0; }).map(function(p){ return p.name + ' +' + fmtKM(p.gap); }).join(' · ') || 'No additional coverage needed'],
@@ -18577,13 +18613,13 @@
       ];
       s.text(8.3, 2.0, 3.6, 0.4, [{runs:[{t:'CURRENT COURSE', sz:16, b:true, color:DECK_C.dkMuted, spc:60}], align:'r'}]);
       s.text(12.1, 2.0, 3.6, 0.4, [{runs:[{t:'YOUR FORTRESS', sz:16, b:true, color:DECK_C.gold, spc:60}], align:'r'}]);
-      rows.forEach(function(rw, k){
-        var y = 2.55 + k * 0.92;
-        s.hline(0.9, y + 0.88, 18.2, '2E4788', 0.5);
-        s.text(0.9, y, 7.2, 0.86, [{runs:[{t:rw[0], sz:16, color:DECK_C.white}]}], {valign:'middle'});
-        s.text(8.3, y, 3.6, 0.86, [{runs:[{t:rw[1], sz:18, color:DECK_C.dkText, font:'Georgia'}], align:'r'}], {valign:'middle'});
-        s.text(12.1, y, 3.6, 0.86, [{runs:[{t:rw[2], sz:18, b:true, color:DECK_C.gold, font:'Georgia'}], align:'r'}], {valign:'middle'});
-        s.text(15.9, y, 3.2, 0.86, [{runs:[{t:rw[3], sz:16, color:DECK_C.dkMuted}]}], {valign:'middle'});
+      rows.forEach(function(rw, k){   // nine rows at 0.82 in: the last ends at 9.9 in, clear of the footer
+        var y = 2.5 + k * 0.82;
+        s.hline(0.9, y + 0.78, 18.2, '2E4788', 0.5);
+        s.text(0.9, y, 7.2, 0.76, [{runs:[{t:rw[0], sz:16, color:DECK_C.white}]}], {valign:'middle'});
+        s.text(8.3, y, 3.6, 0.76, [{runs:[{t:rw[1], sz:18, color:DECK_C.dkText, font:'Georgia'}], align:'r'}], {valign:'middle'});
+        s.text(12.1, y, 3.6, 0.76, [{runs:[{t:rw[2], sz:18, b:true, color:DECK_C.gold, font:'Georgia'}], align:'r'}], {valign:'middle'});
+        s.text(15.9, y, 3.2, 0.76, [{runs:[{t:rw[3], sz:16, color:DECK_C.dkMuted}]}], {valign:'middle'});
       });
     })();
 
