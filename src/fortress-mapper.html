@@ -290,6 +290,8 @@
   table.debt{min-width:960px}
   #annIncTable{min-width:1180px}
   #ltcBenTable{min-width:980px}
+  #holdings th.aum,#holdings td.aum{text-align:center;white-space:nowrap} #holdings th.aum small{display:block;font-weight:400;text-transform:none;letter-spacing:0;font-size:11px}
+  #holdings td.aum label.chk{display:inline-flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer} #holdings td.aum label.chk input{width:18px;height:18px;accent-color:var(--navy)} #holdings td.aum small{font-size:11px;color:var(--muted)}
   #ltcBenTable th small,#annIncTable th small{display:block;font-weight:400;text-transform:none;letter-spacing:0;font-size:11px}
   #ltcBenTable td:first-child{min-width:220px}
   #roofGTable{min-width:820px}
@@ -3764,12 +3766,15 @@
         pages as the accounts need.</p>
       <p>Below the map is where every account lands, plus assets under management and the advisory
         fee. The fee schedule is flat, not marginal — wherever the managed total falls, that band's
-        rate applies to the whole balance. Billable assets are the Walls and Roof only; the cash
-        buffer, the Foundation annuity and the Moat contracts are out, and so is any annuity or life
-        insurance of any kind wherever it sits: a contract marked <b>Stay as is</b> that the waterfall
-        places in the Walls or Roof, a section&nbsp;14 line sent to a contract in force as its To
-        account, or a line placed in a carrier's annuity or life product. Only money in managed
-        portfolios (AUM, cash, CDs) is billable; the fee note names the amount excluded. The <b>weighted average</b>
+        rate applies to the whole balance. Every row in the ending positions carries a <b>Managed
+        AUM</b> tick, and the billable assets are exactly the rows ticked. The tick follows a rule
+        until you set it: a managed portfolio in the Walls or Roof is ticked; the cash buffer, the
+        Foundation annuity, the Moat contracts, a registration held where it is (<b>Stay as is</b>,
+        or the part held back from a partial transfer) and any annuity or life insurance of any kind
+        &mdash; a contract that stays as it is, a section&nbsp;14 line sent to a contract in force as
+        its To account, or a line placed in a carrier's annuity or life product &mdash; are not. Tick
+        or untick any row and the fee follows; the row says <em>default</em> or <em>set</em>, the
+        ticks save with the case, and the fee note names what is left out and what was set by hand. The <b>weighted average</b>
         spreads that same cost across every account the client holds &mdash; accounts held out of the
         plan included &mdash; which is the number a client will ask about.</p>
 
@@ -3813,12 +3818,15 @@
         pages as the accounts need.</p>
       <p>Below the map is where every account lands, plus assets under management and the advisory
         fee. The fee schedule is flat, not marginal — wherever the managed total falls, that band's
-        rate applies to the whole balance. Billable assets are the Walls and Roof only; the cash
-        buffer, the Foundation annuity and the Moat contracts are out, and so is any annuity or life
-        insurance of any kind wherever it sits: a contract marked <b>Stay as is</b> that the waterfall
-        places in the Walls or Roof, a section&nbsp;14 line sent to a contract in force as its To
-        account, or a line placed in a carrier's annuity or life product. Only money in managed
-        portfolios (AUM, cash, CDs) is billable; the fee note names the amount excluded. The <b>weighted average</b>
+        rate applies to the whole balance. Every row in the ending positions carries a <b>Managed
+        AUM</b> tick, and the billable assets are exactly the rows ticked. The tick follows a rule
+        until you set it: a managed portfolio in the Walls or Roof is ticked; the cash buffer, the
+        Foundation annuity, the Moat contracts, a registration held where it is (<b>Stay as is</b>,
+        or the part held back from a partial transfer) and any annuity or life insurance of any kind
+        &mdash; a contract that stays as it is, a section&nbsp;14 line sent to a contract in force as
+        its To account, or a line placed in a carrier's annuity or life product &mdash; are not. Tick
+        or untick any row and the fee follows; the row says <em>default</em> or <em>set</em>, the
+        ticks save with the case, and the fee note names what is left out and what was set by hand. The <b>weighted average</b>
         spreads that same cost across every account the client holds &mdash; accounts held out of the
         plan included &mdash; which is the number a client will ask about.</p>
 
@@ -5807,14 +5815,15 @@
         });
       } catch(e){ ovrLines = {}; }
     }
-    var add = function(d, m, amt){
+    var add = function(d, m, amt, ins){   // ins: the money is an annuity or life insurance contract (never billable)
       if(!regs[d.key]){
-        regs[d.key] = {info:d, total:0, byBucket:{}, sources:{}, srcOrder:[]};
+        regs[d.key] = {info:d, total:0, byBucket:{}, insByBucket:{}, sources:{}, srcOrder:[]};
         order.push(d.key);
       }
       var g = regs[d.key];
       g.total += amt;
       g.byBucket[m.bucket] = (g.byBucket[m.bucket] || 0) + amt;
+      if(ins) g.insByBucket[m.bucket] = (g.insByBucket[m.bucket] || 0) + amt;
       if(!g.sources[m.acct.id]){
         g.sources[m.acct.id] = {acct:m.acct, amt:0};
         g.srcOrder.push(m.acct.id);
@@ -5824,19 +5833,19 @@
     r.moves.forEach(function(m){
       if(!(m.amt > 0.5)) return;
       var d = regFor(m.acct, m.bucket, i, m), lines = ovrLines[m.acct.id + '|' + m.bucket];
-      if(lines && lines.some(function(L){ return ovrOf(L.m, 'to') != null && L.to !== L.d.to; })){
+      if(lines && lines.some(function(L){ return (ovrOf(L.m, 'to') != null && L.to !== L.d.to) || insuranceLine(L); })){
         var tot = lines.reduce(function(a, L){ return a + L.eff; }, 0) || 1;
         lines.forEach(function(L){
           var share = m.amt * L.eff / tot;
           if(ovrOf(L.m, 'to') != null && L.to !== L.d.to){
             var custom = {key:'custom:' + L.to, kind:'custom', custom:true, tax:taxOfTo(L.to, L.d, L.a), owner:effOwner(L.a.owner, i), name:L.to,
                           cust:(L.custOvr || L.d.toAnn) ? L.cust : bucketCustodian(m.bucket, d, i), stay:false, annuity:!!L.d.toAnn};
-            add(custom, m, share);
-          } else add(d, m, share);
+            add(custom, m, share, insuranceLine(L));
+          } else add(d, m, share, insuranceLine(L));
         });
         return;
       }
-      add(d, m, m.amt);
+      add(d, m, m.amt, !!(m.stay && UNMANAGED_POS[m.acct.pos]));
     });
     // stays-in-place first, then IRAs, Roths, after-tax, then accounts the advisor named
     var rank = {stay:0, ltc:1, ira:2, roth:3, nq:4, custom:5};
@@ -7364,15 +7373,12 @@
     return CARRIER_KEYS.some(function(k){ return insuranceCarrier(k) && CARRIER_PRODUCTS[k].indexOf(prod) >= 0; });
   }
   function aumPlan(r){
-    var lines = (adjMoves && typeof lineLedger === 'function') ? lineLedger(r).lines : [];
-    var managed = 0, insured = 0, heldWR = 0;
-    (r.moves || []).forEach(function(m){
-      if(MANAGED_BUCKETS.indexOf(m.bucket) < 0 || !(m.amt > 0.5) || !m.acct) return;
-      if(m.stay || m.acct.move === 'no'){ heldWR += m.amt; if(UNMANAGED_POS[m.acct.pos]) insured += m.amt; return; }   // held where it is: out of the billable base
-      var Ls = lines.filter(function(L){ return L.a && L.a.id === m.acct.id && L.m.bucket === m.bucket && L.eff > 0.5; });
-      var tot = Ls.reduce(function(a, L){ return a + L.eff; }, 0);
-      if(Ls.length && tot > 0.5) Ls.forEach(function(L){ var share = m.amt * L.eff / tot; if(insuranceLine(L)) insured += share; else managed += share; });
-      else managed += m.amt;
+    var managed = 0, insured = 0, heldWR = 0, handOn = 0, handOff = 0;
+    aumRows(r).forEach(function(x){
+      var wr = MANAGED_BUCKETS.indexOf(x.bucket) >= 0;
+      if(x.on){ managed += x.bill; if(!x.dflt) handOn += x.bill; if(wr) insured += x.ins || 0; return; }   // a ticked row bills its managed money only
+      if(x.dflt) handOff += x.bill;
+      if(wr){ insured += x.ins || 0; if(x.stay && !(x.ins > 0.5)) heldWR += x.amt; }
     });
     var held = accounts.reduce(function(s, a){ return s + (a.move === 'no' ? a.val : heldPart(a)); }, 0);
     var current = accounts.reduce(function(s, a){
@@ -7395,7 +7401,7 @@
       managed:managed, current:current, total:total, feeBase:base,
       band:band, pct:band.pct, annual:annual,
       weighted: base > 0.5 ? annual / base : 0,
-      currentBand:feeBandFor(current), held:held, insured:insured, heldWR:heldWR
+      currentBand:feeBandFor(current), held:held, insured:insured, heldWR:heldWR, handOn:handOn, handOff:handOff
     };
   }
   function pctText(p){ return (p * 100).toFixed(2) + '%'; }
@@ -7414,10 +7420,10 @@
     $('feePanel').innerHTML = '<div class="panel">'
       + '<div class="bkt-head">'
       +   '<span class="bkt-name">Assets under management</span>'
-      +   '<span class="bkt-cust">Walls + Roof · billable managed portfolios</span>'
+      +   '<span class="bkt-cust">The registrations ticked Managed AUM above · billable managed portfolios</span>'
       +   '<span class="bkt-total">' + money(f.managed) + '</span></div>'
       + '<dl class="strip" style="margin-top:0">'
-      +   tile('Assets under management', money(f.managed), 'Excludes savings, annuity and life')
+      +   tile('Assets under management', money(f.managed), 'The registrations ticked Managed AUM above')
       +   tile('Advisory fee', pctText(f.pct), f.band.label + ' band, on managed assets')
       +   tile('Weighted average', pctText(f.weighted), 'Same fee across ' + money(f.feeBase) + ' of total assets')
       + '</dl>'
@@ -7425,11 +7431,12 @@
       +   '<th>Total assets managed</th><th class="num">Client fee</th><th></th>'
       + '</tr></thead><tbody>' + rows + '</tbody></table></div></div>'
       + '<p class="fee-note">The schedule is flat, not marginal — the band the total lands in sets the rate on '
-      +   'the whole balance. Billable assets are the managed portfolios only: the '
+      +   'the whole balance. Billable assets are the registrations ticked <b>Managed AUM</b> in the ending positions above — by default the managed portfolios in the Walls and Roof. Unticked by default: the '
       +   money(r.funded.reserve) + ' liquidity buffer, the ' + money(r.funded.foundation)
-      +   ' Foundation annuity and the ' + money(r.funded.moat) + ' Moat contract are excluded. '
-      +   (f.held > 0.5 ? money(f.held) + ' marked <b>Stay as is</b> or held back from a partial transfer is also outside the billable base. ' : '')
-      +   (f.insured > 0.5 ? 'Annuity and life insurance money is never billable, wherever it sits: ' + money(f.insured) + ' in the Walls or Roof \u2014 a contract that stays as it is, a line sent to a contract in force, or a line placed in a carrier\u2019s annuity or life product \u2014 is excluded as well. ' : '')
+      +   ' Foundation annuity and the ' + money(r.funded.moat) + ' Moat contract'
+      +   (f.held > 0.5 ? ', ' + money(f.held) + ' marked <b>Stay as is</b> or held back from a partial transfer' : '')
+      +   (f.insured > 0.5 ? ', and ' + money(f.insured) + ' of annuity or life insurance money in the Walls or Roof (a contract that stays as it is, a line sent to a contract in force, or a line placed in a carrier\u2019s annuity or life product), which is never billable' : '')
+      +   '. ' + (f.handOn > 0.5 ? money(f.handOn) + ' ticked by hand is counted. ' : '') + (f.handOff > 0.5 ? money(f.handOff) + ' unticked by hand is left out. ' : '')
       +   'The <b>weighted average</b> spreads that same cost across every account the client holds — '
       +   money(f.managed) + ' at ' + pctText(f.pct) + ' over ' + money(f.feeBase) + ' of total assets'
       +   (f.held > 0.5 ? ', the ' + money(f.held) + ' held out included' : '')
@@ -8201,22 +8208,31 @@
   function holdingRows(bucket, r){
     var plan = r.plan, out = [];
     if(bucket === 'moat'){
-      return moatContracts(r).map(function(c){
+      out = moatContracts(r).map(function(c){
         return {name:c.name, owner:c.owner, tax:c.tax, cust:c.cust, amt:c.amt,
-                partial:false, stay:false, kind:'ltc', individual:true};
+                partial:false, stay:false, kind:'ltc', individual:true, key:'moat|ltc:' + c.owner, ins:c.amt};
       });
-    }
-    plan.order.forEach(function(k){
+    } else plan.order.forEach(function(k){
       var g = plan.regs[k], amt = g.byBucket[bucket];
       if(!(amt > 0.5)) return;
       out.push({
         name:g.info.name, owner:g.info.owner, tax:g.info.tax,
         cust:bucketCustodian(bucket, g.info, r.inputs),
-        amt:amt, partial:(g.total - amt > 0.5), stay:!!g.info.stay, kind:g.info.kind
+        amt:amt, partial:(g.total - amt > 0.5), stay:!!g.info.stay, kind:g.info.kind,
+        key:aumKeyOf(bucket, g), ins:(g.insByBucket && g.insByBucket[bucket]) || 0
       });
     });
+    out.forEach(function(x){ x.bucket = bucket; x.bill = Math.max(0, x.amt - (x.ins || 0)); x.dflt = MANAGED_BUCKETS.indexOf(bucket) >= 0 && !x.stay && x.bill > 0.5; x.on = aumOn(x); });   // bill: the row's managed money, its annuity or life insurance share aside
     return out.sort(function(a, b){ return b.amt - a.amt; });
   }
+  /* The Managed AUM tick on each ending row (section 21). Blank follows the rule: a managed portfolio in the Walls
+     or Roof is billable; a registration held where it is, an annuity or life insurance contract of any kind, the
+     liquidity buffer, the Foundation annuity and the Moat are not. A tick set by hand is kept with the case, by the
+     level and the registration (a held account by its row in section 06). */
+  var AUM_SET = {};
+  function aumKeyOf(bucket, g){ var k = g.info.key, m = /^stay:(\d+)$/.exec(k); if(m){ k = 'stay:row:' + accounts.map(function(a){ return a.id; }).indexOf(+m[1]); } return bucket + '|' + k; }
+  function aumOn(x){ var v = AUM_SET[x.key]; return v == null ? x.dflt : !!v; }
+  function aumRows(r){ var out = []; if(!r || !r.plan) return out; BKT_ORDER.forEach(function(k){ out = out.concat(holdingRows(k, r)); }); return out; }
 
   function renderHoldings(r){
     var i = r.inputs;
@@ -8240,13 +8256,14 @@
               + '<td><span class="chip plain">'+x.tax+'</span></td>'
               + '<td>'+esc(x.cust)+'</td>'
               + '<td class="num"><b>'+money(x.amt)+'</b></td>'
+              + '<td class="aum"><label class="chk" title="' + (x.on ? 'Counted in the billable assets for the advisory fee' : 'Not billable') + (AUM_SET[x.key] == null ? ' \u2014 following the rule' : ' \u2014 set by hand') + '"><input type="checkbox" data-aum="' + esc(x.key) + '"' + (x.on ? ' checked' : '') + '><small>' + (AUM_SET[x.key] == null ? 'default' : 'set') + (x.on && x.ins > 0.5 ? ' · ' + money(x.bill) + ' billable' : '') + '</small></label></td>'
               + '</tr>';
           }).join('')
-        : '<tr><td colspan="5"><div class="empty-state">Nothing allocated to this level.</div></td></tr>';
+        : '<tr><td colspan="6"><div class="empty-state">Nothing allocated to this level.</div></td></tr>';
 
       var foot = rows.length
         ? '<tfoot><tr><td colspan="4">'+rows.length+' registration'+(rows.length===1?'':'s')+'</td>'
-          + '<td class="num">'+money(total)+'</td></tr></tfoot>'
+          + '<td class="num">'+money(total)+'</td><td class="aum">' + (function(){ var on = rows.filter(function(x){ return x.on; }).reduce(function(s, x){ return s + x.bill; }, 0); return on > 0.5 ? money(on) + ' billable' : ''; })() + '</td></tr></tfoot>'
         : '';
 
       return '<div class="bkt"><div class="panel">'
@@ -8255,7 +8272,7 @@
         +   '<span class="bkt-cust">'+esc(custLabel)+' · '+productFor(k)+'</span>'
         +   '<span class="bkt-total">'+money(total)+'</span></div>'
         + '<div class="step-body"><div class="tbl-scroll"><table><thead><tr>'
-        +   '<th>Registration</th><th>Owner</th><th>Type</th><th>Custodian / carrier</th><th class="num">Ending balance</th>'
+        +   '<th>Registration</th><th>Owner</th><th>Type</th><th>Custodian / carrier</th><th class="num">Ending balance</th><th class="aum">Managed AUM<small>billable for the advisory fee</small></th>'
         + '</tr></thead><tbody>'+body+'</tbody>'+foot+'</table></div></div>'
         + '</div></div>';
     }).join('');
@@ -9580,6 +9597,7 @@
       incomeAdj:Object.keys(INC_ADJ).some(function(k){ return INC_ADJ[k] !== ''; }) ? INC_ADJ : null,
       annuityIncome:Object.keys(ANN_INC).length ? ANN_INC : null,
       ltcBenefits:Object.keys(LTC_BEN).length ? LTC_BEN : null,
+      managedAum:Object.keys(AUM_SET).length ? AUM_SET : null,   // section 21 Managed AUM ticks set by hand
       roofGrowth:Object.keys(ROOF_G).length ? ROOF_G : null,
       wallsSchedule:Object.keys(WALLS_SCHED).length ? WALLS_SCHED : null,
       transfers:adjMoves ? adjMoves.map(function(m){
@@ -9636,6 +9654,7 @@
       accounts = d.accounts.map(function(a){ return mkAcct(a); });
     }
     cashDest = Array.isArray(d.cashFlowTo) ? d.cashFlowTo.map(function(k){ var m = /^row:(\d+)$/.exec(String(k)); var a = m ? accounts[+m[1]] : null; return a ? a.id : null; }).filter(function(x){ return x != null; }) : [];
+    AUM_SET = {}; if(d.managedAum && typeof d.managedAum === 'object') Object.keys(d.managedAum).forEach(function(k){ AUM_SET[k] = !!d.managedAum[k]; });
     fillContribAccounts();
     (function(){
       var e = (d.household && d.household.employment) || {};
@@ -16630,13 +16649,13 @@
   }
 
   armConfirm($('clearAccts'), function(){
-    accounts = []; cashDest = [];
+    accounts = []; cashDest = []; AUM_SET = {};
     if($('sampleBanner')) $('sampleBanner').hidden = true;
     renderAll();
   });
 
   function newCaseReset(){
-    accounts = []; cashDest = [];
+    accounts = []; cashDest = []; AUM_SET = {};
     // the advisor's own name carries from case to case; the date resets to today
     ['clientFirst','clientLast','spouseFirst','spouseLast','clientDob','spouseDob']
       .forEach(function(id){ $(id).value = ''; });
@@ -16848,6 +16867,12 @@
     if(m.bucket === 'moat'){ if(!m.person){ var acc = acctById(m.acctId); m.person = acc ? personOwner(acc.owner, readInputs()) : 'client'; } } else delete m.person;
     clearOvr(m);          // a new account or level gets fresh proposed destinations
     adjRebuild();
+  });
+  /* Section 21: the Managed AUM tick on an ending row; the advisory fee follows it */
+  $('holdings').addEventListener('change', function(e){
+    var k = e.target.getAttribute('data-aum'); if(!k) return;
+    AUM_SET[k] = !!e.target.checked;
+    render();
   });
   /* Picking a destination: back to the proposal, one of the listed choices,
      or Custom, which opens the text box beneath the select. */
@@ -18273,7 +18298,7 @@
       dkBody(s, 0.9, 1.95, 18.2, 0.9, r.adjusted ? 'The plan as your advisor has shaped it — the allocation every projection and the transfer sequence are built on. The full bar is each level’s target; the solid portion is funded from your accounts.' : 'How the Fortress sizes each level from your Needs, Wants and guaranteed income, and how your ' + money(totalVal) + ' of accounts fund it. The full bar is each level’s target; the solid portion is funded.', {sz:16});
       dkLevelBars(s, 0.9, 3.0, 18.2, r, {rowH:1.3});
       dkTile(s, 0.9, 8.1, 4.3, 1.8, 'Placed in protection', money(protectedAmt), 'Foundation annuity + Moat, never exposed to the market', {valueColor:DECK_C.M});
-      dkTile(s, 5.4, 8.1, 4.3, 1.8, 'Managed investments', money(fee.managed), 'Walls + Roof at ' + (i.newCust || 'the new custodian'));
+      dkTile(s, 5.4, 8.1, 4.3, 1.8, 'Managed investments', money(fee.managed), 'The registrations ticked Managed AUM in section 21');
       dkTile(s, 9.9, 8.1, 4.3, 1.8, 'Market exposure', exposurePlan + '%', 'Down from ' + marketPct + '% today', {valueColor:exposurePlan < marketPct ? DECK_C.M : DECK_C.navy});
       dkTile(s, 14.4, 8.1, 4.7, 1.8, 'Needs covered in retirement', fCover + '%', 'Foundation income vs Needs in ' + firstRetRow.year);
     })();
