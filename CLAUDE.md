@@ -69,7 +69,9 @@ host; the demo is updated only as a deliberate release.
 
 - **First-year proration.** Row 0 runs from the month the plan is prepared (`planStart()`); income,
   expenses, conversions and tax are prorated via `act()/actPre()`; pre-plan income sits in the tax
-  base (`row.pre`) but not the cash flow. Any new income or expense line must use `act()`.
+  base (`row.pre`) but not the cash flow, and so do the first year's withdrawals before the plan date,
+  taken at the plan window's pace (`k0`, `preWdOf`). The section 17 table shows that first row on a
+  calendar-year basis (`preParts`). Any new income or expense line must use `act()`.
 - **Dates:** `planYears(ym)` places a `yyyy-mm` on the plan timeline; an "end" month is exclusive.
   Ages are whole years from section 02 unless a feature takes a date of birth (the optimizer does).
 - **RMDs** are computed on the balance before the year's distributions; a QCD reduces the taxable
