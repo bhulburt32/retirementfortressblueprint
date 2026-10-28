@@ -22,6 +22,7 @@ const SUITE = [
   't-secsave',   // Save on every section header: present, never toggles the section, downloads the case file off the server
   't-annto',     // section 14: an annuity in force as a line's To account; carrier, product and tax follow the contract
   't-fee',       // the advisory fee: annuity and life insurance money is never billable, wherever it sits
+  't-ssmonth',   // section 04: Social Security From a month, as shown — in payment or from a future month, required month, override, save, deck
   't-anntax',    // tax: the federally tax-free Walls yield, Roth annuity income, the stress rows on the scenario cards
   't-ltcmerge',  // one LTC contract per insured
   't-ltcscn',    // care-event projections
