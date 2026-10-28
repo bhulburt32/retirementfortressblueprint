@@ -2811,7 +2811,14 @@
         <b>To account</b> list on every other line, and it becomes a registration of its own:
         section&nbsp;21's ending positions, the transfer sequence, the Roof growth rows and the
         report all show it by that name, with the tax type read from the name (Roth, IRA,
-        after-tax) and the custodian you picked on the line.</p>
+        after-tax) and the custodian you picked on the line. The household's annuities in force are
+        offered in the same list &mdash; every deferred contract from section&nbsp;06 (MYGA, variable,
+        growth FIA, RILA; not one already in payment) other than the line's own account &mdash; so a
+        line can add money to a contract the client already owns. Pick one and the carrier, product
+        and tax type follow the contract (change the carrier or product on the line if the addition
+        goes elsewhere); the money shows as its own line under the contract's name in the ending
+        positions, the transfer sequence and the report. The level still sets what the money does in
+        the projections; the contract names where it lands.</p>
 
       <p>The carrier list is Alto's October 2026 inventory of
         eighteen carriers plus Schwab and Fidelity; the product list opens with the model's own
@@ -5810,7 +5817,7 @@
           var share = m.amt * L.eff / tot;
           if(ovrOf(L.m, 'to') != null && L.to !== L.d.to){
             var custom = {key:'custom:' + L.to, kind:'custom', custom:true, tax:taxOfTo(L.to, L.d, L.a), owner:effOwner(L.a.owner, i), name:L.to,
-                          cust:L.custOvr ? L.cust : bucketCustodian(m.bucket, d, i), stay:false};
+                          cust:(L.custOvr || L.d.toAnn) ? L.cust : bucketCustodian(m.bucket, d, i), stay:false, annuity:!!L.d.toAnn};
             add(custom, m, share);
           } else add(d, m, share);
         });
@@ -7557,10 +7564,21 @@
     else if(m.bucket === 'inplace') sub = 'no transfer';
     return {to:reg.name, cust:bucketCustodian(m.bucket, reg, i), prod:reg.kind === 'income' ? ((a.ann && a.ann.product) || 'Income annuity, in force') : productFor(m.bucket), sub:sub, toTax:reg.tax, stay:!!reg.stay || m.bucket === 'inplace'};
   }
+  /* An annuity already in force that a line can be sent to: a deferred contract from section 06 (MYGA, variable,
+     growth FIA or RILA — not one in payment) other than the line's own account, matched by name. The money joins
+     that contract as its own registration: the carrier, product and tax type follow the contract. */
+  function annuityTo(name, src){
+    if(!name) return null;
+    name = String(name).trim();
+    return accounts.filter(function(x){ return isAnnuityPos(x.pos) && !isIncomeAnn(x) && x.name && x.name.trim() === name && (!src || x.id !== src.id); })[0] || null;
+  }
+  function annuityCarrier(x){ return (x.ann && x.ann.company) || x.cust || 'existing carrier'; }
+  function annuityProduct(x){ return (x.ann && x.ann.product) || posShort(x.pos); }
   /* the tax type of a destination: the registration's, or read off a name the advisor picked or typed */
   function taxOfTo(to, d, a){
     var ovr = d && to !== d.to;
     if(!ovr) return (d && d.toTax) || (a ? a.tax : '');
+    var ann = annuityTo(to, a); if(ann) return ann.tax;
     if(/roth/i.test(to)) return 'Roth';
     if(/rollover ira|\bira\b|401|403|457|qualified|tsp/i.test(to)) return 'Qualified';
     if(/after-tax|non-qualified|trust|brokerage|savings|checking|money market|\bcd\b/i.test(to)) return 'Non-Qualified';
@@ -7639,6 +7657,7 @@
       ppl.forEach(function(p){ push(ownerLabel(p) + ' LTC Contract'); });
       curRows().forEach(function(x){ if(x.toC && x.to && String(x.to).trim()) push(x.to); });   // accounts typed under Custom on any line
       if(a) push(a.name);
+      if(m.bucket !== 'moat' && m.bucket !== 'inplace') accounts.forEach(function(x){ if(annuityTo(x.name, a) === x) push(x.name); });   // annuities in force the money can join
     } else if(k === 'cust'){
       push(d.cust);
       push('TBD');                        // carrier not yet chosen
@@ -7778,6 +7797,8 @@
         used[a.id] = (used[a.id] || 0) + eff;
       }
       var d = a ? adjDest(m, a, r) : {to:'\u2014', cust:'\u2014', prod:'\u2014', sub:''};
+      var ann = (a && m.bucket !== 'moat' && m.bucket !== 'inplace') ? annuityTo(ovrOf(m, 'to'), a) : null;
+      if(ann) d = Object.assign({}, d, {cust:annuityCarrier(ann), prod:annuityProduct(ann), toTax:ann.tax, toAnn:ann});
       var pick = function(k){ var v = ovrOf(m, k); return (v != null && v !== '') ? v : d[k]; };
       lines.push({
         m:m, a:a, amt:amt, eff:eff, d:d,
