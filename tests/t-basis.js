@@ -12,7 +12,7 @@ const path = require('path');
   await p.click('#scnTabs [data-scn="1"]'); await p.waitForTimeout(700);   // No Moat without Roth: taxable money in the Walls and Roof
   const out=[];
   const run=async()=>p.evaluate(()=>{ const X=window.__rfb.taxLast();
-    const rows=X.rows.map(x=>({year:x.year, wdT:x.wd.taxable, cg:x.agiParts.cg, gf:x.gainFrac, basis:x.basis, bk:(x.banked||0)+(x.deposits||0)}));
+    const rows=X.rows.map(x=>({year:x.year, wdT:x.wd.taxable + ((x.preParts && x.preParts.wdTaxable) || 0), cg:x.agiParts.cg, gf:x.gainFrac, basis:x.basis, bk:(x.banked||0)+(x.deposits||0)}));
     return {rows, fed:Math.round(X.lifetime), cg:Math.round(rows.reduce((a,x)=>a+x.cg,0)), wdT:Math.round(rows.reduce((a,x)=>a+x.wdT,0))}; });
   const accts=await p.$$eval('#acctBody tr[data-id]',rs=>rs.map(r=>({id:r.dataset.id, name:r.querySelector('input[data-k=name]').value, tax:r.querySelector('select[data-k=tax]').value,
     pos:r.querySelector('select[data-k=pos]').value, val:+r.querySelector('input[data-k=val]').value.replace(/[^0-9.]/g,''), hasBasis:!!r.querySelector('input[data-k=basis]')})));
