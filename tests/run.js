@@ -20,6 +20,7 @@ const SUITE = [
   't-gap',       // section 05 income gap: the Largest gap tile is the biggest shortfall in the series, and the deck page agrees
   't-pfyield',   // section 16: the proposal's blocks collapse on their bars; each account row carries its SEC yield
   't-secsave',   // Save on every section header: present, never toggles the section, downloads the case file off the server
+  't-annto',     // section 14: an annuity in force as a line's To account; carrier, product and tax follow the contract
   't-anntax',    // tax: the federally tax-free Walls yield, Roth annuity income, the stress rows on the scenario cards
   't-ltcmerge',  // one LTC contract per insured
   't-ltcscn',    // care-event projections
