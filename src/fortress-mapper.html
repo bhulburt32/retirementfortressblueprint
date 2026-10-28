@@ -290,6 +290,7 @@
   table.debt{min-width:960px}
   #annIncTable{min-width:1180px}
   #ltcBenTable{min-width:980px}
+  #ssTable input.mon{display:block;min-width:150px;font-size:13px;margin-top:6px} #ssTable input.mon.missing{border-color:var(--st-alert);background:var(--st-alert-bg)}
   #holdings th.aum,#holdings td.aum{text-align:center;white-space:nowrap} #holdings th.aum small{display:block;font-weight:400;text-transform:none;letter-spacing:0;font-size:11px}
   #holdings td.aum label.chk{display:inline-flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer} #holdings td.aum label.chk input{width:18px;height:18px;accent-color:var(--navy)} #holdings td.aum small{font-size:11px;color:var(--muted)}
   #ltcBenTable th small,#annIncTable th small{display:block;font-weight:400;text-transform:none;letter-spacing:0;font-size:11px}
@@ -1367,7 +1368,14 @@
         start benefits (62 to 70) and one COLA assumption (2.5% by default); the tool applies the SSA's own early-claiming
         reduction or delayed credits against a full retirement age worked out from the age in
         section&nbsp;02, and shows the monthly benefit in today's dollars and what COLA makes of it by
-        the start age. When the lower earner's PIA is under half of the higher earner's, the tool adds
+        the start age. The last choice under <span class="ui">Benefit starting age</span>,
+        <b>From a month, as shown</b>, is for a benefit already in payment or on an award letter: a
+        start month appears beneath (required, flagged until entered) and the amount in the Primary
+        Insurance Amount box is paid exactly as entered from that month &mdash; no reduction, no
+        credits, no spousal top-up &mdash; with the COLA from there. A month already past means in
+        payment, and the months of the first calendar year before the plan date sit in that year's tax
+        base like any other income. A scenario's own claiming age in section&nbsp;14 still overrides it
+        as an ordinary claim at that age. When the lower earner's PIA is under half of the higher earner's, the tool adds
         the spousal top-up &mdash; half the higher PIA less their own, reduced on the SSA's spousal
         schedule if claimed early, with no delayed credits &mdash; and notes that it is payable only
         once the higher earner has filed.</p>
@@ -1514,9 +1522,9 @@
             <tr><td>Primary Insurance Amount<small>Monthly benefit at full retirement age, from the SSA statement</small></td>
               <td><input type="text" inputmode="numeric" id="piaC" placeholder="0"></td>
               <td><input type="text" inputmode="numeric" id="piaS" placeholder="0"></td></tr>
-            <tr><td>Benefit starting age</td>
-              <td><select id="ssAgeC"></select></td>
-              <td><select id="ssAgeS"></select></td></tr>
+            <tr><td>Benefit starting age<small>62 to 70 on the SSA schedule, or <b>From a month, as shown</b>: the Primary Insurance Amount above is paid as entered from that month (a benefit already in payment, or an award letter)</small></td>
+              <td><select id="ssAgeC"></select><input type="month" class="mon" id="ssStartC" hidden title="The month the benefit shown above starts (or started)"></td>
+              <td><select id="ssAgeS"></select><input type="month" class="mon" id="ssStartS" hidden title="The month the benefit shown above starts (or started)"></td></tr>
             <tr><td>COLA assumption<small>Annual, applied to both</small></td>
               <td><input type="text" inputmode="decimal" id="ssCola" placeholder="2.5%" value="2.5%"></td>
               <td><small class="hint" style="margin:0">same for both</small></td></tr>
@@ -4540,11 +4548,22 @@
     })};
     ['C','S'].forEach(function(p){
       var who = (p === 'C') ? 'client' : 'spouse';
-      var baseAge = num($('ssAge' + p).value) || 67, ov = (typeof INC_ADJ !== 'undefined' && INC_ADJ && INC_ADJ['ss' + p]) ? num(INC_ADJ['ss' + p]) : 0;   // the scenario's own claiming age, section 14, when set
-      out.ss[who] = {pia:num($('pia' + p).value), age:ov || baseAge, baseAge:baseAge, scnAge:!!ov};
+      var sel = $('ssAge' + p).value, month = sel === 'month', start = month ? ($('ssStart' + p).value || '') : '';
+      var ov = (typeof INC_ADJ !== 'undefined' && INC_ADJ && INC_ADJ['ss' + p]) ? num(INC_ADJ['ss' + p]) : 0;   // the scenario's own claiming age, section 14, when set
+      var baseAge = month ? ssAgeAtMonth(p === 'C' ? 'client' : 'spouse', start) : (num(sel) || 67);
+      /* From a month, as shown: the PIA entered is paid as it is from that month (in payment already, or an award letter) — no
+         SSA factor, no spousal top-up — unless a scenario overrides the claiming age, which is then an ordinary claim at that age */
+      out.ss[who] = {pia:num($('pia' + p).value), age:ov || baseAge, baseAge:baseAge, scnAge:!!ov, mode:month ? 'month' : 'age', start:start, asShown:month && !ov};
     });
     return out;
   }
+  /* the age a person reaches in a yyyy-mm month (whole years from section 02's age, counted from today's year) */
+  function ssAgeAtMonth(who, ym){
+    var age = who === 'client' ? num($('clientAge').value) : (num($('spouseAge').value) || num($('clientAge').value));
+    var m = /^(\d{4})-(\d{2})$/.exec(String(ym || '')); if(!m) return Math.max(62, Math.min(70, Math.round(age))) || 67;
+    return Math.round(age + ((+m[1]) - new Date().getFullYear()) + ((+m[2]) - 1) / 12);
+  }
+  function ssMonthLabel(ym){ var m = /^(\d{4})-(\d{2})$/.exec(String(ym || '')); return m ? new Date(+m[1], +m[2] - 1, 1).toLocaleString('en-US', {month:'short', year:'numeric'}) : ''; }
   function renderNonGuarTable(){
     var spouse = hasSpouse(null);
     $('ngBody').innerHTML = nonGuar.length
@@ -4991,7 +5010,7 @@
     var b = i.benefits, spouse = hasSpouse(i), year = new Date().getFullYear();
     var ageOf = function(who){ return (who === 'client') ? i.clientAge : (i.spouseAge != null ? i.spouseAge : i.clientAge); };
     var spousal = null;
-    if(spouse && b.ss.client.pia > 0.5 && b.ss.spouse.pia > 0.5){
+    if(spouse && b.ss.client.pia > 0.5 && b.ss.spouse.pia > 0.5 && !b.ss.client.asShown && !b.ss.spouse.asShown){   // a benefit entered as shown carries no top-up
       var hi = b.ss.client.pia >= b.ss.spouse.pia ? 'client' : 'spouse', lo = hi === 'client' ? 'spouse' : 'client';
       if(b.ss[lo].pia < 0.5 * b.ss[hi].pia){
         var loBy = year - ageOf(lo), loFra = fraMonths(loBy), early = Math.max(0, loFra - Math.round(b.ss[lo].age * 12));
@@ -5004,9 +5023,10 @@
     var people = {};
     (spouse ? ['client','spouse'] : ['client']).forEach(function(who){
       var x = b.ss[who], age = ageOf(who), by = year - age;
-      var f = ssFactor(x.age, by), own = x.pia * f, top = (spousal && spousal.lo === who) ? spousal.amt : 0;
+      var f = x.asShown ? 1 : ssFactor(x.age, by), own = x.pia * f, top = (spousal && spousal.lo === who) ? spousal.amt : 0;
+      var toClaim = x.asShown ? (planYears(x.start) || 0) : Math.max(0, x.age - age);   // as shown: from the month (a past month is in payment, pre-plan months in the first year's tax base)
       people[who] = {pia:x.pia, claimAge:x.age, age:age, fra:fraMonths(by), factor:f, own:own, top:top,
-                     monthly:own + top, yearsToClaim:Math.max(0, x.age - age)};
+                     monthly:own + top, yearsToClaim:toClaim, asShown:!!x.asShown, start:x.start || '', from:x.asShown ? ssMonthLabel(x.start) : ''};
     });
     return {people:people, spousal:spousal, cola:b.ss.cola || 0};
   }
@@ -5015,7 +5035,8 @@
     var b = i.benefits, spouse = hasSpouse(i), year = new Date().getFullYear();
     $('ssHeadC').textContent = i.clientFirst || 'Client';
     $('ssHeadS').textContent = spouse ? (i.spouseFirst || 'Spouse') : 'Spouse (none on file)';
-    ['piaS','ssAgeS'].forEach(function(id){ $(id).disabled = !spouse; $(id).classList.toggle('off', !spouse); });
+    ['piaS','ssAgeS','ssStartS'].forEach(function(id){ $(id).disabled = !spouse; $(id).classList.toggle('off', !spouse); });
+    ['C','S'].forEach(function(p){ var month = $('ssAge' + p).value === 'month', st = $('ssStart' + p); st.hidden = !month; st.classList.toggle('missing', month && !st.value); });
     var ppl = spouse ? ['client','spouse'] : ['client'];
     var dash = '<td class="num"><small>\u2014</small></td>', pad = spouse ? '' : '<td></td>';
     var ssAnnual = 0, penAnnual = 0;
@@ -5035,6 +5056,9 @@
       var P = plan.people[who], age = P.age, f = P.factor, fra = P.fra, own = P.own, top = P.top, now = P.monthly;
       var yrs = Math.max(0, x.age - age), later = now * Math.pow(1 + (b.ss.cola || 0), yrs);
       ssAnnual += now * 12;
+      if(P.asShown) return '<td><b>' + money(now) + '</b> a month<small>' + (P.start ? 'as shown, from ' + esc(P.from) + ((planYears(P.start) || 0) < 0.05 ? ' \u2014 in payment' : '') : '<span class="flag alert">enter the start month</span>') + '</small>'
+        + (b.ss.cola > 0 && yrs > 0.5 ? '<small>about ' + money(later) + ' a month at ' + x.age + ' after ' + Math.round(yrs) + ' years of COLA</small>' : '')
+        + '<small>' + money(now * 12) + ' a year in today\u2019s dollars</small></td>';
       return '<td><b>' + money(now) + '</b> a month<small>' + (top > 0.5 ? money(own) + ' own benefit, ' : '')
         + (f < 1 ? Math.round((1 - f) * 100) + '% reduction' : f > 1 ? '+' + Math.round((f - 1) * 100) + '% delayed credits' : 'full benefit')
         + ' \u00b7 FRA ' + Math.floor(fra / 12) + (fra % 12 ? ' and ' + (fra % 12) + ' months' : '') + '</small>'
@@ -9687,7 +9711,8 @@
       ['C','S'].forEach(function(p){
         var who = p === 'C' ? 'client' : 'spouse', x = ss[who] || {};
         $('pia' + p).value = x.pia ? fmtN.format(Math.round(x.pia)) : '';
-        $('ssAge' + p).value = String(x.age || 67);
+        $('ssAge' + p).value = x.mode === 'month' ? 'month' : String(x.age || 67);
+        $('ssStart' + p).value = x.mode === 'month' ? (x.start || '') : '';
       });
       pensions = [];
       if(Array.isArray(b.pensions)) b.pensions.forEach(function(y){ pensions.push(mkPension(y)); });
@@ -15654,9 +15679,11 @@
   ['ssAgeC','ssAgeS'].forEach(function(id){
     var o = '';
     for(var a = 62; a <= 70; a++) o += '<option value="' + a + '"' + (a === 67 ? ' selected' : '') + '>' + a + (a === 62 ? ' (earliest)' : a === 70 ? ' (latest)' : '') + '</option>';
+    o += '<option value="month">From a month, as shown</option>';
     $(id).innerHTML = o;
-    $(id).addEventListener('change', render);
+    $(id).addEventListener('change', function(){ var st = $(id === 'ssAgeC' ? 'ssStartC' : 'ssStartS'); if(this.value === 'month' && st && !st.value) setTimeout(function(){ st.focus(); }, 0); render(); });
   });
+  ['ssStartC','ssStartS'].forEach(function(id){ $(id).addEventListener('change', render); $(id).addEventListener('input', render); });
   ['piaC','piaS','ssCola'].forEach(function(id){
     $(id).addEventListener('input', render);
     $(id).addEventListener('blur', function(){
@@ -16675,7 +16702,7 @@
      'piaC','piaS']
       .forEach(function(id){ $(id).value = ''; });
     $('ssCola').value = '2.5%'; ssoCfg = ssoDefault();
-    ['ssAgeC','ssAgeS'].forEach(function(id){ $(id).value = '67'; });
+    ['ssAgeC','ssAgeS'].forEach(function(id){ $(id).value = '67'; }); ['ssStartC','ssStartS'].forEach(function(id){ $(id).value = ''; });
     pensions = []; renderPensionTable();
     jobs = []; renderJobTable();
     annuities = []; renderAnnuityTable();
@@ -18001,7 +18028,7 @@
         var facts = [['Age', String(w === 'client' ? i.clientAge : i.spouseAge)],
           ['Retirement', e.salary > 0.5 && e.retire ? mon(e.retire) : (e.salary > 0.5 ? 'Not set' : 'Retired')],
           ['Salary', e.salary > 0.5 ? money(e.salary) + (e.raise > 0 ? ', +' + pc1(e.raise) + ' a year' : '') : dash],
-          ['Social Security', ss.people[w] && ss.people[w].monthly > 0.5 ? money(ss.people[w].monthly * 12) + ' a year from ' + ss.people[w].claimAge : dash]];
+          ['Social Security', ss.people[w] && ss.people[w].monthly > 0.5 ? money(ss.people[w].monthly * 12) + ' a year from ' + (ss.people[w].from || ss.people[w].claimAge) : dash]];
         facts.forEach(function(f, n){ var yy = 2.95 + n * 0.62; s.text(x + 0.3, yy, 2.1, 0.55, [{runs:[{t:f[0], sz:16, b:true, color:DECK_C.muted}]}], {valign:'middle'}); s.text(x + 2.4, yy, cw - 2.7, 0.55, [{runs:[{t:f[1], sz:16, color:DECK_C.ink2}]}], {valign:'middle'}); });
       });
       var hx = 0.9 + ppl.length * (cw + 0.3), hw = 19.1 - hx, tw = (hw - 0.3) / 2;
@@ -18030,7 +18057,7 @@
       dkHtmlTable(s, 0.9, y1, 10.6, h1, [{t:'Who'}, {t:'Salary', align:'r'}, {t:'Deductions and savings'}, {t:'Take-home', align:'r'}, {t:'Until'}], erows);
       var y2 = y1 + h1 + 0.35;
       dkLabel(s, 0.9, y2, 10, 'Social Security');
-      var srows = ppl.filter(function(w){ return ss.people[w] && ss.people[w].pia > 0.5; }).map(function(w){ var p = ss.people[w]; return [pName(w), money(p.pia) + ' / mo at FRA', 'Claims at ' + p.claimAge + (p.factor && Math.abs(p.factor - 1) > 0.005 ? ' (' + (p.factor > 1 ? '+' : '') + Math.round((p.factor - 1) * 100) + '%)' : ''), money(p.monthly * 12)]; });
+      var srows = ppl.filter(function(w){ return ss.people[w] && ss.people[w].pia > 0.5; }).map(function(w){ var p = ss.people[w]; return [pName(w), p.asShown ? money(p.pia) + ' / mo as shown' : money(p.pia) + ' / mo at FRA', p.asShown ? 'From ' + p.from : 'Claims at ' + p.claimAge + (p.factor && Math.abs(p.factor - 1) > 0.005 ? ' (' + (p.factor > 1 ? '+' : '') + Math.round((p.factor - 1) * 100) + '%)' : ''), money(p.monthly * 12)]; });
       if(ss.spousal && ss.spousal.top > 0.5) srows.push(['Spousal top-up', dash, 'Added to the lower benefit', money(ss.spousal.top * 12 || 0)]);
       if(!srows.length) srows.push(['None entered', '', '', dash]);
       var h2 = 0.5 + srows.length * 0.42;
