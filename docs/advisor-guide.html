@@ -2003,12 +2003,15 @@
         pages as the accounts need.</p>
       <p>Below the map is where every account lands, plus assets under management and the advisory
         fee. The fee schedule is flat, not marginal — wherever the managed total falls, that band's
-        rate applies to the whole balance. Billable assets are the Walls and Roof only; the cash
-        buffer, the Foundation annuity and the Moat contracts are out, and so is any annuity or life
-        insurance of any kind wherever it sits: a contract marked <b>Stay as is</b> that the waterfall
-        places in the Walls or Roof, a section&nbsp;14 line sent to a contract in force as its To
-        account, or a line placed in a carrier's annuity or life product. Only money in managed
-        portfolios (AUM, cash, CDs) is billable; the fee note names the amount excluded. The <b>weighted average</b>
+        rate applies to the whole balance. Every row in the ending positions carries a <b>Managed
+        AUM</b> tick, and the billable assets are exactly the rows ticked. The tick follows a rule
+        until you set it: a managed portfolio in the Walls or Roof is ticked; the cash buffer, the
+        Foundation annuity, the Moat contracts, a registration held where it is (<b>Stay as is</b>,
+        or the part held back from a partial transfer) and any annuity or life insurance of any kind
+        &mdash; a contract that stays as it is, a section&nbsp;14 line sent to a contract in force as
+        its To account, or a line placed in a carrier's annuity or life product &mdash; are not. Tick
+        or untick any row and the fee follows; the row says <em>default</em> or <em>set</em>, the
+        ticks save with the case, and the fee note names what is left out and what was set by hand. The <b>weighted average</b>
         spreads that same cost across every account the client holds &mdash; accounts held out of the
         plan included &mdash; which is the number a client will ask about.</p>
 
