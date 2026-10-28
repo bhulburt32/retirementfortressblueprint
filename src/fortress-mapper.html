@@ -3334,8 +3334,11 @@
         <dt>Projected income tax &mdash; after strategic tax planning</dt>
         <dd>The plan with the withdrawal order, the Roth conversion schedule and the QCDs above. A
           first tile gives the <b>lifetime tax saved</b> against the before block (federal and state,
-          with both totals and the percentage), the note opens with the same comparison, and the
-          taxable-income and tax charts carry the before as a dashed line. Then five tiles &mdash; lifetime federal tax, lifetime state tax, average effective rate (all
+          with both totals and the percentage); a second, <b>Widow's curse tax reduced</b>, carries
+          the survivor-years figure from the curse block above &mdash; the survivor's tax before and
+          after strategic tax planning and how the extra over the couple's tax changes &mdash; in
+          green when the strategies help (it is left out for a single person); the note opens with
+          the same comparison, and the taxable-income and tax charts carry the before as a dashed line. Then five tiles &mdash; lifetime federal tax, lifetime state tax, average effective rate (all
           tax over all income plus Roth conversions), the highest federal bracket reached and when RMDs begin &mdash; then
           three charts with a bar for every year: <b>taxable income</b>; the <b>effective federal
           rate</b>, each bar coloured by the highest federal bracket that year reaches (lighter to
@@ -11630,7 +11633,7 @@
     var anyShort = ts.some(function(t){ return J[t].unfunded > 0.5 || S[t].unfunded > 0.5 || SA[t].unfunded > 0.5; });
     $('widowTable').innerHTML = '<thead>' + grp + hd + '</thead><tbody>' + body + '</tbody><tfoot>' + foot + (anyShort ? '<tr><td colspan="14"><small>† the accounts have run out that year; what cannot be drawn is not taxed, so the tax understates the burden.</small></td></tr>' : '') + '</tfoot>';
     $('widowAssume').innerHTML = '<b>Assumptions.</b> ' + esc(who) + ' is assumed to pass away at ' + W.age + ', in ' + deathYear + (W.past ? ' (already past that age today, so in the first plan year)' : '') + '. From ' + y1.year + ' ' + esc(surv) + ' files single, keeps the larger of the two Social Security benefits (the smaller one stops), receives the survivor share of each pension and annuity line, and takes over the tax-deferred accounts, with required distributions on ' + esc(surv) + '’s own age. Spending and everything else in the plan continue unchanged. Before: no Roth conversions and no QCDs. After: the conversion schedule and the QCDs above, each year’s conversion re-sized to the single filer’s bracket and IRMAA limits after the death. A planning illustration, not tax advice.';
-    WIDOW_LAST = {who:W.who, surv:W.surv, age:W.age, d:d, deathYear:deathYear, firstYear:y1.year, joint:{gross:j1.gross, income:inc(j1), ss:j1.ss, taxable:j1.taxable, tax:tt(j1), marginal:j1.marginal, status:j1.status}, survivor:{gross:y1.gross, income:inc(y1), ss:y1.ss, taxable:y1.taxable, tax:tt(y1), marginal:y1.marginal, status:y1.status, tier:tierS}, after:{taxable:a1.taxable, tax:tt(a1), marginal:a1.marginal}, jointB:jointB, survB:survB, survA:survA, extraB:extraB, extraA:extraA};
+    WIDOW_LAST = {who:W.who, surv:W.surv, age:W.age, d:d, deathYear:deathYear, firstYear:y1.year, joint:{gross:j1.gross, income:inc(j1), ss:j1.ss, taxable:j1.taxable, tax:tt(j1), marginal:j1.marginal, status:j1.status}, survivor:{gross:y1.gross, income:inc(y1), ss:y1.ss, taxable:y1.taxable, tax:tt(y1), marginal:y1.marginal, status:y1.status, tier:tierS}, after:{taxable:a1.taxable, tax:tt(a1), marginal:a1.marginal}, jointB:jointB, survB:survB, survA:survA, extraB:extraB, extraA:extraA, lastYear:S[S.length - 1].year};
   }
   (function(){
     if(!$('widowWho')) return;
@@ -11647,6 +11650,11 @@
     var cmpTax = cmp ? (cmp.lifetime + cmp.lifetimeState) : 0, nowTax = X0.lifetime + X0.lifetimeState, saved = cmpTax - nowTax;
     $(pfx + 'Tiles').innerHTML =
         (cmp ? '<div><dt>Lifetime tax saved</dt><dd>' + (Math.abs(saved) > 0.5 ? (saved < 0 ? '\u2212' : '') + money(Math.abs(saved)) : '\u2014') + '</dd><small>' + money(cmpTax) + ' before strategic tax planning, ' + money(nowTax) + ' after' + (cmpTax > 0.5 && Math.abs(saved) > 0.5 ? ' (' + (saved < 0 ? '+' : '\u2212') + (Math.abs(saved) / cmpTax * 100).toFixed(1) + '%)' : '') + '</small></div>' : '')
+        + (cmp && pfx === 'tax' && WIDOW_LAST ? (function(){   // the widow's or widower's curse block above: the survivor's years before and after the strategies
+            var w = WIDOW_LAST, less = w.survB - w.survA, sg = function(v){ return (v < 0 ? '\u2212' : '') + money(Math.abs(v)); };
+            return '<div' + (less > 0.5 ? ' class="cost gain"' : '') + '><dt>Widow\u2019s curse tax reduced</dt><dd>' + (Math.abs(less) > 0.5 ? money(Math.abs(less)) : '\u2014') + '</dd><small>'
+              + (less > 0.5 ? 'less tax over the survivor\u2019s years ' + w.firstYear + '\u2013' + w.lastYear + ': ' + money(w.survB) + ' of tax before strategic tax planning, ' + money(w.survA) + ' after \u00b7 the extra over the couple\u2019s tax ' + sg(w.extraB) + ' \u2192 ' + sg(w.extraA)
+                 : (less < -0.5 ? 'more tax over the survivor\u2019s years ' + w.firstYear + '\u2013' + w.lastYear + ' \u2014 ' : '') + 'the strategies above do not reduce the survivor\u2019s tax' + (less < -0.5 ? '' : ' over ' + w.firstYear + '\u2013' + w.lastYear + ' in this case')) + '</small></div>'; })() : '')
         + '<div><dt>Lifetime federal tax</dt><dd>' + money(X0.lifetime) + '</dd><small>' + rows.length + ' years, ' + rows[0].year + '–' + rows[rows.length - 1].year + '</small></div>'
       + '<div><dt>Lifetime ' + esc(X0.stateName) + ' tax</dt><dd>' + money(X0.lifetimeState) + '</dd><small>' + (X0.stateInfo && X0.stateInfo.type !== 'none' ? pct(X0.avgStateEffective) + ' of all income + conversions' : 'no state income tax') + '</small></div>'
       + '<div><dt>Average effective rate</dt><dd>' + pct(X0.avgTotalEffective) + '</dd><small>federal ' + pct(X0.avgEffective) + ' \u00b7 all tax \u00f7 (all income + conversions)</small></div>'

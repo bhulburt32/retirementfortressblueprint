@@ -25,6 +25,12 @@ const { chromium } = require('playwright');
   const fedB = num(before.find(t => /Lifetime federal tax/.test(t))), fedA = num(after.find(t => /Lifetime federal tax/.test(t)));
   if(!(fedB > 0) || !/^Lifetime tax saved/.test(after[0])) errs.push('the after block should lead with the lifetime tax saved against before');
   const savedTile = await p.$eval('#taxTiles > div small', e => e.textContent);
+  // the after block carries the curse's survivor-years reduction, in green when the strategies help
+  const WL = await p.evaluate(() => window.__rfb.widow());
+  const curse = await p.$$eval('#taxTiles > div', ds => { const d = ds.find(x => /curse tax reduced/.test(x.querySelector('dt').textContent)); return d ? {dd:d.querySelector('dd').textContent, small:d.querySelector('small').textContent, cls:d.className, color:getComputedStyle(d.querySelector('dd')).color} : null; });
+  console.log('curse tile:', JSON.stringify(curse), '| survB − survA:', WL && Math.round(WL.survB - WL.survA));
+  if(!curse) errs.push('the after block should carry a Widow’s curse tax reduced tile');
+  else { const less = WL.survB - WL.survA, want = less > 0.5 ? '$' + Math.round(less).toLocaleString('en-US') : '—'; if(curse.dd !== want || (less > 0.5 && !/^less tax over the survivor/.test(curse.small))) errs.push('the curse tile should read ' + want + ' with the note opening "less tax over the survivor’s years": ' + curse.dd + ' / ' + curse.small); if(less > 0.5 && !/gain/.test(curse.cls)) errs.push('a reduction should be the green gain tile'); }
   if(!/before strategic tax planning/.test(savedTile)) errs.push('the saved tile should quote before and after');
   const dashed = await p.evaluate(() => ({ svg1: document.querySelectorAll('#taxSvg1 polyline').length, svg3: document.querySelectorAll('#taxSvg3 polyline').length, b1: document.querySelectorAll('#taxBSvg1 polyline').length, bars: document.querySelectorAll('#taxBSvg1 rect').length }));
   console.log('before lines on the after charts:', JSON.stringify(dashed));
