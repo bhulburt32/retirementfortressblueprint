@@ -1759,7 +1759,11 @@
         share of the year's tax in proportion to its income (the rest was withheld before the
         plan), and any Roth conversion in that year is taxed at the margin on top of the full
         year's income &mdash; so the converter sees the real headroom, not a quarter-year's. The
-        assumptions notes under the projections say which month the plan runs from.</p>
+        state tax is figured the same way. Social Security that was already in payment is
+        annualized too: the section&nbsp;17 table's first row shows the benefit received since the
+        plan date with the earlier months noted beneath, and <b>Taxable SS</b> is the taxable share
+        of the whole year's benefit (noted as &ldquo;of $X for the year&rdquo;), so it can exceed the
+        months shown. The assumptions notes under the projections say which month the plan runs from.</p>
 
       <p>Beneath the budget sits the <b>Income Gap</b> chart: every source of income as it stands
         today &mdash; salaries to each retirement date, Social Security, pensions, annuity and other
@@ -3365,7 +3369,7 @@
           minimum distributions on the tax-deferred market balances and whatever has to be drawn, in
           the withdrawal order, to meet Needs and Wants and the tax itself. It files jointly with a
           spouse on file, single otherwise, and takes the standard deduction with the extra amount at
-          65 (and the $6,000 senior deduction while it lasts, 2025&ndash;2028). Hover the chart for any
+          65 (and the $6,000-a-person senior deduction while it lasts, 2025&ndash;2028, the total reduced by 6% of MAGI over $75,000 single or $150,000 joint). Hover the chart for any
           year's figures.</dd>
       </dl>
 
@@ -10373,7 +10377,7 @@
     var ded = (T.std + T.extra65 * ages65) * g;
     var senior = 0;
     if(calYear >= 2025 && calYear <= 2028 && ages65 > 0){
-      senior = ages65 * Math.max(0, SENIOR_BONUS - Math.max(0, agi - T.seniorPhase) * 0.06);   // each person's $6,000 less 6% of the excess: gone at $175,000 single, $250,000 joint
+      senior = Math.max(0, ages65 * SENIOR_BONUS - Math.max(0, agi - T.seniorPhase) * 0.06);   // $6,000 a person, the total less 6% of MAGI over $75,000 single / $150,000 joint: gone at $175,000 single, $250,000 joint with one over 65, $350,000 with both
     }
     var deductions = ded + senior;
     var taxable = Math.max(0, agi - deductions);
@@ -10609,7 +10613,7 @@
         var p2 = cpObj(parts); p2.wages += PRE.emp + PRE.ng; p2.pension += PRE.pen; p2.retirement += PRE.pen + PRE.ann; p2.gross += preOrd + preSS;
         var full = cpObj(stateTax(stateCode, p2, pplAges, fs, g)), noConv = full;
         if(conv > 0.5){ var p3 = cpObj(p2); p3.retirement -= conv; p3.gross -= conv; noConv = stateTax(stateCode, p3, pplAges, fs, g); }
-        var planInc = Math.max(0, parts.gross - conv), share = (planInc + preOrd + preSS) > 0.5 ? planInc / (planInc + preOrd + preSS) : 1;
+        var planInc = Math.max(0, parts.gross), share = (planInc + preOrd + preSS) > 0.5 ? planInc / (planInc + preOrd + preSS) : 1;   // gross is the plan window's income without the conversion
         full.tax = Math.max(0, noConv.tax * share + (full.tax - noConv.tax));
         return full;
       };
@@ -11802,7 +11806,7 @@
       C('', 'Year', '', function(x){ return String(x.year); }, function(){ return 'Total'; }),
       C('', 'Age' + (X0.ppl.length > 1 ? 's' : ''), '', function(x){ return x.ages.join(' / '); }, null),
       C('inc', 'Wages', 'after retirement-plan deferrals', money0(IP('emp')), sumT(IP('emp')), {show:any(IP('emp')), sep:true}),
-      C('inc', 'Social Security', '', money0(IP('ss')), sumT(IP('ss')), {show:any(IP('ss'))}),
+      C('inc', 'Social Security', '', function(x){ return dash(IP('ss')(x)) + (x.preSS > 0.5 ? '<small class="sub">+ ' + money(x.preSS) + ' earlier this year</small>' : ''); }, sumT(IP('ss')), {show:any(IP('ss')) || rows.some(function(x){ return x.preSS > 0.5; })}),
       C('inc', 'Pensions', '', money0(IP('pen')), sumT(IP('pen')), {show:any(IP('pen'))}),
       C('inc', 'Annuities', 'in force + the Foundation annuity', money0(IP('ann')), sumT(IP('ann')), {show:any(IP('ann'))}),
       C('inc', 'Walls yield', '', money0(IP('walls')), sumT(IP('walls')), {show:any(IP('walls'))}),
@@ -11811,10 +11815,10 @@
       C('inc', 'Withdrawals', 'taxable / deferred / Roth', function(x){ return wdAll(x) > 0.5 ? money(x.wd.taxable) + ' / ' + money(x.wd.deferred) + ' / ' + money(x.wd.roth) : '—'; }, function(){ return money(sumOf(wdAll)); }, {show:any(wdAll)}),
       C('inc', 'All income', 'the sum, as paid in', function(x){ return money(x.gross); }, function(){ return money(X0.lifetimeGross); }, {bold:true}),
       C('agi', 'Ordinary income', 'taxable wages, pensions, annuities, Walls yield and IRA money', money0(AP('ord')), sumT(AP('ord')), {sep:true}),
-      C('agi', 'Earlier this year', 'before the plan date', money0(AP('pre')), sumT(AP('pre')), {show:any(AP('pre'))}),
+      C('agi', 'Earlier this year', 'wages, pensions, annuities and other income before the plan date; Social Security in its own row', money0(AP('pre')), sumT(AP('pre')), {show:any(AP('pre'))}),
       C('agi', 'Roth conversion', '', money0(AP('conv')), sumT(AP('conv')), {show:any(AP('conv'))}),
       C('agi', 'Capital gains', basisOn() ? 'taxable withdrawals above cost basis, long-term' : Math.round(TAXABLE_GAIN_SHARE * 100) + '% of taxable withdrawals, long-term', money0(AP('cg')), sumT(AP('cg')), {show:any(AP('cg'))}),
-      C('agi', 'Taxable SS', '', function(x){ return hasSS(x) ? money(x.ssTaxable) : '—'; }, sumT(AP('ss')), {show:rows.some(hasSS)}),
+      C('agi', 'Taxable SS', '', function(x){ return hasSS(x) ? money(x.ssTaxable) + (x.preSS > 0.5 ? '<small class="sub">of ' + money(x.ss + x.preSS) + ' for the year</small>' : '') : '—'; }, sumT(AP('ss')), {show:rows.some(hasSS)}),
       C('agi', 'AGI', 'the sum', function(x){ return money(x.agi); }, sumT(function(x){ return x.agi; }), {bold:true}),
       C('tst', 'Tax-exempt interest', 'AUM - Tax Free Walls yield', money0(function(x){ return x.exempt; }), sumT(function(x){ return x.exempt; }), {show:any(function(x){ return x.exempt; }), sep:true}),
       C('tst', 'MAGI for IRMAA', 'AGI + tax-exempt interest; sets Medicare premiums two years later', function(x){ return money(x.magi); }, null, {sep:!any(function(x){ return x.exempt; })}),
@@ -13512,7 +13516,7 @@
     });
   }
 
-  window.__rfb = Object.assign(window.__rfb || {}, {taxLast:function(){ return taxLast; }, caseData:function(){ return caseData(); }, ltcPools:function(mode){ return ltcPools(compute(), mode); }, acctGrowth:function(id, dflt, t){ return acctGrowth(acctById(id), dflt, t); }, acctStressReturn:function(id, loss, dflt, t){ return acctStressReturn(acctById(id), loss, dflt, t); }, sqTotals:function(){ var X = statusQuoRun(compute()); return X.rows.map(function(x){ return {year:x.year, total:x.layers.total}; }); }, gapSeries:function(){ return GAP_LAST; }, fedTax:function(){ return fedTax.apply(null, arguments); }, pdfLayoutText:pdfLayoutText, propParse:function(p){ return propParse(p); }, propDerived:function(a){ return propDerived(a); }, propSummaries:function(a, d){ return propSummaries(a, d); }, canAskClaude:function(){ return canAskClaude(); }, nitroPerf:function(pg){ return nitroPerf(pg); }, askClaudeJson:function(q){ return askClaudeJson(q); }, compute:function(){ return compute(); }, projectTax:function(r, o){ return projectTax(r, o); }, accounts:function(){ return accounts; }});   // for the test scripts
+  window.__rfb = Object.assign(window.__rfb || {}, {taxLast:function(){ return taxLast; }, fedTax:fedTax, caseData:function(){ return caseData(); }, ltcPools:function(mode){ return ltcPools(compute(), mode); }, acctGrowth:function(id, dflt, t){ return acctGrowth(acctById(id), dflt, t); }, acctStressReturn:function(id, loss, dflt, t){ return acctStressReturn(acctById(id), loss, dflt, t); }, sqTotals:function(){ var X = statusQuoRun(compute()); return X.rows.map(function(x){ return {year:x.year, total:x.layers.total}; }); }, gapSeries:function(){ return GAP_LAST; }, fedTax:function(){ return fedTax.apply(null, arguments); }, pdfLayoutText:pdfLayoutText, propParse:function(p){ return propParse(p); }, propDerived:function(a){ return propDerived(a); }, propSummaries:function(a, d){ return propSummaries(a, d); }, canAskClaude:function(){ return canAskClaude(); }, nitroPerf:function(pg){ return nitroPerf(pg); }, askClaudeJson:function(q){ return askClaudeJson(q); }, compute:function(){ return compute(); }, projectTax:function(r, o){ return projectTax(r, o); }, accounts:function(){ return accounts; }});   // for the test scripts
   /* ---- reading the figures out of the text ---- */
   function nitroNum(s){ var v = parseFloat(String(s).replace(/\u2212/g, '-').replace(/[^0-9.\-]/g, '')); return isFinite(v) ? v : null; }
   /* text out of a PDF carries kerning breaks ("V anguard", "GP A") and letter-spaced headings ("A l l o c a t i o n") */

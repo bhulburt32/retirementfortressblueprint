@@ -1,6 +1,6 @@
 /* Section 17's year-by-year tax table: what makes up All income, how AGI is built, MAGI for IRMAA and provisional
    income for Social Security; the effective rate (tax / (all income + Roth conversion)); the Walls yield as ordinary
-   income; the 3.8% net investment income tax; the OBBBA senior deduction's phase-out per person; the Roth
+   income; the 3.8% net investment income tax; the OBBBA senior deduction's phase-out, once per return; the Roth
    conversion's IRMAA guard on MAGI (AGI + tax-exempt interest). Smith sample. */
 const { chromium } = (function(){ try { return require('playwright'); } catch(e){ return require('playwright-core'); } })();
 const path = require('path');
@@ -53,10 +53,10 @@ const path = require('path');
   console.log('footer:', T.heads.map((h,k)=>T.foot[k]?h+' '+T.foot[k]:null).filter(Boolean).join(' | '));
   if(T.foot[col('Federal tax')]==='' || T.foot[col('Fed. effective')]==='' || T.foot[col('All income')]==='') out.push('the footer totals should sit under Federal tax, Fed. effective and All income');
 
-  // 3. the OBBBA senior deduction: each person's $6,000 less 6% of AGI over $150,000 joint / $75,000 single
+  // 3. the OBBBA senior deduction: $6,000 a person, the total less 6% of AGI over $150,000 joint / $75,000 single (IRC 151(d)(5)(B): one reduction per return)
   const sen=await p.evaluate(()=>[[200000,2,'mfj'],[250000,2,'mfj'],[149000,2,'mfj'],[100000,1,'single'],[175000,1,'single']].map(([agi,n,st])=>[agi,n,st,Math.round(window.__rfb.fedTax(agi,0,0,n,st,1,2027,0).senior)]));
   console.log('senior deduction:', sen.map(s=>s[2]+' '+s[1]+'x65 AGI '+s[0]+': '+s[3]).join(' | '));
-  [[200000,6000],[250000,0],[149000,12000],[100000,4500],[175000,0]].forEach(([agi,want],k)=>{ if(sen[k][3]!==want) out.push('senior deduction at AGI '+agi+' should be '+want+' (got '+sen[k][3]+')'); });
+  [[200000,9000],[250000,6000],[149000,12000],[100000,4500],[175000,0]].forEach(([agi,want],k)=>{ if(sen[k][3]!==want) out.push('senior deduction at AGI '+agi+' should be '+want+' (got '+sen[k][3]+')'); });
   const s2029=await p.evaluate(()=>Math.round(window.__rfb.fedTax(100000,0,0,2,'mfj',1,2029,0).senior));
   if(s2029!==0) out.push('the senior deduction ends after 2028');
 
