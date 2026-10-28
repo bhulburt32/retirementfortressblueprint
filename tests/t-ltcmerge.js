@@ -11,6 +11,12 @@ const path = require('path');
   const rows=async()=>p.$$eval('#ltcBenBody tr[data-ltc]',rs=>rs.map(r=>({key:r.dataset.ltc,name:r.querySelector('td').textContent.replace(/\s+/g,' ').trim(),amt:r.querySelector('[data-lf=amt]').textContent,mo:r.querySelector('[data-lk=monthly]').placeholder,val:r.querySelector('[data-lk=monthly]').value})));
   console.log(JSON.stringify(await rows(),null,1));
   console.log('hint:', await txt('#ltcBenHint'));
+  // every contract row carries a Benefit period cell under that heading, with its unit
+  const hdr=await p.$$eval('#ltcBenTable thead th',ths=>ths.map(t=>t.textContent.trim()));
+  const col=hdr.findIndex(h=>/^Benefit period/.test(h));
+  const cells=await p.$$eval('#ltcBenBody tr[data-ltc]',rs=>rs.map(r=>{ const tds=r.querySelectorAll('td'); return Array.from(tds).map(td=>({inp:!!td.querySelector('[data-lk=years]'), ph:(td.querySelector('[data-lk=years]')||{}).placeholder, unit:(td.querySelector('small.sub')||{}).textContent})); }));
+  console.log('benefit period column', col, 'cells:', JSON.stringify(cells.map(c=>c[col])));
+  if(col<0 || cells.some(c=>!c[col] || !c[col].inp || c[col].unit!=='years' || c[col].ph!=='5.0')) errs.push('each LTC contract needs a Benefit period cell (years, default 5.0) under the Benefit period heading');
   // set Jane's monthly to 9,000 and check it sticks + reload
   const tr=(await p.$$('#ltcBenBody tr[data-ltc]'))[1]; const inp=await tr.$('[data-lk=monthly]'); await inp.click({clickCount:3}); await inp.type('9000'); await p.keyboard.press('Tab'); await p.waitForTimeout(600);
   console.log('after edit:', JSON.stringify((await rows())[1]));
