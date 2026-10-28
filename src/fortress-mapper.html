@@ -3762,7 +3762,11 @@
       <p>Below the map is where every account lands, plus assets under management and the advisory
         fee. The fee schedule is flat, not marginal — wherever the managed total falls, that band's
         rate applies to the whole balance. Billable assets are the Walls and Roof only; the cash
-        buffer, the Foundation annuity and the Moat contracts are out. The <b>weighted average</b>
+        buffer, the Foundation annuity and the Moat contracts are out, and so is any annuity or life
+        insurance of any kind wherever it sits: a contract marked <b>Stay as is</b> that the waterfall
+        places in the Walls or Roof, a section&nbsp;14 line sent to a contract in force as its To
+        account, or a line placed in a carrier's annuity or life product. Only money in managed
+        portfolios (AUM, cash, CDs) is billable; the fee note names the amount excluded. The <b>weighted average</b>
         spreads that same cost across every account the client holds &mdash; accounts held out of the
         plan included &mdash; which is the number a client will ask about.</p>
 
@@ -3807,7 +3811,11 @@
       <p>Below the map is where every account lands, plus assets under management and the advisory
         fee. The fee schedule is flat, not marginal — wherever the managed total falls, that band's
         rate applies to the whole balance. Billable assets are the Walls and Roof only; the cash
-        buffer, the Foundation annuity and the Moat contracts are out. The <b>weighted average</b>
+        buffer, the Foundation annuity and the Moat contracts are out, and so is any annuity or life
+        insurance of any kind wherever it sits: a contract marked <b>Stay as is</b> that the waterfall
+        places in the Walls or Roof, a section&nbsp;14 line sent to a contract in force as its To
+        account, or a line placed in a carrier's annuity or life product. Only money in managed
+        portfolios (AUM, cash, CDs) is billable; the fee note names the amount excluded. The <b>weighted average</b>
         spreads that same cost across every account the client holds &mdash; accounts held out of the
         plan included &mdash; which is the number a client will ask about.</p>
 
@@ -7337,8 +7345,32 @@
   var MANAGED_BUCKETS = ['walls','roof'];
   var UNMANAGED_POS   = {'Cash':1, 'MYGA Annuity':1, 'Variable Annuity':1, 'Income Annuity (FIA)':1, 'Growth Annuity (FIA)':1, 'RILA Annuity':1, 'Cash Value Life Insurance':1, 'LTC / Life':1};
 
+  /* Annuities and life insurance of any kind are never billable, wherever they sit in the levels: a contract marked
+     Stay as is that the waterfall places in the Walls or Roof, a line sent to a contract in force as its To account,
+     or a line placed in a carrier's annuity or life product. A line's product decides (AUM, cash and CDs are
+     managed money; anything named like a contract, or any product of an insurance carrier, is not); a line left at
+     TBD follows its carrier. */
+  var NON_INSURANCE_PRODUCTS = {'Checking/Savings':1, 'CD':1, 'Money Market':1, 'AUM':1, 'AUM - Tax Free':1};
+  function insuranceCarrier(cust){ var ps = CARRIER_PRODUCTS[String(cust || '').trim()]; return !!ps && ps.indexOf('AUM') < 0; }
+  function insuranceLine(L){
+    if(L.d && L.d.toAnn) return true;
+    var prod = String(L.prod || '').trim(), cust = String(L.cust || '').trim();
+    if(NON_INSURANCE_PRODUCTS[prod]) return false;
+    if(/annuit|\bmyga\b|\bfia\b|\brila\b|\bspia\b|\bdia\b|\blife\b|\biul\b|\bltc\b|long.term care|\bcare\b|whole life|universal/i.test(prod)) return true;
+    if(insuranceCarrier(cust)) return true;
+    return CARRIER_KEYS.some(function(k){ return insuranceCarrier(k) && CARRIER_PRODUCTS[k].indexOf(prod) >= 0; });
+  }
   function aumPlan(r){
-    var managed = MANAGED_BUCKETS.reduce(function(s, k){ return s + r.funded[k]; }, 0);
+    var lines = (adjMoves && typeof lineLedger === 'function') ? lineLedger(r).lines : [];
+    var managed = 0, insured = 0, heldWR = 0;
+    (r.moves || []).forEach(function(m){
+      if(MANAGED_BUCKETS.indexOf(m.bucket) < 0 || !(m.amt > 0.5) || !m.acct) return;
+      if(m.stay || m.acct.move === 'no'){ heldWR += m.amt; if(UNMANAGED_POS[m.acct.pos]) insured += m.amt; return; }   // held where it is: out of the billable base
+      var Ls = lines.filter(function(L){ return L.a && L.a.id === m.acct.id && L.m.bucket === m.bucket && L.eff > 0.5; });
+      var tot = Ls.reduce(function(a, L){ return a + L.eff; }, 0);
+      if(Ls.length && tot > 0.5) Ls.forEach(function(L){ var share = m.amt * L.eff / tot; if(insuranceLine(L)) insured += share; else managed += share; });
+      else managed += m.amt;
+    });
     var held = accounts.reduce(function(s, a){ return s + (a.move === 'no' ? a.val : heldPart(a)); }, 0);
     var current = accounts.reduce(function(s, a){
       return s + (UNMANAGED_POS[a.pos] ? 0 : a.val);
@@ -7360,7 +7392,7 @@
       managed:managed, current:current, total:total, feeBase:base,
       band:band, pct:band.pct, annual:annual,
       weighted: base > 0.5 ? annual / base : 0,
-      currentBand:feeBandFor(current), held:held
+      currentBand:feeBandFor(current), held:held, insured:insured, heldWR:heldWR
     };
   }
   function pctText(p){ return (p * 100).toFixed(2) + '%'; }
@@ -7394,6 +7426,7 @@
       +   money(r.funded.reserve) + ' liquidity buffer, the ' + money(r.funded.foundation)
       +   ' Foundation annuity and the ' + money(r.funded.moat) + ' Moat contract are excluded. '
       +   (f.held > 0.5 ? money(f.held) + ' marked <b>Stay as is</b> or held back from a partial transfer is also outside the billable base. ' : '')
+      +   (f.insured > 0.5 ? 'Annuity and life insurance money is never billable, wherever it sits: ' + money(f.insured) + ' in the Walls or Roof \u2014 a contract that stays as it is, a line sent to a contract in force, or a line placed in a carrier\u2019s annuity or life product \u2014 is excluded as well. ' : '')
       +   'The <b>weighted average</b> spreads that same cost across every account the client holds — '
       +   money(f.managed) + ' at ' + pctText(f.pct) + ' over ' + money(f.feeBase) + ' of total assets'
       +   (f.held > 0.5 ? ', the ' + money(f.held) + ' held out included' : '')
