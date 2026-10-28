@@ -290,6 +290,8 @@
   table.debt{min-width:960px}
   #annIncTable{min-width:1180px}
   #ltcBenTable{min-width:980px}
+  #ltcBenTable th small,#annIncTable th small{display:block;font-weight:400;text-transform:none;letter-spacing:0;font-size:11px}
+  #ltcBenTable td:first-child{min-width:220px}
   #roofGTable{min-width:820px}
   .adj-ann tr.grp-row td{background:var(--surface-2);padding:8px 12px;font-size:13px;color:var(--ink-2);border-top:2px solid var(--line-strong)}
   .adj-ann tr.grp-row td span{color:var(--muted);font-weight:400}
@@ -3039,7 +3041,7 @@
         <div class="inc-title gap">LTC benefits<small>One line for each contract in the Moat above &middot; blank follows the Moat sizing: the person&rsquo;s benefit over a 5-year benefit period, from age 80, no inflation</small></div>
         <div class="tbl-wrap" style="margin-top:10px">
           <table id="ltcBenTable" class="adj-ann">
-            <thead><tr><th>Contract</th><th class="num">Premium</th><th class="num">Monthly benefit</th><th class="num">At age</th><th class="num">Benefit period<small>Years &middot; months for an income doubler</small></th><th class="num">Inflation</th><th class="num">Growth<small>Contract value</small></th><th>Continues after value is zero<small>Income doubler</small></th></tr></thead>
+            <thead><tr><th>Contract</th><th class="num">Premium</th><th class="num">Monthly benefit</th><th class="num">At age</th><th class="num">Benefit period<small>years &middot; months for a doubler</small></th><th class="num">Inflation</th><th class="num">Growth<small>Contract value</small></th><th>Continues after value is zero<small>Income doubler</small></th></tr></thead>
             <tbody id="ltcBenBody"></tbody>
           </table>
         </div>
@@ -12459,7 +12461,7 @@
           + '<td class="num" data-lf="amt"></td>'
           + '<td class="num"><input class="num" inputmode="numeric" data-lk="monthly" autocomplete="off" title="Monthly benefit at the age below"></td>'
           + '<td class="num"><input class="num" inputmode="numeric" data-lk="age" placeholder="80" autocomplete="off" title="The age the monthly benefit is quoted at"></td>'
-          + '<td class="num"><input class="num" inputmode="decimal" data-lk="years" autocomplete="off" title="Benefit period in years"></td>'
+          + '<td class="num"><input class="num" inputmode="decimal" data-lk="years" autocomplete="off" title="Benefit period in years \u2014 blank follows the 5-year default"><small class="sub">years</small></td>'
           + '<td class="num"><input class="num" inputmode="decimal" data-lk="infl" placeholder="0.0%" autocomplete="off" title="Annual increase in the monthly benefit after that age"></td>'
           + '<td class="num"><input class="num" inputmode="decimal" data-lk="growth" placeholder="3.0%" autocomplete="off" title="Annual growth of the contract\u2019s value in the projections (3% unless set)"></td><td class="num">\u2014</td></tr>';
       }).join('') + dsRows;
