@@ -1767,11 +1767,15 @@
         share of the year's tax in proportion to its income (the rest was withheld before the
         plan), and any Roth conversion in that year is taxed at the margin on top of the full
         year's income &mdash; so the converter sees the real headroom, not a quarter-year's. The
-        state tax is figured the same way. Social Security that was already in payment is
-        annualized too: the section&nbsp;17 table's first row shows the benefit received since the
-        plan date with the earlier months noted beneath, and <b>Taxable SS</b> is the taxable share
-        of the whole year's benefit (noted as &ldquo;of $X for the year&rdquo;), so it can exceed the
-        months shown. The assumptions notes under the projections say which month the plan runs from.</p>
+        state tax is figured the same way. The section&nbsp;17 tax table's first row is on that
+        calendar-year basis: wages, Social Security, pensions, annuity and other income already in
+        payment show the whole year's amount with the part before the plan date noted beneath, and
+        <b>Taxable SS</b> is the taxable share of the whole year's benefit (&ldquo;of $X for the
+        year&rdquo;). The months before the plan date also drew on the accounts &mdash; the household
+        lived on something, and the balances in section&nbsp;06 are already net of it &mdash; so for
+        that year's tax base those draws are taken at the plan window's own pace (an IRA draw as
+        ordinary income, a taxable-account draw as gain), noted under Withdrawals; nothing moves in
+        the cash flow. The assumptions notes under the projections say which month the plan runs from.</p>
 
       <p>Beneath the budget sits the <b>Income Gap</b> chart: every source of income as it stands
         today &mdash; salaries to each retirement date, Social Security, pensions, annuity and other
@@ -10619,12 +10623,17 @@
       var PRE = (t === 0 && row.pre) ? row.pre : null, pplAges = alive.map(function(w){ return {age:ages[w]}; });
       var preOrd = PRE ? PRE.emp + PRE.pen + (PRE.annTax != null ? PRE.annTax : PRE.ann) + PRE.ng : 0, preSS = PRE ? PRE.ss : 0;
       var cpObj = function(o){ var k, c = {}; for(k in o) c[k] = o[k]; return c; };
-      var fedT = function(ord, cg, ss, conv, nii){
-        conv = conv || 0;
-        var x = fedTax(ord + preOrd, cg, ss + preSS, ages65, fs, g, calYear, wallsExempt);
+      /* The months before the plan date also drew on the accounts — the household lived on something — and the
+         balances in section 06 are already net of it. For the first year's tax base only, those draws are taken at
+         the plan window's own pace (k0: months before the plan date over months in the window): the IRA draws as
+         ordinary income, the taxable-account draws as gains at this year's gain share. Nothing moves in the cash flow. */
+      var k0 = (PRE && P.frac0 > 0.01) ? (1 - P.frac0) / P.frac0 : 0, NO_XTRA = {ord:0, cg:0, taxable:0, deferred:0};
+      var fedT = function(ord, cg, ss, conv, nii, xtra){
+        conv = conv || 0; xtra = xtra || NO_XTRA;
+        var x = fedTax(ord + preOrd + xtra.ord, cg + xtra.cg, ss + preSS, ages65, fs, g, calYear, wallsExempt);
         if(PRE){
-          var noConv = conv > 0.5 ? fedTax(ord - conv + preOrd, cg, ss + preSS, ages65, fs, g, calYear, wallsExempt) : x;
-          var planInc = Math.max(0, ord - conv) + cg + ss, share = (planInc + preOrd + preSS) > 0.5 ? planInc / (planInc + preOrd + preSS) : 1;
+          var noConv = conv > 0.5 ? fedTax(ord - conv + preOrd + xtra.ord, cg + xtra.cg, ss + preSS, ages65, fs, g, calYear, wallsExempt) : x;
+          var planInc = Math.max(0, ord - conv) + cg + ss, preAll = preOrd + preSS + xtra.ord + xtra.cg, share = (planInc + preAll) > 0.5 ? planInc / (planInc + preAll) : 1;
           x = cpObj(x); x.tax = Math.max(0, noConv.tax * share + (x.tax - noConv.tax));
         } else x = cpObj(x);
         x.nii = Math.max(0, nii || 0);
@@ -10632,13 +10641,13 @@
         x.tax += x.niit;
         return x;
       };
-      var stT = function(parts, conv){
-        conv = conv || 0;
+      var stT = function(parts, conv, xtra){
+        conv = conv || 0; xtra = xtra || NO_XTRA;
         if(!PRE) return stateTax(stateCode, parts, pplAges, fs, g);
-        var p2 = cpObj(parts); p2.wages += PRE.emp + PRE.ng; p2.pension += PRE.pen; p2.retirement += PRE.pen + PRE.ann; p2.gross += preOrd + preSS;
+        var p2 = cpObj(parts); p2.wages += PRE.emp + PRE.ng; p2.pension += PRE.pen; p2.retirement += PRE.pen + PRE.ann + xtra.ord; p2.gains += xtra.cg; p2.gross += preOrd + preSS + xtra.ord + xtra.cg;
         var full = cpObj(stateTax(stateCode, p2, pplAges, fs, g)), noConv = full;
         if(conv > 0.5){ var p3 = cpObj(p2); p3.retirement -= conv; p3.gross -= conv; noConv = stateTax(stateCode, p3, pplAges, fs, g); }
-        var planInc = Math.max(0, parts.gross), share = (planInc + preOrd + preSS) > 0.5 ? planInc / (planInc + preOrd + preSS) : 1;   // gross is the plan window's income without the conversion
+        var preAll = preOrd + preSS + xtra.ord + xtra.cg, planInc = Math.max(0, parts.gross), share = (planInc + preAll) > 0.5 ? planInc / (planInc + preAll) : 1;   // gross is the plan window's income without the conversion
         full.tax = Math.max(0, noConv.tax * share + (full.tax - noConv.tax));
         return full;
       };
@@ -10674,6 +10683,15 @@
       var extraCash = (QC && QC.mode === 'cash' && !QC.inBudget) ? gift : 0;
       var snap = JSON.parse(JSON.stringify(bal));
       var txBal0 = sum3(snap.taxable), gainFrac = !BASIS ? TAXABLE_GAIN_SHARE : (txBal0 > 0.5 ? Math.max(0, Math.min(1, 1 - basisT / txBal0)) : 0);   // the share of a taxable withdrawal that is gain this year
+      /* the first year's draws before the plan date: what the months before the plan spent beyond the income they had
+         (the plan window's spending at the same pace, less the pre-plan wages, benefits, pensions and other income), split
+         between taxable and tax-deferred money as the plan window's own draws are */
+      var preInc = PRE ? PRE.emp + PRE.ss + PRE.pen + PRE.ann + PRE.ng : 0;
+      var preWdOf = function(w){
+        if(!(k0 > 0)) return NO_XTRA;
+        var short = Math.max(0, spend * k0 - preInc), tot = w.taxable + w.deferred, fT = tot > 0.5 ? w.taxable / tot : (wdOrder[0] === 'deferred' ? 0 : 1);
+        return {taxable:short * fT, deferred:short * (1 - fT), ord:short * (1 - fT), cg:short * fT * gainFrac};
+      };
       /* One year with a Roth conversion of C: convert first (Roof then Walls, or
          Walls then Roof), then draw whatever Needs, Wants and the tax need in the
          withdrawal order, iterating until the tax settles. */
@@ -10706,13 +10724,13 @@
           /* RMD money not needed for spending and tax is reinvested, after tax, in the after-tax Roof account */
           var rmdSpare = Math.max(0, rmdExcess + freedCash - Math.max(0, spend + tax0 + pay - (income - rmdExcess)));
           bb.taxable.r += rmdSpare; spare0 = rmdSpare;
-          tx0 = fedT(ordBase + wd0.deferred + cv.amt, wd0.taxable * gainFrac, row.ss, cv.amt, niiBase + wd0.taxable * gainFrac);
+          tx0 = fedT(ordBase + wd0.deferred + cv.amt, wd0.taxable * gainFrac, row.ss, cv.amt, niiBase + wd0.taxable * gainFrac, preWdOf(wd0));
           var pen0 = 0; ['client','spouse'].forEach(function(o){ if(wdDef0[o] > 0.5 && t595[o] != null) pen0 += wdDef0[o] * penShare(o, t) * EARLY_WD_PENALTY; });   // the early-withdrawal penalty, part of the tax the draw covers
           if(pen0 > 0.005){ tx0 = cpObj(tx0); tx0.penalty = pen0; tx0.tax += pen0; } else { tx0 = cpObj(tx0); tx0.penalty = 0; }
           /* the draw covers state income tax as well as federal, so the year's cash flow closes */
           var st0 = stT({wages:row.emp - seDed + (row.rothWages || 0) + row.ng, gains:wallsNQy + wd0.taxable * gainFrac, pension:row.pen,
                      retirement:row.pen + annOrd + sleeveOrd + wallsOrd + rmdExcess + wd0.deferred + cv.amt, ssFederal:tx0.ssTaxable,
-                     gross:income + wd0.taxable + wd0.deferred + wd0.roth}, cv.amt);
+                     gross:income + wd0.taxable + wd0.deferred + wd0.roth}, cv.amt, preWdOf(wd0));
           var tot0 = tx0.tax + st0.tax;
           if(Math.abs(tot0 - tax0) < 0.05){ tax0 = tot0; break; }
           tax0 = tot0;
@@ -10777,7 +10795,7 @@
       }
       if(cvInfo && cvInfo.amt > 0.5){
         var stB = stT({wages:stParts.wages, gains:wallsNQy + base.wd.taxable * gainFrac, pension:row.pen,
-          retirement:row.pen + annOrd + sleeveOrd + wallsOrd + rmdExcess + base.wd.deferred, ssFederal:base.tx.ssTaxable, gross:income + base.wd.taxable + base.wd.deferred + base.wd.roth});
+          retirement:row.pen + annOrd + sleeveOrd + wallsOrd + rmdExcess + base.wd.deferred, ssFederal:base.tx.ssTaxable, gross:income + base.wd.taxable + base.wd.deferred + base.wd.roth}, 0, preWdOf(base.wd));
         cvInfo.stateTax = st.tax - stB.tax; cvInfo.tax = cvInfo.fedTax + cvInfo.stateTax; convTax += cvInfo.tax;
       }
       lifetime += tx.tax; lifetimeGross += gross; lifetimeState += st.tax; lifetimePenalty += tx.penalty || 0; lifetimePayroll += pay;
@@ -10787,9 +10805,10 @@
          MAGI for IRMAA adds tax-exempt interest; provisional income for Social Security is AGI before benefits + exempt + half. */
       var cvAmt = cvInfo ? cvInfo.amt : 0, agiCG = wd.taxable * gainFrac, effBase = gross + cvAmt;   // the effective rates: tax over all income plus the year's Roth conversion
       var incParts = {emp:row.emp, ss:row.ss, pen:row.pen, ann:row.ann + row.sleeve, walls:row.wallsYield, ng:row.ng, rmd:rmdExcess, wdTaxable:wd.taxable, wdDeferred:wd.deferred, wdRoth:wd.roth};
-      var agiParts = {ord:ordBase + wd.deferred, pre:preOrd, conv:cvAmt, cg:agiCG, ss:tx.ssTaxable};
+      var preWd = preWdOf(wd), preParts = PRE ? {emp:PRE.emp, ss:PRE.ss, pen:PRE.pen, ann:PRE.ann, ng:PRE.ng, wdTaxable:preWd.taxable, wdDeferred:preWd.deferred, cg:preWd.cg, ord:preOrd + preWd.ord} : null;   // the first calendar year before the plan date
+      var agiParts = {ord:ordBase + wd.deferred, pre:preOrd + preWd.ord, conv:cvAmt, cg:agiCG + preWd.cg, ss:tx.ssTaxable};
       out.push({t:t, year:calYear, ages:row.ages, status:fs, alive:alive.slice(), gross:gross, ss:row.ss, ssTaxable:tx.ssTaxable, agi:tx.agi, deductions:tx.deductions, senior:tx.senior,
-                incParts:incParts, agiParts:agiParts, gainFrac:gainFrac, basis:BASIS ? basisT : null, exempt:wallsExempt, magi:tx.agi + wallsExempt, prov:tx.prov, preSS:preSS,
+                incParts:incParts, agiParts:agiParts, preParts:preParts, gainFrac:gainFrac, basis:BASIS ? basisT : null, exempt:wallsExempt, magi:tx.agi + wallsExempt, prov:tx.prov, preSS:preSS,
                 taxable:tx.taxable, ordTaxable:tx.ordTaxable, cgTaxable:tx.cgTaxable, tax:tx.tax, penalty:tx.penalty || 0, marginal:tx.marginal,
                 effective: effBase > 0.5 ? tx.tax / effBase : 0, effBase:effBase, nii:tx.nii || 0, niit:tx.niit || 0, rmd:rmd, rmdExcess:rmdExcess, qcd:qcd, qcdBy:qcdBy, gift:gift, wd:wd, unfunded:unfunded, ages65:ages65,
                 stateTax:st.tax, stateTaxable:st.taxable, stateRate:st.rate, stateEffective: effBase > 0.5 ? st.tax / effBase : 0,
@@ -11823,6 +11842,11 @@
     var any = function(f){ return rows.some(function(x){ return f(x) > 0.5; }); };
     var sumOf = function(f){ return rows.reduce(function(a, x){ return a + (f(x) || 0); }, 0); };
     var IP = function(k){ return function(x){ return (x.incParts || {})[k] || 0; }; }, AP = function(k){ return function(x){ return (x.agiParts || {})[k] || 0; }; };
+    /* the first calendar year: the plan window's figure plus what came before the plan date, noted beneath */
+    var PP = function(x, k){ return x.preParts ? (x.preParts[k] || 0) : 0; }, IPy = function(k){ return function(x){ return IP(k)(x) + PP(x, k); }; };
+    var preNote = function(v, what){ return v > 0.5 ? '<small class="sub">incl. ' + money(v) + ' ' + (what || 'before the plan date') + '</small>' : ''; };
+    var incCell = function(k){ return function(x){ return dash(IPy(k)(x)) + preNote(PP(x, k)); }; };
+    var preAll = function(x){ return ['emp','ss','pen','ann','ng','wdTaxable','wdDeferred'].reduce(function(a, k){ return a + PP(x, k); }, 0); };
     var wdAll = function(x){ return x.wd.taxable + x.wd.deferred + x.wd.roth; };
     var hasSS = function(x){ return (x.ss + (x.preSS || 0)) > 0.5; };
     var C = function(g, h, sub, cell, tot, o){ o = o || {}; return {g:g, h:h, sub:sub, cell:cell, tot:tot, bold:o.bold, show:o.show == null ? true : o.show, sep:o.sep}; };
@@ -11830,19 +11854,18 @@
     var cols = [
       C('', 'Year', '', function(x){ return String(x.year); }, function(){ return 'Total'; }),
       C('', 'Age' + (X0.ppl.length > 1 ? 's' : ''), '', function(x){ return x.ages.join(' / '); }, null),
-      C('inc', 'Wages', 'after retirement-plan deferrals', money0(IP('emp')), sumT(IP('emp')), {show:any(IP('emp')), sep:true}),
-      C('inc', 'Social Security', '', function(x){ return dash(IP('ss')(x)) + (x.preSS > 0.5 ? '<small class="sub">+ ' + money(x.preSS) + ' earlier this year</small>' : ''); }, sumT(IP('ss')), {show:any(IP('ss')) || rows.some(function(x){ return x.preSS > 0.5; })}),
-      C('inc', 'Pensions', '', money0(IP('pen')), sumT(IP('pen')), {show:any(IP('pen'))}),
-      C('inc', 'Annuities', 'in force + the Foundation annuity', money0(IP('ann')), sumT(IP('ann')), {show:any(IP('ann'))}),
+      C('inc', 'Wages', 'after retirement-plan deferrals', incCell('emp'), sumT(IPy('emp')), {show:any(IPy('emp')), sep:true}),
+      C('inc', 'Social Security', '', incCell('ss'), sumT(IPy('ss')), {show:any(IPy('ss'))}),
+      C('inc', 'Pensions', '', incCell('pen'), sumT(IPy('pen')), {show:any(IPy('pen'))}),
+      C('inc', 'Annuities', 'in force + the Foundation annuity', incCell('ann'), sumT(IPy('ann')), {show:any(IPy('ann'))}),
       C('inc', 'Walls yield', '', money0(IP('walls')), sumT(IP('walls')), {show:any(IP('walls'))}),
-      C('inc', 'Other income', 'non-guaranteed', money0(IP('ng')), sumT(IP('ng')), {show:any(IP('ng'))}),
+      C('inc', 'Other income', 'non-guaranteed', incCell('ng'), sumT(IPy('ng')), {show:any(IPy('ng'))}),
       C('inc', 'RMD drawn', 'beyond the Walls yield', money0(IP('rmd')), sumT(IP('rmd')), {show:any(IP('rmd'))}),
-      C('inc', 'Withdrawals', 'taxable / deferred / Roth', function(x){ return wdAll(x) > 0.5 ? money(x.wd.taxable) + ' / ' + money(x.wd.deferred) + ' / ' + money(x.wd.roth) : '—'; }, function(){ return money(sumOf(wdAll)); }, {show:any(wdAll)}),
-      C('inc', 'All income', 'the sum, as paid in', function(x){ return money(x.gross); }, function(){ return money(X0.lifetimeGross); }, {bold:true}),
-      C('agi', 'Ordinary income', 'taxable wages, pensions, annuities, Walls yield and IRA money', money0(AP('ord')), sumT(AP('ord')), {sep:true}),
-      C('agi', 'Earlier this year', 'wages, pensions, annuities and other income before the plan date; Social Security in its own row', money0(AP('pre')), sumT(AP('pre')), {show:any(AP('pre'))}),
+      C('inc', 'Withdrawals', 'taxable / deferred / Roth', function(x){ var pw = PP(x, 'wdTaxable') + PP(x, 'wdDeferred'); return (wdAll(x) > 0.5 ? money(x.wd.taxable) + ' / ' + money(x.wd.deferred) + ' / ' + money(x.wd.roth) : '—') + (pw > 0.5 ? '<small class="sub">+ ' + money(PP(x, 'wdTaxable')) + ' / ' + money(PP(x, 'wdDeferred')) + ' before the plan date, at the plan\u2019s pace</small>' : ''); }, function(){ return money(sumOf(wdAll)); }, {show:any(wdAll)}),
+      C('inc', 'All income', 'the sum, as paid in', function(x){ return money(x.gross + preAll(x)) + preNote(preAll(x)); }, function(){ return money(X0.lifetimeGross + sumOf(preAll)); }, {bold:true}),
+      C('agi', 'Ordinary income', 'taxable wages, pensions, annuities, Walls yield and IRA money', function(x){ return dash(AP('ord')(x) + AP('pre')(x)) + preNote(AP('pre')(x)); }, sumT(function(x){ return AP('ord')(x) + AP('pre')(x); }), {sep:true}),
       C('agi', 'Roth conversion', '', money0(AP('conv')), sumT(AP('conv')), {show:any(AP('conv'))}),
-      C('agi', 'Capital gains', basisOn() ? 'taxable withdrawals above cost basis, long-term' : Math.round(TAXABLE_GAIN_SHARE * 100) + '% of taxable withdrawals, long-term', money0(AP('cg')), sumT(AP('cg')), {show:any(AP('cg'))}),
+      C('agi', 'Capital gains', basisOn() ? 'taxable withdrawals above cost basis, long-term' : Math.round(TAXABLE_GAIN_SHARE * 100) + '% of taxable withdrawals, long-term', function(x){ return dash(AP('cg')(x)) + preNote(PP(x, 'cg')); }, sumT(AP('cg')), {show:any(AP('cg'))}),
       C('agi', 'Taxable SS', '', function(x){ return hasSS(x) ? money(x.ssTaxable) + (x.preSS > 0.5 ? '<small class="sub">of ' + money(x.ss + x.preSS) + ' for the year</small>' : '') : '—'; }, sumT(AP('ss')), {show:rows.some(hasSS)}),
       C('agi', 'AGI', 'the sum', function(x){ return money(x.agi); }, sumT(function(x){ return x.agi; }), {bold:true}),
       C('tst', 'Tax-exempt interest', 'AUM - Tax Free Walls yield', money0(function(x){ return x.exempt; }), sumT(function(x){ return x.exempt; }), {show:any(function(x){ return x.exempt; }), sep:true}),

@@ -14,7 +14,7 @@ const path = require('path');
   const out=[];
   const num=s=>{ const v=String(s).replace(/[^0-9.\-]/g,''); return v===''||v==='-'? NaN : +v; };
   const rowsOf=async()=>p.evaluate(()=>window.__rfb.taxLast().rows.map(x=>({year:x.year, gross:x.gross, agi:x.agi, tax:x.tax, eff:x.effective, inc:x.incParts, ap:x.agiParts,
-    exempt:x.exempt, magi:x.magi, prov:x.prov, ss:x.ss, preSS:x.preSS, ssTaxable:x.ssTaxable, conv:x.conv ? x.conv.amt : 0, nii:x.nii, niit:x.niit, gf:x.gainFrac, status:window.__rfb.taxLast().status})));
+    exempt:x.exempt, magi:x.magi, prov:x.prov, ss:x.ss, preSS:x.preSS, ssTaxable:x.ssTaxable, conv:x.conv ? x.conv.amt : 0, nii:x.nii, niit:x.niit, gf:x.gainFrac, pcg:(x.preParts && x.preParts.cg) || 0, status:window.__rfb.taxLast().status})));
   const check=(R,label)=>{
     let bad=0;
     R.forEach(x=>{
@@ -25,7 +25,7 @@ const path = require('path');
       if(Math.abs(x.magi-(x.agi+x.exempt))>0.5){ bad++; out.push(label+' '+x.year+': MAGI should be AGI + tax-exempt interest'); }
       if((x.ss+(x.preSS||0))>0.5 && Math.abs(x.prov-prov)>0.5){ bad++; out.push(label+' '+x.year+': provisional '+Math.round(x.prov)+' vs '+Math.round(prov)); }
       const base=x.gross+x.conv; if(base>0.5 && Math.abs(x.eff-x.tax/base)>1e-9){ bad++; out.push(label+' '+x.year+': effective should be tax / (all income + conversion)'); }
-      if(Math.abs(x.ap.cg-x.gf*x.inc.wdTaxable)>0.5){ bad++; out.push(label+' '+x.year+': capital gains should be the taxable withdrawals times the gain share only (the Walls yield is ordinary income)'); }
+      if(Math.abs(x.ap.cg-(x.gf*x.inc.wdTaxable+x.pcg))>0.5){ bad++; out.push(label+' '+x.year+': capital gains should be the taxable withdrawals times the gain share (plus the first year’s pre-plan draws) only (the Walls yield is ordinary income)'); }
       const niit=0.038*Math.max(0,Math.min(x.nii,x.agi-(x.status==='mfj'?250000:200000))); if(Math.abs(niit-x.niit)>0.5){ bad++; out.push(label+' '+x.year+': NIIT '+Math.round(x.niit)+' should be '+Math.round(niit)); }
     });
     return bad;
